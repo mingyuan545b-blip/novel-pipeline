@@ -1,6 +1,35 @@
 const { getDatabase, getTableForType, safeParse, extractMaterialFields, extractChapterFields, extractProjectFields, extractKvFields, scheduleSave, DEDICATED_TABLES, queryAll, queryOne, runSql, queryMaterialsByProject: queryMaterialsByProjectDB, queryChaptersByProject: queryChaptersByProjectDB, queryKvByType, countItemsByType } = require('./database');
 const { STORE_SIZE_LIMITS, STORE_DEFAULT_MAX_SIZE, STORE_TRIMMING } = require('../config/systemConfig');
 const { CRAFT_TYPES } = require('../config/materialTypes');
+const logger = require('../shared/logger');
+
+const _writeLocks = new Map();
+
+async function acquireLock(type, id) {
+    const key = `${type}:${id}`;
+    const maxWaitMs = 15000;
+    const start = Date.now();
+    while (true) {
+        const holder = _writeLocks.get(key);
+        if (!holder) break;
+        if (Date.now() - holder.time > 10000) {
+            _writeLocks.delete(key);
+            logger.warn('store', `Lock stale, force breaking: ${key}`);
+            break;
+        }
+        if (Date.now() - start > maxWaitMs) {
+            _writeLocks.delete(key);
+            logger.warn('store', `Lock wait timeout: ${key}`);
+            break;
+        }
+        await new Promise(r => setTimeout(r, 50));
+    }
+    _writeLocks.set(key, { time: Date.now() });
+}
+
+function releaseLock(type, id) {
+    _writeLocks.delete(`${type}:${id}`);
+}
 
 function trimItemData(type, data) {
     const maxSize = STORE_SIZE_LIMITS[type] || STORE_DEFAULT_MAX_SIZE;
@@ -77,23 +106,25 @@ function getItem(type, id) {
     return safeParse(row.data);
 }
 
-function setItem(type, id, data) {
-    const db = getDatabase();
-    const table = getTableForType(type);
-
-    data = trimItemData(type, { ...data });
-    if (!data.id) data.id = id;
-
-    const now = new Date().toISOString();
-    const existing = getItem(type, id);
-    if (existing && existing.createdAt) {
-        data.createdAt = existing.createdAt;
-    } else if (!data.createdAt) {
-        data.createdAt = now;
-    }
-    data.updatedAt = now;
-
+async function setItem(type, id, data) {
+    await acquireLock(type, id);
     try {
+        const db = getDatabase();
+        const table = getTableForType(type);
+
+        data = trimItemData(type, { ...data });
+        if (!data.id) data.id = id;
+
+        const now = new Date().toISOString();
+        const existing = getItem(type, id);
+        if (existing && existing.createdAt) {
+            data.createdAt = existing.createdAt;
+        } else if (!data.createdAt) {
+            data.createdAt = now;
+        }
+        data.updatedAt = now;
+
+        try {
         if (table === 'materials') {
             const f = extractMaterialFields(data);
             const existing = queryOne(db, 'SELECT id FROM materials WHERE id = ?', [id]);
@@ -143,13 +174,18 @@ function setItem(type, id, data) {
     }
 
     return data;
+    } finally {
+        releaseLock(type, id);
+    }
 }
 
-function deleteItem(type, id) {
+async function deleteItem(type, id) {
+    await acquireLock(type, id);
+    try {
     if (type === 'materials') {
         const item = getItem(type, id);
         if (item && isFoundationMaterial(item)) {
-            console.warn(`[STORE] Blocked deletion of foundation material: ${id} (${item.name})`);
+            logger.warn('store', `Blocked deletion of foundation material: ${id} (${item.name})`);
             return false;
         }
     }
@@ -181,6 +217,9 @@ function deleteItem(type, id) {
     } catch (err) {
         console.error(`[STORE] SQLite delete error for ${type}/${id}:`, err.message);
         return false;
+    }
+    } finally {
+        releaseLock(type, id);
     }
 }
 

@@ -28,6 +28,7 @@ const promptConfigRoutes = require('./routes/prompt-config');
 const optimizerRoutes = require('./routes/optimizer');
 const chapterAuditRoutes = require('./routes/chapterAudit');
 const flavorRoutes = require('./routes/flavors');
+const { errorHandler } = require('./middleware/errorHandler');
 const store = require('./store');
 
 const app = express();
@@ -280,14 +281,7 @@ if (fs.existsSync(clientDistPath)) {
     });
 }
 
-app.use((err, req, res, next) => {
-    console.error('[SERVER ERROR]', err.stack || err.message || err);
-    const isDev = process.env.NODE_ENV !== 'production';
-    res.status(500).json({
-        error: isDev ? (err.message || 'Internal Server Error') : 'Internal Server Error',
-        ...(isDev && err.stack ? { stack: err.stack.split('\n').slice(0, 5).join('\n') } : {})
-    });
-});
+app.use(errorHandler);
 
 store.ensureBackend().then(() => {
     const { runStartupChecks } = require('./services/startupChecks');
