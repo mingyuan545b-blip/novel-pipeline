@@ -1,0 +1,17 @@
+{
+  "id": "704a2a0d-d369-48bf-8e43-bb9262909b6c",
+  "projectId": "d367c98e-f5fa-4794-83e9-415ef553d6b8",
+  "type": "equipment",
+  "name": "回音石",
+  "description": "探索遗迹获得·短暂恢复一感",
+  "initialContent": "获取方式：在沉默之域遗迹中探索发现\n功能：使用后短暂恢复一种感官（约一刻钟）\n限制：每块回音石只能使用一次\n受主世界修为天花板压制：恢复时间随修为差距缩短",
+  "currentContent": "获取方式：在沉默之域遗迹中探索发现\n功能：使用后短暂恢复一种感官（约一刻钟）\n限制：每块回音石只能使用一次\n受主世界修为天花板压制：恢复时间随修为差距缩短",
+  "parentPlane": "a313659b-88c0-46e0-9d71-d67a35f76c18",
+  "isLocked": false,
+  "isFoundation": false,
+  "tags": [],
+  "version": 1,
+  "changeLog": [],
+  "createdAt": "2026-05-11T11:45:06.097Z",
+  "updatedAt": "2026-05-11T11:45:06.097Z"
+}

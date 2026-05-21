@@ -1,0 +1,234 @@
+{
+  "id": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "name": "位面掠夺·万界归墟",
+  "description": "100万字目标·番茄平台适配·12卷360章·每卷一个次位面副本·反套路搞笑风格",
+  "genre": "high-martial-crossplane",
+  "mode": "tomato-short",
+  "targetChapters": 100,
+  "targetWordCount": 0,
+  "currentChapter": 0,
+  "status": "draft",
+  "styleProfile": {
+    "key": "high-martial-crossplane",
+    "label": "主位面高武·反套路喜剧",
+    "povRule": "第三人称限制视角，男主视角为主",
+    "dialogueRule": "对话需体现角色性格，男主说话抽象但应景，禁止AI腔",
+    "behaviorRule": "行为需符合人设，男主谨小慎微但关键时刻果断",
+    "toneRule": "搞笑反套路，系统反套路化呈现，金句应景不烂梗",
+    "titleRule": "章节标题需有悬念感或反差感，禁止流水账式标题",
+    "reviewFocus": "战力一致性、次位面隔离性、角色性格一致性、反AI痕迹",
+    "materialFocus": "战力体系、次位面素材、角色关系"
+  },
+  "settings": {
+    "autoPipeline": false,
+    "chapterRounds": 2
+  },
+  "styleTemplateId": "",
+  "constraints": [
+    "no-derailment",
+    "character-consistency",
+    "worldview-consistency",
+    "hook-every-chapter",
+    "fast-escalation",
+    "reader-satisfaction",
+    "tomato-metrics"
+  ],
+  "chapters": [],
+  "chapterIntents": {
+    "chapters": []
+  },
+  "hookBudget": {
+    "hooks": [],
+    "lastUpdated": null
+  },
+  "createdAt": "2026-05-11T15:04:10.310Z",
+  "updatedAt": "2026-05-11T15:04:10.310Z",
+  "ruleStack": {
+    "rules": [
+      {
+        "id": "R001",
+        "layer": "L1",
+        "layerName": "hard_facts",
+        "precedence": 100,
+        "scope": "global",
+        "category": "hard",
+        "content": "[法家·律令天宪体系] 禁止/威慑/约束/裁决/审判/制裁/封禁/天宪）",
+        "source": "素材:法家·律令天宪体系",
+        "active": true,
+        "createdAt": "2026-05-11T15:16:18.114Z"
+      }
+    ],
+    "activeOverrides": [],
+    "version": 2,
+    "lastUpdated": "2026-05-11T15:16:18.114Z"
+  },
+  "contextTraces": {
+    "chapters": {
+      "chapter-0001": {
+        "chapter": 1,
+        "timestamp": "2026-05-11T15:39:49.249Z",
+        "plannerInputs": [
+          "chapter-outline",
+          "previous-chapter",
+          "hook-budget",
+          "rule-stack",
+          "core-materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "hook-agenda",
+          "rule-stack",
+          "core-characters",
+          "worldview-rules"
+        ],
+        "composerInputs": [],
+        "notes": [
+          "Intent generated for chapter 1"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": null,
+        "hookBudgetSnapshot": null
+      },
+      "chapter-0002": {
+        "chapter": 2,
+        "timestamp": "2026-05-12T04:20:04.950Z",
+        "plannerInputs": [
+          "chapter-outline",
+          "previous-chapter",
+          "hook-budget",
+          "rule-stack",
+          "core-materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "hook-agenda",
+          "rule-stack",
+          "core-characters",
+          "worldview-rules"
+        ],
+        "composerInputs": [],
+        "notes": [
+          "Intent generated for chapter 2"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": null,
+        "hookBudgetSnapshot": null
+      }
+    }
+  },
+  "_pipeline_metrics": {
+    "agentTimings": {
+      "writer": {
+        "calls": 7,
+        "totalMs": 1071265,
+        "avgMs": 153038,
+        "maxMs": 175558,
+        "totalTokens": 105001
+      },
+      "fast-review": {
+        "calls": 6,
+        "totalMs": 495808,
+        "avgMs": 82635,
+        "maxMs": 101685,
+        "totalTokens": 51279
+      },
+      "final-editor": {
+        "calls": 1,
+        "totalMs": 68552,
+        "avgMs": 68552,
+        "maxMs": 68552,
+        "totalTokens": 7487
+      },
+      "material-manager": {
+        "calls": 3,
+        "totalMs": 307371,
+        "avgMs": 102457,
+        "maxMs": 116744,
+        "totalTokens": 37572
+      }
+    },
+    "reviewPassRates": {},
+    "tokenUsage": {},
+    "chapterDurations": [],
+    "errorCounts": {},
+    "agentPassRates": {
+      "fast-review": {
+        "total": 6,
+        "passed": 1,
+        "failChapters": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ]
+      },
+      "final-editor": {
+        "total": 1,
+        "passed": 1,
+        "failChapters": []
+      }
+    },
+    "reviserLoops": [],
+    "hookResolutionLog": [],
+    "materialAddedLog": [
+      {
+        "chapterNumber": 1,
+        "materialType": "sub-plane",
+        "materialName": "镜楼·规则怪谈世界",
+        "action": "update",
+        "timestamp": "2026-05-11T15:46:23.078Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "镜楼·3楼引路者·老周",
+        "action": "update",
+        "timestamp": "2026-05-11T15:46:23.081Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "mechanism",
+        "materialName": "系统·反套路化呈现规范",
+        "action": "update",
+        "timestamp": "2026-05-11T15:46:23.084Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "沈墨辞",
+        "action": "update",
+        "timestamp": "2026-05-11T15:53:40.828Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "老周",
+        "action": "create",
+        "timestamp": "2026-05-11T15:53:40.833Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "worldview",
+        "materialName": "镜楼·三层规则",
+        "action": "create",
+        "timestamp": "2026-05-11T15:53:40.839Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "sub-plane",
+        "materialName": "镜楼·规则怪谈副本",
+        "action": "create",
+        "timestamp": "2026-05-11T15:58:12.494Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "老周",
+        "action": "create",
+        "timestamp": "2026-05-11T15:58:12.497Z"
+      }
+    ],
+    "branchingLog": []
+  }
+}

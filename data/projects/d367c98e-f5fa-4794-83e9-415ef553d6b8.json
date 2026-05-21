@@ -1,0 +1,739 @@
+{
+  "id": "d367c98e-f5fa-4794-83e9-415ef553d6b8",
+  "name": "位面掠夺·端到端测试",
+  "mode": "novel",
+  "targetChapterCount": 360,
+  "currentChapter": 0,
+  "styleProfile": {
+    "key": "witty-strategy",
+    "label": "位面掠夺·智斗喜剧",
+    "description": "高武智斗向，五家九境战力体系，金手指为位面掠夺+规则解读",
+    "povRule": "紧贴男主\"局外人+吐槽役\"视角。描写要快准狠，不要慢悠悠铺陈。",
+    "dialogueRule": "对话要像活人说话，不要像念台词。主角台词融合谨小慎微与抽象幽默，善用反讽、错位类比与冷面吐槽。",
+    "behaviorRule": "主角行动遵循\"观察规则→解读漏洞→设计博弈→利用漏洞→一击制胜\"循环。",
+    "toneRule": "搞笑是核心不是点缀。杜绝AI腔调，采用白描+冷面吐槽+节奏明快的网文喜剧笔法。"
+  },
+  "genre": "witty-strategy",
+  "wordConfig": {
+    "TARGET_MIN_WORDS": 2200,
+    "TARGET_MAX_WORDS": 2800,
+    "REJECT_MIN_WORDS": 1800,
+    "MAX_CHAPTER_WORDS": 3500
+  },
+  "createdAt": "2026-05-11T11:45:06.072Z",
+  "updatedAt": "2026-05-11T11:45:06.072Z",
+  "chapterIntents": {
+    "chapters": {
+      "chapter-0001": {
+        "chapter": 1,
+        "goal": "通过沈渡日常扫地与师姐陆衡霜的互动，自然引出其手腕‘气流印’与脑内异响的异常状态，确立主角底层身份与潜在金手指/危机伏笔，完成修仙世界观的初步铺垫。",
+        "outlineNode": "Ch1 沈渡在渊渟阁外门扫地，被师姐陆衡霜叫住——她发现沈渡手腕上多了一道奇怪的气流印。沈渡自己也不知道那是什么，只觉得脑子里偶尔冒出一些莫名其妙的声音。",
+        "mustKeep": [
+          "沈渡渊渟阁外门扫地弟子的底层身份与低调隐忍的性格基调",
+          "手腕气流印与脑内异响作为核心异常设定，本章仅展示现象，绝不解释其具体来源或功能"
+        ],
+        "mustAvoid": [
+          "避免过早揭示气流印与脑内声音的具体来历或金手指机制（严守L1硬事实的未知性）",
+          "避免陆衡霜的互动流于表面寒暄，需体现修仙者对灵力异象的敏锐与师姐的关切"
+        ],
+        "styleEmphasis": "日常修仙与微悬疑交织，侧重环境氛围渲染与细节白描，节奏由缓入紧",
+        "hookAdvance": [
+          "沈渡手腕气流印的灵力属性与来历",
+          "脑内莫名声音的身份、目的及其与气流印的关联"
+        ],
+        "hookResolve": [],
+        "conflictDesign": "冲突类型：内部困惑与外部探查的碰撞；对立双方：沈渡（试图掩饰异常/内心困惑） vs 陆衡霜（敏锐察觉/关切追问）；赌注：沈渡能否在不引起外门高层注意的前提下妥善应对师姐的探查，以及异常状态是否会在此刻失控暴露。",
+        "chapterEndHook": "陆衡霜离去后，沈渡脑内的杂音骤然收敛，化作一句清晰而古老的低语；与此同时，手腕气流印不受控地泛起微光，隐隐指向渊渟阁后山禁地，暗示未知危机或机缘已悄然锁定主角。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-11T11:46:36.543Z"
+      },
+      "chapter-0002": {
+        "chapter": 2,
+        "goal": "通过系统首次语音交互与新手任务执行，确立沈渡与系统的初步绑定关系，并展示其利用规则漏洞完成‘物理说服’的行为模式。",
+        "outlineNode": "Ch2 系统首次\"发言\"——识海灼烧，一个欠揍的声音说检测到高维灵魂正在格式化。沈渡以为脑瘤。系统发布新手任务：用\"物理说服\"让管事闭嘴。沈渡照做后获得第一笔积分。",
+        "mustKeep": [
+          "沈渡底层杂役的谨小慎微与破局野心的内在矛盾",
+          "系统绝不弹出UI的硬事实（L1）"
+        ],
+        "mustAvoid": [
+          "避免任何系统界面、文字提示或视觉化交互描写"
+        ],
+        "styleEmphasis": "冷峻写实与黑色幽默交织，突出底层生存质感与系统反差的荒诞感",
+        "hookAdvance": [
+          "系统语音来源与高维灵魂格式化机制的伏笔"
+        ],
+        "hookResolve": [],
+        "conflictDesign": "{\"type\":\"体制压迫与个体反抗\",\"opposingSides\":\"沈渡（底层杂役） vs 管事（渊渟阁规则执行者）\",\"stakes\":\"沈渡的生存积分获取与潜在暴露风险\"}",
+        "chapterEndHook": "积分到账瞬间，识海深处传来第二道冰冷提示音：‘警告：高维灵魂格式化进度1%。检测到渊渟阁禁地方向存在同源能量波动。’同时，后山方向传来锁链断裂的闷响。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 2,
+            "max": 12,
+            "remaining": 10,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-11T12:26:29.705Z"
+      },
+      "chapter-0003": {
+        "chapter": 3,
+        "goal": "建立沈渡将腕部气流印发烫转化为‘系统静默期生理雷达’的应对机制，借陆衡霜的默许与方砚带来的律鉴司通报，将内部杂役考核压力与外部‘天机异象’调查交织，完成从被动承受格式化威胁到主动利用生理反馈探查规则的转变。",
+        "outlineNode": "Ch3 沈渡发现手腕上的气流印会微微发烫——系统沉默时的身体反馈。陆衡霜注意到沈渡的异常，但没有追问。方砚来访渊渟阁，带来律鉴司关于\"天机异象\"的通报。",
+        "mustKeep": [
+          "沈渡当前状态（启微二阶杂役/气流印激活/10积分/瓶颈松动）与行为模式（观察漏洞→借力打力→顺势化解，面对高维威胁转为主动探查与生理反馈利用）",
+          "系统绝不弹出任何可视化UI的硬规则，所有高维交互必须严格通过生理反馈（发烫/气压/杂音/环境异变）或隐晦线索呈现",
+          "陆衡霜‘察觉异常但不追问’的留白态度，维持渊渟阁高层的深不可测与规则博弈的张力"
+        ],
+        "mustAvoid": [
+          "绝对避免系统弹出数据面板、进度条或传统游戏化提示（严格遵循L1规则R001）",
+          "避免沈渡在启微二阶阶段直接硬刚或暴露系统存在，需保持底层苟活本能与借力打力的行为逻辑，不可出现战力崩坏或降智操作"
+        ],
+        "styleEmphasis": "强化‘生理感知替代系统UI’的沉浸式描写，保持底层修仙界的粗粝质感与高压下的冷静算计，对话与神态留白多于直白解释，突出‘规则缝隙中求生’的智性张力",
+        "hookAdvance": [
+          "推进‘天机异象’与系统‘格式化流程’的同源关联伏笔，暗示高维干预与修仙界禁地规则的底层冲突",
+          "铺垫十二时辰存活窗口的倒计时压力，将生理烫感频率与时间流逝绑定"
+        ],
+        "hookResolve": [
+          "回收上一章‘赵四刁难洗衣’的短期冲突，通过沈渡利用瓶颈松动的微末灵力与规则漏洞顺势交差，完成底层生存压力的阶段性化解"
+        ],
+        "conflictDesign": "冲突类型：隐性规则试探与外部审查压力交织；对立双方：沈渡（利用生理反馈与底层规则漏洞自保/探查） vs 律鉴司体制审查压力/赵四底层规矩压迫；赌注：十二时辰内摸清气流印规律并完美掩盖异常，否则面临系统强制格式化或律鉴司异象清洗，成功则稳固身份并打开禁地破局缺口。",
+        "chapterEndHook": "方砚离去后，沈渡腕部气流印的烫感毫无征兆地转为刺骨冰寒，与律鉴司通报密卷末尾‘天机逆乱，禁地同源’的八字朱批产生诡异共振。沈渡意识到，所谓的‘格式化’并非抹杀，而是高维坐标正在强制锚定他的肉身，十二时辰的存活窗口实为‘同化’倒计时。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 2,
+            "max": 12,
+            "remaining": 10,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-11T13:30:05.618Z"
+      }
+    }
+  },
+  "hookBudget": {
+    "hooks": [
+      {
+        "id": "H001",
+        "type": "伏笔铺垫",
+        "status": "open",
+        "startChapter": 1,
+        "lastAdvancedChapter": 0,
+        "expectedPayoffStart": 10,
+        "expectedPayoffEnd": 25,
+        "payoffTiming": "mid-arc",
+        "notes": "伏笔·无瞳的注视",
+        "linkedHookIds": [],
+        "createdAt": "2026-05-11T11:46:36.552Z"
+      },
+      {
+        "id": "H002",
+        "type": "伏笔铺垫",
+        "status": "open",
+        "startChapter": 1,
+        "lastAdvancedChapter": 0,
+        "expectedPayoffStart": 10,
+        "expectedPayoffEnd": 25,
+        "payoffTiming": "mid-arc",
+        "notes": "伏笔·闻笙的真实身份",
+        "linkedHookIds": [],
+        "createdAt": "2026-05-11T11:46:36.554Z"
+      },
+      {
+        "id": "H003",
+        "type": "伏笔铺垫",
+        "status": "open",
+        "startChapter": 1,
+        "lastAdvancedChapter": 0,
+        "expectedPayoffStart": 10,
+        "expectedPayoffEnd": 25,
+        "payoffTiming": "mid-arc",
+        "notes": "伏笔·禁地低语与气流印指引",
+        "linkedHookIds": [],
+        "createdAt": "2026-05-11T13:30:05.631Z"
+      }
+    ],
+    "lastUpdated": "2026-05-11T13:30:05.631Z"
+  },
+  "ruleStack": {
+    "rules": [
+      {
+        "id": "R001",
+        "layer": "L1",
+        "layerName": "hard_facts",
+        "precedence": 100,
+        "scope": "global",
+        "category": "hard",
+        "content": "[系统机制·位面掠夺] 绝不弹出UI",
+        "source": "素材:系统机制·位面掠夺",
+        "active": true,
+        "createdAt": "2026-05-11T11:46:36.556Z"
+      }
+    ],
+    "activeOverrides": [],
+    "version": 2,
+    "lastUpdated": "2026-05-11T11:46:36.556Z"
+  },
+  "contextTraces": {
+    "chapters": {
+      "chapter-0001": {
+        "chapter": 1,
+        "timestamp": "2026-05-11T12:03:18.035Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-1-intent"
+        ],
+        "notes": [
+          "Chapter 1 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 2,
+          "maxCapacity": 12,
+          "remaining": 10,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0002": {
+        "chapter": 2,
+        "timestamp": "2026-05-11T12:37:37.250Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-2-intent"
+        ],
+        "notes": [
+          "Chapter 2 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 2,
+          "maxCapacity": 12,
+          "remaining": 10,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0003": {
+        "chapter": 3,
+        "timestamp": "2026-05-11T13:46:40.990Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-3-intent"
+        ],
+        "notes": [
+          "Chapter 3 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 3,
+          "maxCapacity": 12,
+          "remaining": 9,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      }
+    }
+  },
+  "_pipeline_metrics": {
+    "agentTimings": {
+      "writer": {
+        "calls": 9,
+        "totalMs": 1253080,
+        "avgMs": 139231,
+        "maxMs": 166960,
+        "totalTokens": 116205
+      },
+      "first-review": {
+        "calls": 9,
+        "totalMs": 980396,
+        "avgMs": 108933,
+        "maxMs": 151678,
+        "totalTokens": 94707
+      },
+      "second-review": {
+        "calls": 3,
+        "totalMs": 262306,
+        "avgMs": 87435,
+        "maxMs": 89304,
+        "totalTokens": 30764
+      },
+      "final-editor": {
+        "calls": 3,
+        "totalMs": 149348,
+        "avgMs": 49783,
+        "maxMs": 55694,
+        "totalTokens": 22489
+      },
+      "material-manager": {
+        "calls": 7,
+        "totalMs": 664525,
+        "avgMs": 94932,
+        "maxMs": 106201,
+        "totalTokens": 83127
+      }
+    },
+    "reviewPassRates": {},
+    "tokenUsage": {},
+    "chapterDurations": [],
+    "errorCounts": {},
+    "agentPassRates": {
+      "first-review": {
+        "total": 9,
+        "passed": 3,
+        "failChapters": [
+          1,
+          1,
+          2,
+          2,
+          2,
+          3
+        ]
+      },
+      "second-review": {
+        "total": 3,
+        "passed": 3,
+        "failChapters": []
+      },
+      "final-editor": {
+        "total": 3,
+        "passed": 3,
+        "failChapters": []
+      }
+    },
+    "reviserLoops": [],
+    "hookResolutionLog": [],
+    "materialAddedLog": [
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "沈渡",
+        "action": "create",
+        "timestamp": "2026-05-11T12:03:17.999Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "陆衡霜",
+        "action": "create",
+        "timestamp": "2026-05-11T12:03:18.003Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "power-system",
+        "materialName": "系统机制·位面掠夺",
+        "action": "update",
+        "timestamp": "2026-05-11T12:03:18.007Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "character",
+        "materialName": "沈渡",
+        "action": "update",
+        "timestamp": "2026-05-11T12:37:37.163Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "power-system",
+        "materialName": "系统机制·位面掠夺",
+        "action": "update",
+        "timestamp": "2026-05-11T12:37:37.169Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "foreshadowing",
+        "materialName": "伏笔·禁地同源灰雾与格式化源头",
+        "action": "create",
+        "timestamp": "2026-05-11T12:37:37.177Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "沈渡",
+        "action": "update",
+        "timestamp": "2026-05-11T13:07:24.761Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "陆衡霜",
+        "action": "create",
+        "timestamp": "2026-05-11T13:07:24.764Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "foreshadowing",
+        "materialName": "伏笔·禁地低语与气流印指引",
+        "action": "create",
+        "timestamp": "2026-05-11T13:07:24.769Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "character",
+        "materialName": "沈渡",
+        "action": "update",
+        "timestamp": "2026-05-11T13:08:52.107Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "mechanism",
+        "materialName": "机制·高维灵魂格式化",
+        "action": "create",
+        "timestamp": "2026-05-11T13:08:52.110Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "foreshadowing",
+        "materialName": "伏笔·禁地低语与气流印指引",
+        "action": "update",
+        "timestamp": "2026-05-11T13:08:52.113Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "character",
+        "materialName": "沈渡",
+        "action": "update",
+        "timestamp": "2026-05-11T13:43:22.177Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "foreshadowing",
+        "materialName": "伏笔·禁地低语与气流印指引",
+        "action": "update",
+        "timestamp": "2026-05-11T13:43:22.181Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "foreshadowing",
+        "materialName": "伏笔·禁地低语与气流印指引",
+        "action": "update",
+        "timestamp": "2026-05-11T13:45:12.988Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "character",
+        "materialName": "陆衡霜",
+        "action": "create",
+        "timestamp": "2026-05-11T13:45:13.003Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "worldview",
+        "materialName": "律鉴司天机异象通报",
+        "action": "create",
+        "timestamp": "2026-05-11T13:45:13.026Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "mechanism",
+        "materialName": "气流印",
+        "action": "create",
+        "timestamp": "2026-05-11T13:46:40.785Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "foreshadowing",
+        "materialName": "伏笔·十二时辰同化锚定",
+        "action": "create",
+        "timestamp": "2026-05-11T13:46:40.798Z"
+      }
+    ],
+    "branchingLog": []
+  },
+  "_circuitBreaker": {
+    "consecutiveFailures": 4,
+    "lastFailureStep": "first-review",
+    "tripped": true,
+    "tripChapter": 2,
+    "history": [
+      {
+        "step": "first-review",
+        "chapterNumber": 1,
+        "result": "fail",
+        "timestamp": "2026-05-11T11:51:34.357Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 1,
+        "result": "fail",
+        "timestamp": "2026-05-11T11:55:22.417Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 1,
+        "result": "pass",
+        "timestamp": "2026-05-11T12:03:18.036Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 2,
+        "result": "fail",
+        "timestamp": "2026-05-11T12:30:03.755Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 2,
+        "result": "fail",
+        "timestamp": "2026-05-11T12:30:34.860Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 2,
+        "result": "fail",
+        "timestamp": "2026-05-11T12:33:51.771Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 2,
+        "result": "pass",
+        "timestamp": "2026-05-11T12:37:37.255Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 3,
+        "result": "fail",
+        "timestamp": "2026-05-11T13:35:10.129Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 3,
+        "result": "pass",
+        "timestamp": "2026-05-11T13:46:40.999Z"
+      }
+    ]
+  }
+}

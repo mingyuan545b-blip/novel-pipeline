@@ -1,0 +1,26 @@
+{
+  "id": "9c709531-4607-4a55-89ad-de5a6a0ebd09",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "第1章IP方向",
+  "description": "无IP风险",
+  "eventType": "revelation",
+  "storyOrder": 21,
+  "sortOrder": 21,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "auto-generated",
+    "ip-direction"
+  ],
+  "createdAt": "2026-05-13T10:01:02.522Z",
+  "updatedAt": "2026-05-13T10:01:02.522Z"
+}

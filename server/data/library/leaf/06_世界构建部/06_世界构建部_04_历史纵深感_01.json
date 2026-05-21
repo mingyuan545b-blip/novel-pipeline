@@ -1,0 +1,31 @@
+{
+  "id": "06_世界构建部_04_历史纵深感_01",
+  "category_path": "06_世界构建部/04_历史纵深感/01_古籍传说",
+  "display_name": "古籍传说",
+  "department": "06_世界构建部",
+  "subcategory": "04_历史纵深感",
+  "applicable_modes": [
+    "novel"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "古籍传说",
+    "历史纵深感",
+    "世界构建部"
+  ],
+  "context_slot": "L4",
+  "context_priority": 20,
+  "injection_point": "material-manager",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.287Z"
+}

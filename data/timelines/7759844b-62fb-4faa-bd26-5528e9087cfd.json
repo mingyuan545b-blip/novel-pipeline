@@ -1,0 +1,30 @@
+{
+  "id": "7759844b-62fb-4faa-bd26-5528e9087cfd",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【所属位面】城寨次位面\n【所属势力】和义堂\n【身份】底层新丁\n【核心欲望】存活并摸清走私线账本底细\n【内在矛盾】谨小慎微的自保本能与关键时刻果断下注的博弈冲动\n【行为模式】以微表情与肢体细节洞察人心，习惯用痛感压制情绪，交易思维主导人际互动，绝不轻易信人\n【当前状态】落座三日，正筹备潜入账房查账，左手无名指旧疤因频繁动用察人术产生灼痛反噬",
+  "eventType": "character",
+  "storyOrder": 57,
+  "sortOrder": 57,
+  "storyTime": "第6章",
+  "chapterIds": [
+    "5d03189a-2eb0-4767-b209-e6cb40a1bb5d"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "73a399d6-67f9-4242-8ccd-b8bd8c47d207"
+  ],
+  "characterIds": [
+    "73a399d6-67f9-4242-8ccd-b8bd8c47d207"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "主角登场，确立核心人设、行为逻辑与当前行动线",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T16:16:11.084Z",
+  "updatedAt": "2026-05-13T16:16:11.084Z"
+}

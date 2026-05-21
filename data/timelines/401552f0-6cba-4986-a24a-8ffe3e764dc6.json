@@ -1,0 +1,28 @@
+{
+  "id": "401552f0-6cba-4986-a24a-8ffe3e764dc6",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "白衣之遇",
+  "description": "沈墨辞在9楼遇到穿白衣服的神秘人，按规则5微笑点头。白衣人回以微笑后消失。沉默女用纸条警告：白衣人是镜楼创造者的残留意识，微笑等于签订契约。沈墨辞后背发凉，但表面镇定：\"给命运来个差评。\"系统提示契约效果：可感知即将违反规则的危险。",
+  "eventType": "world",
+  "storyOrder": 6,
+  "sortOrder": 6,
+  "storyTime": "第2阶段",
+  "chapterIds": [
+    "5e5aeb15-564f-44ef-8cfe-5274a99a3a69"
+  ],
+  "questIds": [
+    "adf43eac-a5bc-4604-b8a2-6327fda1c8e7"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "9楼遇到穿白衣服",
+  "importance": "normal",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "第7章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

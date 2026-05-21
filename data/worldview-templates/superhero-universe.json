@@ -1,0 +1,113 @@
+{
+    "id": "superhero-universe",
+    "label": "超英宇宙型",
+    "tag": "漫威/DC式",
+    "description": "多个独立英雄各有起源，逐渐汇聚成团队，面对越来越大的危机，个人线+团队线交织",
+    "applicableGenres": ["都市", "异能", "科幻", "超能"],
+    "phases": [
+        {
+            "id": "early",
+            "label": "前期·起源篇",
+            "chapterRange": "1-25%",
+            "description": "单个英雄的起源故事，个人成长+小范围危机",
+            "worldRules": {
+                "powerCeiling": "街区级（打倒几个歹徒/阻止一次抢劫）",
+                "geographicScope": "单一城市",
+                "factionComplexity": "1-2个反派组织",
+                "characterScale": "3-5个核心角色",
+                "threatLevel": "街头犯罪/小规模阴谋",
+                "knowledgeScope": "只知道自己的能力，超能世界是未知的"
+            },
+            "narrativeRules": {
+                "povScope": "单一主角视角",
+                "pacingRule": "日常+战斗交替，每章推进一点",
+                "humorDensity": "高——个人日常多",
+                "powerDisplay": "能力刚觉醒，还在摸索",
+                "worldReveal": "暗示更大的超能世界存在"
+            },
+            "consistencyAnchors": [
+                "主角的能力边界必须明确（不能后期突然多出新能力）",
+                "起源故事的核心创伤/动机不能遗忘",
+                "第一个反派必须和主角有个人恩怨（不能是路人BOSS）"
+            ]
+        },
+        {
+            "id": "mid",
+            "label": "中期·汇聚篇",
+            "chapterRange": "25-65%",
+            "description": "多个英雄相遇，组建团队，面对跨城市/国家级危机",
+            "worldRules": {
+                "powerCeiling": "城市级（阻止城市级灾难）",
+                "geographicScope": "多个城市/国家",
+                "factionComplexity": "3-5个势力，有灰色地带和内部矛盾",
+                "characterScale": "10-20个角色，团队+反派",
+                "threatLevel": "城市级危机/国家级阴谋",
+                "knowledgeScope": "发现超能世界有组织/规则/历史"
+            },
+            "narrativeRules": {
+                "povScope": "多英雄视角切换",
+                "pacingRule": "团队任务+个人线交替",
+                "humorDensity": "中——团队互动有笑点，任务紧张",
+                "powerDisplay": "能力成熟，但遇到更强者",
+                "worldReveal": "揭示超能世界的组织架构和历史"
+            },
+            "consistencyAnchors": [
+                "每个英雄的能力不能重叠（团队中每人有独特定位）",
+                "团队内部矛盾必须源于性格/理念差异（不能硬制造）",
+                "中期反派必须比前期强，但强得有逻辑",
+                "英雄的个人线不能被团队线吞没"
+            ],
+            "transitionFrom": {
+                "trigger": "英雄们被迫合作/发现共同敌人",
+                "mustResolve": "各英雄的起源故事核心矛盾",
+                "mustEstablish": "团队化学反应/共同敌人"
+            }
+        },
+        {
+            "id": "late",
+            "label": "后期·终局篇",
+            "chapterRange": "65-100%",
+            "description": "全宇宙级危机，所有英雄汇聚，个人线收束，最终决战",
+            "worldRules": {
+                "powerCeiling": "世界级/宇宙级（拯救世界/宇宙）",
+                "geographicScope": "全球/宇宙/多维",
+                "factionComplexity": "所有势力被迫站队",
+                "characterScale": "30+角色，所有英雄+反派",
+                "threatLevel": "灭世/灭宇宙级",
+                "knowledgeScope": "超能世界的终极真相"
+            },
+            "narrativeRules": {
+                "povScope": "多线汇聚，高潮时快速切换",
+                "pacingRule": "持续高压，每2章一个转折",
+                "humorDensity": "低——终局以紧张为主",
+                "powerDisplay": "能力极限突破，但必须有代价",
+                "worldReveal": "所有谜底揭晓"
+            },
+            "consistencyAnchors": [
+                "终局危机必须和前期暗示的伏笔呼应",
+                "每个英雄必须有高光时刻（不能沦为背景板）",
+                "最终BOSS的动机必须合理（不能是纯粹的恶）",
+                "牺牲必须有意义（不能复活）"
+            ],
+            "transitionFrom": {
+                "trigger": "终极威胁现身/团队分裂又重聚",
+                "mustResolve": "团队内部矛盾",
+                "mustEstablish": "最终抉择/最终牺牲"
+            }
+        }
+    ],
+    "globalConsistencyRules": [
+        "每个英雄的能力体系独立且互不重叠",
+        "能力有代价——越强越有副作用/限制",
+        "英雄不能全能——必须有弱点和软肋",
+        "反派有逻辑——不是纯粹的恶，有自己的理由",
+        "团队化学反应>个人战力叠加",
+        "危机升级必须和角色成长同步"
+    ],
+    "forbiddenPatterns": [
+        "英雄突然获得新能力没有铺垫",
+        "反派比英雄弱却靠剧情杀赢",
+        "团队没有内部矛盾（那不是团队是工具组）",
+        "终局靠一个人解决（必须是团队合力）"
+    ]
+}

@@ -1,0 +1,18 @@
+{
+  "chapterId": "fb0cbc63-022f-454b-9ba6-d3416115c7a5",
+  "chapterNumber": 5,
+  "title": "江晚",
+  "wordCount": 2489,
+  "violations": [
+    {
+      "type": "noTension",
+      "severity": "medium",
+      "desc": "章节收尾缺乏张力/悬念钩子",
+      "category": "收尾张力不足"
+    }
+  ],
+  "criticalCount": 0,
+  "highCount": 0,
+  "clean": false,
+  "auditedAt": "2026-05-19T13:08:50.694Z"
+}

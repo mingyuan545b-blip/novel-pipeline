@@ -1,0 +1,30 @@
+{
+  "id": "4bf54b9d-0efd-46ed-9434-4eeaa8b6f0aa",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "蓝衫报信童",
+  "description": "【所属位面】九龙\n【所属势力】和义堂\n【身份】九龙街头流浪儿/暗线情报传递者\n【核心欲望】通过传递关键情报换取生存筹码或庇护\n【内在矛盾】极度畏惧和义堂巡街势力 vs 渴望摆脱底层饥饿与欺凌\n【行为模式】行动迅捷无声，塞入线索后绝不回头，习惯压低嗓音快速交代核心动线，光脚踩青石板不发出声响，对和义堂香堂开香时间极为敏感",
+  "eventType": "character",
+  "storyOrder": 7,
+  "sortOrder": 7,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "a5587b86-e21b-4b27-af97-fe72a0742b4b"
+  ],
+  "characterIds": [
+    "a5587b86-e21b-4b27-af97-fe72a0742b4b"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "贺千坠入九龙城寨后首个接触NPC，提供和义堂香堂与账房关键动线，具备独立求生逻辑与情报交易本能",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T05:44:41.265Z",
+  "updatedAt": "2026-05-13T05:44:41.265Z"
+}

@@ -1,0 +1,381 @@
+:root,
+[data-theme="mario"] {
+    --theme-name: mario;
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #0f3460;
+    --bg-card: rgba(22, 33, 62, 0.9);
+    --bg-card-hover: rgba(26, 40, 72, 0.95);
+    --bg-input: rgba(15, 25, 50, 0.95);
+    --neon-blue: #4a90d9;
+    --neon-pink: #e74c3c;
+    --neon-purple: #9b59b6;
+    --neon-green: #2ecc71;
+    --neon-orange: #f39c12;
+    --neon-red: #e74c3c;
+    --neon-yellow: #f1c40f;
+    --gradient-primary: linear-gradient(135deg, #e74c3c, #f39c12);
+    --gradient-secondary: linear-gradient(135deg, #4a90d9, #2ecc71);
+    --gradient-accent: linear-gradient(135deg, #f1c40f, #e74c3c);
+    --gradient-success: linear-gradient(135deg, #2ecc71, #4a90d9);
+    --gradient-warning: linear-gradient(135deg, #f39c12, #e74c3c);
+    --glow-blue: 0 0 6px rgba(74,144,217,0.3), 0 0 14px rgba(74,144,217,0.15);
+    --glow-pink: 0 0 6px rgba(231,76,60,0.3), 0 0 14px rgba(231,76,60,0.15);
+    --glow-purple: 0 0 6px rgba(155,89,182,0.3), 0 0 14px rgba(155,89,182,0.15);
+    --glow-green: 0 0 6px rgba(46,204,113,0.3), 0 0 14px rgba(46,204,113,0.15);
+    --glow-orange: 0 0 6px rgba(243,156,18,0.3), 0 0 14px rgba(243,156,18,0.15);
+    --glow-red: 0 0 6px rgba(231,76,60,0.3), 0 0 14px rgba(231,76,60,0.15);
+    --text-primary: #ecf0f1;
+    --text-secondary: #95a5a6;
+    --text-muted: #7f8c8d;
+    --text-accent: #f1c40f;
+    --border-color: rgba(243,156,18,0.12);
+    --border-glow: 1px solid rgba(243,156,18,0.2);
+    --font-primary: 'Quicksand', 'Rajdhani', 'Segoe UI', sans-serif;
+    --font-mono: 'Fira Code', 'Consolas', monospace;
+    --font-body: 'Quicksand', 'Nunito', 'Segoe UI', sans-serif;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    --sidebar-width: 260px;
+    --header-height: 64px;
+    --card-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 0 20px rgba(243,156,18,0.03);
+    --card-shadow-hover: 0 8px 24px rgba(0,0,0,0.4), 0 0 30px rgba(243,156,18,0.06);
+    --btn-shadow: none;
+    --input-shadow: none;
+    --sidebar-bg: var(--bg-secondary);
+    --header-bg: var(--bg-secondary);
+}
+
+[data-theme="mario"] .app-layout {
+    background: #1a1a2e;
+    overflow: hidden;
+}
+
+[data-theme="mario"] .app-bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+[data-theme="mario"] .app-bg-layer::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background:
+        linear-gradient(0deg, #2d5a1e 0%, #3a7a28 15%, #4a9a35 30%, transparent 100%);
+    animation: marioGround 20s linear infinite;
+}
+
+[data-theme="mario"] .app-bg-layer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle 40px at 15% 25%, rgba(241,196,15,0.15) 0%, transparent 100%),
+        radial-gradient(circle 30px at 75% 15%, rgba(241,196,15,0.1) 0%, transparent 100%),
+        radial-gradient(circle 25px at 45% 35%, rgba(241,196,15,0.08) 0%, transparent 100%),
+        radial-gradient(circle 50px at 85% 30%, rgba(74,144,217,0.06) 0%, transparent 100%),
+        radial-gradient(circle 35px at 25% 45%, rgba(74,144,217,0.04) 0%, transparent 100%);
+    animation: marioStars 6s ease-in-out infinite alternate;
+}
+
+@keyframes marioGround {
+    0% { background-position: 0 0; }
+    100% { background-position: -200px 0; }
+}
+
+@keyframes marioStars {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+[data-theme="mario"] .app-content::after {
+    background: rgba(26,26,46,0.35) !important;
+}
+
+[data-theme="mario"] .cyber-card {
+    position: relative;
+    border: 2px solid rgba(243,156,18,0.15);
+    box-shadow: var(--card-shadow);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+[data-theme="mario"] .cyber-card::before {
+    background: linear-gradient(90deg, rgba(231,76,60,0.7), rgba(243,156,18,0.6), rgba(241,196,15,0.5));
+    opacity: 0.8;
+    height: 3px;
+}
+
+[data-theme="mario"] .cyber-card::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(231,76,60,0.08), transparent 40%, transparent 60%, rgba(241,196,15,0.08));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+[data-theme="mario"] .cyber-card:hover {
+    border-color: rgba(243,156,18,0.3);
+    box-shadow: var(--card-shadow-hover), 0 0 20px rgba(231,76,60,0.05);
+    transform: translateY(-2px);
+}
+
+[data-theme="mario"] .cyber-card:hover::after {
+    opacity: 1;
+}
+
+[data-theme="mario"] .cyber-btn {
+    border: 3px solid #000;
+    background: linear-gradient(180deg, #ff9c31 0%, #ce3100 40%, #ce3100 60%, #ff9c31 100%);
+    letter-spacing: 0.5px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: visible;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    box-shadow: 0 4px 0 #8b1a00, 0 6px 8px rgba(0,0,0,0.4);
+    padding: 8px 20px;
+    min-height: 38px;
+}
+
+[data-theme="mario"] .cyber-btn::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    right: 4px;
+    height: 3px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 1px;
+}
+
+[data-theme="mario"] .cyber-btn::after {
+    content: '';
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    width: 18px;
+    height: 18px;
+    background:
+        radial-gradient(ellipse 8px 6px at 50% 30%, #fc9838 0%, #fc9838 100%),
+        radial-gradient(ellipse 4px 3px at 35% 25%, #d82800 0%, #d82800 100%),
+        radial-gradient(ellipse 4px 3px at 65% 25%, #d82800 0%, #d82800 100%),
+        radial-gradient(ellipse 12px 4px at 50% 50%, #fff 0%, #fff 100%),
+        radial-gradient(ellipse 3px 3px at 40% 70%, #fc9838 0%, #fc9838 100%),
+        radial-gradient(ellipse 3px 3px at 60% 70%, #fc9838 0%, #fc9838 100%),
+        radial-gradient(ellipse 8px 4px at 50% 85%, #fc9838 0%, #fc9838 100%);
+    border-radius: 50% 50% 0 0;
+    opacity: 0;
+    transition: none;
+    pointer-events: none;
+    z-index: 100;
+}
+
+[data-theme="mario"] .cyber-btn:hover {
+    box-shadow: 0 2px 0 #8b1a00, 0 3px 6px rgba(0,0,0,0.3);
+    transform: translateY(2px);
+    background: linear-gradient(180deg, #ffad4f 0%, #e04010 40%, #e04010 60%, #ffad4f 100%);
+}
+
+[data-theme="mario"] .cyber-btn:hover::after {
+    animation: marioMushroomPop 0.6s ease forwards;
+}
+
+@keyframes marioMushroomPop {
+    0% { opacity: 0; transform: translateX(-50%) scale(0.3) translateY(10px); }
+    40% { opacity: 1; transform: translateX(-50%) scale(1.2) translateY(-15px); }
+    60% { transform: translateX(-50%) scale(0.9) translateY(-8px); }
+    80% { transform: translateX(-50%) scale(1.05) translateY(-12px); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(-10px); }
+}
+
+[data-theme="mario"] .cyber-btn:active {
+    box-shadow: 0 0px 0 #8b1a00, 0 1px 3px rgba(0,0,0,0.2);
+    transform: translateY(4px);
+}
+
+[data-theme="mario"] .cyber-btn-primary {
+    background: linear-gradient(180deg, #f1c40f 0%, #f39c12 40%, #e74c3c 100%);
+    border: 3px solid #000;
+    box-shadow: 0 4px 0 #8b1a00, 0 6px 8px rgba(0,0,0,0.4);
+    color: #fff;
+}
+
+[data-theme="mario"] .cyber-btn-primary:hover {
+    box-shadow: 0 2px 0 #8b1a00, 0 3px 6px rgba(0,0,0,0.3);
+    transform: translateY(2px);
+    background: linear-gradient(180deg, #f7dc6f 0%, #f5b041 40%, #ec7063 100%);
+}
+
+[data-theme="mario"] .cyber-input,
+[data-theme="mario"] .cyber-textarea,
+[data-theme="mario"] .cyber-select {
+    border: 2px solid rgba(243,156,18,0.1);
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+}
+
+[data-theme="mario"] .cyber-input:focus,
+[data-theme="mario"] .cyber-textarea:focus {
+    border-color: rgba(241,196,15,0.35);
+    box-shadow: 0 0 12px rgba(241,196,15,0.06), inset 0 0 10px rgba(241,196,15,0.02);
+}
+
+[data-theme="mario"] .app-sidebar {
+    background: rgba(22,33,62,0.95);
+    border-right: 2px solid rgba(231,76,60,0.08);
+}
+
+[data-theme="mario"] .app-sidebar::after {
+    background: linear-gradient(180deg, var(--neon-red), var(--neon-orange), var(--neon-yellow));
+    opacity: 0.4;
+}
+
+[data-theme="mario"] .app-header {
+    background: rgba(22,33,62,0.95);
+    border-bottom: 2px solid rgba(231,76,60,0.08);
+}
+
+[data-theme="mario"] .app-header::after {
+    background: linear-gradient(90deg, var(--neon-red), var(--neon-orange), var(--neon-yellow), var(--neon-red));
+    background-size: 200% 100%;
+    animation: marioHeaderFlow 3s linear infinite;
+    opacity: 0.6;
+    height: 3px;
+}
+
+@keyframes marioHeaderFlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+[data-theme="mario"] .stat-card {
+    border: 2px solid rgba(243,156,18,0.1);
+    box-shadow: var(--card-shadow);
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+}
+
+[data-theme="mario"] .stat-card::before {
+    background: linear-gradient(90deg, rgba(231,76,60,0.5), rgba(243,156,18,0.4), rgba(241,196,15,0.3));
+    opacity: 0.7;
+    height: 3px;
+}
+
+[data-theme="mario"] .pipeline-node-icon {
+    border: 2px solid rgba(231,76,60,0.15);
+    box-shadow: 0 0 8px rgba(231,76,60,0.06);
+}
+
+[data-theme="mario"] .cyber-badge {
+    border-radius: var(--radius-sm);
+}
+
+[data-theme="mario"] .cyber-tabs {
+    border-bottom: 2px solid rgba(231,76,60,0.08);
+}
+
+[data-theme="mario"] .cyber-tab-active {
+    text-shadow: 0 0 8px currentColor;
+}
+
+[data-theme="mario"] .sidebar-link-active {
+    background: rgba(231,76,60,0.06);
+    border-left: 3px solid var(--neon-red);
+    box-shadow: inset 0 0 15px rgba(231,76,60,0.02);
+}
+
+[data-theme="mario"] .module-switch-active {
+    background: rgba(231,76,60,0.06) !important;
+    color: var(--neon-yellow) !important;
+    border-color: rgba(231,76,60,0.25) !important;
+    box-shadow: 0 0 8px rgba(231,76,60,0.06) !important;
+}
+
+[data-theme="mario"] .page-title {
+    text-shadow: 0 0 18px rgba(241,196,15,0.2);
+}
+
+[data-theme="mario"] .cyber-section-title {
+    text-shadow: 0 0 8px rgba(241,196,15,0.12);
+}
+
+[data-theme="mario"] ::-webkit-scrollbar-track {
+    background: rgba(231,76,60,0.02);
+}
+
+[data-theme="mario"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(231,76,60,0.35), rgba(243,156,18,0.35), rgba(241,196,15,0.35));
+    border-radius: 6px;
+    box-shadow: 0 0 4px rgba(231,76,60,0.1);
+}
+
+[data-theme="mario"] ::selection {
+    background: rgba(231,76,60,0.2);
+}
+
+[data-theme="mario"] .cyber-loading {
+    animation: marioBounce 0.6s ease-in-out infinite;
+}
+
+@keyframes marioBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+[data-theme="mario"] .app-main {
+    position: relative;
+}
+
+[data-theme="mario"] .app-main::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(231,76,60,0.15) 0px,
+        rgba(231,76,60,0.15) 16px,
+        rgba(243,156,18,0.15) 16px,
+        rgba(243,156,18,0.15) 32px,
+        rgba(241,196,15,0.15) 32px,
+        rgba(241,196,15,0.15) 48px
+    );
+    pointer-events: none;
+    z-index: 1;
+}

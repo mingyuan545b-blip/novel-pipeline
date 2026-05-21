@@ -1,0 +1,28 @@
+{
+  "id": "2c070d5d-b77f-4653-995f-67f822c9af49",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "夜语耳闻",
+  "description": "夜晚规则生效，沈墨辞只能耳语。他在7楼遇到守夜人沉默女，她用纸条告诉他13楼的秘密。沈墨辞用\"战略性能量转移\"形容自己小声说话的样子。沉默女第一次露出笑意。天亮后，沈墨辞发现3楼的镜子少了一面——有人破镜了。",
+  "eventType": "revelation",
+  "storyOrder": 2,
+  "sortOrder": 2,
+  "storyTime": "第1阶段",
+  "chapterIds": [
+    "f347874c-2301-466c-9b49-a62944552259"
+  ],
+  "questIds": [
+    "adf43eac-a5bc-4604-b8a2-6327fda1c8e7"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "7楼遇到守夜人沉",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "第3章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

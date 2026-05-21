@@ -1,0 +1,128 @@
+{
+  "id": "3a3016f7-1259-4f95-b9d8-e0a80d2e874b",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "chapterNumber": 9,
+  "timestamp": "2026-05-18T09:02:29.110Z",
+  "characterStates": {
+    "0d4ea532-8174-4f8e-8432-f14ced7fa86b": {
+      "id": "0d4ea532-8174-4f8e-8432-f14ced7fa86b",
+      "name": "歪嘴明",
+      "content": "【所属位面】38497659-d64f-4bc0-b3b6-f1b3f4025b83\n【所属势力】fb01ead5-fe86-49f4-bebb-47965e649756\n【身份】和义堂线头目/试水局发起者\n【核心欲望】摆脱马仔身份，清道自立，掌控地盘主导权\n【行为模式】以试水局测试手下忠诚度与破局能力；表面施压实则递刀；重规矩但更重利益\n【微特征】拇指搓磨光绪通宝；眼皮半掀，喉音带浓痰；嘴角疤随扯动",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 9,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "15d5ccaf-f61b-4751-96bf-c7fe401cf41e": {
+      "id": "15d5ccaf-f61b-4751-96bf-c7fe401cf41e",
+      "name": "九指强",
+      "content": "【所属位面】城寨次位面\n【所属势力】和义堂\n【身份】赌档话事人/立规者\n【核心欲望】以血腥立规震慑堂口，维持表面铁腕秩序，掩盖权力被渗透的危机\n【内在矛盾】自断三指立威实为心虚，高压禁千令下暗流涌动，疑似被内部势力借势腾挪空间\n【行为模式】动作干脆残忍，立规矩时不怒自威，习惯用白手帕擦刀掩饰血迹，对出千者零容忍\n【关键线索】断指立规引发堂口震动，疑似配合歪嘴明等人转移视线，为沈不归靠岸腾出操作空间",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 9,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "24826b53-94dc-4b78-a44a-7d4c5bd616b0": {
+      "id": "24826b53-94dc-4b78-a44a-7d4c5bd616b0",
+      "name": "纪棠",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】与贺千短暂交锋后抽身，留下九指强今晚点人情报警报，疑似暗中布局\n【核心欲望】取回账本夹层当票，清算旧债\n【行为模式】冷静自持，以信息差换取执行者，不涉情感与额外解释，行动利落不留痕迹\n【微表情习惯】眼神如秤砣下压，补妆动作慢条斯理但视线紧盯目标\n【内在矛盾】追求程序正义的执念 vs 城寨生存法则的冷酷现实",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 9,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9": {
+      "id": "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9",
+      "name": "江晚",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】与贺千在天台结盟，锁定周三茶楼流水证据，掌握路线图与当票线索\n【核心欲望】获取和义堂洗钱流水证据，将其送入局子（独立于主角的正义诉求）\n【内在矛盾】追求程序正义的执念 vs 城寨生存法则的冷酷现实\n【行为模式】冷静带刺，行动利落，以明确利益划分建立合作底线，不依赖他人\n【微表情习惯】叼烟不点火，手指敲击铁管节奏稳定，眼神冷硬如生铁",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 8,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "6d4ae14d-dd17-46e3-9ea3-ea6e06c7f7d5": {
+      "id": "6d4ae14d-dd17-46e3-9ea3-ea6e06c7f7d5",
+      "name": "贺千",
+      "content": "【所属位面】城寨次位面\n【所属势力】和义堂\n【当前状态】潜伏观察地下赌档立威局，识破权力博弈暗流，接收纪棠火漆密信面临跨区抉择\n【核心欲望】在高压走私局与海关收网夹缝中存活并攫取筹码，规避规则反噬\n【内在矛盾】谨小慎微的生存本能与高风险破局需求冲突，对纪棠“卖命契”既警惕又不得不接\n【行为模式】藏锋敛锐，以微表情与环境细节推演局势，依赖铜筹温度预警风险，痛感刺激下果断行动\n【关键关联】绑定铜筹风险预警机制，与纪棠存在卖命契约束，察觉歪嘴明异常与九指强立威真相",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 9,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "7d7f1ad2-5cac-4104-a1a0-e643d24ebf68": {
+      "id": "7d7f1ad2-5cac-4104-a1a0-e643d24ebf68",
+      "name": "歪嘴明",
+      "content": "【核心欲望】维持堂口日常运转，向九指强交差，保全自身中层位置\n【内在矛盾】表面恭敬顺从强权，实则暗藏不满与讥讽，需在九指强与底层马仔间走钢丝\n【行为模式】用盘核桃掩饰情绪，说话漏风带刺，招新以骰子筛人，看穿藏拙后顺势给台阶，微表情习惯为嘴角硬扯与眼神下压\n【所属势力】和义堂\n【当前状态】负责堂口招新与派活，对主角持观察利用态度",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 9,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "db2dfec4-a940-4cea-87a8-ad198d3501e5": {
+      "id": "db2dfec4-a940-4cea-87a8-ad198d3501e5",
+      "name": "九指强",
+      "content": "【所属位面】九龙\n【所属势力】和义堂\n【当前状态】武力巡视堂口，强压账目平账，暗中掩盖早年出千上位的黑历史\n【核心欲望】维持九龙表层秩序垄断，掩盖资金流向或应对上层清查，极度忌惮他人出千\n【行为模式】以沉默停顿与断指疤痕制造视觉压迫，精准施压，靠出千上位后立规矩见一个剁一个\n【微表情习惯】把玩核桃骤停时目光锁定目标后颈",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 9,
+      "active": true,
+      "changesFromPrev": []
+    }
+  },
+  "relationshipStates": {},
+  "equipmentStates": {
+    "7c9babf5-311b-43d1-91ff-7105e162e3a6": {
+      "id": "7c9babf5-311b-43d1-91ff-7105e162e3a6",
+      "name": "铜筹",
+      "content": "【所属位面】城寨次位面\n【类型】风险感知道具\n【机制】温度与痛感随局势危险程度及规则触发阈值变化（凉=安全/看客，微麻/烫=危险/规则试探，骤冷/剧痛=越界/代价预警）\n【使用代价】强行跨区或违背规则将引发旧伤抽痛与物理干扰（指尖微颤/握持打滑），痛感具象化规则惩罚\n【关联角色】贺千",
+      "owner": "未知",
+      "status": "完好",
+      "lastChangeChapter": 0
+    },
+    "b5d59a91-9927-4921-b39c-8dcb24f62a38": {
+      "id": "b5d59a91-9927-4921-b39c-8dcb24f62a38",
+      "name": "铜筹",
+      "content": "【所属位面】城寨次位面\n【物理形态】边缘盘得锃亮的古旧铜筹，表面有毛边与刻痕\n【触发机制】宿主动念察人或面临高危抉择时自动升温，痛感沿无名指旧疤上行；过度使用将引发骨缝刺痛与精神反噬\n【规则反馈】刻痕随局势重组显示提示，温度与痛感对应风险等级，贪多必遭反噬\n【当前状态】已激活，正持续传递账房查账的高危预警",
+      "owner": "未知",
+      "status": "完好",
+      "lastChangeChapter": 0
+    }
+  },
+  "growthMilestones": {},
+  "foreshadowingStates": {},
+  "activeQuests": [],
+  "timelineEvents": [],
+  "worldviewSnapshot": [],
+  "powerSystemSnapshot": [],
+  "diffFromPrev": {
+    "isNew": false,
+    "changes": [
+      {
+        "type": "character",
+        "id": "15d5ccaf-f61b-4751-96bf-c7fe401cf41e",
+        "name": "九指强",
+        "change": "新增角色"
+      }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "84077b1f-31ff-4c0c-9fc4-9c6e268f0605",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "镜楼核心",
+  "description": "裂痕强闯13楼触发镜楼防御，大量镜中倒影实体化攻击。沈墨辞利用破镜碎片豁免规则3（夜晚不可发声），大声喊出所有规则漏洞，帮助守镜人反击。沉默女揭示真实身份——镜楼意识碎片，她可以暂时关闭13楼的防御。沈墨辞进入核心区域。",
+  "eventType": "revelation",
+  "storyOrder": 8,
+  "sortOrder": 8,
+  "storyTime": "第2阶段",
+  "chapterIds": [
+    "ab53b99c-f883-4a74-a69e-b0b412e7119a"
+  ],
+  "questIds": [
+    "adf43eac-a5bc-4604-b8a2-6327fda1c8e7"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "核心区域",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第9章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

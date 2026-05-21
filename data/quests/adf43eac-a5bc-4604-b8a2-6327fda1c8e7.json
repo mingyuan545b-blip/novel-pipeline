@@ -1,0 +1,43 @@
+{
+  "id": "adf43eac-a5bc-4604-b8a2-6327fda1c8e7",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "parentId": "45780d74-a23d-4308-9c25-31b7604dbfde",
+  "title": "起始篇·觉醒",
+  "description": "第1-10章的故事弧线",
+  "status": "active",
+  "priority": "high",
+  "sortOrder": 0,
+  "materialIds": [],
+  "chapterIds": [
+    "486f40a6-807e-491a-b95c-b82ae2f7b55f",
+    "4279043a-5968-4237-83db-2d4999235fb5",
+    "f347874c-2301-466c-9b49-a62944552259",
+    "b6c958a6-d249-4486-bb66-8c0d54ea5a6c",
+    "fb88855b-21ad-411d-9102-34279dbdbf0d",
+    "2affa96d-8835-4063-a4b2-0a8bba5c88ba",
+    "5e5aeb15-564f-44ef-8cfe-5274a99a3a69",
+    "ed8ae113-64de-4060-bda3-7227cf1260a7",
+    "ab53b99c-f883-4a74-a69e-b0b412e7119a",
+    "e2610ab1-40de-46b0-b01b-573a84b0ebdd"
+  ],
+  "timelineEventIds": [
+    "91e97838-126e-4ad5-98b8-6e5c436bbe27",
+    "4dd75e27-fe5f-42e6-a9ec-f542d2a1e3d2",
+    "2c070d5d-b77f-4653-995f-67f822c9af49",
+    "4990cd42-b9d1-4a10-b0ca-e4647705d2df",
+    "4b249f4e-aeaa-4686-8876-e0fc5a34aaf6",
+    "7271586f-c298-43f9-ac6e-680b982b07fa",
+    "401552f0-6cba-4986-a24a-8ffe3e764dc6",
+    "b7d2f7e8-ff05-4edd-9b08-b46b7ae7249b",
+    "84077b1f-31ff-4c0c-9fc4-9c6e268f0605",
+    "fd19db9b-e6b7-4e17-b717-8bd16b518473"
+  ],
+  "progress": 0,
+  "notes": "",
+  "tags": [
+    "阶段任务",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

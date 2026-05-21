@@ -1,0 +1,44 @@
+{
+    "id": "chinglish",
+    "label": "中式英语",
+    "description": "中式英语，good good study day day up，我ben明白，we two who who，中英混搭自带喜感",
+    "features": {
+        "vocabulary": {
+            "好": "good/very good",
+            "很": "very/so much",
+            "明白": "understand/ben明白",
+            "不行": "no way/impossible",
+            "快点": "hurry up/quickly",
+            "谢谢": "thank you/thx",
+            "厉害": "powerful/amazing",
+            "没问题": "no problem/NP",
+            "真的": "really/truly",
+            "开心": "happy",
+            "当然": "of course/sure",
+            "漂亮": "beautiful/handsome"
+        },
+        "patterns": [
+            "中式语法直译神句：good good study day day up、we two who who、you me you me、give you color see see",
+            "英文单词后加中文语气词：very好呢、so easy嘛、amazing了吧",
+            "拼音式英语：ben明白=本明白、I服了you、long time no see",
+            "中英无缝切换：中文句子中间突然蹦一个英文词，'这事儿very tricky，but没关系'",
+            "Chinglish经典句式：'You ask me, I ask who?' 'No three no four' 'People mountain people sea'"
+        ],
+        "toneMarkers": ["中英无缝切换", "语法混乱自带喜感", "英文单词后加中文语气词"],
+        "forbidden": [
+            "禁止用真正流利的英语，必须是中式英语的违和感",
+            "禁止每句话都中英混搭，每3-5句出现1次即可",
+            "禁止在严肃场景用中式英语"
+        ]
+    },
+    "intensity": {
+        "light": "偶尔夹带英文单词（OK、no problem、very）",
+        "medium": "light + 中式语法混搭（very好呢、I服了you、ben明白）",
+        "heavy": "medium + good good study式直译+Chinglish经典句式+密集中英混搭"
+    },
+    "examples": {
+        "light": "这事儿OK的，no problem。",
+        "medium": "这事儿very good呢，I ben明白你的意思，so easy嘛，give you color see see！",
+        "heavy": "这事儿very good呢，I ben明白你的意思啦！We two who who嘛，so easy，good good study day day up！You ask me I ask who？No three no four的事情不要做哦，people mountain people sea，trust me brother！"
+    }
+}

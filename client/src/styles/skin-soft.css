@@ -1,0 +1,190 @@
+:root,
+[data-theme="ceramic"] {
+    --theme-name: ceramic;
+    --bg-primary: #1a1a24;
+    --bg-secondary: #22222e;
+    --bg-tertiary: #2a2a38;
+    --bg-card: #2e2e3c;
+    --bg-card-hover: #363646;
+    --bg-input: #262632;
+    --neon-blue: #6c8ebf;
+    --neon-pink: #d4739a;
+    --neon-purple: #9b72cf;
+    --neon-green: #6abf8a;
+    --neon-orange: #e8a45c;
+    --neon-red: #d45c5c;
+    --neon-yellow: #d4c45c;
+    --gradient-primary: linear-gradient(135deg, #6c8ebf, #9b72cf, #d4739a);
+    --gradient-secondary: linear-gradient(135deg, #9b72cf, #6c8ebf);
+    --gradient-accent: linear-gradient(135deg, #d4739a, #d45c5c);
+    --gradient-success: linear-gradient(135deg, #6abf8a, #6c8ebf);
+    --gradient-warning: linear-gradient(135deg, #e8a45c, #d45c5c);
+    --glow-blue: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.3);
+    --glow-pink: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.3);
+    --glow-purple: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.3);
+    --glow-green: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.3);
+    --glow-orange: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.3);
+    --glow-red: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.3);
+    --text-primary: #d8d8e8;
+    --text-secondary: #9898b0;
+    --text-muted: #686880;
+    --text-accent: #6c8ebf;
+    --border-color: rgba(108,142,191,0.1);
+    --border-glow: none;
+    --font-primary: 'Nunito', 'Segoe UI', sans-serif;
+    --font-mono: 'Fira Code', 'Consolas', monospace;
+    --font-body: 'Nunito', 'Segoe UI', sans-serif;
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --radius-xl: 38px;
+    --transition-fast: 0.25s ease;
+    --transition-normal: 0.4s ease;
+    --transition-slow: 0.6s ease;
+    --sidebar-width: 260px;
+    --header-height: 64px;
+    --card-shadow: 6px 6px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(60,60,80,0.25);
+    --card-shadow-hover: 8px 8px 18px rgba(0,0,0,0.6), -4px -4px 10px rgba(70,70,90,0.3);
+    --btn-shadow: 4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(60,60,80,0.2);
+    --input-shadow: inset 3px 3px 6px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(60,60,80,0.15);
+    --sidebar-bg: var(--bg-secondary);
+    --header-bg: var(--bg-secondary);
+}
+
+[data-theme="ceramic"] .app-layout {
+    background: linear-gradient(135deg, #1a1a24 0%, #1e1e2c 30%, #222230 60%, #1e1e2c 100%);
+}
+
+[data-theme="ceramic"] .app-bg-layer::after {
+    background: rgba(26,26,36,0.5);
+}
+
+[data-theme="ceramic"] .cyber-card {
+    border: none;
+    box-shadow: var(--card-shadow);
+    background: linear-gradient(145deg, var(--bg-card), var(--bg-tertiary));
+    border-radius: 28px;
+}
+
+[data-theme="ceramic"] .cyber-card::before {
+    display: none;
+}
+
+[data-theme="ceramic"] .cyber-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(108,142,191,0.15), rgba(155,114,207,0.15), rgba(212,115,154,0.15), transparent);
+    border-radius: 28px 28px 0 0;
+}
+
+[data-theme="ceramic"] .cyber-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-3px) scale(1.005);
+}
+
+[data-theme="ceramic"] .cyber-btn {
+    border: none;
+    box-shadow: var(--btn-shadow);
+    border-radius: 20px;
+    text-transform: none;
+    letter-spacing: 0.5px;
+    background: linear-gradient(145deg, var(--bg-card), var(--bg-tertiary));
+}
+
+[data-theme="ceramic"] .cyber-btn::before {
+    display: none;
+}
+
+[data-theme="ceramic"] .cyber-btn:hover {
+    box-shadow: 5px 5px 14px rgba(0,0,0,0.5), -3px -3px 8px rgba(70,70,90,0.25);
+    transform: translateY(-1px);
+}
+
+[data-theme="ceramic"] .cyber-btn:active {
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(60,60,80,0.15);
+    transform: translateY(1px);
+}
+
+[data-theme="ceramic"] .cyber-btn-primary {
+    background: linear-gradient(135deg, #6c8ebf, #9b72cf);
+    box-shadow: 4px 4px 12px rgba(108,142,191,0.3), -2px -2px 6px rgba(60,60,80,0.2);
+    color: #fff;
+}
+
+[data-theme="ceramic"] .cyber-input,
+[data-theme="ceramic"] .cyber-textarea,
+[data-theme="ceramic"] .cyber-select {
+    border: none;
+    box-shadow: var(--input-shadow);
+    border-radius: 16px;
+    background: var(--bg-input);
+}
+
+[data-theme="ceramic"] .cyber-input:focus,
+[data-theme="ceramic"] .cyber-textarea:focus {
+    box-shadow: inset 3px 3px 6px rgba(0,0,0,0.35), inset -2px -2px 4px rgba(60,60,80,0.2), 0 0 0 3px rgba(108,142,191,0.12);
+}
+
+[data-theme="ceramic"] .app-sidebar::after {
+    display: none;
+}
+
+[data-theme="ceramic"] .app-header::after {
+    background: linear-gradient(90deg, rgba(108,142,191,0.15), rgba(155,114,207,0.15), rgba(212,115,154,0.15), rgba(108,142,191,0.15));
+    background-size: 200% 100%;
+    animation: flowGlow 6s ease infinite;
+    opacity: 0.4;
+}
+
+[data-theme="ceramic"] .stat-card {
+    border: none;
+    box-shadow: var(--card-shadow);
+    background: linear-gradient(145deg, var(--bg-card), var(--bg-tertiary));
+    border-radius: 28px;
+}
+
+[data-theme="ceramic"] .stat-card::before {
+    display: none;
+}
+
+[data-theme="ceramic"] .pipeline-node-icon {
+    border: none;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(60,60,80,0.2);
+    background: linear-gradient(145deg, var(--bg-card), var(--bg-tertiary));
+}
+
+[data-theme="ceramic"] .cyber-badge {
+    border-radius: 14px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+[data-theme="ceramic"] .cyber-tabs {
+    border-bottom: 2px solid rgba(108,142,191,0.08);
+}
+
+[data-theme="ceramic"] .cyber-loading {
+    border-width: 3px;
+}
+
+[data-theme="ceramic"] .module-switch-active {
+    background: linear-gradient(145deg, rgba(108,142,191,0.15), rgba(155,114,207,0.1)) !important;
+    color: var(--neon-blue) !important;
+    border-color: rgba(108,142,191,0.2) !important;
+}
+
+[data-theme="ceramic"] ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+[data-theme="ceramic"] ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #6c8ebf, #9b72cf, #d4739a);
+    border-radius: 10px;
+}
+
+[data-theme="ceramic"] ::selection {
+    background: rgba(108,142,191,0.25);
+}

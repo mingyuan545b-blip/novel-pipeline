@@ -1,0 +1,19 @@
+{
+    "dxt_version": "0.1",
+    "name": "@aipy-pro/material-manager",
+    "display_name": "素材管理员",
+    "version": "1.0.0",
+    "description": "小说创作流水线 - 素材管理员Agent，管理和更新素材库",
+    "author": { "name": "NovelPipeline" },
+    "icon": "icon.svg",
+    "server": {
+        "type": "node",
+        "entry_point": "server.js",
+        "mcp_config": {
+            "command": "node",
+            "args": ["${__dirname}/server.js"],
+            "env": {}
+        }
+    },
+    "keywords": ["conversation-tool"]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "03_人物熔炉部_04_人物关系网_02",
+  "category_path": "03_人物熔炉部/04_人物关系网/02_对立关系",
+  "display_name": "对立关系",
+  "department": "03_人物熔炉部",
+  "subcategory": "04_人物关系网",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "对立关系",
+    "人物关系网",
+    "人物熔炉部"
+  ],
+  "context_slot": "L2",
+  "context_priority": 80,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.239Z"
+}

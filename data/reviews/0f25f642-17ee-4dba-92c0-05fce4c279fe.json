@@ -1,0 +1,28 @@
+{
+  "id": "0f25f642-17ee-4dba-92c0-05fce4c279fe",
+  "chapterId": "fb0cbc63-022f-454b-9ba6-d3416115c7a5",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "step": "final-editor",
+  "type": "final-editor",
+  "reviewer": "final-editor-agent",
+  "result": {
+    "approved": true,
+    "action": "approve",
+    "edits": [
+      "章末断章替换为感官压迫式收尾，绑定铜筹灼痛/旧伤反噬/追兵脚步声",
+      "江晚合作台词植入九记车房暗线死钟规则，具象化违约代价"
+    ],
+    "ipDirection": "维持1980年代九龙城寨白话风，禁用网络流行语与影视化套话",
+    "materialGuidance": "铜筹/旧伤进度追踪严格采用叙事融入式，禁止任何形式的方括号或UI标签",
+    "scheduleNote": "定稿完成，直接接入发布库，下一章需跟进账本破局代价结算与权限掉落"
+  },
+  "passed": true,
+  "content": "定稿完成，直接接入发布库，下一章需跟进账本破局代价结算与权限掉落",
+  "issues": [
+    "章末断章替换为感官压迫式收尾，绑定铜筹灼痛/旧伤反噬/追兵脚步声",
+    "江晚合作台词植入九记车房暗线死钟规则，具象化违约代价"
+  ],
+  "suggestions": [],
+  "round": 1,
+  "createdAt": "2026-05-13T15:53:53.122Z"
+}

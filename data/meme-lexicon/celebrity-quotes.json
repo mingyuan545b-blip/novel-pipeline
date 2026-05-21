@@ -1,0 +1,74 @@
+{
+    "id": "celebrity-quotes",
+    "label": "名人语录乱入",
+    "description": "在完全不搭的场景引用名人名言/影视经典台词，反差越大越好笑，用对了是神来之笔用多了是尬",
+    "category": "meme-lexicon",
+    "entries": [
+        {
+            "quote": "小同志",
+            "source": "经典革命题材",
+            "triggerScene": "上级对下级/老手对新手的称呼",
+            "buildupRule": "先营造正经严肃氛围，再突然蹦出这句",
+            "densityLimit": "每5章最多1次",
+            "exampleUsage": "老王拍了拍他的肩膀：'小同志，革命尚未成功啊。'"
+        },
+        {
+            "quote": "鸡汤来咯",
+            "source": "网络热梗",
+            "triggerScene": "有人要灌鸡汤/说教/安慰时",
+            "buildupRule": "对方正准备长篇大论安慰时，被这句打断",
+            "densityLimit": "每3章最多1次",
+            "exampleUsage": "他清了清嗓子正要开导，旁边有人端着碗过来：'鸡汤来咯——'"
+        },
+        {
+            "quote": "这瓜保熟吗",
+            "source": "《征服》刘华强",
+            "triggerScene": "质疑/试探/找茬时",
+            "buildupRule": "先有质疑的眼神或动作，再用这句开场",
+            "densityLimit": "每5章最多1次",
+            "exampleUsage": "他眯着眼看了看那堆证据：'这瓜保熟吗？'"
+        },
+        {
+            "quote": "优势在我",
+            "source": "《大决战》蒋介石",
+            "triggerScene": "明明劣势还嘴硬/盲目自信时",
+            "buildupRule": "先描述不利局面，再让角色自信满满说出这句",
+            "densityLimit": "每5章最多1次",
+            "exampleUsage": "兵力只有对方三分之一，他大手一挥：'优势在我！'"
+        },
+        {
+            "quote": "厉不厉害你坤哥",
+            "source": "网络热梗",
+            "triggerScene": "炫耀/装杯/展示实力后",
+            "buildupRule": "先做了一件确实厉害的事，再用这句收尾",
+            "densityLimit": "每10章最多1次",
+            "exampleUsage": "一拳打穿墙壁，他甩了甩手：'厉不厉害你坤哥？'"
+        },
+        {
+            "quote": "是谁给你的勇气",
+            "source": "《欢乐颂》/网络",
+            "triggerScene": "质问/嘲讽对方胆大包天时",
+            "buildupRule": "先描述对方做了离谱的事，再反问",
+            "densityLimit": "每5章最多1次",
+            "exampleUsage": "'是谁给你的勇气？'他冷笑，'是梁静茹吗？'"
+        },
+        {
+            "quote": "年轻真好",
+            "source": "日常感叹",
+            "triggerScene": "看到年轻人做傻事/冲动事时，老辈感慨",
+            "buildupRule": "先描述年轻人的莽撞行为，再由旁观者感叹",
+            "densityLimit": "每10章最多1次",
+            "exampleUsage": "看着十八岁的小伙冲上去送人头，老张摇摇头：'年轻真好啊。'"
+        }
+    ],
+    "globalRules": {
+        "maxQuotesPerChapter": 2,
+        "mustMatchScene": true,
+        "forbidden": [
+            "禁止引用涉及真实政治人物的敏感语录",
+            "禁止每章用超过2个名人语录",
+            "禁止语录和场景毫无关联硬塞",
+            "名人语录是彩蛋不是主菜，读者能会心一笑就够了"
+        ]
+    }
+}

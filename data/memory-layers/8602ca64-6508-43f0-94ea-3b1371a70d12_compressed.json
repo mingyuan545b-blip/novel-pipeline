@@ -1,0 +1,197 @@
+{
+  "chapterNumber": 1,
+  "volumes": {
+    "1": {
+      "volumeNumber": 1,
+      "startChapter": 1,
+      "endChapter": 30,
+      "chapters": [
+        {
+          "chapterNumber": 1,
+          "title": "渊鳞隐契·合欢宗里当花瓶",
+          "summary": "沈渡端着紫檀木托盘，步子迈得比绣花针还细。\n托盘上搁着三盏灵茶，茶水没洒出一滴。\n他刚拐过青石回廊，就听见假山后头传来几声压低的嗤笑。",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 2,
+          "title": "命牌初刻·系统让我卸载QQ",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 3,
+          "title": "残卷融汇·启微三阶的废物",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 4,
+          "title": "器鸣初颤·出发前的准备",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 5,
+          "title": "雾隐迷途·踏入沉默之域",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 6,
+          "title": "声锁初现·聆者的追猎",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 7,
+          "title": "回声暗涌·话痨遇上话痨",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 8,
+          "title": "猎团密谋·反抗者的交易",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 9,
+          "title": "子时倒音·声音逆流的恐怖",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 10,
+          "title": "红物驱暗·沉默中的交易",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 11,
+          "title": "铭文破译·七条规则的漏洞",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 12,
+          "title": "暗市浮沉·缄默守卫的秘密",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 13,
+          "title": "声纹仿造·回声的绝活",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 14,
+          "title": "冬至将至·规则异变的前兆",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 15,
+          "title": "守卫围猎·身份暴露的危机",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 16,
+          "title": "独对聆者·启微三阶的逆袭",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 17,
+          "title": "猎团真相·回声的另一面",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 18,
+          "title": "守卫倒戈·鸣刃的抉择",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 19,
+          "title": "王座方位·冬至倒计时",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 20,
+          "title": "破阶之刻·启微四阶的声律",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 21,
+          "title": "无音殿前·规则武化",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 22,
+          "title": "规则反噬·以彼之道",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 23,
+          "title": "殿门洞开·缄默王的凝视",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 24,
+          "title": "谕令降临·冬至之刻",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 25,
+          "title": "王口初启·千年的第一声",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 26,
+          "title": "能力掠夺·沉默之主的馈赠",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 27,
+          "title": "域崩撤离·最后的馈赠",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 28,
+          "title": "归途惊魂·修为压制的初体验",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 29,
+          "title": "花瓶逆袭·合欢宗里的禁声",
+          "summary": "",
+          "keyEvents": []
+        },
+        {
+          "chapterNumber": 30,
+          "title": "渊鳞初显·新的命牌刻痕",
+          "summary": "",
+          "keyEvents": []
+        }
+      ],
+      "summary": ""
+    }
+  },
+  "totalTokenEstimate": 1526,
+  "projectId": "8602ca64-6508-43f0-94ea-3b1371a70d12",
+  "layer": "compressed",
+  "updatedAt": "2026-05-12T14:30:06.360Z"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "fed0b3d9-b8d3-46e4-92bf-c72da713a017",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "概念碎片",
+  "description": "沈墨辞利用口才（软饭男的说服力）让双方同时说出\"我不需要你\"，合作解除。但他发现草原世界的真正秘密：这不是一个真实世界，而是某个已消亡文明的\"概念残影\"。系统掠夺条件触发，沈墨辞获得\"因果律闪避\"弱化版——在致命攻击来临时有15%概率自动闪避。",
+  "eventType": "revelation",
+  "storyOrder": 17,
+  "sortOrder": 17,
+  "storyTime": "第4阶段",
+  "chapterIds": [
+    "a5fbe54c-2166-44d7-95ef-8dba02b04dc9"
+  ],
+  "questIds": [
+    "9900d2fb-37ad-46be-95c7-7a1941a06195"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "致命攻击来临时有",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第18章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

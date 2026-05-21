@@ -1,0 +1,30 @@
+{
+  "id": "ce776c63-6ae6-40d1-9081-1231bd9a0f74",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【核心欲望】在规则夹缝中存活并获取关键筹码\n【内在矛盾】市井赌徒的谨慎底线与绝境中的果断冒险\n【行为模式】出千被抓认赔是底线，遇死路优先推演代价再博弈，善用环境细节反制，习惯以冷面吐槽对冲高压\n【当前状态】左手无名指旧伤裂开，掌心暗金纹路激活，正攀爬侧巷排水管逼近和义堂账房\n【所属势力】null",
+  "eventType": "character",
+  "storyOrder": 43,
+  "sortOrder": 43,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "5b79da66-d78a-4ce9-aa61-7ac58f447344"
+  ],
+  "characterIds": [
+    "5b79da66-d78a-4ce9-aa61-7ac58f447344"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "主角首次登场，确立核心欲望与行为模式",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T14:06:21.532Z",
+  "updatedAt": "2026-05-13T14:06:21.532Z"
+}

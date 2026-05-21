@@ -1,0 +1,28 @@
+{
+  "id": "9ceb9c03-3e0a-433d-b6c7-3903b5cfb520",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "命牌三震",
+  "description": "系统发布第三个任务：文明类·魔法世界。沈墨辞这次更加谨慎，选择在裴知远监视最松懈的深夜穿越。进入一个中世纪魔法世界，他获得身份：一个没落魔法家族的最后继承人。魔法世界有完整的魔力等级和势力格局，沈墨辞需要在这个世界生存并完成系统任务。",
+  "eventType": "world",
+  "storyOrder": 22,
+  "sortOrder": 22,
+  "storyTime": "第5阶段",
+  "chapterIds": [
+    "d7c8dfdd-8d77-4a28-ac30-ce9d1b4f3fbe"
+  ],
+  "questIds": [
+    "da497396-18a3-4900-ad42-b8f09e937632"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "裴知远监视最松懈",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第23章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

@@ -1,0 +1,21 @@
+{
+    "id": "历史",
+    "label": "历史",
+    "namingStyle": "poetic-imagery",
+    "namingStyleIntensity": "heavy",
+    "worldviewTemplate": "martial-ascension",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["shadow-schemer", "old-fox", "smiling-traitor", "true-expert", "green-tea", "sneaky-backstabber", "info-broker"],
+    "defaultSpeechStyles": ["bureaucratese", "euphemism"],
+    "defaultDialects": ["陕西", "北京"],
+    "styleHints": {
+        "pov": "第三人称全知视角",
+        "tone": "厚重沉郁",
+        "style": "历史权谋"
+    },
+    "wordConfig": { "minWords": 2500, "targetWords": 3000, "maxWords": 4000 },
+    "constraintOverrides": ["historical-accuracy", "no-anachronism", "court-etiquette"],
+    "reviewFocus": ["历史事件/人物不穿越错乱", "官制/礼仪/称谓符合朝代", "权谋逻辑经得起推敲", "古文引用不出硬伤", "人物动机符合时代局限"],
+    "defaultSystemPersona": "contract-devil",
+    "materialFocus": ["character", "faction", "institution", "character-relationship", "foreshadowing", "worldview"]
+}

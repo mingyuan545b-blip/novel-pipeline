@@ -1,0 +1,11 @@
+{
+  "id": "04_对白艺术部_03_角色语言区分_03",
+  "success_rate": 50,
+  "attempts": 0,
+  "auto_disabled": false,
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ]
+}

@@ -1,0 +1,113 @@
+{
+    "id": "urban-awakening",
+    "label": "都市觉醒型",
+    "tag": "都市异能/灵气复苏/诡秘之主式",
+    "description": "现代都市中隐藏着超自然世界，主角从普通人逐渐深入，发现城市下面有另一个世界在运转",
+    "applicableGenres": ["都市", "异能", "灵异", "悬疑"],
+    "phases": [
+        {
+            "id": "early",
+            "label": "前期·觉醒篇",
+            "chapterRange": "1-30%",
+            "description": "普通人意外接触超自然，发现隐藏世界，战力弱小靠智谋",
+            "worldRules": {
+                "powerCeiling": "初级异能（感知增强/简单操控）",
+                "geographicScope": "单一城市+隐藏空间",
+                "factionComplexity": "1-2个秘密组织",
+                "characterScale": "5-10个角色",
+                "threatLevel": "低级异怪/小组织阴谋",
+                "knowledgeScope": "只知道超自然存在，规则不明"
+            },
+            "narrativeRules": {
+                "povScope": "主角视角，信息受限",
+                "pacingRule": "日常+诡异事件交替，悬疑为主",
+                "humorDensity": "高——都市日常+超自然反差",
+                "powerDisplay": "靠智谋和信息差取胜",
+                "worldReveal": "每次事件揭示一条超自然规则"
+            },
+            "consistencyAnchors": [
+                "超自然规则必须一开始就有逻辑（不能后期改）",
+                "主角的觉醒方式决定能力方向（不能偏移）",
+                "都市日常和超自然的边界必须明确"
+            ]
+        },
+        {
+            "id": "mid",
+            "label": "中期·深入篇",
+            "chapterRange": "30-70%",
+            "description": "深入超自然世界，加入组织/自立门户，发现更大的阴谋",
+            "worldRules": {
+                "powerCeiling": "中级异能（区域控制/规则干涉）",
+                "geographicScope": "多个城市+异空间",
+                "factionComplexity": "3-7个组织，有合作有对抗",
+                "characterScale": "20-40个角色",
+                "threatLevel": "组织级阴谋/城市级异变",
+                "knowledgeScope": "了解超自然世界的组织架构和规则体系"
+            },
+            "narrativeRules": {
+                "povScope": "主角+盟友视角",
+                "pacingRule": "任务+调查+组织政治交替",
+                "humorDensity": "中——任务紧张但队友互动有趣",
+                "powerDisplay": "能力成长但遇到规则级对手",
+                "worldReveal": "揭示超自然世界的历史和权力结构"
+            },
+            "consistencyAnchors": [
+                "组织的规则和前期的暗示必须一致",
+                "主角的能力成长必须有逻辑路径",
+                "中期的阴谋必须和前期的伏笔呼应",
+                "都市社会对超自然的反应必须合理"
+            ],
+            "transitionFrom": {
+                "trigger": "主角加入/对抗核心组织/发现超自然起源",
+                "mustResolve": "觉醒篇的核心谜题",
+                "mustEstablish": "更大的阴谋/更深的真相"
+            }
+        },
+        {
+            "id": "late",
+            "label": "后期·真相篇",
+            "chapterRange": "70-100%",
+            "description": "触及超自然世界的起源真相，面临改变世界的抉择",
+            "worldRules": {
+                "powerCeiling": "规则级（改写超自然法则）",
+                "geographicScope": "全球+异界+概念空间",
+                "factionComplexity": "所有势力终极对决",
+                "characterScale": "核心角色收束",
+                "threatLevel": "世界级异变/超自然与现实的边界崩溃",
+                "knowledgeScope": "超自然起源的终极真相"
+            },
+            "narrativeRules": {
+                "povScope": "多线收束",
+                "pacingRule": "持续高压",
+                "humorDensity": "低——终局严肃",
+                "powerDisplay": "触及规则本质但代价巨大",
+                "worldReveal": "所有谜底揭晓"
+            },
+            "consistencyAnchors": [
+                "超自然起源必须和前中期所有规则兼容",
+                "主角的最终抉择必须和觉醒时的初心呼应",
+                "现实世界和超自然世界的边界必须有结局",
+                "所有组织的命运必须有交代"
+            ],
+            "transitionFrom": {
+                "trigger": "发现超自然起源/世界边界开始崩溃",
+                "mustResolve": "中期阴谋的核心矛盾",
+                "mustEstablish": "最终抉择：维持现状还是改变世界"
+            }
+        }
+    ],
+    "globalConsistencyRules": [
+        "超自然规则必须自洽——不能为了剧情临时加规则",
+        "都市社会对超自然的反应必须递进——从无知到恐慌到适应",
+        "主角的能力成长必须有代价——越强越危险",
+        "组织的行为必须有逻辑——不能为了剧情做蠢事",
+        "现实和超自然的边界必须明确——不能模糊处理"
+    ],
+    "forbiddenPatterns": [
+        "超自然规则前后矛盾",
+        "普通人突然接受超自然毫无反应",
+        "组织为了剧情需要做蠢事",
+        "主角能力无限膨胀没有代价",
+        "现实世界完全被忽略"
+    ]
+}

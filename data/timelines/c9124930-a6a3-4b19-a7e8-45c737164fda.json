@@ -1,0 +1,28 @@
+{
+  "id": "c9124930-a6a3-4b19-a7e8-45c737164fda",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "锦瑟之秘",
+  "description": "苏锦瑟私下告诉沈墨辞，她知道他\"有些秘密\"，但不会追问——因为每个人都有秘密。她透露自己也在隐瞒什么。沈墨辞第一次对苏锦瑟产生真诚的信任。两人达成默契：互不追问，互相掩护。沈墨辞用积分将修为提升到正言六重，同时升级规则之眼。",
+  "eventType": "world",
+  "storyOrder": 27,
+  "sortOrder": 27,
+  "storyTime": "第6阶段",
+  "chapterIds": [
+    "46a5324f-bf92-4df0-9ca2-2d0f935a8353"
+  ],
+  "questIds": [
+    "da497396-18a3-4900-ad42-b8f09e937632"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "隐瞒什么",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第28章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

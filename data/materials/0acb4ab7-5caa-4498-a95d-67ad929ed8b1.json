@@ -1,0 +1,17 @@
+{
+  "id": "0acb4ab7-5caa-4498-a95d-67ad929ed8b1",
+  "projectId": "d367c98e-f5fa-4794-83e9-415ef553d6b8",
+  "type": "character",
+  "name": "方砚",
+  "description": "律鉴司少司命",
+  "initialContent": "核心欲望：建立完美的秩序体系\n内在矛盾：规则至上的信念 vs 规则无法覆盖的灰色地带\n行为模式：先立规矩再行事，以规则为武器\n性格：强迫症+话少但每句都是结论+偶尔被沈渡气到失态\n修为：法家肃纲三阶",
+  "currentContent": "核心欲望：建立完美的秩序体系\n内在矛盾：规则至上的信念 vs 规则无法覆盖的灰色地带\n行为模式：先立规矩再行事，以规则为武器\n性格：强迫症+话少但每句都是结论+偶尔被沈渡气到失态\n修为：法家肃纲三阶",
+  "parentPlane": null,
+  "isLocked": true,
+  "isFoundation": true,
+  "tags": [],
+  "version": 1,
+  "changeLog": [],
+  "createdAt": "2026-05-11T11:45:06.083Z",
+  "updatedAt": "2026-05-11T11:45:06.083Z"
+}

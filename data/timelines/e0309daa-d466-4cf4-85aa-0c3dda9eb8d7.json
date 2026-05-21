@@ -1,0 +1,28 @@
+{
+  "id": "e0309daa-d466-4cf4-85aa-0c3dda9eb8d7",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "周三茶楼账本争夺",
+  "description": "【预期回收窗口】第3-5章\n【关联角色】贺千、九指强、歪嘴明、纪棠\n【悬念设定】周三下午两点界限街外茶楼二楼雅间对账。真账本藏于界限街牛皮纸袋，贺千需借黄铜钥匙从后门潜入。纪棠要求分得第七局老鬼账页作为带路条件，双方信任脆弱，随时可能反水。九指强已收紧巡逻路线，硬闯必死。",
+  "eventType": "foreshadow",
+  "storyOrder": 3,
+  "sortOrder": 3,
+  "storyTime": "第3章",
+  "chapterIds": [
+    "0ebb3be7-6529-4742-be08-e6a360547f40"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "05892388-264c-4431-ba51-9eb5c9eae5be"
+  ],
+  "characterIds": [],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "本章明确周三任务目标、路线、筹码交换与潜在冲突，设定期望回收窗口",
+  "tags": [
+    "auto-generated",
+    "material-foreshadowing"
+  ],
+  "createdAt": "2026-05-13T02:48:14.492Z",
+  "updatedAt": "2026-05-13T02:48:14.492Z"
+}

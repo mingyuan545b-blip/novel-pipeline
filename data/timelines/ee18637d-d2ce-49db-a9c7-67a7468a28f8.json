@@ -1,0 +1,28 @@
+{
+  "id": "ee18637d-d2ce-49db-a9c7-67a7468a28f8",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "宗门小比",
+  "description": "合欢宗月度小比，沈墨辞被安排上场。他本想继续装弱，但对手是看他不顺眼的内门弟子。沈墨辞用规则之眼感知到对手招式中的\"规则\"——固定套路，然后利用漏洞一招制胜。全场震惊，苏锦瑟嘴角微扬。沈墨辞内心：这叫战术性示弱之后的战术性反击。",
+  "eventType": "character",
+  "storyOrder": 11,
+  "sortOrder": 11,
+  "storyTime": "第3阶段",
+  "chapterIds": [
+    "50a689b2-83a2-48c0-9021-34b1e53ce4aa"
+  ],
+  "questIds": [
+    "9900d2fb-37ad-46be-95c7-7a1941a06195"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第12章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

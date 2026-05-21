@@ -1,0 +1,15 @@
+{
+    "currentVersion": "1.0.0",
+    "buildNumber": 1,
+    "releaseDate": "2026-04-15T00:00:00.000Z",
+    "changelog": [
+        "初始发布版本",
+        "5种AI Agent自动化流水线",
+        "4种皮肤风格",
+        "小说模块 + 漫剧模块",
+        "会员系统"
+    ],
+    "minClientVersion": "1.0.0",
+    "forceUpdate": false,
+    "downloadUrl": null
+}

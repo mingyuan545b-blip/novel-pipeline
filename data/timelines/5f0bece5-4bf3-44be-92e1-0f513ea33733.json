@@ -1,0 +1,26 @@
+{
+  "id": "5f0bece5-4bf3-44be-92e1-0f513ea33733",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "第1章IP方向",
+  "description": "无知名IP角色出场，无需处理",
+  "eventType": "revelation",
+  "storyOrder": 5,
+  "sortOrder": 5,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "auto-generated",
+    "ip-direction"
+  ],
+  "createdAt": "2026-05-13T04:14:33.246Z",
+  "updatedAt": "2026-05-13T04:14:33.246Z"
+}

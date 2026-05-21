@@ -1,0 +1,33 @@
+{
+  "id": "02_情节引擎部_03_反转设计_02",
+  "category_path": "02_情节引擎部/03_反转设计/02_信息反转",
+  "display_name": "信息反转",
+  "department": "02_情节引擎部",
+  "subcategory": "03_反转设计",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "信息反转",
+    "反转设计",
+    "情节引擎部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.221Z"
+}

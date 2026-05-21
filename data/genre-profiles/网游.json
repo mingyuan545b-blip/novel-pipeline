@@ -1,0 +1,21 @@
+{
+    "id": "网游",
+    "label": "网游",
+    "namingStyle": "net-abstract",
+    "namingStyleIntensity": "heavy",
+    "worldviewTemplate": "adventure-escalation",
+    "defaultMode": "shuangwen",
+    "defaultArchetypes": ["wise-fool", "chaos-agent", "comedy-girl", "fake-expert", "living-treasure", "grind-king", "sneaky-backstabber"],
+    "defaultSpeechStyles": ["abstract", "crazy", "nonsense"],
+    "defaultDialects": ["东北", "四川"],
+    "styleHints": {
+        "pov": "第三人称限制视角",
+        "tone": "轻松搞笑",
+        "style": "网游爽文"
+    },
+    "wordConfig": { "minWords": 2000, "targetWords": 2500, "maxWords": 3500 },
+    "constraintOverrides": ["game-mechanic-consistency", "no-realworld-bleed", "number-crunch-accuracy"],
+    "reviewFocus": ["游戏数值体系不崩坏", "副本/任务逻辑不穿帮", "网游术语使用准确", "线上线下切换自然", "爽点节奏密集不注水"],
+    "defaultSystemPersona": "pay-to-win",
+    "materialFocus": ["power-system", "mechanism", "equipment", "character", "foreshadowing"]
+}

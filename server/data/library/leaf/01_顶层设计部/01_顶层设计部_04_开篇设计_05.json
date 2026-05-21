@@ -1,0 +1,31 @@
+{
+  "id": "01_顶层设计部_04_开篇设计_05",
+  "category_path": "01_顶层设计部/04_开篇设计/05_日常颠覆式开头",
+  "display_name": "日常颠覆式开头",
+  "department": "01_顶层设计部",
+  "subcategory": "04_开篇设计",
+  "applicable_modes": [
+    "novel"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "日常颠覆式开头",
+    "开篇设计",
+    "顶层设计部"
+  ],
+  "context_slot": "L2",
+  "context_priority": 80,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.207Z"
+}

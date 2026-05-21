@@ -1,0 +1,31 @@
+{
+  "id": "06_世界构建部_05_日常生活_03",
+  "category_path": "06_世界构建部/05_日常生活/03_货币交易",
+  "display_name": "货币交易",
+  "department": "06_世界构建部",
+  "subcategory": "05_日常生活",
+  "applicable_modes": [
+    "novel"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "货币交易",
+    "日常生活",
+    "世界构建部"
+  ],
+  "context_slot": "L4",
+  "context_priority": 20,
+  "injection_point": "material-manager",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.290Z"
+}

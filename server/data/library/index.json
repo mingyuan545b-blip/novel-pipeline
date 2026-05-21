@@ -1,0 +1,3190 @@
+{
+  "version": "v1.0",
+  "last_sync": "2026-04-29T15:39:35.292Z",
+  "total_entries": 184,
+  "entries": [
+    {
+      "id": "00_叙事之魂部_01_故事母题_01",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_01.json",
+      "tags": [
+        "复仇",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "复仇",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_01_故事母题_02",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_02.json",
+      "tags": [
+        "成长",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "成长",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_01_故事母题_03",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_03.json",
+      "tags": [
+        "爱情",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "爱情",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_01_故事母题_04",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_04.json",
+      "tags": [
+        "求生",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "求生",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_01_故事母题_05",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_05.json",
+      "tags": [
+        "寻找",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "寻找",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_01_故事母题_06",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_06.json",
+      "tags": [
+        "归来",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "归来",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_01_故事母题_07",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_01_故事母题_07.json",
+      "tags": [
+        "牺牲",
+        "故事母题",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "牺牲",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_02_高概念内核_01",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_02_高概念内核_01.json",
+      "tags": [
+        "时间循环",
+        "高概念内核",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "时间循环",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_02_高概念内核_02",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_02_高概念内核_02.json",
+      "tags": [
+        "身份错位",
+        "高概念内核",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "身份错位",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_02_高概念内核_03",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_02_高概念内核_03.json",
+      "tags": [
+        "规则游戏",
+        "高概念内核",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "规则游戏",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_02_高概念内核_04",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_02_高概念内核_04.json",
+      "tags": [
+        "平行世界",
+        "高概念内核",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "平行世界",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_02_高概念内核_05",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_02_高概念内核_05.json",
+      "tags": [
+        "末世生存",
+        "高概念内核",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "末世生存",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_02_高概念内核_06",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_02_高概念内核_06.json",
+      "tags": [
+        "反乌托邦",
+        "高概念内核",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "反乌托邦",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_03_叙事模型_01",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_03_叙事模型_01.json",
+      "tags": [
+        "公路片模型",
+        "叙事模型",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "公路片模型",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_03_叙事模型_02",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_03_叙事模型_02.json",
+      "tags": [
+        "密室模型",
+        "叙事模型",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "密室模型",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_03_叙事模型_03",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_03_叙事模型_03.json",
+      "tags": [
+        "倒计时模型",
+        "叙事模型",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "倒计时模型",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_03_叙事模型_04",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_03_叙事模型_04.json",
+      "tags": [
+        "破案模型",
+        "叙事模型",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "破案模型",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_03_叙事模型_05",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_03_叙事模型_05.json",
+      "tags": [
+        "起义模型",
+        "叙事模型",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "起义模型",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_04_读者心理操控_01",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_04_读者心理操控_01.json",
+      "tags": [
+        "信息差设计",
+        "读者心理操控",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "信息差设计",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_04_读者心理操控_02",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_04_读者心理操控_02.json",
+      "tags": [
+        "情绪过山车",
+        "读者心理操控",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "情绪过山车",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_04_读者心理操控_03",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_04_读者心理操控_03.json",
+      "tags": [
+        "道德困境引导",
+        "读者心理操控",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "道德困境引导",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_05_情感巅峰设计_01",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_05_情感巅峰设计_01.json",
+      "tags": [
+        "单一情感引爆",
+        "情感巅峰设计",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "单一情感引爆",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "00_叙事之魂部_05_情感巅峰设计_02",
+      "path": "leaf/00_叙事之魂部/00_叙事之魂部_05_情感巅峰设计_02.json",
+      "tags": [
+        "复合情感叠加",
+        "情感巅峰设计",
+        "叙事之魂部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen"
+      ],
+      "display_name": "复合情感叠加",
+      "department": "00_叙事之魂部",
+      "context_slot": "L0",
+      "injection_point": "intent-planner"
+    },
+    {
+      "id": "01_顶层设计部_01_故事模型_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_01_故事模型_01.json",
+      "tags": [
+        "英雄之旅",
+        "故事模型",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "英雄之旅",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_01_故事模型_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_01_故事模型_02.json",
+      "tags": [
+        "三幕剧",
+        "故事模型",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "三幕剧",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_01_故事模型_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_01_故事模型_03.json",
+      "tags": [
+        "起承转合",
+        "故事模型",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "起承转合",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_01_故事模型_04",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_01_故事模型_04.json",
+      "tags": [
+        "环形叙事",
+        "故事模型",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "环形叙事",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_01_故事模型_05",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_01_故事模型_05.json",
+      "tags": [
+        "多线并行",
+        "故事模型",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "多线并行",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_01_故事模型_06",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_01_故事模型_06.json",
+      "tags": [
+        "反结构",
+        "故事模型",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "反结构",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_02_叙事视角_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_02_叙事视角_01.json",
+      "tags": [
+        "第一人称亲历者",
+        "叙事视角",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "第一人称亲历者",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_02_叙事视角_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_02_叙事视角_02.json",
+      "tags": [
+        "第一人称旁观者",
+        "叙事视角",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "第一人称旁观者",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_02_叙事视角_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_02_叙事视角_03.json",
+      "tags": [
+        "第三人称有限",
+        "叙事视角",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "第三人称有限",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_02_叙事视角_04",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_02_叙事视角_04.json",
+      "tags": [
+        "第三人称全知",
+        "叙事视角",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "第三人称全知",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_02_叙事视角_05",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_02_叙事视角_05.json",
+      "tags": [
+        "多人称切换",
+        "叙事视角",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "多人称切换",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_02_叙事视角_06",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_02_叙事视角_06.json",
+      "tags": [
+        "不可靠叙述者",
+        "叙事视角",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "不可靠叙述者",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_03_时间线设计_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_03_时间线设计_01.json",
+      "tags": [
+        "顺叙",
+        "时间线设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "顺叙",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_03_时间线设计_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_03_时间线设计_02.json",
+      "tags": [
+        "倒叙",
+        "时间线设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "倒叙",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_03_时间线设计_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_03_时间线设计_03.json",
+      "tags": [
+        "插叙",
+        "时间线设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "插叙",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_03_时间线设计_04",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_03_时间线设计_04.json",
+      "tags": [
+        "双线并行",
+        "时间线设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "双线并行",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_03_时间线设计_05",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_03_时间线设计_05.json",
+      "tags": [
+        "碎片化拼贴",
+        "时间线设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "碎片化拼贴",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_04_开篇设计_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_04_开篇设计_01.json",
+      "tags": [
+        "冲突式开头",
+        "开篇设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "冲突式开头",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_04_开篇设计_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_04_开篇设计_02.json",
+      "tags": [
+        "悬念式开头",
+        "开篇设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "悬念式开头",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_04_开篇设计_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_04_开篇设计_03.json",
+      "tags": [
+        "氛围式开头",
+        "开篇设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "氛围式开头",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_04_开篇设计_04",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_04_开篇设计_04.json",
+      "tags": [
+        "声明式开头",
+        "开篇设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "声明式开头",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_04_开篇设计_05",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_04_开篇设计_05.json",
+      "tags": [
+        "日常颠覆式开头",
+        "开篇设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "日常颠覆式开头",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_05_结尾设计_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_05_结尾设计_01.json",
+      "tags": [
+        "闭合式",
+        "结尾设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "闭合式",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_05_结尾设计_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_05_结尾设计_02.json",
+      "tags": [
+        "开放式",
+        "结尾设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "开放式",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_05_结尾设计_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_05_结尾设计_03.json",
+      "tags": [
+        "反转式",
+        "结尾设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "反转式",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_05_结尾设计_04",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_05_结尾设计_04.json",
+      "tags": [
+        "首尾呼应式",
+        "结尾设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "首尾呼应式",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_05_结尾设计_05",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_05_结尾设计_05.json",
+      "tags": [
+        "戛然而止式",
+        "结尾设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "戛然而止式",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_06_章节结构_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_06_章节结构_01.json",
+      "tags": [
+        "章节断点设计",
+        "章节结构",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "章节断点设计",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_06_章节结构_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_06_章节结构_02.json",
+      "tags": [
+        "多视角章节排布",
+        "章节结构",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "多视角章节排布",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_06_章节结构_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_06_章节结构_03.json",
+      "tags": [
+        "幕间过渡技法",
+        "章节结构",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "幕间过渡技法",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_07_情感节奏设计_01",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_07_情感节奏设计_01.json",
+      "tags": [
+        "单章情绪曲线",
+        "情感节奏设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "单章情绪曲线",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_07_情感节奏设计_02",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_07_情感节奏设计_02.json",
+      "tags": [
+        "全本情绪分布",
+        "情感节奏设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "全本情绪分布",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "01_顶层设计部_07_情感节奏设计_03",
+      "path": "leaf/01_顶层设计部/01_顶层设计部_07_情感节奏设计_03.json",
+      "tags": [
+        "情绪转换阀",
+        "情感节奏设计",
+        "顶层设计部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "情绪转换阀",
+      "department": "01_顶层设计部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_01_冲突类型_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_01_冲突类型_01.json",
+      "tags": [
+        "人与环境",
+        "冲突类型",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "人与环境",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_01_冲突类型_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_01_冲突类型_02.json",
+      "tags": [
+        "人与人",
+        "冲突类型",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "人与人",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_01_冲突类型_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_01_冲突类型_03.json",
+      "tags": [
+        "人与自我",
+        "冲突类型",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "人与自我",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_01_冲突类型_04",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_01_冲突类型_04.json",
+      "tags": [
+        "复合型",
+        "冲突类型",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "复合型",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_02_悬念编码_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_02_悬念编码_01.json",
+      "tags": [
+        "桌下炸弹",
+        "悬念编码",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "桌下炸弹",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_02_悬念编码_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_02_悬念编码_02.json",
+      "tags": [
+        "谜题盒子",
+        "悬念编码",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "谜题盒子",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_02_悬念编码_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_02_悬念编码_03.json",
+      "tags": [
+        "命运悬丝",
+        "悬念编码",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "命运悬丝",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_02_悬念编码_04",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_02_悬念编码_04.json",
+      "tags": [
+        "虚假情报",
+        "悬念编码",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "虚假情报",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_03_反转设计_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_03_反转设计_01.json",
+      "tags": [
+        "身份反转",
+        "反转设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "身份反转",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_03_反转设计_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_03_反转设计_02.json",
+      "tags": [
+        "信息反转",
+        "反转设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "信息反转",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_03_反转设计_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_03_反转设计_03.json",
+      "tags": [
+        "目标反转",
+        "反转设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "目标反转",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_03_反转设计_04",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_03_反转设计_04.json",
+      "tags": [
+        "情感反转",
+        "反转设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "情感反转",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_03_反转设计_05",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_03_反转设计_05.json",
+      "tags": [
+        "结构反转",
+        "反转设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "结构反转",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_04_伏笔与呼应_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_04_伏笔与呼应_01.json",
+      "tags": [
+        "物件伏笔",
+        "伏笔与呼应",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "物件伏笔",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_04_伏笔与呼应_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_04_伏笔与呼应_02.json",
+      "tags": [
+        "台词伏笔",
+        "伏笔与呼应",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "台词伏笔",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_04_伏笔与呼应_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_04_伏笔与呼应_03.json",
+      "tags": [
+        "场景伏笔",
+        "伏笔与呼应",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "场景伏笔",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_04_伏笔与呼应_04",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_04_伏笔与呼应_04.json",
+      "tags": [
+        "行为伏笔",
+        "伏笔与呼应",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "行为伏笔",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_05_高潮设计_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_05_高潮设计_01.json",
+      "tags": [
+        "物理高潮",
+        "高潮设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "物理高潮",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_05_高潮设计_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_05_高潮设计_02.json",
+      "tags": [
+        "心理高潮",
+        "高潮设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "心理高潮",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_05_高潮设计_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_05_高潮设计_03.json",
+      "tags": [
+        "复合型高潮",
+        "高潮设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "复合型高潮",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_05_高潮设计_04",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_05_高潮设计_04.json",
+      "tags": [
+        "反高潮",
+        "高潮设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "反高潮",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_06_节拍与节奏_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_06_节拍与节奏_01.json",
+      "tags": [
+        "单章内部节拍",
+        "节拍与节奏",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "单章内部节拍",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_06_节拍与节奏_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_06_节拍与节奏_02.json",
+      "tags": [
+        "多章间起承转合",
+        "节拍与节奏",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "多章间起承转合",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_06_节拍与节奏_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_06_节拍与节奏_03.json",
+      "tags": [
+        "整本书节拍控制",
+        "节拍与节奏",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "整本书节拍控制",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_07_因果链设计_01",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_07_因果链设计_01.json",
+      "tags": [
+        "直线因果",
+        "因果链设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "直线因果",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_07_因果链设计_02",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_07_因果链设计_02.json",
+      "tags": [
+        "蝴蝶效应",
+        "因果链设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "蝴蝶效应",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "02_情节引擎部_07_因果链设计_03",
+      "path": "leaf/02_情节引擎部/02_情节引擎部_07_因果链设计_03.json",
+      "tags": [
+        "宿命因果",
+        "因果链设计",
+        "情节引擎部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "宿命因果",
+      "department": "02_情节引擎部",
+      "context_slot": "L3",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_01_人物出场塑造_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_01_人物出场塑造_01.json",
+      "tags": [
+        "行动定义法",
+        "人物出场塑造",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "行动定义法",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_01_人物出场塑造_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_01_人物出场塑造_02.json",
+      "tags": [
+        "反差破除法",
+        "人物出场塑造",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "反差破除法",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_01_人物出场塑造_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_01_人物出场塑造_03.json",
+      "tags": [
+        "第三方介绍法",
+        "人物出场塑造",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "第三方介绍法",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_01_人物出场塑造_04",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_01_人物出场塑造_04.json",
+      "tags": [
+        "环境映射法",
+        "人物出场塑造",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "环境映射法",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_01_人物出场塑造_05",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_01_人物出场塑造_05.json",
+      "tags": [
+        "逐步揭示法",
+        "人物出场塑造",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "逐步揭示法",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_02_人物标签系统_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_02_人物标签系统_01.json",
+      "tags": [
+        "口头禅",
+        "人物标签系统",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "口头禅",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_02_人物标签系统_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_02_人物标签系统_02.json",
+      "tags": [
+        "标志性动作",
+        "人物标签系统",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "标志性动作",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_02_人物标签系统_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_02_人物标签系统_03.json",
+      "tags": [
+        "外貌特征",
+        "人物标签系统",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "外貌特征",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_02_人物标签系统_04",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_02_人物标签系统_04.json",
+      "tags": [
+        "偏好与怪癖",
+        "人物标签系统",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "偏好与怪癖",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_03_人物源动力_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_03_人物源动力_01.json",
+      "tags": [
+        "生存需求",
+        "人物源动力",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "生存需求",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_03_人物源动力_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_03_人物源动力_02.json",
+      "tags": [
+        "情感需求",
+        "人物源动力",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "情感需求",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_03_人物源动力_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_03_人物源动力_03.json",
+      "tags": [
+        "尊严需求",
+        "人物源动力",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "尊严需求",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_03_人物源动力_04",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_03_人物源动力_04.json",
+      "tags": [
+        "超越性需求",
+        "人物源动力",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "超越性需求",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_04_人物关系网_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_04_人物关系网_01.json",
+      "tags": [
+        "分身关系",
+        "人物关系网",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "分身关系",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_04_人物关系网_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_04_人物关系网_02.json",
+      "tags": [
+        "对立关系",
+        "人物关系网",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "对立关系",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_04_人物关系网_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_04_人物关系网_03.json",
+      "tags": [
+        "师徒关系",
+        "人物关系网",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "师徒关系",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_04_人物关系网_04",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_04_人物关系网_04.json",
+      "tags": [
+        "变数关系",
+        "人物关系网",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "变数关系",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_04_人物关系网_05",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_04_人物关系网_05.json",
+      "tags": [
+        "镜像关系",
+        "人物关系网",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "镜像关系",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_05_人物弧光_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_05_人物弧光_01.json",
+      "tags": [
+        "成长型",
+        "人物弧光",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "成长型",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_05_人物弧光_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_05_人物弧光_02.json",
+      "tags": [
+        "堕落型",
+        "人物弧光",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "堕落型",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_05_人物弧光_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_05_人物弧光_03.json",
+      "tags": [
+        "坚定型",
+        "人物弧光",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "坚定型",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_05_人物弧光_04",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_05_人物弧光_04.json",
+      "tags": [
+        "幻灭型",
+        "人物弧光",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "幻灭型",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_06_配角功能化_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_06_配角功能化_01.json",
+      "tags": [
+        "情报提供者",
+        "配角功能化",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "情报提供者",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_06_配角功能化_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_06_配角功能化_02.json",
+      "tags": [
+        "麻烦制造者",
+        "配角功能化",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "麻烦制造者",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_06_配角功能化_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_06_配角功能化_03.json",
+      "tags": [
+        "道德标尺",
+        "配角功能化",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "道德标尺",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_06_配角功能化_04",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_06_配角功能化_04.json",
+      "tags": [
+        "气氛调节器",
+        "配角功能化",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "气氛调节器",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_06_配角功能化_05",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_06_配角功能化_05.json",
+      "tags": [
+        "主题传达者",
+        "配角功能化",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "主题传达者",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_07_群像设计_01",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_07_群像设计_01.json",
+      "tags": [
+        "平衡式群像",
+        "群像设计",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "平衡式群像",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_07_群像设计_02",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_07_群像设计_02.json",
+      "tags": [
+        "主次分明式群像",
+        "群像设计",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "主次分明式群像",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "03_人物熔炉部_07_群像设计_03",
+      "path": "leaf/03_人物熔炉部/03_人物熔炉部_07_群像设计_03.json",
+      "tags": [
+        "多中心式群像",
+        "群像设计",
+        "人物熔炉部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "多中心式群像",
+      "department": "03_人物熔炉部",
+      "context_slot": "L2",
+      "injection_point": "writer"
+    },
+    {
+      "id": "04_对白艺术部_01_对白功能_01",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_01_对白功能_01.json",
+      "tags": [
+        "推进剧情",
+        "对白功能",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "推进剧情",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_01_对白功能_02",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_01_对白功能_02.json",
+      "tags": [
+        "展示性格",
+        "对白功能",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "展示性格",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_01_对白功能_03",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_01_对白功能_03.json",
+      "tags": [
+        "营造氛围",
+        "对白功能",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "营造氛围",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_01_对白功能_04",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_01_对白功能_04.json",
+      "tags": [
+        "传达主题",
+        "对白功能",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "传达主题",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_02_潜台词设计_01",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_02_潜台词设计_01.json",
+      "tags": [
+        "话说一半",
+        "潜台词设计",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "话说一半",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_02_潜台词设计_02",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_02_潜台词设计_02.json",
+      "tags": [
+        "正话反说",
+        "潜台词设计",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "正话反说",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_02_潜台词设计_03",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_02_潜台词设计_03.json",
+      "tags": [
+        "答非所问",
+        "潜台词设计",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "答非所问",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_02_潜台词设计_04",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_02_潜台词设计_04.json",
+      "tags": [
+        "用沉默说话",
+        "潜台词设计",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "用沉默说话",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_03_角色语言区分_01",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_03_角色语言区分_01.json",
+      "tags": [
+        "用词习惯",
+        "角色语言区分",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "用词习惯",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_03_角色语言区分_02",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_03_角色语言区分_02.json",
+      "tags": [
+        "句式长短",
+        "角色语言区分",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "句式长短",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_03_角色语言区分_03",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_03_角色语言区分_03.json",
+      "tags": [
+        "专业性术语",
+        "角色语言区分",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "专业性术语",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_03_角色语言区分_04",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_03_角色语言区分_04.json",
+      "tags": [
+        "敬语粗口",
+        "角色语言区分",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "敬语粗口",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_04_多人对话调度_01",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_04_多人对话调度_01.json",
+      "tags": [
+        "交替式",
+        "多人对话调度",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "交替式",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_04_多人对话调度_02",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_04_多人对话调度_02.json",
+      "tags": [
+        "插话打断",
+        "多人对话调度",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "插话打断",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_04_多人对话调度_03",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_04_多人对话调度_03.json",
+      "tags": [
+        "一方主导",
+        "多人对话调度",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "一方主导",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_05_特殊对话场景_01",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_05_特殊对话场景_01.json",
+      "tags": [
+        "审讯谈判",
+        "特殊对话场景",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "审讯谈判",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_05_特殊对话场景_02",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_05_特殊对话场景_02.json",
+      "tags": [
+        "告白分手",
+        "特殊对话场景",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "告白分手",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_05_特殊对话场景_03",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_05_特殊对话场景_03.json",
+      "tags": [
+        "临终遗言",
+        "特殊对话场景",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "临终遗言",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_05_特殊对话场景_04",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_05_特殊对话场景_04.json",
+      "tags": [
+        "公开演讲",
+        "特殊对话场景",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "公开演讲",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_06_对白与叙述衔接_01",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_06_对白与叙述衔接_01.json",
+      "tags": [
+        "独白内心戏",
+        "对白与叙述衔接",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "独白内心戏",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "04_对白艺术部_06_对白与叙述衔接_02",
+      "path": "leaf/04_对白艺术部/04_对白艺术部_06_对白与叙述衔接_02.json",
+      "tags": [
+        "动作与对白配合",
+        "对白与叙述衔接",
+        "对白艺术部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "动作与对白配合",
+      "department": "04_对白艺术部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_01_句式与节奏_01",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_01_句式与节奏_01.json",
+      "tags": [
+        "极短句",
+        "句式与节奏",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "极短句",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_01_句式与节奏_02",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_01_句式与节奏_02.json",
+      "tags": [
+        "长句",
+        "句式与节奏",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "长句",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_01_句式与节奏_03",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_01_句式与节奏_03.json",
+      "tags": [
+        "长短交错",
+        "句式与节奏",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "长短交错",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_01_句式与节奏_04",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_01_句式与节奏_04.json",
+      "tags": [
+        "密集分段",
+        "句式与节奏",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "密集分段",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_01_句式与节奏_05",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_01_句式与节奏_05.json",
+      "tags": [
+        "标点留白",
+        "句式与节奏",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "标点留白",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_02_感官调度_01",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_02_感官调度_01.json",
+      "tags": [
+        "视觉主导",
+        "感官调度",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "视觉主导",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_02_感官调度_02",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_02_感官调度_02.json",
+      "tags": [
+        "听觉主导",
+        "感官调度",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "听觉主导",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_02_感官调度_03",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_02_感官调度_03.json",
+      "tags": [
+        "嗅觉味觉主导",
+        "感官调度",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "嗅觉味觉主导",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_02_感官调度_04",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_02_感官调度_04.json",
+      "tags": [
+        "体感触觉主导",
+        "感官调度",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "体感触觉主导",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_02_感官调度_05",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_02_感官调度_05.json",
+      "tags": [
+        "多感官交织",
+        "感官调度",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "多感官交织",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_03_修辞系统_01",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_03_修辞系统_01.json",
+      "tags": [
+        "比喻",
+        "修辞系统",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "比喻",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_03_修辞系统_02",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_03_修辞系统_02.json",
+      "tags": [
+        "通感",
+        "修辞系统",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "通感",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_03_修辞系统_03",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_03_修辞系统_03.json",
+      "tags": [
+        "拟人拟物",
+        "修辞系统",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "拟人拟物",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_03_修辞系统_04",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_03_修辞系统_04.json",
+      "tags": [
+        "排比反复",
+        "修辞系统",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "排比反复",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_03_修辞系统_05",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_03_修辞系统_05.json",
+      "tags": [
+        "反讽",
+        "修辞系统",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "反讽",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_04_描写技法_01",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_04_描写技法_01.json",
+      "tags": [
+        "白描",
+        "描写技法",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "白描",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_04_描写技法_02",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_04_描写技法_02.json",
+      "tags": [
+        "工笔细描",
+        "描写技法",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "工笔细描",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_04_描写技法_03",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_04_描写技法_03.json",
+      "tags": [
+        "印象派描写",
+        "描写技法",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "印象派描写",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_04_描写技法_04",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_04_描写技法_04.json",
+      "tags": [
+        "动态描写",
+        "描写技法",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "动态描写",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_01",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_01.json",
+      "tags": [
+        "克制冷峻",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "克制冷峻",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_02",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_02.json",
+      "tags": [
+        "热烈奔放",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "热烈奔放",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_03",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_03.json",
+      "tags": [
+        "幽默诙谐",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "幽默诙谐",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_04",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_04.json",
+      "tags": [
+        "沉郁顿挫",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "沉郁顿挫",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_05",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_05.json",
+      "tags": [
+        "诗性哲思",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "诗性哲思",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_06",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_06.json",
+      "tags": [
+        "民间说书人腔",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "民间说书人腔",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_05_叙事腔调_07",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_05_叙事腔调_07.json",
+      "tags": [
+        "日记书信体",
+        "叙事腔调",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "日记书信体",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_06_文字质感_01",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_06_文字质感_01.json",
+      "tags": [
+        "清丽",
+        "文字质感",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "清丽",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_06_文字质感_02",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_06_文字质感_02.json",
+      "tags": [
+        "冷硬",
+        "文字质感",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "冷硬",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_06_文字质感_03",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_06_文字质感_03.json",
+      "tags": [
+        "绮丽",
+        "文字质感",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "绮丽",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "05_文笔滤镜部_06_文字质感_04",
+      "path": "leaf/05_文笔滤镜部/05_文笔滤镜部_06_文字质感_04.json",
+      "tags": [
+        "简洁",
+        "文字质感",
+        "文笔滤镜部"
+      ],
+      "modes": [
+        "novel",
+        "shuangwen",
+        "tomato-short"
+      ],
+      "display_name": "简洁",
+      "department": "05_文笔滤镜部",
+      "context_slot": "L3",
+      "injection_point": "polisher"
+    },
+    {
+      "id": "06_世界构建部_01_世界规则_01",
+      "path": "leaf/06_世界构建部/06_世界构建部_01_世界规则_01.json",
+      "tags": [
+        "物理法则",
+        "世界规则",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "物理法则",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_01_世界规则_02",
+      "path": "leaf/06_世界构建部/06_世界构建部_01_世界规则_02.json",
+      "tags": [
+        "魔法科技体系",
+        "世界规则",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "魔法科技体系",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_01_世界规则_03",
+      "path": "leaf/06_世界构建部/06_世界构建部_01_世界规则_03.json",
+      "tags": [
+        "社会制度",
+        "世界规则",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "社会制度",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_01_世界规则_04",
+      "path": "leaf/06_世界构建部/06_世界构建部_01_世界规则_04.json",
+      "tags": [
+        "文化习俗",
+        "世界规则",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "文化习俗",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_02_规则揭示方式_01",
+      "path": "leaf/06_世界构建部/06_世界构建部_02_规则揭示方式_01.json",
+      "tags": [
+        "角色经历揭示",
+        "规则揭示方式",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "角色经历揭示",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_02_规则揭示方式_02",
+      "path": "leaf/06_世界构建部/06_世界构建部_02_规则揭示方式_02.json",
+      "tags": [
+        "对话交代",
+        "规则揭示方式",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "对话交代",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_02_规则揭示方式_03",
+      "path": "leaf/06_世界构建部/06_世界构建部_02_规则揭示方式_03.json",
+      "tags": [
+        "附录序章说明",
+        "规则揭示方式",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "附录序章说明",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_02_规则揭示方式_04",
+      "path": "leaf/06_世界构建部/06_世界构建部_02_规则揭示方式_04.json",
+      "tags": [
+        "细节暗示",
+        "规则揭示方式",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "细节暗示",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_03_空间构建_01",
+      "path": "leaf/06_世界构建部/06_世界构建部_03_空间构建_01.json",
+      "tags": [
+        "地图地理",
+        "空间构建",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "地图地理",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_03_空间构建_02",
+      "path": "leaf/06_世界构建部/06_世界构建部_03_空间构建_02.json",
+      "tags": [
+        "标志性建筑",
+        "空间构建",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "标志性建筑",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_03_空间构建_03",
+      "path": "leaf/06_世界构建部/06_世界构建部_03_空间构建_03.json",
+      "tags": [
+        "空间转换技法",
+        "空间构建",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "空间转换技法",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_04_历史纵深感_01",
+      "path": "leaf/06_世界构建部/06_世界构建部_04_历史纵深感_01.json",
+      "tags": [
+        "古籍传说",
+        "历史纵深感",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "古籍传说",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_04_历史纵深感_02",
+      "path": "leaf/06_世界构建部/06_世界构建部_04_历史纵深感_02.json",
+      "tags": [
+        "遗迹废墟",
+        "历史纵深感",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "遗迹废墟",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_04_历史纵深感_03",
+      "path": "leaf/06_世界构建部/06_世界构建部_04_历史纵深感_03.json",
+      "tags": [
+        "代际恩怨",
+        "历史纵深感",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "代际恩怨",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_05_日常生活_01",
+      "path": "leaf/06_世界构建部/06_世界构建部_05_日常生活_01.json",
+      "tags": [
+        "衣食住行",
+        "日常生活",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "衣食住行",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_05_日常生活_02",
+      "path": "leaf/06_世界构建部/06_世界构建部_05_日常生活_02.json",
+      "tags": [
+        "节庆仪式",
+        "日常生活",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "节庆仪式",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_05_日常生活_03",
+      "path": "leaf/06_世界构建部/06_世界构建部_05_日常生活_03.json",
+      "tags": [
+        "货币交易",
+        "日常生活",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "货币交易",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_06_权力结构_01",
+      "path": "leaf/06_世界构建部/06_世界构建部_06_权力结构_01.json",
+      "tags": [
+        "政治权力",
+        "权力结构",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "政治权力",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_06_权力结构_02",
+      "path": "leaf/06_世界构建部/06_世界构建部_06_权力结构_02.json",
+      "tags": [
+        "经济权力",
+        "权力结构",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "经济权力",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    },
+    {
+      "id": "06_世界构建部_06_权力结构_03",
+      "path": "leaf/06_世界构建部/06_世界构建部_06_权力结构_03.json",
+      "tags": [
+        "文化话语权力",
+        "权力结构",
+        "世界构建部"
+      ],
+      "modes": [
+        "novel"
+      ],
+      "display_name": "文化话语权力",
+      "department": "06_世界构建部",
+      "context_slot": "L4",
+      "injection_point": "material-manager"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "05_文笔滤镜部_03_修辞系统_05",
+  "success_rate": 50,
+  "attempts": 0,
+  "auto_disabled": false,
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ]
+}

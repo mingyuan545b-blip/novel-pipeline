@@ -1,0 +1,21 @@
+{
+    "id": "科幻",
+    "label": "科幻",
+    "namingStyle": "cyber-codename",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "adventure-escalation",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["true-expert", "ghost-watcher", "void-walker", "snake-mentor", "grind-king", "info-broker", "clueless-straight"],
+    "defaultSpeechStyles": ["military", "translationese"],
+    "defaultDialects": ["上海", "福建"],
+    "styleHints": {
+        "pov": "第三人称限制视角",
+        "tone": "冷静理性",
+        "style": "硬核科幻"
+    },
+    "wordConfig": { "minWords": 2500, "targetWords": 3000, "maxWords": 4000 },
+    "constraintOverrides": ["hard-science-plausibility", "tech-jargon-consistency", "no-magic-handwave"],
+    "reviewFocus": ["科技设定自洽不矛盾", "物理/天文常识不出错", "技术术语前后一致", "文明层级逻辑合理", "悬念伏笔回收闭环"],
+    "defaultSystemPersona": "data-analyst",
+    "materialFocus": ["technology", "power-system", "character", "faction", "foreshadowing", "geography"]
+}

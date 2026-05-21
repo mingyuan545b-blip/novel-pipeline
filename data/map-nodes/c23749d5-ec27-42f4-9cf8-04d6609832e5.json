@@ -1,0 +1,18 @@
+{
+  "id": "c23749d5-ec27-42f4-9cf8-04d6609832e5",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "parentId": null,
+  "level": "universe",
+  "name": "宇宙",
+  "description": "",
+  "x": 0,
+  "y": 0,
+  "width": 800,
+  "height": 600,
+  "color": "#1a1a2e",
+  "factionId": null,
+  "materialIds": [],
+  "tags": [],
+  "createdAt": "2026-05-19T13:08:40.363Z",
+  "updatedAt": "2026-05-19T13:08:40.363Z"
+}

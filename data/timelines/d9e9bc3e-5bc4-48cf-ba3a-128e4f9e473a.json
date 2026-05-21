@@ -1,0 +1,30 @@
+{
+  "id": "d9e9bc3e-5bc4-48cf-ba3a-128e4f9e473a",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【所属位面】38497659-d64f-4bc0-b3b6-f1b3f4025b83\n【所属势力】fb01ead5-fe86-49f4-bebb-47965e649756\n【核心欲望】在高压走私局与海关收网夹缝中存活并攫取筹码\n【内在矛盾】谨小慎微的生存本能与关键时刻果断押注的博弈冲动\n【行为模式】身体先于理智反应，痛觉旧疤发痒为预警；擅用老千手法（移花接木）试探破局；接堂口暗号即押注，退路斩断后不回头\n【当前状态】左手无名指旧疤灼痛，铜筹烫感烙下焦痕，已被堂口眼线标记，面临72小时收网强制抉择",
+  "eventType": "character",
+  "storyOrder": 59,
+  "sortOrder": 59,
+  "storyTime": "第7章",
+  "chapterIds": [
+    "3be80dd3-065b-47a7-99a6-8a433652f538"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "6d4ae14d-dd17-46e3-9ea3-ea6e06c7f7d5"
+  ],
+  "characterIds": [
+    "6d4ae14d-dd17-46e3-9ea3-ea6e06c7f7d5"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "定稿正文确立主角核心人设、生理预警机制及当前高压处境",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T16:32:13.571Z",
+  "updatedAt": "2026-05-13T16:32:13.571Z"
+}

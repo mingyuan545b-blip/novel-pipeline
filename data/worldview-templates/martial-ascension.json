@@ -1,0 +1,114 @@
+{
+    "id": "martial-ascension",
+    "label": "修仙飞升型",
+    "tag": "仙侠/修真/凡人修仙式",
+    "description": "从凡人起步，修炼境界层层提升，每个境界是一个全新的世界，飞升后前世界的天花板只是后世界的地板",
+    "applicableGenres": ["仙侠", "玄幻", "修真", "高武"],
+    "phases": [
+        {
+            "id": "early",
+            "label": "前期·凡人篇",
+            "chapterRange": "1-30%",
+            "description": "凡人世界/低阶修仙界，资源稀缺，步步惊心",
+            "worldRules": {
+                "powerCeiling": "筑基/金丹级（飞剑/符箓/简单法术）",
+                "geographicScope": "一个宗门/一座城/一片山脉",
+                "factionComplexity": "2-3个宗门/家族，资源争夺",
+                "characterScale": "5-15个角色",
+                "threatLevel": "同门争斗/妖兽/小宗门战争",
+                "knowledgeScope": "只知道修炼基本功法，更高境界是传说"
+            },
+            "narrativeRules": {
+                "povScope": "主角视角为主",
+                "pacingRule": "修炼+冒险交替，每10章一个小突破",
+                "humorDensity": "中——修仙苦但有师兄弟打趣",
+                "powerDisplay": "弱者靠机智和运气生存",
+                "worldReveal": "每15章揭示一个修炼体系层级"
+            },
+            "consistencyAnchors": [
+                "修炼体系必须一开始就定好大框架（可以后期细化但不能推翻）",
+                "主角的功法特色必须贯穿始终",
+                "凡人篇的恩怨必须后续有回应"
+            ]
+        },
+        {
+            "id": "mid",
+            "label": "中期·大能篇",
+            "chapterRange": "30-70%",
+            "description": "进入更高修仙界，境界提升，接触天地法则，势力格局巨变",
+            "worldRules": {
+                "powerCeiling": "元婴/化神级（移山填海/千里传音）",
+                "geographicScope": "大陆/修仙界/多个秘境",
+                "factionComplexity": "5-10个势力，正道魔道散修三足鼎立",
+                "characterScale": "30-50个角色",
+                "threatLevel": "宗门大战/天劫/远古封印松动",
+                "knowledgeScope": "发现修炼的终极目标/天道法则的存在"
+            },
+            "narrativeRules": {
+                "povScope": "主角+重要配角视角",
+                "pacingRule": "大战+闭关+探索交替",
+                "humorDensity": "低——格局大了笑点少了",
+                "powerDisplay": "碾压低阶但被同阶强者压制",
+                "worldReveal": "每10章揭示一个天道法则/远古秘密"
+            },
+            "consistencyAnchors": [
+                "境界体系必须严格递进，不能跳级",
+                "前期的功法/法宝在后期必须有升级路径",
+                "凡人篇的配角不能被遗忘（至少有交代）",
+                "天劫/突破必须有代价和风险"
+            ],
+            "transitionFrom": {
+                "trigger": "主角突破关键境界/发现飞升通道/宗门被灭",
+                "mustResolve": "凡人篇的主要恩怨",
+                "mustEstablish": "更高层的修炼目标/更大的威胁"
+            }
+        },
+        {
+            "id": "late",
+            "label": "后期·天道篇",
+            "chapterRange": "70-100%",
+            "description": "触及天道本质，飞升/渡劫/与天地对抗，所有因果收束",
+            "worldRules": {
+                "powerCeiling": "渡劫/大乘级（改天换地/创造世界）",
+                "geographicScope": "三界/仙界/天道之上",
+                "factionComplexity": "天道/仙界势力/远古存在",
+                "characterScale": "核心角色收束+天道级存在",
+                "threatLevel": "天道崩塌/纪元终结",
+                "knowledgeScope": "修炼的终极真相/天道的本质"
+            },
+            "narrativeRules": {
+                "povScope": "主角视角为主，关键配角收束",
+                "pacingRule": "持续高压，渡劫+决战",
+                "humorDensity": "极低——终局严肃",
+                "powerDisplay": "接近天道，但天道不可违",
+                "worldReveal": "修炼体系的终极答案"
+            },
+            "consistencyAnchors": [
+                "天道规则不能和前中期已确认的修炼规则矛盾",
+                "飞升必须有代价（不能白嫖）",
+                "所有因果必须了结（欠的债要还）",
+                "结局必须回应开篇的核心承诺"
+            ],
+            "transitionFrom": {
+                "trigger": "主角触及天道法则/发现纪元秘密/渡天劫",
+                "mustResolve": "中期核心矛盾",
+                "mustEstablish": "最终抉择：顺天还是逆天"
+            }
+        }
+    ],
+    "globalConsistencyRules": [
+        "境界体系严格递进——每个境界有明确的战力区间",
+        "功法只能升级不能推翻——主角的根基功法必须贯穿始终",
+        "天劫/突破有代价——越强的突破风险越大",
+        "因果必须了结——前期欠的债后期必须还",
+        "飞升不是终点——飞升后还有更高的天花板",
+        "天道规则只能补充不能推翻"
+    ],
+    "forbiddenPatterns": [
+        "境界突然跳级没有过渡",
+        "前期功法后期完全不用了",
+        "天劫没有风险轻松渡过",
+        "飞升后凡人篇的一切都不重要了",
+        "天道规则和修炼体系矛盾"
+    ]
+}

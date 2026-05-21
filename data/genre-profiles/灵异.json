@@ -1,0 +1,21 @@
+{
+    "id": "灵异",
+    "label": "灵异",
+    "namingStyle": "dark-abyss",
+    "namingStyleIntensity": "heavy",
+    "worldviewTemplate": "urban-awakening",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["ghost-watcher", "mad-believer", "blood-debt-collector", "snake-mentor", "green-tea", "clueless-straight", "chatterbox"],
+    "defaultSpeechStyles": ["euphemism", "translationese"],
+    "defaultDialects": ["广东", "广西"],
+    "styleHints": {
+        "pov": "第一人称/第三人称限制视角",
+        "tone": "阴森悬疑",
+        "style": "灵异惊悚"
+    },
+    "wordConfig": { "minWords": 2200, "targetWords": 2800, "maxWords": 3500 },
+    "constraintOverrides": ["horror-atmosphere-mandatory", "no-overpowered-protagonist", "rule-consistency"],
+    "reviewFocus": ["恐怖氛围营造不泄气", "灵异规则前后一致不矛盾", "民俗禁忌考据不出错", "悬念节奏不提前泄底", "角色恐惧反应真实不尬演"],
+    "defaultSystemPersona": "fortune-cookie",
+    "materialFocus": ["character", "mechanism", "foreshadowing", "phenomenon", "location"]
+}

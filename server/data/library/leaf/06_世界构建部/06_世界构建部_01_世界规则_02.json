@@ -1,0 +1,31 @@
+{
+  "id": "06_世界构建部_01_世界规则_02",
+  "category_path": "06_世界构建部/01_世界规则/02_魔法科技体系",
+  "display_name": "魔法科技体系",
+  "department": "06_世界构建部",
+  "subcategory": "01_世界规则",
+  "applicable_modes": [
+    "novel"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "魔法科技体系",
+    "世界规则",
+    "世界构建部"
+  ],
+  "context_slot": "L4",
+  "context_priority": 20,
+  "injection_point": "material-manager",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.280Z"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "84d41932-cd45-4a80-be2a-022df933abb0",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【所属位面】九龙\n【所属势力】无\n【当前状态】已入局九龙，激活铜筹，处于账房与香堂路线抉择节点\n【核心欲望】查明父亲死因，获取账房线索\n【行为模式】临场应变极快，善用痛感与规则试探，以筹码为唯一依仗\n【微表情习惯】咬紧牙关压抑痛楚，指尖习惯性探入内袋确认筹码位置",
+  "eventType": "character",
+  "storyOrder": 24,
+  "sortOrder": 24,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "2aef582f-b7f7-4880-bbe5-cd6a7d569d8d"
+  ],
+  "characterIds": [
+    "2aef582f-b7f7-4880-bbe5-cd6a7d569d8d"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "主角状态随入局推进发生质变，需同步当前坐标与核心目标",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T10:08:06.824Z",
+  "updatedAt": "2026-05-13T10:08:06.824Z"
+}

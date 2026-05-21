@@ -1,0 +1,33 @@
+{
+  "id": "02_情节引擎部_01_冲突类型_02",
+  "category_path": "02_情节引擎部/01_冲突类型/02_人与人",
+  "display_name": "人与人",
+  "department": "02_情节引擎部",
+  "subcategory": "01_冲突类型",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "人与人",
+    "冲突类型",
+    "情节引擎部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.216Z"
+}

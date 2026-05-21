@@ -1,0 +1,28 @@
+{
+  "id": "b712e64b-6e01-4ad3-b142-df7c80fc4966",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "规则改写",
+  "description": "沈墨辞在魔法世界深处找到规则改写的遗迹，触发系统掠夺条件。他掠夺\"元素契约\"弱化版——在主世界可与自然元素建立微弱联系，辅助修为运转。任务结算获得大量积分。但掠夺过程中引发空间震荡，法家裴知远在主世界感知到了异常。",
+  "eventType": "world",
+  "storyOrder": 25,
+  "sortOrder": 25,
+  "storyTime": "第6阶段",
+  "chapterIds": [
+    "2655d1e2-372a-40cf-b5cb-4ab79a016378"
+  ],
+  "questIds": [
+    "da497396-18a3-4900-ad42-b8f09e937632"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "魔法世界深处找到",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第26章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

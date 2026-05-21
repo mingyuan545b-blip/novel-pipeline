@@ -1,0 +1,30 @@
+{
+  "id": "db2ca67c-830d-4da2-9e44-1894d81cd40b",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【所属位面】九龙\n【所属势力】无\n【当前状态】与江晚在天台达成临时合作，准备周三茶楼行动\n【核心欲望】获取千局筹码，清算旧债，生存\n【内在矛盾】生存本能与旧债清算的拉扯，对信任的极度不信任\n【行为模式】冷静自持，利用规则与信息差，以利益绑定替代信任，习惯以痛觉（左手旧伤）保持清醒\n【微表情习惯】指关节泛白时无意识摩挲物品，旧伤发作时倒吸凉气但表情不变",
+  "eventType": "character",
+  "storyOrder": 16,
+  "sortOrder": 16,
+  "storyTime": "第5章",
+  "chapterIds": [
+    "fb0cbc63-022f-454b-9ba6-d3416115c7a5"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "0d58a1fc-8536-4232-a783-4225a1fdf783"
+  ],
+  "characterIds": [
+    "0d58a1fc-8536-4232-a783-4225a1fdf783"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "主角登场，建立基础档案",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T07:25:05.867Z",
+  "updatedAt": "2026-05-13T07:25:05.867Z"
+}

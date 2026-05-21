@@ -1,0 +1,138 @@
+{
+  "chapters": [
+    {
+      "chapter": 36,
+      "created": [
+        "[character]沈渡",
+        "[character]蓝灰猎手",
+        "[foreshadowing]理道碑林阵眼与裂隙共鸣",
+        "[mechanism]失败图鉴·规则测试场"
+      ],
+      "createdAt": "2026-05-10T16:25:00.515Z",
+      "updatedAt": "2026-05-10T16:25:00.515Z"
+    },
+    {
+      "chapter": 37,
+      "created": [
+        "[equipment]失败图鉴",
+        "[character]沈渡",
+        "[character]顾缄言",
+        "[foreshadowing]理道碑林阵眼与裂隙共鸣",
+        "[foreshadowing]高维能量波动与强制更新"
+      ],
+      "createdAt": "2026-05-10T16:41:38.150Z",
+      "updatedAt": "2026-05-10T16:41:38.150Z"
+    },
+    {
+      "chapter": 38,
+      "created": [
+        "[character]遁者",
+        "[equipment]永恒奶酪·高维信标",
+        "[character]沈渡",
+        "[foreshadowing]苏挽青的秘密",
+        "[foreshadowing]理道碑林阵眼与裂隙共鸣",
+        "[foreshadowing]位面裂隙之谜"
+      ],
+      "archived": [
+        "[foreshadowing]高维能量波动与强制更新"
+      ],
+      "foreshadowProgress": [
+        "引魂灯异象:未回收，状态维持",
+        "苏挽青的秘密:更新中，坐标已印证",
+        "理道碑林阵眼与裂隙共鸣:更新中，通道已开启",
+        "顾缄言的问号标记:未回收，状态维持",
+        "高维能量波动与强制更新:已回收，倒计时归零触发刷新",
+        "位面裂隙之谜:更新中，通道方向异常"
+      ],
+      "createdAt": "2026-05-10T16:49:20.971Z",
+      "updatedAt": "2026-05-10T16:49:20.971Z"
+    },
+    {
+      "chapter": 39,
+      "created": [
+        "[character]沈渡",
+        "[character]苏挽青",
+        "[character]吴管事",
+        "[power-system]位面掠夺系统",
+        "[foreshadowing]位面裂隙之谜",
+        "[mechanism]古籍区账本权限锁"
+      ],
+      "archived": [
+        "[foreshadowing]理道碑林阵眼与裂隙共鸣",
+        "[foreshadowing]苏挽青的秘密"
+      ],
+      "createdAt": "2026-05-10T17:02:57.917Z",
+      "updatedAt": "2026-05-10T17:02:57.917Z"
+    },
+    {
+      "chapter": 40,
+      "created": [
+        "[character]蓝灰猎手",
+        "[equipment]坐标信标·发光奶酪",
+        "[power-system]位面掠夺系统",
+        "[foreshadowing]位面裂隙之谜",
+        "[worldview]次位面·不可毁灭沙盒"
+      ],
+      "createdAt": "2026-05-10T17:09:51.989Z",
+      "updatedAt": "2026-05-10T17:09:51.989Z"
+    },
+    {
+      "chapter": 41,
+      "created": [
+        "[character]顾缄言",
+        "[foreshadowing]位面裂隙之谜",
+        "[mechanism]问号金属片·共振锚点"
+      ],
+      "createdAt": "2026-05-10T17:21:39.521Z",
+      "updatedAt": "2026-05-10T17:21:39.521Z"
+    },
+    {
+      "chapter": 42,
+      "created": [
+        "[character]沈渡",
+        "[character]顾缄言",
+        "[character]褐甲力士",
+        "[equipment]暗金色石板",
+        "[worldview]次位面·不可毁灭沙盒",
+        "[foreshadowing]位面裂隙之谜",
+        "[power-system]位面掠夺系统"
+      ],
+      "createdAt": "2026-05-10T17:36:52.003Z",
+      "updatedAt": "2026-05-10T17:36:52.003Z"
+    },
+    {
+      "chapter": 43,
+      "created": [
+        "[character]沈渡",
+        "[character]蓝灰猎手"
+      ],
+      "createdAt": "2026-05-10T17:45:23.030Z",
+      "updatedAt": "2026-05-10T17:45:23.030Z"
+    },
+    {
+      "chapter": 44,
+      "createdAt": "2026-05-10T18:00:27.281Z",
+      "updatedAt": "2026-05-10T18:00:27.281Z"
+    },
+    {
+      "chapter": 45,
+      "created": [
+        "[worldview]次位面·不可毁灭沙盒",
+        "[mechanism]时间锚点与重置协议",
+        "[foreshadowing]位面裂隙之谜",
+        "[power-system]位面掠夺系统"
+      ],
+      "archived": [
+        "[character]蓝灰猎手"
+      ],
+      "foreshadowProgress": [
+        "引魂灯异象:未回收",
+        "顾缄言的问号标记:未回收",
+        "位面裂隙之谜:推进中"
+      ],
+      "createdAt": "2026-05-10T18:12:06.044Z",
+      "updatedAt": "2026-05-10T18:12:06.044Z"
+    }
+  ],
+  "lastUpdated": "2026-05-10T18:12:06.045Z"
+}

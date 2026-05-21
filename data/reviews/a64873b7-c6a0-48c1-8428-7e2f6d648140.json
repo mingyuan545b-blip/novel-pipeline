@@ -1,0 +1,108 @@
+{
+  "id": "a64873b7-c6a0-48c1-8428-7e2f6d648140",
+  "chapterId": "c7397c8f-c2d6-47ab-8963-244b4c4bf9a0",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "step": "first-review",
+  "type": "first-review",
+  "reviewer": "first-review-agent",
+  "result": {
+    "passed": false,
+    "summary": "机制具象化合格但章末断章张力不足，心理推演脱离动作触发，合作契约代价未显性化，需按建议整改后复审。",
+    "issues": [
+      {
+        "title": "章末断章张力不足",
+        "location": "末段",
+        "originalText": "左边是界限街...抬脚踩进左侧的暗渠。赌一把。",
+        "perspective": "protagonist",
+        "violationReason": "缺乏即时压迫感与代价预告，未形成强制抉择钩子，不符合章末断章硬性要求。",
+        "howToFix": "将路线选择与铜筹生理反馈及环境威胁强绑定，加入迫近危机使选择成为唯一解。",
+        "targetText": "探照灯光柱切过雨幕...贺千咬破舌尖咽下血腥味，抬脚狠狠踹开右侧暗渠的朽木板。",
+        "severity": "high"
+      },
+      {
+        "title": "心理推演脱离动作触发",
+        "location": "第11-13段",
+        "originalText": "九指强切的是别人的指头...这潭水比表面深得多。",
+        "perspective": "protagonist",
+        "violationReason": "连续纯心理独白无环境/动作触发，推演痕迹过重，违反独立心理段落限制。",
+        "howToFix": "将推演拆解包裹在微动作与感官观察中，用观察-触发-判断替代直接陈述。",
+        "targetText": "贺千喉结滚了一下...规矩立得越硬，心虚的底子越薄...这潭水，早就漫过警戒线了。",
+        "severity": "medium"
+      },
+      {
+        "title": "合作代价未显性化",
+        "location": "第16-18段",
+        "originalText": "贺千把纸条凑到煤油灯下...沈不归。这个名字在城寨里是个禁忌...",
+        "perspective": "protagonist",
+        "violationReason": "信息提供方动机/条件/违约代价空白，配角呈现偏向工具人。",
+        "howToFix": "通过物品细节或身体记忆补充契约痕迹，明确情报传递的代价与约束。",
+        "targetText": "火漆印裂开的瞬间...纪棠递的不是梯子，是卖命契。",
+        "severity": "medium"
+      }
+    ],
+    "suggestions": [
+      {
+        "title": "节奏微循环优化",
+        "description": "在信息接收与路线分析间插入小型环境危机，强制主角移动中拼图，强化规划-执行-危机-结算循环。"
+      },
+      {
+        "title": "铜筹机制深化",
+        "description": "增加温度阈值对应的具体生理代价（如指尖麻痹/视觉模糊），使代价结算更可感。"
+      },
+      {
+        "title": "断章结构轮换",
+        "description": "下章建议切换为info_reversal或threat_approach断章，避免同类钩子疲劳。"
+      }
+    ]
+  },
+  "passed": false,
+  "content": "机制具象化合格但章末断章张力不足，心理推演脱离动作触发，合作契约代价未显性化，需按建议整改后复审。",
+  "issues": [
+    {
+      "title": "章末断章张力不足",
+      "location": "末段",
+      "originalText": "左边是界限街...抬脚踩进左侧的暗渠。赌一把。",
+      "perspective": "protagonist",
+      "violationReason": "缺乏即时压迫感与代价预告，未形成强制抉择钩子，不符合章末断章硬性要求。",
+      "howToFix": "将路线选择与铜筹生理反馈及环境威胁强绑定，加入迫近危机使选择成为唯一解。",
+      "targetText": "探照灯光柱切过雨幕...贺千咬破舌尖咽下血腥味，抬脚狠狠踹开右侧暗渠的朽木板。",
+      "severity": "high"
+    },
+    {
+      "title": "心理推演脱离动作触发",
+      "location": "第11-13段",
+      "originalText": "九指强切的是别人的指头...这潭水比表面深得多。",
+      "perspective": "protagonist",
+      "violationReason": "连续纯心理独白无环境/动作触发，推演痕迹过重，违反独立心理段落限制。",
+      "howToFix": "将推演拆解包裹在微动作与感官观察中，用观察-触发-判断替代直接陈述。",
+      "targetText": "贺千喉结滚了一下...规矩立得越硬，心虚的底子越薄...这潭水，早就漫过警戒线了。",
+      "severity": "medium"
+    },
+    {
+      "title": "合作代价未显性化",
+      "location": "第16-18段",
+      "originalText": "贺千把纸条凑到煤油灯下...沈不归。这个名字在城寨里是个禁忌...",
+      "perspective": "protagonist",
+      "violationReason": "信息提供方动机/条件/违约代价空白，配角呈现偏向工具人。",
+      "howToFix": "通过物品细节或身体记忆补充契约痕迹，明确情报传递的代价与约束。",
+      "targetText": "火漆印裂开的瞬间...纪棠递的不是梯子，是卖命契。",
+      "severity": "medium"
+    }
+  ],
+  "suggestions": [
+    {
+      "title": "节奏微循环优化",
+      "description": "在信息接收与路线分析间插入小型环境危机，强制主角移动中拼图，强化规划-执行-危机-结算循环。"
+    },
+    {
+      "title": "铜筹机制深化",
+      "description": "增加温度阈值对应的具体生理代价（如指尖麻痹/视觉模糊），使代价结算更可感。"
+    },
+    {
+      "title": "断章结构轮换",
+      "description": "下章建议切换为info_reversal或threat_approach断章，避免同类钩子疲劳。"
+    }
+  ],
+  "round": 2,
+  "createdAt": "2026-05-18T08:49:12.982Z"
+}

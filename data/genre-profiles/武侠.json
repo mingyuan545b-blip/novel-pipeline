@@ -1,0 +1,21 @@
+{
+    "id": "武侠",
+    "label": "武侠",
+    "namingStyle": "jianghu-epithet",
+    "namingStyleIntensity": "heavy",
+    "worldviewTemplate": "martial-ascension",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["old-fox", "loyal-shield", "blood-debt-collector", "roast-friend", "green-tea", "info-broker", "sneaky-backstabber"],
+    "defaultSpeechStyles": ["hustler", "euphemism"],
+    "defaultDialects": ["陕西", "河南", "四川"],
+    "styleHints": {
+        "pov": "第三人称全知视角",
+        "tone": "苍劲豪迈",
+        "style": "传统武侠"
+    },
+    "wordConfig": { "minWords": 2500, "targetWords": 3000, "maxWords": 4000 },
+    "constraintOverrides": ["jianghu-etiquette", "no-modern-slang", "martial-logic-consistency"],
+    "reviewFocus": ["江湖规矩与门派礼仪不穿帮", "武功招式描写不重复", "恩怨因果链清晰", "侠义精神不崩塌", "古风用语不出戏"],
+    "defaultSystemPersona": "nostalgic-elder",
+    "materialFocus": ["character", "faction", "power-system", "equipment", "character-relationship", "foreshadowing"]
+}

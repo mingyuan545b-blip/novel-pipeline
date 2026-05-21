@@ -1,0 +1,21 @@
+{
+    "id": "都市异能",
+    "label": "都市异能",
+    "namingStyle": "cyber-codename",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "urban-awakening",
+    "defaultMode": "shuangwen",
+    "defaultArchetypes": ["old-fox", "shadow-schemer", "smiling-traitor", "chaos-agent", "sneaky-backstabber", "social-butterfly", "chatterbox"],
+    "defaultSpeechStyles": ["hustler", "abstract"],
+    "defaultDialects": ["北京", "东北"],
+    "styleHints": {
+        "pov": "第三人称限制视角",
+        "tone": "爽快利落",
+        "style": "都市爽文"
+    },
+    "wordConfig": { "minWords": 2000, "targetWords": 2500, "maxWords": 3500 },
+    "constraintOverrides": ["modern-setting-consistency", "ability-secrecy", "no-rural-scene-mismatch"],
+    "reviewFocus": ["异能体系与都市日常的融合度", "势力暗线逻辑不穿帮", "现代常识不出戏（手机/网络/法律）", "主角装逼节奏不拖沓"],
+    "defaultSystemPersona": "snake-oil",
+    "materialFocus": ["character", "faction", "power-system", "institution", "foreshadowing"]
+}

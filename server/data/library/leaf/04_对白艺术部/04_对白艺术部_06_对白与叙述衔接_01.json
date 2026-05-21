@@ -1,0 +1,33 @@
+{
+  "id": "04_对白艺术部_06_对白与叙述衔接_01",
+  "category_path": "04_对白艺术部/06_对白与叙述衔接/01_独白内心戏",
+  "display_name": "独白内心戏",
+  "department": "04_对白艺术部",
+  "subcategory": "06_对白与叙述衔接",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "独白内心戏",
+    "对白与叙述衔接",
+    "对白艺术部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "polisher",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.258Z"
+}

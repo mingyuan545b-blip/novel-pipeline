@@ -1,0 +1,33 @@
+{
+  "id": "03_人物熔炉部_07_群像设计_02",
+  "category_path": "03_人物熔炉部/07_群像设计/02_主次分明式群像",
+  "display_name": "主次分明式群像",
+  "department": "03_人物熔炉部",
+  "subcategory": "07_群像设计",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "主次分明式群像",
+    "群像设计",
+    "人物熔炉部"
+  ],
+  "context_slot": "L2",
+  "context_priority": 80,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.247Z"
+}

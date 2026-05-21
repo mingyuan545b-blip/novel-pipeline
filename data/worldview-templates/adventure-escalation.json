@@ -1,0 +1,113 @@
+{
+    "id": "adventure-escalation",
+    "label": "冒险升级型",
+    "tag": "海贼王/全职猎人/七龙珠式",
+    "description": "主角从弱小起步，逐步探索更广阔的世界，每到一个新区域战力天花板翻倍，地图层层展开，势力越来越庞大",
+    "applicableGenres": ["玄幻", "高武", "奇幻", "冒险", "异能"],
+    "phases": [
+        {
+            "id": "early",
+            "label": "前期·起航篇",
+            "chapterRange": "1-30%",
+            "description": "主角在起始区域冒险，战力天花板低，地图范围小，势力简单",
+            "worldRules": {
+                "powerCeiling": "区域级（一拳碎墙/百米冲刺）",
+                "geographicScope": "单一城镇/岛屿/区域",
+                "factionComplexity": "2-3个势力，黑白分明",
+                "characterScale": "5-10个核心角色",
+                "threatLevel": "地方恶霸/小组织头目",
+                "knowledgeScope": "只知道眼前世界，更大的世界是传说"
+            },
+            "narrativeRules": {
+                "povScope": "主角视角为主，偶尔配角视角",
+                "pacingRule": "快节奏，每5章一个小高潮",
+                "humorDensity": "高——日常多，紧张少",
+                "powerDisplay": "小技巧取胜，不是碾压",
+                "worldReveal": "每10章揭示一个世界观碎片"
+            },
+            "consistencyAnchors": [
+                "主角的核心动机必须贯穿始终（不能后期换目标）",
+                "起始区域的NPC不能后期突然变强",
+                "前期建立的规则不能后期推翻（如：前期说'没人能飞'，后期不能人人飞）"
+            ]
+        },
+        {
+            "id": "mid",
+            "label": "中期·拓展篇",
+            "chapterRange": "30-70%",
+            "description": "主角进入更广阔的世界，战力天花板大幅提升，地图扩展，势力错综复杂",
+            "worldRules": {
+                "powerCeiling": "城市级（一拳碎楼/千米冲刺）",
+                "geographicScope": "大陆/海域/多个区域",
+                "factionComplexity": "5-10个势力，有灰色地带",
+                "characterScale": "20-50个角色，多线叙事",
+                "threatLevel": "区域霸主/国家级势力",
+                "knowledgeScope": "发现世界比想象中大得多，有隐藏的历史/规则"
+            },
+            "narrativeRules": {
+                "povScope": "多视角切换，配角有自己的故事线",
+                "pacingRule": "张弛交替，大战后必须有休整",
+                "humorDensity": "中——大战少幽默，日常保持",
+                "powerDisplay": "碾压弱者但被强者碾压，中间态",
+                "worldReveal": "每5章揭示一个重大世界观真相"
+            },
+            "consistencyAnchors": [
+                "前期的核心角色必须继续出现（不能遗忘）",
+                "战力体系必须线性增长，不能跳级（前期天花板→中期地板）",
+                "前期建立的势力必须在更大格局中有位置",
+                "中期新规则必须兼容前期旧规则（不能推翻）"
+            ],
+            "transitionFrom": {
+                "trigger": "主角击败前期最终BOSS/获得关键能力/发现新世界入口",
+                "mustResolve": "前期所有伏笔要么回收要么明确延后",
+                "mustEstablish": "中期核心矛盾/新目标/新势力"
+            }
+        },
+        {
+            "id": "late",
+            "label": "后期·终局篇",
+            "chapterRange": "70-100%",
+            "description": "主角触及世界真相，战力接近天花板，地图扩展到极限，所有势力汇聚",
+            "worldRules": {
+                "powerCeiling": "世界级（一拳碎山/瞬移千里）",
+                "geographicScope": "全球/多个世界/宇宙",
+                "factionComplexity": "10+势力，多方博弈，没有纯黑纯白",
+                "characterScale": "50+角色，多线汇聚",
+                "threatLevel": "世界级威胁/灭世危机",
+                "knowledgeScope": "世界真相揭露，前期传说的谜底"
+            },
+            "narrativeRules": {
+                "povScope": "多线汇聚，所有角色线收束",
+                "pacingRule": "持续高压，每3章一个转折",
+                "humorDensity": "低——终局少幽默，紧张为主",
+                "powerDisplay": "碾压大部分对手，只有最终BOSS有悬念",
+                "worldReveal": "所有世界观谜底揭晓"
+            },
+            "consistencyAnchors": [
+                "终局必须回应开篇的核心承诺（主角的目标达成了吗）",
+                "所有主要角色必须有结局（不能遗忘）",
+                "战力不能突然膨胀到无法理解（必须和中期有衔接）",
+                "世界真相不能推翻前中期已确认的事实"
+            ],
+            "transitionFrom": {
+                "trigger": "主角触及世界核心秘密/最终BOSS现身/所有势力被迫站队",
+                "mustResolve": "中期核心矛盾必须解决或进入终局",
+                "mustEstablish": "最终目标/最终对手/最终抉择"
+            }
+        }
+    ],
+    "globalConsistencyRules": [
+        "战力体系必须单调递增——后期的地板必须≥前期的天花板",
+        "地图只能扩展不能收缩——前期地图在后期必须仍有意义",
+        "核心动机不能变——主角可以换方法但不能换目标",
+        "已确认的事实不能推翻——可以补充但不能矛盾",
+        "NPC不能凭空消失——前中后都要有交代",
+        "规则只能细化不能推翻——'没人能飞'可以变成'只有神能飞'但不能变成'人人能飞'"
+    ],
+    "forbiddenPatterns": [
+        "前期说'这是世界上最强的'后期又来一个更强的（应该说'已知范围内最强'）",
+        "前期的关键道具/能力后期完全不用了",
+        "前期的核心配角中期消失后期突然出现",
+        "战力突然跳级没有过渡（中期地板必须≥前期天花板×2）"
+    ]
+}

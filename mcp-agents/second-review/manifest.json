@@ -1,0 +1,19 @@
+{
+    "dxt_version": "0.1",
+    "name": "@aipy-pro/second-review",
+    "display_name": "复审",
+    "version": "1.0.0",
+    "description": "小说创作流水线 - 复审Agent，审核逻辑、字数和风格",
+    "author": { "name": "NovelPipeline" },
+    "icon": "icon.svg",
+    "server": {
+        "type": "node",
+        "entry_point": "server.js",
+        "mcp_config": {
+            "command": "node",
+            "args": ["${__dirname}/server.js"],
+            "env": {}
+        }
+    },
+    "keywords": ["conversation-tool"]
+}

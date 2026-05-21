@@ -1,0 +1,26 @@
+{
+  "id": "a355646b-e8f6-4668-9b6b-9488f143e9e3",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "第1章IP方向",
+  "description": "无",
+  "eventType": "revelation",
+  "storyOrder": 22,
+  "sortOrder": 22,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "auto-generated",
+    "ip-direction"
+  ],
+  "createdAt": "2026-05-13T10:06:26.451Z",
+  "updatedAt": "2026-05-13T10:06:26.451Z"
+}

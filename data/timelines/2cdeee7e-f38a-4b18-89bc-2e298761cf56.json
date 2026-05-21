@@ -1,0 +1,28 @@
+{
+  "id": "2cdeee7e-f38a-4b18-89bc-2e298761cf56",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "暗流涌动",
+  "description": "沈墨辞小比获胜引起注意。法家明法殿的人来合欢宗\"交流\"，实则是调查近期空间波动（沈墨辞穿越造成的）。苏锦瑟出面周旋。沈墨辞意识到穿越可能留下痕迹，需要更加小心。系统沉默，没有新任务。",
+  "eventType": "plot",
+  "storyOrder": 12,
+  "sortOrder": 12,
+  "storyTime": "第3阶段",
+  "chapterIds": [
+    "289bf271-8352-4667-8cb0-aa74e6c8f0f0"
+  ],
+  "questIds": [
+    "9900d2fb-37ad-46be-95c7-7a1941a06195"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第13章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

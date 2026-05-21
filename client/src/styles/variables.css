@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Fira+Code:wght@300;400;500&family=Nunito:wght@300;400;500;600;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap');
+@import './skin-soft.css';
+@import './skin-glass.css';
+@import './skin-liquid.css';
+@import './skin-ripple.css';
+@import './skin-aurora.css';
+@import './skin-mario.css';
+:root {
+    --app-bg-opacity: 1;
+    --app-bg-image: none;
+    --app-bg-blur: 0px;
+}
+
+.app-layout {
+    position: relative;
+}
+
+.app-bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background-color: var(--bg-primary);
+    transition: background-color 0.5s ease;
+}

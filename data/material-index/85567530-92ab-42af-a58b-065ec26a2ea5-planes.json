@@ -1,0 +1,40 @@
+{
+  "主世界": {
+    "character": [
+      "0971d177-d018-442f-94f8-bfced6e4426f",
+      "45f5028d-ca21-4872-9602-c3a58dce00f7",
+      "6418e676-876c-49d9-9fef-ec820e0d559e",
+      "64f3493a-fdc6-4693-9634-4c3d2ffa6d69",
+      "bce7bf35-f443-4b9c-ab7b-6129df2d8fde"
+    ],
+    "foreshadowing": [
+      "18e35120-98cd-4a91-af03-e8377d585300"
+    ],
+    "equipment": [
+      "1f6e5550-dcb0-4be7-9f8d-cbe70bf654ac"
+    ],
+    "sub-plane": [
+      "28b45748-8293-4b7f-8b4e-1ad53b2fb98e",
+      "575c9d0e-4607-4ecd-a596-89d63d74451e"
+    ],
+    "relationship": [
+      "62379eae-d9e1-498f-bb65-6f981fa291f1"
+    ],
+    "worldview": [
+      "63f4daa8-f4c8-4194-b35e-6cd6da0116cb"
+    ],
+    "famous-scene": [
+      "788ffc1f-770a-4e0c-9348-1d173e41520d"
+    ],
+    "faction": [
+      "85eedaac-e949-4761-80cf-f83c45e061e2",
+      "bfa31a08-0a2f-47e5-8b05-80387def43a8"
+    ],
+    "catchphrase": [
+      "aec923db-fc82-4675-a2e4-327bbc380564"
+    ],
+    "power-system": [
+      "f0ff4d8f-720d-4608-a7e6-59e4f82e2b60"
+    ]
+  }
+}

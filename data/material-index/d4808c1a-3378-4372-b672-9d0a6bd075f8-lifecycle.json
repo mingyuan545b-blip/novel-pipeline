@@ -1,0 +1,22 @@
+{
+  "semiPermanent": [
+    "0d4ea532-8174-4f8e-8432-f14ced7fa86b",
+    "15d5ccaf-f61b-4751-96bf-c7fe401cf41e",
+    "24826b53-94dc-4b78-a44a-7d4c5bd616b0",
+    "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9",
+    "7d7f1ad2-5cac-4104-a1a0-e643d24ebf68",
+    "db2dfec4-a940-4cea-87a8-ad198d3501e5",
+    "fb01ead5-fe86-49f4-bebb-47965e649756"
+  ],
+  "ephemeral": [
+    "1c1acb1c-7e25-411d-900d-82d731bb0113",
+    "436840d6-5824-4078-a816-43edfd30103d",
+    "748ebaff-0128-4f2d-8a05-a3ab1ab8b41d",
+    "7c9babf5-311b-43d1-91ff-7105e162e3a6",
+    "b5d59a91-9927-4921-b39c-8dcb24f62a38"
+  ],
+  "permanent": [
+    "38497659-d64f-4bc0-b3b6-f1b3f4025b83",
+    "6d4ae14d-dd17-46e3-9ea3-ea6e06c7f7d5"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "f633d48e-10fe-4421-a983-b308bed2f1bf",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "纪棠",
+  "description": "【身份】城寨独立账房/和义堂资金结算人\n【核心欲望】维持账面绝对平衡与自身安全\n【内在矛盾】精算师思维与江湖险恶的碰撞，只做买卖不欠人情\n【行为模式】拨算盘确认节奏，通过肢体微动作判断底细，交易条件明码标价\n【外貌特征】半旧碎花衬衫，虎口斜切旧疤，指腹厚茧，指甲缝残留印泥红渍\n【微表情习惯】搪瓷杯底轻磕桌面两下作为思考或打断信号\n【与贺千关系】初次交易试探，提供深水埗当铺跑腿任务\n【当前状态】活跃，持有待派送纸条",
+  "eventType": "character",
+  "storyOrder": 33,
+  "sortOrder": 33,
+  "storyTime": "第2章",
+  "chapterIds": [
+    "c0b0f23a-d8ca-44ab-88b1-6849b6ab32c3"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "3e3286e2-ba12-4477-bc8e-acda11eb1a79"
+  ],
+  "characterIds": [
+    "3e3286e2-ba12-4477-bc8e-acda11eb1a79"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "本章关键交互配角，承担信息差提供与支线任务触发功能，具备独立算账逻辑与交易底线",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T11:29:16.493Z",
+  "updatedAt": "2026-05-13T11:29:16.493Z"
+}

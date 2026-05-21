@@ -1,0 +1,30 @@
+{
+  "id": "7ac77932-5231-45d6-aedd-3ddcb5352560",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "唐装老头",
+  "description": "【所属位面】主世界\n【身份】暗巷守路人/城寨旧民\n【核心欲望】借贺千之手向账房传话，清算沈不归旧账\n【内在矛盾】知晓内情却困守死胡同，以规矩为筹码换取破局机会\n【行为模式】蹲坐木箱抽烟，嗓音沙哑如砂纸摩擦，关节粗大指甲藏泥，习惯以“数三声”逼选\n【立场逻辑】纯粹交易思维，不涉帮派立场只认等价交换，守暗巷死规矩\n【微表情习惯】磕烟头于鞋底，抬眼时瞳孔浑浊无情绪波动\n【与贺千关系】临时引路人与传话中介",
+  "eventType": "character",
+  "storyOrder": 38,
+  "sortOrder": 38,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "0cbddaeb-cc67-476e-938f-2a8017e41334"
+  ],
+  "characterIds": [
+    "0cbddaeb-cc67-476e-938f-2a8017e41334"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "新出场关键配角，提供路径选择与沈不归线索，具独立交易逻辑与行为模式",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T11:35:53.494Z",
+  "updatedAt": "2026-05-13T11:35:53.494Z"
+}

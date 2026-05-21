@@ -1,0 +1,28 @@
+{
+  "id": "ce9d593f-9e8e-4412-a208-133ae932ac23",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "锦瑟之疑",
+  "description": "苏锦瑟私下试探沈墨辞，用道家秘术感知他体内的异常气息（规则之眼的残留）。沈墨辞心跳加速但表面淡定，用\"修炼了一门偏门功法\"搪塞。苏锦瑟没有追问，但暗中加强了对他的监视。沈墨辞决定更谨慎地使用掠夺来的能力。",
+  "eventType": "world",
+  "storyOrder": 13,
+  "sortOrder": 13,
+  "storyTime": "第3阶段",
+  "chapterIds": [
+    "055fe4be-3a0c-4335-b349-093ad0c5c9c4"
+  ],
+  "questIds": [
+    "9900d2fb-37ad-46be-95c7-7a1941a06195"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第14章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

@@ -1,0 +1,132 @@
+{
+  "id": "5ba07c80-9a2b-4fd2-9147-0b2007a40a8e",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "chapterNumber": 6,
+  "timestamp": "2026-05-13T16:16:11.112Z",
+  "characterStates": {
+    "24826b53-94dc-4b78-a44a-7d4c5bd616b0": {
+      "id": "24826b53-94dc-4b78-a44a-7d4c5bd616b0",
+      "name": "纪棠",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】与贺千短暂交锋后抽身，留下九指强今晚点人情报警报，疑似暗中布局\n【核心欲望】取回账本夹层当票，清算旧债\n【行为模式】冷静自持，以信息差换取执行者，不涉情感与额外解释，行动利落不留痕迹\n【微表情习惯】眼神如秤砣下压，补妆动作慢条斯理但视线紧盯目标\n【内在矛盾】追求程序正义的执念 vs 城寨生存法则的冷酷现实",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 5,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9": {
+      "id": "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9",
+      "name": "江晚",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】与贺千在天台结盟，锁定周三茶楼流水证据，掌握路线图与当票线索\n【核心欲望】获取和义堂洗钱流水证据，将其送入局子（独立于主角的正义诉求）\n【内在矛盾】追求程序正义的执念 vs 城寨生存法则的冷酷现实\n【行为模式】冷静带刺，行动利落，以明确利益划分建立合作底线，不依赖他人\n【微表情习惯】叼烟不点火，手指敲击铁管节奏稳定，眼神冷硬如生铁",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "71adeccf-4d0f-4492-9608-dd93088a56a6": {
+      "id": "71adeccf-4d0f-4492-9608-dd93088a56a6",
+      "name": "贺千",
+      "content": "【所属位面】38497659-d64f-4bc0-b3b6-f1b3f4025b83\n【所属势力】fb01ead5-fe86-49f4-bebb-47965e649756\n【核心欲望】在高压暗局中存活并反向掌控筹码\n【内在矛盾】谨小慎微的底层生存本能 vs 关键时刻必须果断介入的破局需求\n【行为模式】依赖嗅觉、触觉与环境痕迹推演路线，拒绝硬闯；擅长用请客套取信息差；对铜筹发热有明确代价认知，习惯以退为进",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "73a399d6-67f9-4242-8ccd-b8bd8c47d207": {
+      "id": "73a399d6-67f9-4242-8ccd-b8bd8c47d207",
+      "name": "贺千",
+      "content": "【所属位面】城寨次位面\n【所属势力】和义堂\n【身份】底层新丁\n【核心欲望】存活并摸清走私线账本底细\n【内在矛盾】谨小慎微的自保本能与关键时刻果断下注的博弈冲动\n【行为模式】以微表情与肢体细节洞察人心，习惯用痛感压制情绪，交易思维主导人际互动，绝不轻易信人\n【当前状态】落座三日，正筹备潜入账房查账，左手无名指旧疤因频繁动用察人术产生灼痛反噬",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "7c9a8aa4-996d-4992-b47f-1554a8030ed6": {
+      "id": "7c9a8aa4-996d-4992-b47f-1554a8030ed6",
+      "name": "贺千",
+      "content": "【所属势力】和义堂\n【所属位面】城寨次位面\n【核心欲望】在千局规则下存活并积攒筹码\n【内在矛盾】谨小慎微的生存本能与关键时刻果断入局的博弈冲动\n【行为模式】以代价结算为导向，优先评估风险与退路，通过身体感知（旧伤抽痛/铜筹发热）判断局势，不轻信程序正义，习惯用交易逻辑衡量合作",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "7d7f1ad2-5cac-4104-a1a0-e643d24ebf68": {
+      "id": "7d7f1ad2-5cac-4104-a1a0-e643d24ebf68",
+      "name": "歪嘴明",
+      "content": "【核心欲望】维持堂口日常运转，向九指强交差，保全自身中层位置\n【内在矛盾】表面恭敬顺从强权，实则暗藏不满与讥讽，需在九指强与底层马仔间走钢丝\n【行为模式】用盘核桃掩饰情绪，说话漏风带刺，招新以骰子筛人，看穿藏拙后顺势给台阶，微表情习惯为嘴角硬扯与眼神下压\n【所属势力】和义堂\n【当前状态】负责堂口招新与派活，对主角持观察利用态度",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "d6e21eb5-ce18-4616-8494-2c6ff57a644d": {
+      "id": "d6e21eb5-ce18-4616-8494-2c6ff57a644d",
+      "name": "江晚",
+      "content": "【所属势力】外部执法机构\n【所属位面】主世界\n【核心欲望】获取完整证据链完成案件闭环\n【内在矛盾】程序正义的绝对坚守与城寨潜规则的生存逻辑冲突\n【行为模式】高度理性与流程化，不涉人情交易，以十分钟为硬性时间节点，提供路线掩护但拒绝承担连带风险，行事如精密机器",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "db2dfec4-a940-4cea-87a8-ad198d3501e5": {
+      "id": "db2dfec4-a940-4cea-87a8-ad198d3501e5",
+      "name": "九指强",
+      "content": "【所属位面】九龙\n【所属势力】和义堂\n【当前状态】武力巡视堂口，强压账目平账，暗中掩盖早年出千上位的黑历史\n【核心欲望】维持九龙表层秩序垄断，掩盖资金流向或应对上层清查，极度忌惮他人出千\n【行为模式】以沉默停顿与断指疤痕制造视觉压迫，精准施压，靠出千上位后立规矩见一个剁一个\n【微表情习惯】把玩核桃骤停时目光锁定目标后颈",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 6,
+      "active": true,
+      "changesFromPrev": []
+    }
+  },
+  "relationshipStates": {},
+  "equipmentStates": {
+    "b5d59a91-9927-4921-b39c-8dcb24f62a38": {
+      "id": "b5d59a91-9927-4921-b39c-8dcb24f62a38",
+      "name": "铜筹",
+      "content": "【所属位面】城寨次位面\n【物理形态】边缘盘得锃亮的古旧铜筹，表面有毛边与刻痕\n【触发机制】宿主动念察人或面临高危抉择时自动升温，痛感沿无名指旧疤上行；过度使用将引发骨缝刺痛与精神反噬\n【规则反馈】刻痕随局势重组显示提示，温度与痛感对应风险等级，贪多必遭反噬\n【当前状态】已激活，正持续传递账房查账的高危预警",
+      "owner": "未知",
+      "status": "完好",
+      "lastChangeChapter": 0
+    }
+  },
+  "growthMilestones": {},
+  "foreshadowingStates": {},
+  "activeQuests": [],
+  "timelineEvents": [],
+  "worldviewSnapshot": [],
+  "powerSystemSnapshot": [],
+  "diffFromPrev": {
+    "isNew": false,
+    "changes": [
+      {
+        "type": "character",
+        "id": "73a399d6-67f9-4242-8ccd-b8bd8c47d207",
+        "name": "贺千",
+        "change": "新增角色"
+      }
+    ]
+  }
+}

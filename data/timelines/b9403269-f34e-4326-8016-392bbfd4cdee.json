@@ -1,0 +1,28 @@
+{
+  "id": "b9403269-f34e-4326-8016-392bbfd4cdee",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "双能力测试",
+  "description": "回到主世界，沈墨辞在合欢宗后山测试两个掠夺能力。规则之眼在主世界效果减弱但仍有用，可感知阵法和禁制的\"规则\"。因果律闪避触发概率降至5%，但关键时刻可能救命。他用积分将儒家修为提升到正言三重。苏锦瑟在后山\"偶遇\"他，两人有一段微妙的对话。",
+  "eventType": "world",
+  "storyOrder": 18,
+  "sortOrder": 18,
+  "storyTime": "第4阶段",
+  "chapterIds": [
+    "db361927-dd8a-46cd-9852-0071b4514968"
+  ],
+  "questIds": [
+    "9900d2fb-37ad-46be-95c7-7a1941a06195"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "合欢宗后山测试两",
+  "importance": "normal",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "第19章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

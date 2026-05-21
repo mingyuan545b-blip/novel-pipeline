@@ -1,0 +1,1824 @@
+{
+  "id": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "name": "千面",
+  "description": "无限流副本博弈·千面",
+  "genre": "infinite-dungeon",
+  "mode": "novel",
+  "targetChapters": 30,
+  "targetWordCount": 90000,
+  "currentChapter": 1,
+  "status": "active",
+  "styleProfile": {
+    "key": "infinite-dungeon",
+    "label": "主位面高武·反套路喜剧",
+    "povRule": "第三人称限制视角，男主视角为主",
+    "dialogueRule": "对话需体现角色性格，男主说话抽象但应景，禁止AI腔",
+    "behaviorRule": "行为需符合人设，男主谨小慎微但关键时刻果断",
+    "toneRule": "搞笑反套路，系统反套路化呈现，金句应景不烂梗",
+    "titleRule": "章节标题需有悬念感或反差感，禁止流水账式标题",
+    "reviewFocus": "战力一致性、次位面隔离性、角色性格一致性、反AI痕迹",
+    "materialFocus": "战力体系、次位面素材、角色关系",
+    "mechanicFormat": {
+      "progressTracking": "叙事融入式：通过感官体验/物品变化/身体反应呈现进度状态（如铜筹发烫、无名指隐痛、字迹浮现等），禁止方括号标签格式",
+      "progressExample": "铜筹在口袋里微微发烫，上面的\"一筹\"二字似乎比刚才更清晰了。贺千活动了一下左手无名指，那道旧伤又在隐隐作痛——每次动用千术后的代价，从不缺席。",
+      "propFormat": "叙事融入式：通过角色与道具的交互呈现功能/代价/限制（如铜筹升温、痛感蔓延等），禁止[道具:XX]标签格式",
+      "cooperationFormat": "叙事融入式：通过对话和行动呈现合作条件与违约代价，禁止[合作约定]标签格式",
+      "hookFormat": "叙事融入式断章：用场景描写呈现二选一/威胁逼近（如左边是XX右边是XX），禁止\"面临抉择：①②\"标准格式模板",
+      "forbiddenFormats": [
+        "[权限终端]",
+        "[筹码]",
+        "[道具]",
+        "[合作约定]",
+        "[契约绑定]",
+        "[千术]",
+        "[代价标记]",
+        "理智锚点",
+        "认知碎片进度",
+        "cooldown",
+        "面临抉择：①②格式"
+      ],
+      "humorType": "黑色幽默/反讽/冷面吐槽，密度10-20%",
+      "settingEra": "1980年代九龙城寨，白话文风，禁止网络用语"
+    },
+    "protagonistName": "贺千"
+  },
+  "settings": {
+    "autoPipeline": false,
+    "chapterRounds": 2
+  },
+  "styleTemplateId": null,
+  "constraints": [],
+  "chapters": [],
+  "chapterIntents": {
+    "chapters": {
+      "chapter-0001": {
+        "chapter": 1,
+        "goal": "完成千面系统激活与九龙城寨场景转换，建立'一筹'筹码与和义堂香堂的初始线索关联",
+        "outlineNode": "贺千在现实世界的地下赌场出千被识破，被人堵在巷子里。千面系统激活，他面前出现一扇虚掩的门——推开就是九龙城寨的窄巷。贺千还没搞清楚状况，就被一个跑过的孩子撞了个趔趄，孩子塞给他一张皱巴巴的纸条：'和义堂今晚开香堂，你要找的东西在账房。'贺千发现自己口袋里多了一枚铜筹码，上面刻着'一筹'。他站在巷口，闻到潮热的空气、烧腊的油烟、和某种说不清的危险气息。这是他进入千局的第一步——没有新手教程，没有任务说明，只有一张纸条和一枚筹码。",
+        "mustKeep": [
+          "贺千作为千术执行者的身份与动机",
+          "千面系统激活机制与'一筹'筹码的绑定关系"
+        ],
+        "mustAvoid": [
+          "避免引入与法家律令天宪体系冲突的超自然或无序设定"
+        ],
+        "styleEmphasis": null,
+        "hookAdvance": [
+          "推进'和义堂香堂账房目标物'的线索伏笔"
+        ],
+        "hookResolve": [],
+        "conflictDesign": "环境生存冲突：贺千 vs 赌场追兵与九龙城寨未知势力；赌注：人身安全与'一筹'筹码的线索价值",
+        "chapterEndHook": "账房位置暴露引发和义堂巡逻队逼近，铜筹码突然发烫显示倒计时",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T13:28:07.853Z"
+      },
+      "chapter-0002": {
+        "chapter": 2,
+        "goal": "通过贺千的市井探索与首次施展千术，具象化城寨‘烟火气与铁规矩并存’的生态，确立和义堂的秩序框架与纪棠的暗线身份，并以千术赢钱触发暗处监视，完成从逃亡到潜伏的场景转换。",
+        "outlineNode": "贺千在城寨里摸索，发现这里不是简单的复古场景——人是有血有肉的，巷子里的阿婆会骂他挡路，大排档老板会催他点单。他找到修表老头的小铺子，老头正在修一块停了的表，头也不抬地说：'新来的？先去和义堂报个名，不然你连巷子都走不出去。'贺千观察到城寨的生态——和义堂收保护费管秩序，但也不是铁板一块，有人对九指强的做派不满。纪棠以'从港岛来收账'的身份出现在大排档，和贺千打了个照面，两人心照不宣——都是外来者，但谁也不点破。贺千第一次使用千术：在牌档上赢了一顿饭钱，却发现自己赢的每一把都被角落里的眼睛盯着。",
+        "mustKeep": [
+          "城寨必须呈现为有血有肉的真实市井生态，拒绝悬浮布景感，保留阿婆骂街、大排档催单等生活化细节。",
+          "贺千的千术使用需保持克制与隐蔽，左手掌心暗金纹路作为核心超自然设定需与城寨环境产生隐性互动。",
+          "纪棠的‘港岛收账人’身份与贺千的‘外来者’默契需保持心照不宣的张力，不提前点破双方底牌。"
+        ],
+        "mustAvoid": [
+          "避免将城寨秩序描绘为纯粹的黑帮火拼或无序混乱，需严格遵循L1法家律令体系逻辑，体现和义堂规则具有‘立规、威慑、裁决’的类律令天宪属性。"
+        ],
+        "styleEmphasis": "冷峻市井白描与暗流悬疑交织，侧重感官细节（烟油味、青苔、金属冷光）与心理博弈，文风克制、留白，突出‘规矩之下无闲棋’的压迫感。",
+        "hookAdvance": [
+          "推进‘掌心暗金门扉纹路’伏笔：纹路在城寨特定规则场域下产生共鸣或指引，暗示其与城寨空间/权力结构的关联。",
+          "推进‘暗处监视网络’伏笔：千术赢钱触发的视线并非偶然，而是城寨底层情报网或执法机制的自动响应。"
+        ],
+        "hookResolve": [
+          "回收‘赌场逃亡死局’伏笔：通过空间转换与市井掩护，彻底切断追兵线索，完成安全脱身。"
+        ],
+        "conflictDesign": "冲突类型：环境适应与规则试探；对立双方：贺千（低调试探的外来者）VS 和义堂秩序网络（修表人、暗哨、纪棠等）；赌注：能否在不暴露底牌的前提下获取生存资源与合法身份，一旦越界将面临城寨‘律令’的强制裁决与驱逐。",
+        "chapterEndHook": "贺千刚收起赢来的饭钱，牌档角落的盯梢者并未拔刀，而是将一张盖有和义堂朱砂印的‘入册令’无声推至桌角；与此同时，修表铺里那块停摆多年的怀表突然‘咔哒’走秒，与贺千掌心暗金纹路的脉动完全同频，暗示城寨的‘天宪’已将他标记为待裁决对象。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T14:07:39.445Z"
+      },
+      "chapter-0003": {
+        "chapter": 3,
+        "goal": "贺千通过‘精准控输’的赌局面试成功混入和义堂底层，摸清歪嘴明与九指强之间的权力暗流，并获取修表老头提供的‘周三茶楼对账’关键线索，为后续情报行动铺路。",
+        "outlineNode": "贺千去和义堂报名当跑腿，歪嘴明负责面试。面试方式很直接——让贺千跟人赌一把，赢了留下，输了滚蛋。贺千故意输了一手，但输得恰到好处，让歪嘴明觉得他'有点小聪明但不成气候'。九指强在堂口里露了一面，气场压人，手下人连呼吸都放轻了。贺千注意到九指强的右手确实只有四根手指，断指处有个旧疤。和义堂内部暗流涌动——歪嘴明对九指强毕恭毕敬，但贺千从歪嘴明跟手下人的低语中捕捉到一丝不满。纪棠在城寨另一头开了间小当铺，开始收集情报。修表老头给贺千指了条路：'账房的人每周三去城寨外面的茶楼对账，你要找的东西，不在堂口里，在茶楼。'",
+        "mustKeep": [
+          "延续上一章潮湿、逼仄、底层生存的市井质感与高密度感官描写",
+          "严格维持九指强‘气场压人、断指旧疤’的视觉特征及和义堂内部‘表面恭敬、暗藏不满’的权力张力"
+        ],
+        "mustAvoid": [
+          "脱离底层江湖的‘规矩与威慑’逻辑，严禁出现现代法治体系介入或角色行为违背黑帮内部‘律令/家法’设定的情节（严格遵循L1法家律令天宪体系约束）"
+        ],
+        "styleEmphasis": "冷硬写实风，强化环境细节（潮湿、霓虹、市井噪音）与人物微表情/肢体语言的对照，以‘留白’和‘暗流’替代直白对话，突出江湖规矩的压迫感。",
+        "hookAdvance": [
+          "推进‘周三茶楼对账’线索（明确目标地点、时间窗口与情报价值）",
+          "铺垫纪棠当铺作为独立情报节点的运作模式与城寨暗线网络"
+        ],
+        "hookResolve": [
+          "回收上一章‘今晚如何落脚/摸清门道’的生存悬念（通过成功入职跑腿解决短期生存危机）"
+        ],
+        "conflictDesign": "心理博弈/试探性冲突 | 对立双方：贺千（伪装求职者） vs 歪嘴明（堂口面试官） | 赌注：贺千的生存资格与堂口信任度（真赢则锋芒毕露遭忌惮，真输则被扫地出门，必须‘精准控输’以换取底层身份与观察权限）",
+        "chapterEndHook": "贺千领到跑腿差事走出堂口，按老头指引望向城寨外的茶楼方向，却透过雨幕发现茶楼二楼窗边正坐着九指强的一名心腹，手中把玩着一枚与修表老头所给信物同源的铜牌，暗示‘对账’实为权力清洗的陷阱，周三之行危机四伏。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T14:27:14.990Z"
+      },
+      "chapter-0004": {
+        "chapter": 4,
+        "goal": "贺千通过阿辉获取福来茶楼具体位置及九指强靠出千上位的秘密，同时纪棠通过'三筹'铜筹确认千局已进入第三步，为后续潜入茶楼布局铺垫。",
+        "outlineNode": "贺千第一次跟踪账房的人去茶楼，但跟丢了——城寨的巷子像迷宫，他还没摸清路线。回来被歪嘴明训了一顿，说他偷懒。贺千借机跟和义堂的另一个跑腿阿辉套近乎，阿辉是个话多的人，喝了两杯就讲起了和义堂的旧事：九指强当年不是堂主，是靠一场赌局赢了前任才上位的。'那场赌局有鬼，'阿辉压低声音，'但没人敢说。'贺千心里有了数——九指强最恨的就是出千，因为他自己就是靠出千上位的。纪棠在当铺里接待了一个当东西的老妇人，老妇人当的是一枚旧铜筹，纪棠认出上面刻着'三筹'——这意味着这局千局里已经有人走到了第三步。修表老头告诉贺千：'茶楼叫福来茶楼，从城寨东门出去左拐第三条巷子。但你去之前，得先学会一件事——在这里，你的眼睛比你的手重要。'",
+        "mustKeep": [
+          "贺千谨慎多疑的性格特质与底层生存逻辑",
+          "九指强靠出千上位却最恨出千的矛盾设定"
+        ],
+        "mustAvoid": [
+          "违反法家律令天宪体系的核心规则（如角色可随意破坏规则而不受制裁）"
+        ],
+        "styleEmphasis": "市井悬疑氛围强化（潮湿巷弄/茶楼暗语/当铺旧物交织的压迫感）",
+        "hookAdvance": [
+          "推进'三筹'铜筹伏笔：暗示千局已有人走到第三步，需明确该线索与茶楼赌局的关联"
+        ],
+        "hookResolve": [],
+        "conflictDesign": "{\"type\":\"信任试探与信息博弈\",\"opposingSides\":\"贺千（伪装顺从的底层跑腿） vs 歪嘴明（掌控堂口情报的监视者）\",\"stakes\":\"贺千能否在保持低调的前提下获取茶楼路线，同时避免暴露真实意图被堂口清理\"}",
+        "chapterEndHook": "贺千按修表老头指示找到福来茶楼，却在门缝瞥见账房先生正与一名戴铜面具的人交接账本，面具人袖口露出与'三筹'铜筹相同的纹路——暗示茶楼已是千局核心节点，而贺千的跟踪早被反向利用。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T15:13:00.793Z"
+      },
+      "chapter-0005": {
+        "chapter": 5,
+        "goal": "促成贺千与江晚的临时合作，明确双方获取账本的不同目的（筹码交易vs依法结案），并通过江晚提供的走私路线图线索，将调查焦点引向账本缺失的关键数字环节。",
+        "outlineNode": "贺千在城寨的天台上遇到江晚。她坐在水箱边上抽烟，看着远处的维港，像是城寨里唯一一个会往外面看的人。'你也想出去？'贺千问。'我从来没进去过，'江晚说，'我是外面的人，进来查一桩案子。'她是便衣，查的是和义堂的走私网络，账本是她要的证据。两人发现目标一致，但目的不同——贺千要拿账本换筹码，江晚要拿账本结案。江晚给贺千看了她搜集的线索：和义堂的走私路线图，但缺了最关键的一环——账本上的数字。贺千答应帮她，但心里清楚：这局千局的筹码只认账本，不认正义。纪棠传来消息：歪嘴明最近在找一个人，说是'堂主点名要找的'。",
+        "mustKeep": [
+          "贺千与江晚目标一致但核心目的对立（个人筹码/程序正义）",
+          "城寨天台场景的潮湿压抑氛围及江晚作为外部调查者的孤立感"
+        ],
+        "mustAvoid": [
+          "避免将江晚的执法动机浪漫化，需严格遵循法家体系下证据链与程序正义的约束逻辑"
+        ],
+        "styleEmphasis": "冷硬派 noir 风格，强调环境细节（滴水线/霉味/粤曲）与角色间试探性对话的张力",
+        "hookAdvance": [
+          "推进‘歪嘴明寻找堂主点名人物’线索，暗示该人物与账本数字缺失环节存在直接关联"
+        ],
+        "hookResolve": [
+          "部分回收‘账房行踪’伏笔，通过走私路线图交叉印证账房可能负责账本数字加密"
+        ],
+        "conflictDesign": "目标冲突：贺千（账本作为黑市筹码） vs 江晚（账本作为司法证据）；赌注：账本控制权归属及和义堂走私网络能否被合法瓦解",
+        "chapterEndHook": "悬念：纪棠密报中‘堂主点名要找的人’突然出现在天台下方巷道，其手中握有半页带火漆印的账本残页，火漆纹样与江晚路线图标记完全吻合",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T15:24:23.050Z"
+      },
+      "chapter-0006": {
+        "chapter": 6,
+        "goal": "贺千运用千术技巧从和义堂成员处套取账房作息规律，并初步接触走私线账本线索，同时消化修表老头的生存法则与贺山的梦境警告。",
+        "outlineNode": "贺千在和义堂站稳了脚跟，开始系统性地收集情报。他发现千术在这个世界同样管用——不是超能力，而是对人心的操控。他用'望气术'（观察微表情）读出了歪嘴明对九指强的真实态度：表面恭敬，骨子里不服。他用'听声术'（从闲聊中提取关键信息）从阿辉口中套出了账房的人的作息规律。修表老头教贺千城寨的生存法则：'在这里，每个人都在演戏，区别只是演技好坏。你要做的不是看穿所有人，而是比所有人演得更好。'贺千第一次在梦里见到了贺山——不是回忆，是千局系统推送的信息碎片。贺山说了一句话：'第一局最危险的不是敌人，是你自己以为这只是一场游戏。'",
+        "mustKeep": [
+          "贺千的千术能力（望气术/听声术）作为情报收集核心手段",
+          "城寨‘人人演戏’的生存法则与贺山的梦境警告",
+          "江晚索要走私线账本的明确任务线"
+        ],
+        "mustAvoid": [
+          "避免引入超自然或魔法元素，千术必须严格限定为心理操控与观察技巧",
+          "避免破坏城寨‘演技生存’的底层逻辑，角色行为需符合‘演戏’设定"
+        ],
+        "styleEmphasis": "心理博弈与市井写实交织，突出‘演技’与‘信息操控’的冷峻质感；梦境片段采用碎片化、隐喻式描写",
+        "hookAdvance": [
+          "贺山梦境警告：‘第一局最危险的不是敌人，是你自己以为这只是一场游戏。’",
+          "江晚索要的走私线账本线索"
+        ],
+        "hookResolve": [],
+        "conflictDesign": "冲突类型：信任博弈与信息操控；对立双方：贺千（利用千术渗透） vs 和义堂中层（歪嘴明/九指强等，表面合作实则防备）；赌注：账本关键线索的获取与贺千在和义堂的生存根基",
+        "chapterEndHook": "贺千在账房外蹲守时，通过听声术截获一段加密对话，提及‘贺山’与‘千局系统’的关联词，同时修表老头突然现身警告：‘你查的账本，沾着上一任‘玩家’的血。’",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T16:01:56.679Z"
+      },
+      "chapter-0007": {
+        "chapter": 7,
+        "goal": "贺千伪装成茶楼跑堂潜入账房动线，确认黑色皮包为走私账本并锁定港岛贸易行老板的外部资金线，同时利用‘换牌术’在歪嘴明突发查岗时完成身份掩护。",
+        "outlineNode": "贺千第二次去茶楼，这次走对了路。他在茶楼里装作跑堂的，亲眼看到账房的人——一个戴金丝眼镜的中年人，手边永远放着一个黑色皮包。皮包里应该就是账本。但贺千发现一个意外：账房的人不是在和义堂的人对账，而是在跟一个穿西装的外面人对账。这意味着和义堂的走私网络比江晚知道的更复杂。贺千想偷看账本，但账房的人警觉性极高，皮包从不离手。纪棠通过当铺的渠道打听到穿西装的人是港岛一家贸易行的老板，和义堂只是他的一条线。歪嘴明突然出现在茶楼，贺千差点暴露，靠一手'换牌术'（快速换掉自己桌上的茶杯位置）蒙混过关。",
+        "mustKeep": [
+          "贺千的江湖手艺（察言观色/换牌术）需保持细节写实与生理反馈（如旧疤痛感、指尖微操）",
+          "账房金丝眼镜中年人的高度警觉性与黑色皮包绝对不离手的设定必须严格维持"
+        ],
+        "mustAvoid": [
+          "避免将走私网络描写为脱离‘律令/行规’约束的无序状态，需体现其受港岛贸易契约或内部严酷堂规制约的隐蔽秩序（遵循L1法家律令体系）",
+          "避免贺千轻易触碰或强行打开皮包导致潜入节奏崩坏与逻辑失真"
+        ],
+        "styleEmphasis": "强化微观动作与心理博弈的冷峻写实风格，侧重环境嘈杂掩护下的暗流涌动、指尖微操的紧张感，以及旧疤痛觉带来的生理预警反馈。",
+        "hookAdvance": [
+          "推进‘港岛贸易行老板与和义堂的暗线合作’伏笔，揭示走私网络受跨境资本与合规稽查双重约束的复杂生态",
+          "推进‘黑色皮包账本’的核心机密属性，铺垫其作为利益分配与律令制裁依据的关键作用"
+        ],
+        "hookResolve": [
+          "回收上一章‘歪嘴明笑纹与眼神不符’的伏笔，通过其茶楼查岗时的敏锐压迫感，坐实其‘面服心叛、暗中织网’的真实状态"
+        ],
+        "conflictDesign": "冲突类型：潜伏探查 vs 警觉反制；对立双方：贺千（伪装跑堂/暗中取证） vs 账房金丝眼镜男（死守皮包/高度戒备）与歪嘴明（突发巡场/识破危机）；赌注：身份暴露将触发和义堂内部律令制裁与灭口，港岛走私暗线情报彻底断裂。",
+        "chapterEndHook": "纪棠通过当铺暗线传来急报：港岛贸易行老板三日后将亲赴茶楼‘验账’。贺千目送账房先生离开时，瞥见其皮包暗扣因颠簸弹开半寸，露出一角盖有‘海关稽查’火漆印的封条，暗示走私网络正面临官方律令收网的倒计时危机。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T16:17:33.387Z"
+      },
+      "chapter-0008": {
+        "chapter": 8,
+        "goal": "通过贺千故意弄湿信件并如实汇报的‘第三条路’，完成歪嘴明的忠诚度试探，并借机确认歪嘴明暗中联络外部势力、意图取代九指强的真实动机，为后续三方权力博弈铺路。",
+        "outlineNode": "歪嘴明找贺千帮忙办一件事：去城寨外面送一封信。贺千意识到这是试探——如果他不去，说明他心里有鬼；如果他去了，说明他听话。贺千选了第三条路：去送信，但故意把信弄湿了，让收信人看不清内容，然后回来如实汇报。歪嘴明没生气，反而笑了：'你小子有点意思。'贺千从歪嘴明的反应中读出：这封信的内容歪嘴明也不想让人看清——他在给外面的人传消息，瞒着九指强。贺千把这件事告诉了江晚，江晚的脸色变了：'歪嘴明在跟外面的人勾连？那他可能就是我要找的线人。'但贺千知道，歪嘴明不是线人，歪嘴明是想取而代之。修表老头在贺千回来后说了一句：'棋局里最危险的不是对手的棋子，是自己人倒戈。'",
+        "mustKeep": [
+          "贺千‘表面顺从、实则留手、精准拿捏分寸’的生存智慧与冷静观察力",
+          "九龙城寨潮湿压抑、暗流涌动的底层江湖氛围与潜规则语境"
+        ],
+        "mustAvoid": [
+          "避免脱离‘法家·律令天宪体系’的底层逻辑，任何越界或试探行为必须伴随明确的规则威慑与潜在制裁风险，不可写成无代价的爽文式破局",
+          "避免直接点破歪嘴明的全部夺权计划，保持信息差与悬疑张力"
+        ],
+        "styleEmphasis": "冷峻写实与心理博弈并重，强调动作细节的隐喻性（如弄湿信件、疤痕发痒）与环境氛围对人物心理的压迫感",
+        "hookAdvance": [
+          "推进‘歪嘴明暗中勾连外部势力并图谋篡位’的暗线伏笔",
+          "推进‘江晚寻找线人’的任务线，建立贺千与江晚的信息共享但认知分歧"
+        ],
+        "hookResolve": [
+          "回收‘歪嘴明对贺千的初步试探’悬念，确立贺千在帮派中的初步信任地位"
+        ],
+        "conflictDesign": "心理试探与权力博弈（对立双方：贺千的生存自保 vs 歪嘴明的立威掩谋；赌注：贺千的性命信任与立足资格 vs 歪嘴明篡位计划的保密性与内部掌控权）",
+        "chapterEndHook": "修表老头话音刚落，贺千瞥见窗外雨幕中闪过一个熟悉的身影——正是上一章茶楼二楼那个皮包死死缠在椅腿上的金丝眼镜男。老头用镊子敲了敲表盘，低声补了一句：‘信湿了，但火已经点着了。’暗示外部势力已提前介入城寨，背叛的齿轮正式咬合，贺千意识到自己刚递出的不是湿信，而是催命符。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-13T16:33:12.005Z"
+      },
+      "chapter-0009": {
+        "chapter": 9,
+        "goal": "通过旁观九指强切指立威与自述，完成对堂口‘禁千’底层逻辑的心理侧写；借歪嘴明微表情确认内部权力暗流；接收沈不归现身码头的情报，为下一步跨区行动确立坐标与风险预案。",
+        "outlineNode": "和义堂的地下赌档出了事——有人出千被当场抓住，九指强亲自处理。贺千被叫去围观，看到九指强用一把裁纸刀切掉了那人的小指。'我最恨出千，'九指强说，举起了自己缺指的右手，'这根手指是我自己切的——当年我出千赢了堂主之位，切指谢罪。'贺千的冷汗下来了：他最擅长的千术，在这个世界里是最致命的罪名。但贺千也注意到了一个细节——九指强切指的时候，歪嘴明的嘴角微微上扬。回到住处，贺千把九指强的故事重新捋了一遍：一个靠出千上位的人，最恨出千——这不是矛盾，这是恐惧。九指强怕有人用同样的手段对付他。纪棠传来消息：沈不归出现了，在城寨外围的码头。",
+        "mustKeep": [
+          "贺千【行为模式】：遇险先毁证保身，以退为进索要资源；将铜筹温变与无名指痛感作为风险阈值与代价结算依据",
+          "贺千【内在矛盾】：谨小慎微求稳与关键时刻果断冒险的博弈倾向",
+          "L1硬事实·法家律令天宪体系：堂口规矩即天宪，出千必受极刑制裁，强调绝对威慑、裁决与封禁的不可违逆性"
+        ],
+        "mustAvoid": [
+          "避免贺千在未触发风险阈值（铜筹/痛感）前贸然暴露千术底牌或进行无逻辑的硬刚，违背其‘以退为进、毁证保身’的核心行为模式",
+          "避免将九指强的‘恨千’简单处理为道德洁癖或情绪宣泄，需严格遵循L1体系的‘恐惧投射型统治’逻辑，保持高压威慑与律令裁决的合理性"
+        ],
+        "styleEmphasis": "冷硬写实与心理侧写交织，强调环境压迫感（雨夜、血腥、金属冷光）与微表情细节捕捉；叙事节奏由‘血腥立威’的爆发转向‘密室推演’的冷峻，突出法家律令下的窒息氛围。",
+        "hookAdvance": [
+          "推进‘沈不归码头现身’线索，将其与贺千待执行的界限街送信任务建立空间/时间上的潜在交汇",
+          "激活‘歪嘴明切指时嘴角上扬’的权力暗线伏笔，暗示堂口高层存在借规杀人或规则博弈的意图"
+        ],
+        "hookResolve": [
+          "回收‘九指强缺指来历’的表层悬念，将其明确转化为‘恐惧型统治’的底层逻辑，完成堂口权力规则的具象化落地"
+        ],
+        "conflictDesign": "心理博弈与规则试探型冲突。对立双方：贺千（藏拙求生/解读规则） vs 九指强（立威震慑/恐惧投射）及歪嘴明（暗中布局/借规杀人）。赌注：贺千若暴露千术底牌或误判堂口规则，将面临切指抹杀的极刑制裁；若成功隐藏并精准解读权力暗流，则可获得在走私局与海关夹缝中周旋的筹码，并锁定下一步行动的安全路径。",
+        "chapterEndHook": "贺千将牛皮纸信封贴身藏好，左侧口袋的铜筹骤然转冷触发无名指刺痛；他推开窗望向城寨外围，码头方向的探照灯光束正撕裂雨幕，而纪棠的密信在桌上显出‘沈不归已靠岸’的血字。界限街送信路线与沈不归的靠岸轨迹即将在雨夜重叠，退无可退，贺千必须在‘越界递投名状’与‘截胡关键人物’之间做出致命抉择。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-18T08:41:13.027Z"
+      },
+      "chapter-0010": {
+        "chapter": 10,
+        "goal": "完成贺千与沈不归在码头的初次交锋与临时结盟，明确双方对账本的利益分割；通过沈不归之口揭示“千局”角色分配机制及贺千“千手”身份的本质，引发贺千对自身能力来源的认知危机。",
+        "outlineNode": "贺千在码头见到了沈不归。沈不归坐在集装箱上，手里把玩着一枚铜筹——'二筹'。他比贺千早进这局千局，已经拿到了第二枚筹码。'你是来抢账本的？'沈不归问。'我是来拿账本的，'贺千说，'抢是你的词。'沈不归笑了：'账本只有一本，你想好怎么跟我分了吗？'两人达成临时协议：沈不归要的是账本里关于走私路线的信息，贺千要的是账本本身。沈不归透露了一个关键信息——千局的'角色'不是固定的，每个人进局时被分配的身份不同，有人是棋手，有人是棋子，而贺千被分配的角色是'千手'——专门负责骗的。'所以你的千术不是你自己的本事，是千局给你的能力框架。'沈不归的话让贺千不舒服，但他没法反驳。",
+        "mustKeep": [
+          "贺千依赖铜筹温度预警风险的行为模式及藏锋敛锐的生存本能",
+          "贺千在高压走私局中规避规则反噬的核心欲望与内在矛盾"
+        ],
+        "mustAvoid": [
+          "避免脱离法家律令天宪体系的规则威慑框架，角色行动不可无视‘千局’既定律令而无代价",
+          "避免将贺千的千术描写为纯粹的个人天赋，需严格贴合‘能力框架由千局赋予’的设定"
+        ],
+        "styleEmphasis": "冷硬悬疑与心理博弈交织，侧重环境氛围的压迫感与对话中的机锋暗藏，强化身份认知被颠覆时的心理不适感",
+        "hookAdvance": [
+          "推进‘千局角色分配机制’伏笔：揭示身份非固定且贺千为‘千手’的设定",
+          "推进‘账本与走私路线’利益线：明确沈不归与贺千的临时分账协议"
+        ],
+        "hookResolve": [
+          "回收‘地下赌档立威局’的紧张对峙线：贺千完成潜伏观察并抽身前往码头",
+          "初步验证‘铜筹温度预警’机制：冷筹状态确认安全过渡至码头会面"
+        ],
+        "conflictDesign": "冲突类型：利益博弈与认知冲突；对立双方：贺千（求账本实体）与沈不归（求走私路线情报）；赌注：账本控制权与情报分割的临时协议，以及贺千对自身能力来源（千局赋予vs个人本事）的认知底线",
+        "chapterEndHook": "沈不归话音刚落，贺千指尖的铜筹骤然由冷转烫，表面浮现出细密的‘千手’暗纹；远处海关缉私艇的探照灯毫无征兆地扫过码头集装箱，广播里传出冰冷的规则宣读声，暗示‘千局’的强制介入与律令裁决已至。",
+        "hookAgenda": {
+          "mustAdvance": [],
+          "eligibleResolve": [],
+          "staleDebt": [],
+          "avoidNewFamilies": [],
+          "budget": {
+            "active": 0,
+            "max": 12,
+            "remaining": 12,
+            "nearCapacity": false,
+            "overCapacity": false
+          }
+        },
+        "generatedAt": "2026-05-18T09:03:48.588Z"
+      }
+    }
+  },
+  "hookBudget": {
+    "hooks": [],
+    "lastUpdated": null
+  },
+  "createdAt": "2026-05-13T13:24:06.813Z",
+  "updatedAt": "2026-05-13T13:24:06.814Z",
+  "ruleStack": {
+    "rules": [
+      {
+        "id": "R001",
+        "layer": "L1",
+        "layerName": "hard_facts",
+        "precedence": 100,
+        "scope": "global",
+        "category": "hard",
+        "content": "[法家·律令天宪体系] 禁止/威慑/约束/裁决/审判/制裁/封禁/天宪）",
+        "source": "素材:法家·律令天宪体系",
+        "active": true,
+        "createdAt": "2026-05-11T15:16:18.114Z"
+      }
+    ],
+    "activeOverrides": [],
+    "version": 2,
+    "lastUpdated": "2026-05-11T15:16:18.114Z"
+  },
+  "contextTraces": {
+    "chapters": {
+      "chapter-0001": {
+        "chapter": 1,
+        "timestamp": "2026-05-13T14:06:21.587Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-1-intent"
+        ],
+        "notes": [
+          "Chapter 1 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0002": {
+        "chapter": 2,
+        "timestamp": "2026-05-13T14:26:01.259Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-2-intent"
+        ],
+        "notes": [
+          "Chapter 2 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0003": {
+        "chapter": 3,
+        "timestamp": "2026-05-13T15:12:43.834Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-3-intent"
+        ],
+        "notes": [
+          "Chapter 3 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0004": {
+        "chapter": 4,
+        "timestamp": "2026-05-13T15:23:53.569Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-4-intent"
+        ],
+        "notes": [
+          "Chapter 4 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0005": {
+        "chapter": 5,
+        "timestamp": "2026-05-13T15:57:37.617Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-5-intent"
+        ],
+        "notes": [
+          "Chapter 5 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0006": {
+        "chapter": 6,
+        "timestamp": "2026-05-13T16:16:11.179Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-6-intent"
+        ],
+        "notes": [
+          "Chapter 6 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0007": {
+        "chapter": 7,
+        "timestamp": "2026-05-13T16:32:13.666Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-7-intent"
+        ],
+        "notes": [
+          "Chapter 7 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0008": {
+        "chapter": 8,
+        "timestamp": "2026-05-18T08:40:01.793Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-8-intent"
+        ],
+        "notes": [
+          "Chapter 8 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0009": {
+        "chapter": 9,
+        "timestamp": "2026-05-18T09:02:29.162Z",
+        "plannerInputs": [
+          "chapter-intent",
+          "hook-budget",
+          "rule-stack",
+          "memory",
+          "materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "intent-goal",
+          "intent-mustKeep",
+          "intent-mustAvoid",
+          "hook-agenda",
+          "rule-stack-L1",
+          "rule-stack-L2"
+        ],
+        "composerInputs": [
+          "chapter-9-intent"
+        ],
+        "notes": [
+          "Chapter 9 completed successfully"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": {
+          "total": 1,
+          "active": 1,
+          "byLayer": {
+            "L1": 1
+          },
+          "overrideEdges": [
+            {
+              "from": "L4",
+              "to": "L3",
+              "allowed": true,
+              "scope": "current_chapter",
+              "description": "当前任务可覆盖规划（如审核反馈要求修改大纲走向）"
+            },
+            {
+              "from": "L4",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖作者意图（不能违背创作方向和主题）"
+            },
+            {
+              "from": "L4",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_chapter",
+              "description": "当前任务不可覆盖硬事实（不能违反世界观铁律）"
+            },
+            {
+              "from": "L3",
+              "to": "L2",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖作者意图"
+            },
+            {
+              "from": "L3",
+              "to": "L1",
+              "allowed": false,
+              "scope": "current_arc",
+              "description": "规划不可覆盖硬事实"
+            },
+            {
+              "from": "L2",
+              "to": "L1",
+              "allowed": false,
+              "scope": "book",
+              "description": "作者意图不可覆盖硬事实"
+            }
+          ],
+          "activeOverrides": []
+        },
+        "hookBudgetSnapshot": {
+          "activeCount": 0,
+          "maxCapacity": 12,
+          "remaining": 12,
+          "nearCapacity": false,
+          "overCapacity": false,
+          "staleCount": 0,
+          "urgentCount": 0,
+          "staleHooks": [],
+          "urgentHooks": []
+        }
+      },
+      "chapter-0010": {
+        "chapter": 10,
+        "timestamp": "2026-05-18T09:03:48.592Z",
+        "plannerInputs": [
+          "chapter-outline",
+          "previous-chapter",
+          "hook-budget",
+          "rule-stack",
+          "core-materials"
+        ],
+        "selectedContext": [],
+        "selectedSources": [
+          "hook-agenda",
+          "rule-stack",
+          "core-characters",
+          "worldview-rules"
+        ],
+        "composerInputs": [],
+        "notes": [
+          "Intent generated for chapter 10"
+        ],
+        "budgetAllocation": null,
+        "ruleStackSnapshot": null,
+        "hookBudgetSnapshot": null
+      }
+    }
+  },
+  "_pipeline_metrics": {
+    "agentTimings": {
+      "writer": {
+        "calls": 12,
+        "totalMs": 1584995,
+        "avgMs": 132083,
+        "maxMs": 184679,
+        "totalTokens": 142551
+      },
+      "first-review": {
+        "calls": 31,
+        "totalMs": 3294491,
+        "avgMs": 106274,
+        "maxMs": 178308,
+        "totalTokens": 365602
+      },
+      "second-review": {
+        "calls": 14,
+        "totalMs": 1165145,
+        "avgMs": 83225,
+        "maxMs": 108172,
+        "totalTokens": 158439
+      },
+      "final-editor": {
+        "calls": 13,
+        "totalMs": 771442,
+        "avgMs": 59342,
+        "maxMs": 74276,
+        "totalTokens": 119270
+      },
+      "reviser": {
+        "calls": 19,
+        "totalMs": 2763401,
+        "avgMs": 145442,
+        "maxMs": 210572,
+        "totalTokens": 310476
+      },
+      "material-manager": {
+        "calls": 9,
+        "totalMs": 902858,
+        "avgMs": 100318,
+        "maxMs": 141958,
+        "totalTokens": 105486
+      },
+      "polisher": {
+        "calls": 7,
+        "totalMs": 1105823,
+        "avgMs": 157975,
+        "maxMs": 207319,
+        "totalTokens": 97148
+      }
+    },
+    "reviewPassRates": {},
+    "tokenUsage": {},
+    "chapterDurations": [],
+    "errorCounts": {},
+    "agentPassRates": {
+      "first-review": {
+        "total": 31,
+        "passed": 11,
+        "failChapters": [
+          1,
+          1,
+          2,
+          3,
+          3,
+          3,
+          3,
+          3,
+          5,
+          5,
+          5,
+          6,
+          7,
+          8,
+          8,
+          8,
+          8,
+          9,
+          9,
+          10
+        ]
+      },
+      "second-review": {
+        "total": 14,
+        "passed": 13,
+        "failChapters": [
+          10
+        ]
+      },
+      "final-editor": {
+        "total": 13,
+        "passed": 10,
+        "failChapters": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    "reviserLoops": [
+      {
+        "chapterNumber": 1,
+        "loopCount": 2,
+        "totalReviserMs": 115464,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T13:56:12.746Z"
+      },
+      {
+        "chapterNumber": 1,
+        "loopCount": 3,
+        "totalReviserMs": 176173,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:00:53.633Z"
+      },
+      {
+        "chapterNumber": 2,
+        "loopCount": 2,
+        "totalReviserMs": 124651,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:15:36.757Z"
+      },
+      {
+        "chapterNumber": 2,
+        "loopCount": 3,
+        "totalReviserMs": 210641,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:20:37.832Z"
+      },
+      {
+        "chapterNumber": 3,
+        "loopCount": 2,
+        "totalReviserMs": 174262,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:36:19.136Z"
+      },
+      {
+        "chapterNumber": 3,
+        "loopCount": 3,
+        "totalReviserMs": 160741,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:41:28.405Z"
+      },
+      {
+        "chapterNumber": 3,
+        "loopCount": 4,
+        "totalReviserMs": 157194,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:46:04.143Z"
+      },
+      {
+        "chapterNumber": 3,
+        "loopCount": 5,
+        "totalReviserMs": 107304,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T14:49:42.948Z"
+      },
+      {
+        "chapterNumber": 5,
+        "loopCount": 2,
+        "totalReviserMs": 177308,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T15:30:53.820Z"
+      },
+      {
+        "chapterNumber": 5,
+        "loopCount": 3,
+        "totalReviserMs": 106711,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T15:34:24.502Z"
+      },
+      {
+        "chapterNumber": 5,
+        "loopCount": 4,
+        "totalReviserMs": 161495,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T15:39:02.144Z"
+      },
+      {
+        "chapterNumber": 6,
+        "loopCount": 2,
+        "totalReviserMs": 120398,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T16:08:17.768Z"
+      },
+      {
+        "chapterNumber": 7,
+        "loopCount": 2,
+        "totalReviserMs": 127881,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T16:24:17.062Z"
+      },
+      {
+        "chapterNumber": 8,
+        "loopCount": 2,
+        "totalReviserMs": 85322,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T16:38:39.151Z"
+      },
+      {
+        "chapterNumber": 8,
+        "loopCount": 3,
+        "totalReviserMs": 134256,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-13T16:45:07.365Z"
+      },
+      {
+        "chapterNumber": 8,
+        "loopCount": 4,
+        "totalReviserMs": 131464,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-18T08:26:53.187Z"
+      },
+      {
+        "chapterNumber": 8,
+        "loopCount": 5,
+        "totalReviserMs": 158690,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-18T08:31:07.425Z"
+      },
+      {
+        "chapterNumber": 9,
+        "loopCount": 2,
+        "totalReviserMs": 144970,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-18T08:47:22.298Z"
+      },
+      {
+        "chapterNumber": 9,
+        "loopCount": 3,
+        "totalReviserMs": 189862,
+        "issuesFixed": 0,
+        "timestamp": "2026-05-18T08:52:22.859Z"
+      }
+    ],
+    "hookResolutionLog": [],
+    "materialAddedLog": [
+      {
+        "chapterNumber": 1,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T14:06:21.529Z"
+      },
+      {
+        "chapterNumber": 1,
+        "materialType": "sub-plane",
+        "materialName": "城寨次位面",
+        "action": "create",
+        "timestamp": "2026-05-13T14:06:21.535Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T14:26:01.181Z"
+      },
+      {
+        "chapterNumber": 2,
+        "materialType": "faction",
+        "materialName": "和义堂",
+        "action": "create",
+        "timestamp": "2026-05-13T14:26:01.188Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T15:12:43.725Z"
+      },
+      {
+        "chapterNumber": 3,
+        "materialType": "character",
+        "materialName": "歪嘴明",
+        "action": "create",
+        "timestamp": "2026-05-13T15:12:43.735Z"
+      },
+      {
+        "chapterNumber": 4,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T15:23:53.491Z"
+      },
+      {
+        "chapterNumber": 4,
+        "materialType": "mechanism",
+        "materialName": "铜筹代价与千局进度",
+        "action": "create",
+        "timestamp": "2026-05-13T15:23:53.498Z"
+      },
+      {
+        "chapterNumber": 5,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T15:57:37.550Z"
+      },
+      {
+        "chapterNumber": 5,
+        "materialType": "character",
+        "materialName": "江晚",
+        "action": "create",
+        "timestamp": "2026-05-13T15:57:37.556Z"
+      },
+      {
+        "chapterNumber": 6,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T16:16:11.079Z"
+      },
+      {
+        "chapterNumber": 6,
+        "materialType": "equipment",
+        "materialName": "铜筹",
+        "action": "create",
+        "timestamp": "2026-05-13T16:16:11.088Z"
+      },
+      {
+        "chapterNumber": 7,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "create",
+        "timestamp": "2026-05-13T16:32:13.566Z"
+      },
+      {
+        "chapterNumber": 7,
+        "materialType": "mechanism",
+        "materialName": "铜筹痛觉反馈锚点",
+        "action": "create",
+        "timestamp": "2026-05-13T16:32:13.574Z"
+      },
+      {
+        "chapterNumber": 8,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "update",
+        "timestamp": "2026-05-18T08:40:01.734Z"
+      },
+      {
+        "chapterNumber": 8,
+        "materialType": "character",
+        "materialName": "歪嘴明",
+        "action": "create",
+        "timestamp": "2026-05-18T08:40:01.737Z"
+      },
+      {
+        "chapterNumber": 8,
+        "materialType": "mechanism",
+        "materialName": "界限街试水局",
+        "action": "create",
+        "timestamp": "2026-05-18T08:40:01.742Z"
+      },
+      {
+        "chapterNumber": 9,
+        "materialType": "character",
+        "materialName": "贺千",
+        "action": "update",
+        "timestamp": "2026-05-18T09:02:29.084Z"
+      },
+      {
+        "chapterNumber": 9,
+        "materialType": "character",
+        "materialName": "九指强",
+        "action": "create",
+        "timestamp": "2026-05-18T09:02:29.087Z"
+      },
+      {
+        "chapterNumber": 9,
+        "materialType": "equipment",
+        "materialName": "铜筹",
+        "action": "create",
+        "timestamp": "2026-05-18T09:02:29.093Z"
+      }
+    ],
+    "branchingLog": []
+  },
+  "_circuitBreaker": {
+    "consecutiveFailures": 6,
+    "lastFailureStep": "first-review",
+    "history": [
+      {
+        "step": "first-review",
+        "chapterNumber": 1,
+        "result": "fail",
+        "timestamp": "2026-05-13T13:57:57.455Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 1,
+        "result": "pass",
+        "timestamp": "2026-05-13T14:06:21.588Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 2,
+        "result": "fail",
+        "timestamp": "2026-05-13T14:17:07.186Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 2,
+        "result": "pass",
+        "timestamp": "2026-05-13T14:26:01.261Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 3,
+        "result": "fail",
+        "timestamp": "2026-05-13T14:38:47.660Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 3,
+        "result": "fail",
+        "timestamp": "2026-05-13T14:43:26.945Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 3,
+        "result": "fail",
+        "timestamp": "2026-05-13T14:47:55.639Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 3,
+        "result": "fail",
+        "timestamp": "2026-05-13T14:51:13.357Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 3,
+        "result": "pass",
+        "timestamp": "2026-05-13T15:12:43.837Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 4,
+        "result": "pass",
+        "timestamp": "2026-05-13T15:23:53.572Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 5,
+        "result": "fail",
+        "timestamp": "2026-05-13T15:27:56.507Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 5,
+        "result": "fail",
+        "timestamp": "2026-05-13T15:32:37.788Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 5,
+        "result": "fail",
+        "timestamp": "2026-05-13T15:36:20.644Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 5,
+        "result": "pass",
+        "timestamp": "2026-05-13T15:57:37.619Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 6,
+        "result": "fail",
+        "timestamp": "2026-05-13T16:06:17.364Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 6,
+        "result": "pass",
+        "timestamp": "2026-05-13T16:16:11.182Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 7,
+        "result": "fail",
+        "timestamp": "2026-05-13T16:22:09.176Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 7,
+        "result": "pass",
+        "timestamp": "2026-05-13T16:32:13.669Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 8,
+        "result": "fail",
+        "timestamp": "2026-05-13T16:37:13.823Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 8,
+        "result": "fail",
+        "timestamp": "2026-05-13T16:40:34.277Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 8,
+        "result": "fail",
+        "timestamp": "2026-05-13T16:46:17.000Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 8,
+        "result": "fail",
+        "timestamp": "2026-05-18T08:28:28.731Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 8,
+        "result": "pass",
+        "timestamp": "2026-05-18T08:40:01.795Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 9,
+        "result": "fail",
+        "timestamp": "2026-05-18T08:44:57.323Z"
+      },
+      {
+        "step": "first-review",
+        "chapterNumber": 9,
+        "result": "fail",
+        "timestamp": "2026-05-18T08:49:12.989Z"
+      },
+      {
+        "step": "any",
+        "chapterNumber": 9,
+        "result": "pass",
+        "timestamp": "2026-05-18T09:02:29.164Z"
+      }
+    ],
+    "tripped": true,
+    "tripChapter": 8
+  }
+}

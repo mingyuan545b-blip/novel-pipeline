@@ -1,0 +1,26 @@
+{
+  "id": "ae3aa2dd-d443-4a9e-a261-bfcfb01bfd92",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "第1章IP方向",
+  "description": "无IP风险，维持当前特征描述策略",
+  "eventType": "revelation",
+  "storyOrder": 30,
+  "sortOrder": 30,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "auto-generated",
+    "ip-direction"
+  ],
+  "createdAt": "2026-05-13T11:02:38.751Z",
+  "updatedAt": "2026-05-13T11:02:38.751Z"
+}

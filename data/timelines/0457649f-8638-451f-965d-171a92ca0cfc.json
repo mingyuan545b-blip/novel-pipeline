@@ -1,0 +1,30 @@
+{
+  "id": "0457649f-8638-451f-965d-171a92ca0cfc",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【所属位面】主世界(千局表层)\n【身份】千局破局者/贺山之子\n【核心欲望】查明父亲死因与千局真相，在死局中存活\n【内在矛盾】理性求生的谨慎本能 vs 对破局执念的赌徒心态\n【行为模式】遇险时依赖直觉与身体痛觉反馈做决策，习惯在绝境中观察环境寻找规则漏洞，不轻信表象，行事果断且带极强目的性\n【持有物/机制】铜筹一筹(引路媒介，绑定旧伤痛觉反馈，温度指示方位)；洗生人味(账房准入门槛，需剥离生人气息方可跨入，具体代价待显化)\n【当前状态】已接受暗巷老头条件，正持筹潜入账房暗线\n【关联记忆】父亲遗信千局是假的",
+  "eventType": "character",
+  "storyOrder": 39,
+  "sortOrder": 39,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "2ac33e9a-a6f1-4e23-bf9d-0ef0ae62be83"
+  ],
+  "characterIds": [
+    "2ac33e9a-a6f1-4e23-bf9d-0ef0ae62be83"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "主角正式切入千局城寨层，需建立核心行为逻辑、动机与状态基线",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T11:37:55.176Z",
+  "updatedAt": "2026-05-13T11:37:55.176Z"
+}

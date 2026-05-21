@@ -1,0 +1,28 @@
+{
+  "id": "bebdc556-922c-44a7-b913-ed5d2cf63468",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "命牌新篇",
+  "description": "论道大会结束，沈墨辞回到合欢宗。系统发布第四个任务预告：动漫类次位面。沈墨辞看着命牌上的任务简报，深吸一口气。他盘点现有能力：规则之眼（感知规则）、因果律闪避（5%自动闪避）、元素契约（与自然元素微弱联系），修为正言六重。前路漫漫，但至少他不再是那个只能装弱的男宠了。苏锦瑟在月下独酌，看着沈墨辞房间的灯火，低声自语：\"小墨辞，你到底在瞒我什么……\"卷末。",
+  "eventType": "world",
+  "storyOrder": 29,
+  "sortOrder": 29,
+  "storyTime": "第6阶段",
+  "chapterIds": [
+    "3a5ba4bf-e27f-4c0a-9a22-cfcd7f885e4e"
+  ],
+  "questIds": [
+    "da497396-18a3-4900-ad42-b8f09e937632"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "月下独酌",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第30章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

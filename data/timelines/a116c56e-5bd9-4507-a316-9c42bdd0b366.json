@@ -1,0 +1,30 @@
+{
+  "id": "a116c56e-5bd9-4507-a316-9c42bdd0b366",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "江晚",
+  "description": "【所属势力】外部执法机构\n【所属位面】主世界\n【核心欲望】获取完整证据链完成案件闭环\n【内在矛盾】程序正义的绝对坚守与城寨潜规则的生存逻辑冲突\n【行为模式】高度理性与流程化，不涉人情交易，以十分钟为硬性时间节点，提供路线掩护但拒绝承担连带风险，行事如精密机器",
+  "eventType": "character",
+  "storyOrder": 55,
+  "sortOrder": 55,
+  "storyTime": "第5章",
+  "chapterIds": [
+    "fb0cbc63-022f-454b-9ba6-d3416115c7a5"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "d6e21eb5-ce18-4616-8494-2c6ff57a644d"
+  ],
+  "characterIds": [
+    "d6e21eb5-ce18-4616-8494-2c6ff57a644d"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "首次出场，建立外部调查员档案与主角合作博弈关系起点",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T15:57:37.560Z",
+  "updatedAt": "2026-05-13T15:57:37.560Z"
+}

@@ -1,0 +1,45 @@
+{
+  "faction": [
+    "0e472248-d70f-44da-a6c2-a6267533b6d6",
+    "ce2c4ffd-e314-49f3-85ad-21ade03087bf"
+  ],
+  "power-system": [
+    "351b35ed-91c6-4ee9-ab89-ebf511476e09",
+    "517d463f-ea5a-4425-95c6-1cc040b49478",
+    "c350308b-60c5-4c2b-8e30-622ff9d0440d",
+    "d0e4294c-6033-4c49-ae38-b430c0cbf917",
+    "de1c777c-ba98-4c6a-aca1-2f9e10b10c32"
+  ],
+  "character": [
+    "396e9dd1-60a3-432a-b770-3e8db66b4488",
+    "3fe4fc11-6d47-47d1-9ba1-36b59133322f",
+    "4acf2b7b-3a5d-41a3-8ac7-281551873e13",
+    "4cb95fc7-822c-4400-a763-7e61df8c414b",
+    "812ef22f-a762-4cb1-b7d2-efd69e556127",
+    "84047c5a-50c1-4b53-ac59-1344df42b1db"
+  ],
+  "writing-technique": [
+    "3e70a3b3-42f2-4736-8b38-8b980f5ca36d",
+    "49014ee5-e1c5-49d5-9fcb-028da48a6b3c",
+    "b139ae08-0e75-45d5-a6a5-d149af4e4a85",
+    "e0cf6e22-ff1f-4244-bf97-b8fda9017fce"
+  ],
+  "sub-plane": [
+    "4aad5d80-1e6b-4c67-8c69-6dc0d3939c3e"
+  ],
+  "mechanism": [
+    "67c151e9-78da-4e0c-9109-8f196ed1ce94",
+    "73d28cf1-a6cf-473c-9503-639cdec753af",
+    "ab161f01-ed4a-4cf2-84ee-b2952686ea69",
+    "ba6a4c9c-8d51-49a5-bda7-04a0c5c9928b",
+    "caa7996e-8935-4ac0-8bc8-614fa1da6092",
+    "da4db089-b412-48da-8646-fc986eac9671"
+  ],
+  "equipment": [
+    "851fbd6f-c489-4702-abf5-0750160804fa",
+    "df97f77d-7099-4a66-b3cf-ffdcf2bc28de"
+  ],
+  "worldview": [
+    "9271d13c-4016-4db0-bf36-3b6aaa19c6a8"
+  ]
+}

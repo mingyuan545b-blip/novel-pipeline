@@ -1,0 +1,21 @@
+{
+    "id": "玄幻",
+    "label": "玄幻修仙",
+    "namingStyle": "poetic-imagery",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "martial-ascension",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["true-expert", "old-fox", "snake-mentor", "shadow-schemer", "green-tea", "grind-king", "info-broker"],
+    "defaultSpeechStyles": ["literary", "euphemism"],
+    "defaultDialects": ["四川", "陕西"],
+    "styleHints": {
+        "pov": "第三人称限制视角",
+        "tone": "热血激昂",
+        "style": "热血爽文"
+    },
+    "wordConfig": { "minWords": 2500, "targetWords": 3000, "maxWords": 4000 },
+    "constraintOverrides": ["no-random-plot", "worldview-consistency"],
+    "reviewFocus": ["境界体系一致性", "功法名称连贯性", "修为压制逻辑", "灵根/体质设定不矛盾"],
+    "defaultSystemPersona": "anti-cliche",
+    "materialFocus": ["power-system", "character", "faction", "equipment", "foreshadowing"]
+}

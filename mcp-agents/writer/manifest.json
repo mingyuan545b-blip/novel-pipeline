@@ -1,0 +1,19 @@
+{
+    "dxt_version": "0.1",
+    "name": "@aipy-pro/writer",
+    "display_name": "执笔人",
+    "version": "1.0.0",
+    "description": "小说创作流水线 - 执笔人Agent，负责根据章节大纲和素材库创作正文",
+    "author": { "name": "NovelPipeline" },
+    "icon": "icon.svg",
+    "server": {
+        "type": "node",
+        "entry_point": "server.js",
+        "mcp_config": {
+            "command": "node",
+            "args": ["${__dirname}/server.js"],
+            "env": {}
+        }
+    },
+    "keywords": ["conversation-tool"]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "04_对白艺术部_04_多人对话调度_03",
+  "success_rate": 50,
+  "attempts": 0,
+  "auto_disabled": false,
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+    "dxt_version": "0.1",
+    "name": "@aipy-pro/first-review",
+    "display_name": "初审",
+    "version": "1.0.0",
+    "description": "小说创作流水线 - 初审Agent，审核正文与素材库的一致性",
+    "author": { "name": "NovelPipeline" },
+    "icon": "icon.svg",
+    "server": {
+        "type": "node",
+        "entry_point": "server.js",
+        "mcp_config": {
+            "command": "node",
+            "args": ["${__dirname}/server.js"],
+            "env": {}
+        }
+    },
+    "keywords": ["conversation-tool"]
+}

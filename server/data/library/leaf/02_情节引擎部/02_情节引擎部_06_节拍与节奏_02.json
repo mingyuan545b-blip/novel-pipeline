@@ -1,0 +1,33 @@
+{
+  "id": "02_情节引擎部_06_节拍与节奏_02",
+  "category_path": "02_情节引擎部/06_节拍与节奏/02_多章间起承转合",
+  "display_name": "多章间起承转合",
+  "department": "02_情节引擎部",
+  "subcategory": "06_节拍与节奏",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "多章间起承转合",
+    "节拍与节奏",
+    "情节引擎部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.228Z"
+}

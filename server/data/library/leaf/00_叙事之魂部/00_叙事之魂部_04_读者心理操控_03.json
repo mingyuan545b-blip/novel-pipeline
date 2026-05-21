@@ -1,0 +1,32 @@
+{
+  "id": "00_叙事之魂部_04_读者心理操控_03",
+  "category_path": "00_叙事之魂部/04_读者心理操控/03_道德困境引导",
+  "display_name": "道德困境引导",
+  "department": "00_叙事之魂部",
+  "subcategory": "04_读者心理操控",
+  "applicable_modes": [
+    "novel",
+    "shuangwen"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "道德困境引导",
+    "读者心理操控",
+    "叙事之魂部"
+  ],
+  "context_slot": "L0",
+  "context_priority": 100,
+  "injection_point": "intent-planner",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.193Z"
+}

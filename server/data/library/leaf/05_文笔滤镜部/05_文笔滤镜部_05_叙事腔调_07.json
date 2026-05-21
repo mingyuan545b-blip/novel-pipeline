@@ -1,0 +1,33 @@
+{
+  "id": "05_文笔滤镜部_05_叙事腔调_07",
+  "category_path": "05_文笔滤镜部/05_叙事腔调/07_日记书信体",
+  "display_name": "日记书信体",
+  "department": "05_文笔滤镜部",
+  "subcategory": "05_叙事腔调",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "日记书信体",
+    "叙事腔调",
+    "文笔滤镜部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "polisher",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.276Z"
+}

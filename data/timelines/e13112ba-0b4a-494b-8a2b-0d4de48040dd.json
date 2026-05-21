@@ -1,0 +1,28 @@
+{
+  "id": "e13112ba-0b4a-494b-8a2b-0d4de48040dd",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "魔力初开",
+  "description": "沈墨辞发现魔法世界的魔力体系与主世界修为有本质不同——魔力是外在能量，修为是内在修为。他用规则之眼感知魔法规则的底层逻辑，发现魔法的本质是\"与元素签订契约\"。他利用儒家言出法随的底子，以\"言\"为媒介与火元素签订契约，获得基础火系魔法。",
+  "eventType": "revelation",
+  "storyOrder": 23,
+  "sortOrder": 23,
+  "storyTime": "第5阶段",
+  "chapterIds": [
+    "c5e7d77a-315b-4dde-8572-85aa0afb0cd4"
+  ],
+  "questIds": [
+    "da497396-18a3-4900-ad42-b8f09e937632"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "能量",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第24章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

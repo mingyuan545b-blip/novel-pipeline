@@ -1,0 +1,28 @@
+{
+  "id": "8ca31f7d-7573-4a29-879b-45af5d7d7f6a",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "命牌再震",
+  "description": "系统发布第二个任务：抽象概念类世界。沈墨辞在深夜被传送，这次有了经验，提前准备了干粮和水。进入一个看似和平的青青草原世界，遇到一群蓝白色绒衣的羊族居民和一栋灰色城堡里的发明家。他意识到这是某种抽象概念世界，规则与\"永远追不上\"有关。",
+  "eventType": "world",
+  "storyOrder": 14,
+  "sortOrder": 14,
+  "storyTime": "第3阶段",
+  "chapterIds": [
+    "2fbdf818-dd13-40f7-8444-9490afd76b86"
+  ],
+  "questIds": [
+    "9900d2fb-37ad-46be-95c7-7a1941a06195"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "深夜被传送",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第15章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

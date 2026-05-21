@@ -1,0 +1,33 @@
+{
+  "id": "04_对白艺术部_03_角色语言区分_03",
+  "category_path": "04_对白艺术部/03_角色语言区分/03_专业性术语",
+  "display_name": "专业性术语",
+  "department": "04_对白艺术部",
+  "subcategory": "03_角色语言区分",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "专业性术语",
+    "角色语言区分",
+    "对白艺术部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "polisher",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.253Z"
+}

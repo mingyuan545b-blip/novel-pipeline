@@ -1,0 +1,119 @@
+{
+  "id": "750ba425-8afd-474f-920b-22776789ea2d",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "chapterNumber": 1,
+  "timestamp": "2026-05-13T11:04:21.722Z",
+  "characterStates": {
+    "24826b53-94dc-4b78-a44a-7d4c5bd616b0": {
+      "id": "24826b53-94dc-4b78-a44a-7d4c5bd616b0",
+      "name": "纪棠",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】与贺千短暂交锋后抽身，留下九指强今晚点人情报警报，疑似暗中布局\n【核心欲望】取回账本夹层当票，清算旧债\n【行为模式】冷静自持，以信息差换取执行者，不涉情感与额外解释，行动利落不留痕迹\n【微表情习惯】眼神如秤砣下压，补妆动作慢条斯理但视线紧盯目标\n【内在矛盾】追求程序正义的执念 vs 城寨生存法则的冷酷现实",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 0,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "28f0a6fc-c11b-4dbe-a58d-39dd9d54cd5b": {
+      "id": "28f0a6fc-c11b-4dbe-a58d-39dd9d54cd5b",
+      "name": "贺山",
+      "content": "【角色·贺山】\n身份：贺千之父 / 千局前入局者（已死）\n死因：与千局相关，具体真相待揭\n遗留线索：信上只有一句\"千局是假的\"\n与贺千关系：驱动贺千入局的核心动机\n叙事功能：伏笔载体，通过遗留物和他人回忆逐步揭示\n禁忌：不可通过回忆直接揭示全部真相",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 0,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "2fc5a289-cddf-4a66-8739-b52a688a0a98": {
+      "id": "2fc5a289-cddf-4a66-8739-b52a688a0a98",
+      "name": "贺千",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】已突破边界进入次位面，铜筹激活引发左手无名指旧伤共振，正潜伏于和义堂外围骑楼\n【核心欲望】查明账本夹层当票，验证父亲遗言“千局是假的”\n【行为模式】绝境中依赖地形观察与信息差制定潜入路线，躯体异象下保持战术冷静，行动利落不拖沓\n【微表情习惯】咬紧后槽牙应对高压抉择，习惯性摩挲口袋硬物确认状态",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 1,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9": {
+      "id": "6c9947b9-cf2c-4b80-b713-8fad4e84b2d9",
+      "name": "江晚",
+      "content": "【所属位面】九龙\n【所属势力】无\n【当前状态】与贺千在天台结盟，锁定周三茶楼流水证据，掌握路线图与当票线索\n【核心欲望】获取和义堂洗钱流水证据，将其送入局子（独立于主角的正义诉求）\n【内在矛盾】追求程序正义的执念 vs 城寨生存法则的冷酷现实\n【行为模式】冷静带刺，行动利落，以明确利益划分建立合作底线，不依赖他人\n【微表情习惯】叼烟不点火，手指敲击铁管节奏稳定，眼神冷硬如生铁",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 0,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "bf9890b0-d67c-4147-9491-0be9e6725474": {
+      "id": "bf9890b0-d67c-4147-9491-0be9e6725474",
+      "name": "歪嘴明",
+      "content": "【所属位面】九龙\n【所属势力】和义堂\n【当前状态】以做旧扑克试探贺千后放行，转为暗中抱怨账目\n【核心欲望】在九指强夺权前保全自身筹码与退路\n【行为模式】表面粗粝实则精细，利用规则漏洞设局测试新人底线\n【微表情习惯】嘴角歪斜随情绪加深，指甲刀敲击桌面掩饰不安\n【立场逻辑】察觉堂口内部贪墨与强哥逼平账的矛盾，试图在权力夹缝中留后路",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 0,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "db2dfec4-a940-4cea-87a8-ad198d3501e5": {
+      "id": "db2dfec4-a940-4cea-87a8-ad198d3501e5",
+      "name": "九指强",
+      "content": "【所属位面】九龙\n【所属势力】和义堂\n【当前状态】武力巡视堂口，强压账目平账，暗中掩盖早年出千上位的黑历史\n【核心欲望】维持九龙表层秩序垄断，掩盖资金流向或应对上层清查，极度忌惮他人出千\n【行为模式】以沉默停顿与断指疤痕制造视觉压迫，精准施压，靠出千上位后立规矩见一个剁一个\n【微表情习惯】把玩核桃骤停时目光锁定目标后颈",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 0,
+      "active": true,
+      "changesFromPrev": []
+    },
+    "e2bccd5d-39fd-4032-a538-1302c8bbbc8d": {
+      "id": "e2bccd5d-39fd-4032-a538-1302c8bbbc8d",
+      "name": "沈不归",
+      "content": "【角色·沈不归】\n身份：千局\"老鬼\"（传说级人物）/ 前代入局者\n状态：行踪不明，通过遗留线索和他人传闻存在\n叙事功能：千局深层规则的揭示者，贺千最终理解千局真相的关键\n与贺千关系：间接引导，非直接出场\n禁忌：不可过早揭示身份，不可机械降神",
+      "location": "未知",
+      "status": "活跃",
+      "powerLevel": "未知",
+      "emotionalState": "平静",
+      "lastAppearanceChapter": 0,
+      "active": true,
+      "changesFromPrev": []
+    }
+  },
+  "relationshipStates": {},
+  "equipmentStates": {
+    "6399995f-ebc4-40d6-93f2-9a59b19d3231": {
+      "id": "6399995f-ebc4-40d6-93f2-9a59b19d3231",
+      "name": "铜筹码",
+      "content": "【所属位面】九龙\n【外观特征】铜色发暗，边缘有棱角，中央阴刻“一筹”二字，质感冰凉\n【触发机制】掌心贴合后热量由表及里渗透，同步引发绑定者左手无名指旧伤抽痛\n【功能指向】千局身份标识与进度指示器，热度与痛感强度随接近核心目标或危险区域呈正相关\n【当前状态】已激活绑定贺千，处于低热预警态",
+      "owner": "未知",
+      "status": "完好",
+      "lastChangeChapter": 0
+    }
+  },
+  "growthMilestones": {},
+  "foreshadowingStates": {},
+  "activeQuests": [],
+  "timelineEvents": [],
+  "worldviewSnapshot": [
+    {
+      "id": "87add268-0a00-4e56-bd06-1fbb708b8ae4",
+      "name": "千局",
+      "content": "【规则显化】入局彻底摒弃系统提示与UI界面，转为物理媒介传导与躯体感官异象强制反馈\n【边界条件】无新手引导与规则说明，入局者需通过环境交互与生理痛觉自行摸索边界\n【违反后果】躯体负荷直接映射规则偏离，热度与痛感为隐性惩罚机制，未知越界将引发不可逆生理反噬"
+    }
+  ],
+  "powerSystemSnapshot": [],
+  "diffFromPrev": {
+    "isNew": true,
+    "changes": []
+  }
+}

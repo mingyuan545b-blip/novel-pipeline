@@ -1,0 +1,21 @@
+{
+    "id": "奇幻",
+    "label": "奇幻",
+    "namingStyle": "element-fusion",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "adventure-escalation",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["true-expert", "chaos-agent", "loyal-shield", "fallen-pride", "living-treasure", "grind-king", "chatterbox"],
+    "defaultSpeechStyles": ["chuunibyou", "literary"],
+    "defaultDialects": [],
+    "styleHints": {
+        "pov": "第三人称限制视角",
+        "tone": "史诗壮阔",
+        "style": "西式奇幻"
+    },
+    "wordConfig": { "minWords": 2500, "targetWords": 3000, "maxWords": 4000 },
+    "constraintOverrides": ["western-fantasy-naming", "race-ability-consistency", "no-eastern-cultivation-bleed"],
+    "reviewFocus": ["种族/魔法体系自洽不矛盾", "世界观设定不与已建立规则冲突", "异族文化特征鲜明不脸谱化", "冒险节奏张弛有度", "翻译腔与叙事自然度平衡"],
+    "defaultSystemPersona": "troll-system",
+    "materialFocus": ["power-system", "character", "faction", "geography", "equipment", "worldview"]
+}

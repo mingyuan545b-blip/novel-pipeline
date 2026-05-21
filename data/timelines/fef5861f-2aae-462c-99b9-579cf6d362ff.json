@@ -1,0 +1,30 @@
+{
+  "id": "fef5861f-2aae-462c-99b9-579cf6d362ff",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "贺千",
+  "description": "【所属位面】九龙\n【所属势力】无\n【身份】千局入局者/前代老千\n【核心欲望】在局中存活并探寻千局真相\n【内在矛盾】传统千术经验与手法依赖 vs 规则怪谈式无引导局的未知恐惧\n【行为模式】冷静评估风险，利用环境遮蔽与信息差周旋，遇险优先寻找生路而非硬拼\n【微表情习惯】遇险时屏息贴墙，手指习惯性摩挲随身物件或抠墙缝寻找着力点\n【当前状态】初入九龙，持铜筹激活暗门，正循线索寻找和义堂账房",
+  "eventType": "character",
+  "storyOrder": 19,
+  "sortOrder": 19,
+  "storyTime": "第1章",
+  "chapterIds": [
+    "12bdb33f-5b74-48d6-9045-7103e7847d61"
+  ],
+  "questIds": [],
+  "materialIds": [
+    "73c5a8f2-cc6f-42a0-af6e-de7168deeab5"
+  ],
+  "characterIds": [
+    "73c5a8f2-cc6f-42a0-af6e-de7168deeab5"
+  ],
+  "location": "",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "主角正式入局，确立核心动机与行为模式",
+  "tags": [
+    "auto-generated",
+    "material-character"
+  ],
+  "createdAt": "2026-05-13T08:03:29.949Z",
+  "updatedAt": "2026-05-13T08:03:29.949Z"
+}

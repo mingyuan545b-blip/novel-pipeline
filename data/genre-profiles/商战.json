@@ -1,0 +1,21 @@
+{
+    "id": "商战",
+    "label": "商战",
+    "namingStyle": "double-entendre",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "urban-awakening",
+    "defaultMode": "shuangwen",
+    "defaultArchetypes": ["shadow-schemer", "smiling-traitor", "old-fox", "fake-expert", "green-tea", "sneaky-backstabber", "info-broker"],
+    "defaultSpeechStyles": ["passive-aggressive", "humblebrag", "bureaucratese"],
+    "defaultDialects": ["上海", "北京"],
+    "styleHints": {
+        "pov": "第三人称限制视角",
+        "tone": "精明干练",
+        "style": "商战博弈"
+    },
+    "wordConfig": { "minWords": 2000, "targetWords": 2500, "maxWords": 3500 },
+    "constraintOverrides": ["business-logic-plausibility", "no-fantasy-ability", "legal-framework-awareness"],
+    "reviewFocus": ["商业逻辑经得起推敲", "谈判/博弈心理战真实不降智", "行业术语使用准确不外行", "人物话里有话的双关表达到位", "利益链条因果清晰"],
+    "defaultSystemPersona": "haggler",
+    "materialFocus": ["character", "faction", "institution", "character-relationship", "foreshadowing"]
+}

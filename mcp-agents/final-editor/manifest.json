@@ -1,0 +1,19 @@
+{
+    "dxt_version": "0.1",
+    "name": "@aipy-pro/final-editor",
+    "display_name": "定稿人",
+    "version": "1.0.0",
+    "description": "小说创作流水线 - 定稿人Agent，拥有最高裁定权限，控制IP方向",
+    "author": { "name": "NovelPipeline" },
+    "icon": "icon.svg",
+    "server": {
+        "type": "node",
+        "entry_point": "server.js",
+        "mcp_config": {
+            "command": "node",
+            "args": ["${__dirname}/server.js"],
+            "env": {}
+        }
+    },
+    "keywords": ["conversation-tool"]
+}

@@ -1,0 +1,21 @@
+{
+    "id": "言情",
+    "label": "言情",
+    "namingStyle": "poetic-imagery",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "urban-awakening",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["fallen-pride", "blood-debt-collector", "roast-friend", "comedy-girl", "green-tea", "grind-king", "social-butterfly"],
+    "defaultSpeechStyles": ["literary", "passive-aggressive"],
+    "defaultDialects": ["台湾", "苏州"],
+    "styleHints": {
+        "pov": "第三人称限制视角/第一人称",
+        "tone": "细腻缠绵",
+        "style": "都市言情"
+    },
+    "wordConfig": { "minWords": 2200, "targetWords": 2800, "maxWords": 3500 },
+    "constraintOverrides": ["emotion-driven-plot", "no-gratuitous-violence", "relationship-progression-pace"],
+    "reviewFocus": ["情感推进节奏不突兀", "角色心理描写细腻真实", "暧昧/冲突张力不泄气", "对话含蓄与直白的火候拿捏", "人物魅力值不崩塌"],
+    "defaultSystemPersona": "tsundere",
+    "materialFocus": ["character", "character-psychology", "character-relationship", "character-dialogue", "foreshadowing", "location"]
+}

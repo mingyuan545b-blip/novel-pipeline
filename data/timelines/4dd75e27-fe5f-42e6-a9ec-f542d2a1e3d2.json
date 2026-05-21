@@ -1,0 +1,28 @@
+{
+  "id": "4dd75e27-fe5f-42e6-a9ec-f542d2a1e3d2",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "镜中非我",
+  "description": "沈墨辞在3楼探索，差点直视镜中倒影超3秒，被老周一把拉住。老周用谜语暗示规则漏洞。沈墨辞发现通过镜子看别人的倒影是安全的，开始利用这个漏洞观察其他楼层。夜晚降临，整楼陷入黑暗，他听到走廊传来脚步声。",
+  "eventType": "world",
+  "storyOrder": 1,
+  "sortOrder": 1,
+  "storyTime": "第1阶段",
+  "chapterIds": [
+    "4279043a-5968-4237-83db-2d4999235fb5"
+  ],
+  "questIds": [
+    "adf43eac-a5bc-4604-b8a2-6327fda1c8e7"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "鞋底边缘",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "第2章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

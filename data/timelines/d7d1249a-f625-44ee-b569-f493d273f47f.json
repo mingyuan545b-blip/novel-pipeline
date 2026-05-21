@@ -1,0 +1,26 @@
+{
+  "id": "d7d1249a-f625-44ee-b569-f493d273f47f",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "第2章IP方向",
+  "description": "1980九龙城寨市井博弈，白话冷硬风，禁用现代网络语与文青修辞",
+  "eventType": "revelation",
+  "storyOrder": 25,
+  "sortOrder": 25,
+  "storyTime": "第2章",
+  "chapterIds": [
+    "c0b0f23a-d8ca-44ab-88b1-6849b6ab32c3"
+  ],
+  "questIds": [],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "auto-generated",
+    "ip-direction"
+  ],
+  "createdAt": "2026-05-13T10:16:34.423Z",
+  "updatedAt": "2026-05-13T10:16:34.423Z"
+}

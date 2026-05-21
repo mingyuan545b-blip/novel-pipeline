@@ -1,0 +1,28 @@
+{
+  "id": "40a0263a-6125-4001-8161-8953acd9a077",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "title": "五家论道",
+  "description": "主世界五家联合举办论道大会，合欢宗作为道家分支参加。苏锦瑟带沈墨辞同行。论道大会上，沈墨辞见识到五家顶尖强者的实力，深刻理解\"主世界战力天花板\"的含义——他掠夺的所有能力加起来，在入圣境强者面前如同蚍蜉撼树。这让他更加谨慎，也更加渴望变强。",
+  "eventType": "world",
+  "storyOrder": 28,
+  "sortOrder": 28,
+  "storyTime": "第6阶段",
+  "chapterIds": [
+    "903a958f-c636-48af-9b2f-1271ab020149"
+  ],
+  "questIds": [
+    "da497396-18a3-4900-ad42-b8f09e937632"
+  ],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "入圣境强者面前如",
+  "importance": "normal",
+  "isKeyEvent": false,
+  "notes": "",
+  "tags": [
+    "第29章",
+    "自动生成"
+  ],
+  "createdAt": "2026-05-19T12:24:52.160Z",
+  "updatedAt": "2026-05-19T12:24:52.160Z"
+}

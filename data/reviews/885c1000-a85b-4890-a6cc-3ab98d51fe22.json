@@ -1,0 +1,100 @@
+{
+  "id": "885c1000-a85b-4890-a6cc-3ab98d51fe22",
+  "chapterId": "4279043a-5968-4237-83db-2d4999235fb5",
+  "projectId": "ce877373-da85-4e09-bb30-e7a41a930d1e",
+  "step": "fast-review",
+  "type": "fast-review",
+  "reviewer": "fast-review-agent",
+  "result": {
+    "passed": false,
+    "summary": "本章智斗爽与喜剧反套路表现优异，节奏紧凑、视角严格、段落合规。但触发AI禁用词红线，且章末钩子偏静态，需按指导替换词汇并强化结尾张力。",
+    "issues": [
+      {
+        "title": "AI腔调禁用词",
+        "location": "第4段末句",
+        "originalText": "仿佛只要再往前半步，就能跨过那道无形的界线。",
+        "perspective": "narrator",
+        "violationReason": "触发绝对红线高频词‘仿佛’，违反反AI痕迹与文风约束。",
+        "howToFix": "删除‘仿佛’，替换为直接的肌肉拉扯与生理失控描写，强化体感。",
+        "targetText": "膝盖不受控制地往前顶，小腿肌肉绷紧得像拉满的弓弦，那道界线就在脚尖前半寸。",
+        "severity": "high"
+      },
+      {
+        "title": "章末钩子张力不足",
+        "location": "末段末句",
+        "originalText": "他只能等。",
+        "perspective": "protagonist",
+        "violationReason": "结尾被动收束，未满足‘末段包含1个未闭合张力点’硬性结构要求，缺乏即时翻页驱动力。",
+        "howToFix": "增加突发感官异变或规则打破瞬间，将静态等待转为动态危机前兆。",
+        "targetText": "门把手突然自己往下沉了半寸。金属摩擦的轻响在死寂中炸开，他屏住呼吸，指尖的战术匕首无声滑出鞘口。",
+        "severity": "medium"
+      },
+      {
+        "title": "喜剧梗陈旧化",
+        "location": "倒数第4段末句",
+        "originalText": "直接进地狱难度副本。",
+        "perspective": "protagonist",
+        "violationReason": "‘地狱难度副本’属泛用烂梗，缺乏本作高武反套路专属错位感，幽默质量未达最优标准。",
+        "howToFix": "结合主位面修仙设定进行反差自嘲，强化现代思维与高武规则的碰撞。",
+        "targetText": "穿越过来连个新手保护期都没有，开局直接发配去给守阁长老当试药童子。这破规矩比祖师爷的戒律还费头发。",
+        "severity": "medium"
+      }
+    ],
+    "suggestions": [
+      {
+        "title": "金手指待机暗示",
+        "description": "在脚步声逼近至门口时，插入1处身体微反应（如识海深处微烫/灵力自行护脉），以去UI化方式提示系统/能力处于压制待机状态，衔接下一章实战。"
+      },
+      {
+        "title": "战力命名预检",
+        "description": "下一章若涉及境界展示或功法运转，强制使用‘9大等级×9小等级’雅致框架命名，提前自查词库，杜绝传统修仙词汇混入。"
+      }
+    ]
+  },
+  "passed": false,
+  "content": "本章智斗爽与喜剧反套路表现优异，节奏紧凑、视角严格、段落合规。但触发AI禁用词红线，且章末钩子偏静态，需按指导替换词汇并强化结尾张力。",
+  "issues": [
+    {
+      "title": "AI腔调禁用词",
+      "location": "第4段末句",
+      "originalText": "仿佛只要再往前半步，就能跨过那道无形的界线。",
+      "perspective": "narrator",
+      "violationReason": "触发绝对红线高频词‘仿佛’，违反反AI痕迹与文风约束。",
+      "howToFix": "删除‘仿佛’，替换为直接的肌肉拉扯与生理失控描写，强化体感。",
+      "targetText": "膝盖不受控制地往前顶，小腿肌肉绷紧得像拉满的弓弦，那道界线就在脚尖前半寸。",
+      "severity": "high"
+    },
+    {
+      "title": "章末钩子张力不足",
+      "location": "末段末句",
+      "originalText": "他只能等。",
+      "perspective": "protagonist",
+      "violationReason": "结尾被动收束，未满足‘末段包含1个未闭合张力点’硬性结构要求，缺乏即时翻页驱动力。",
+      "howToFix": "增加突发感官异变或规则打破瞬间，将静态等待转为动态危机前兆。",
+      "targetText": "门把手突然自己往下沉了半寸。金属摩擦的轻响在死寂中炸开，他屏住呼吸，指尖的战术匕首无声滑出鞘口。",
+      "severity": "medium"
+    },
+    {
+      "title": "喜剧梗陈旧化",
+      "location": "倒数第4段末句",
+      "originalText": "直接进地狱难度副本。",
+      "perspective": "protagonist",
+      "violationReason": "‘地狱难度副本’属泛用烂梗，缺乏本作高武反套路专属错位感，幽默质量未达最优标准。",
+      "howToFix": "结合主位面修仙设定进行反差自嘲，强化现代思维与高武规则的碰撞。",
+      "targetText": "穿越过来连个新手保护期都没有，开局直接发配去给守阁长老当试药童子。这破规矩比祖师爷的戒律还费头发。",
+      "severity": "medium"
+    }
+  ],
+  "suggestions": [
+    {
+      "title": "金手指待机暗示",
+      "description": "在脚步声逼近至门口时，插入1处身体微反应（如识海深处微烫/灵力自行护脉），以去UI化方式提示系统/能力处于压制待机状态，衔接下一章实战。"
+    },
+    {
+      "title": "战力命名预检",
+      "description": "下一章若涉及境界展示或功法运转，强制使用‘9大等级×9小等级’雅致框架命名，提前自查词库，杜绝传统修仙词汇混入。"
+    }
+  ],
+  "round": 2,
+  "createdAt": "2026-05-11T16:47:36.233Z"
+}

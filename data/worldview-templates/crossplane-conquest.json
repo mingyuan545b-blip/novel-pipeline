@@ -1,0 +1,117 @@
+{
+    "id": "crossplane-conquest",
+    "label": "位面征服型",
+    "tag": "无限流/副本流/位面掠夺式",
+    "description": "主世界+多个次位面，每个位面有独立世界观，主角穿越位面掠夺能力，主世界和次位面双线推进",
+    "applicableGenres": ["高武", "玄幻", "无限流", "副本"],
+    "phases": [
+        {
+            "id": "early",
+            "label": "前期·初入篇",
+            "chapterRange": "1-25%",
+            "description": "主角刚获得穿越能力，探索前几个位面，战力弱小，每次穿越都是生死考验",
+            "worldRules": {
+                "powerCeiling": "单个位面的中上水平",
+                "geographicScope": "主世界+2-3个次位面",
+                "factionComplexity": "主世界1-2个势力+每个位面1-2个势力",
+                "characterScale": "5-15个角色",
+                "threatLevel": "位面级威胁（在位面内是生死存亡）",
+                "knowledgeScope": "只知道穿越规则，不知道位面本质"
+            },
+            "narrativeRules": {
+                "povScope": "主角视角，信息受限",
+                "pacingRule": "位面内快节奏+主世界休整交替",
+                "humorDensity": "中——位面内紧张+主世界日常",
+                "powerDisplay": "在位面内靠策略取胜，不是碾压",
+                "worldReveal": "每个位面揭示一条穿越规则"
+            },
+            "consistencyAnchors": [
+                "穿越规则必须一开始就定好（触发条件/限制/代价）",
+                "主世界的时间流速和位面的关系必须明确",
+                "主角在位面获得的能力带回主世界的方式必须一致",
+                "每个位面必须有独立完整的世界观（不能是空壳）"
+            ]
+        },
+        {
+            "id": "mid",
+            "label": "中期·深入篇",
+            "chapterRange": "25-70%",
+            "description": "主角穿越更多位面，能力积累，发现位面之间的联系，主世界格局变化",
+            "worldRules": {
+                "powerCeiling": "多个位面能力融合，主世界顶级",
+                "geographicScope": "主世界+5-10个次位面",
+                "factionComplexity": "主世界多势力+位面势力+其他穿越者",
+                "characterScale": "30-60个角色",
+                "threatLevel": "多线威胁——位面内+主世界+其他穿越者",
+                "knowledgeScope": "发现位面的本质/位面之间的联系/穿越的起源"
+            },
+            "narrativeRules": {
+                "povScope": "主角+重要配角+其他穿越者视角",
+                "pacingRule": "位面线+主世界线交替推进",
+                "humorDensity": "中——位面反差+主世界互动",
+                "powerDisplay": "位面内碾压但主世界有对手",
+                "worldReveal": "每2-3个位面揭示一个关于穿越本质的真相"
+            },
+            "consistencyAnchors": [
+                "不同位面的能力体系不能冲突（融合规则必须明确）",
+                "主世界的时间线必须连贯（不能穿越回来时间乱跳）",
+                "每个位面的世界观必须独立完整（不能串设定）",
+                "其他穿越者的存在必须有合理解释",
+                "位面之间的联系必须逻辑自洽"
+            ],
+            "transitionFrom": {
+                "trigger": "发现位面本质/遇到其他穿越者/主世界格局巨变",
+                "mustResolve": "前期位面的核心矛盾",
+                "mustEstablish": "位面之间的联系/更大的威胁"
+            }
+        },
+        {
+            "id": "late",
+            "label": "后期·终局篇",
+            "chapterRange": "70-100%",
+            "description": "位面真相揭露，所有线索汇聚，面临终极抉择",
+            "worldRules": {
+                "powerCeiling": "超越位面限制",
+                "geographicScope": "所有位面+位面之间的空间",
+                "factionComplexity": "所有势力终极对决",
+                "characterScale": "核心角色收束",
+                "threatLevel": "位面崩溃/所有世界毁灭",
+                "knowledgeScope": "位面的终极真相/穿越的起源"
+            },
+            "narrativeRules": {
+                "povScope": "多线收束",
+                "pacingRule": "持续高压",
+                "humorDensity": "低——终局严肃",
+                "powerDisplay": "能力极限但代价巨大",
+                "worldReveal": "所有位面谜底揭晓"
+            },
+            "consistencyAnchors": [
+                "位面真相必须和所有已揭示的规则兼容",
+                "每个位面的结局必须有交代",
+                "主世界的命运和位面的命运必须关联",
+                "主角的最终抉择必须和初入篇的初心呼应"
+            ],
+            "transitionFrom": {
+                "trigger": "位面开始崩溃/终极真相浮现",
+                "mustResolve": "中期核心矛盾",
+                "mustEstablish": "最终抉择：拯救所有位面还是牺牲部分"
+            }
+        }
+    ],
+    "globalConsistencyRules": [
+        "穿越规则始终如一——触发/限制/代价不能变",
+        "每个位面有独立世界观——不能串设定",
+        "能力融合有规则——不能无限叠加",
+        "主世界时间线连贯——不能穿越回来时间乱跳",
+        "位面之间有联系——但不能强行关联",
+        "IP规避——位面灵感来源不能直呼其名"
+    ],
+    "forbiddenPatterns": [
+        "位面世界观互相串设定",
+        "穿越规则前后矛盾",
+        "能力无限叠加没有上限",
+        "主世界变成背景板",
+        "位面是空壳没有完整世界观",
+        "直接使用IP角色名/地名"
+    ]
+}

@@ -1,0 +1,226 @@
+@keyframes backgroundShift {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.app-layout::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(255, 0, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(170, 0, 255, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: backgroundShift 20s ease infinite;
+    background-size: 200% 200%;
+}
+
+.app-layout > * {
+    position: relative;
+    z-index: 1;
+}
+
+.cyber-card {
+    position: relative;
+}
+
+.cyber-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 240, 255, 0.008) 2px,
+        rgba(0, 240, 255, 0.008) 4px
+    );
+    pointer-events: none;
+    border-radius: var(--radius-lg);
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.pipeline-node-icon {
+    position: relative;
+}
+
+.pipeline-node-active .pipeline-node-icon::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    animation: neonPulse 2s ease infinite;
+}
+
+.cyber-btn-primary {
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent 30%
+    );
+    animation: spin 4s linear infinite;
+}
+
+.sidebar-link-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    background: var(--gradient-primary);
+    border-radius: 0 2px 2px 0;
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.cyber-modal {
+    position: relative;
+}
+
+.cyber-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+}
+
+.agent-card {
+    position: relative;
+}
+
+.agent-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-secondary);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+}
+
+.agent-card:hover::before {
+    opacity: 1;
+}
+
+.material-type-icon {
+    position: relative;
+}
+
+.material-type-icon::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: var(--radius-sm);
+    border: 1px solid currentColor;
+    opacity: 0.2;
+}
+
+.cyber-input:focus,
+.cyber-textarea:focus {
+    position: relative;
+}
+
+.cyber-input:focus + .form-label,
+.cyber-textarea:focus + .form-label {
+    color: var(--neon-blue);
+}
+
+@keyframes typingCursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.typing-indicator {
+    display: inline-block;
+    width: 2px;
+    height: 16px;
+    background: var(--neon-blue);
+    margin-left: 2px;
+    animation: typingCursor 1s step-end infinite;
+    vertical-align: middle;
+}
+
+@keyframes pipelinePulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+}
+
+.pipeline-running .pipeline-node-active .pipeline-node-icon {
+    animation: pipelinePulse 2s infinite;
+}
+
+.glow-text-blue {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3);
+}
+
+.glow-text-pink {
+    text-shadow: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.hover-lift {
+    transition: transform var(--transition-normal);
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+}
+
+.cyber-scanline {
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-scanline::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    right: 0;
+    height: 30%;
+    background: linear-gradient(
+        180deg,
+        transparent,
+        rgba(0, 240, 255, 0.03),
+        transparent
+    );
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+}

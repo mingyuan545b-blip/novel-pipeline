@@ -1,0 +1,33 @@
+{
+  "id": "03_人物熔炉部_06_配角功能化_03",
+  "category_path": "03_人物熔炉部/06_配角功能化/03_道德标尺",
+  "display_name": "道德标尺",
+  "department": "03_人物熔炉部",
+  "subcategory": "06_配角功能化",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "道德标尺",
+    "配角功能化",
+    "人物熔炉部"
+  ],
+  "context_slot": "L2",
+  "context_priority": 80,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.245Z"
+}

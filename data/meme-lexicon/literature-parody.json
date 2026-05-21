@@ -1,0 +1,65 @@
+{
+    "id": "literature-parody",
+    "label": "文学戏仿",
+    "description": "用经典文学风格的语气说完全不搭的现代事，反差越大越好笑，文学腔调+荒谬内容=喜剧炸弹",
+    "category": "meme-lexicon",
+    "entries": [
+        {
+            "id": "luxun-style",
+            "label": "鲁迅文学",
+            "description": "用鲁迅式的冷峻讽刺、短句白描、'我大抵是'句式说现代事",
+            "signaturePatterns": [
+                "我大抵是xxx了——",
+                "世上本没有xxx，xxx的人多了，便成了xxx",
+                "我家门前有两棵树，一棵是xxx，另一棵也是xxx",
+                "不在xxx中爆发，就在xxx中灭亡",
+                "真的猛士，敢于xxx"
+            ],
+            "triggerScene": "角色陷入沉思/感慨/讽刺时",
+            "buildupRule": "先有沉默或叹息，再用鲁迅式开头引入",
+            "densityLimit": "每10章最多1次",
+            "exampleUsage": "我大抵是输了——横竖都赢不了，索性躺平了罢。"
+        },
+        {
+            "id": "lindaiyu-style",
+            "label": "林黛玉文学",
+            "description": "用林黛玉式的多愁善感、尖酸刻薄、自怨自艾说完全不搭的事",
+            "signaturePatterns": [
+                "你xxx你的，我xxx我的",
+                "早知xxx，当初就不xxx",
+                "罢了罢了，xxx又有什么意思呢",
+                "你倒是xxx，只怕xxx",
+                "我不过是xxx，你何苦xxx"
+            ],
+            "triggerScene": "角色撒娇/吃醋/小性子/矫情时",
+            "buildupRule": "先有委屈或不满的铺垫，再用黛玉式语气爆发",
+            "densityLimit": "每10章最多1次",
+            "exampleUsage": "'你打你的怪，理我做什么？'她翻了个白眼，'罢了罢了，你心里哪有我。'"
+        },
+        {
+            "id": "ruozhiba-style",
+            "label": "弱智吧文学",
+            "description": "看似逻辑自洽实则荒谬至极的推理，一本正经说胡话，逻辑闭环但前提离谱",
+            "signaturePatterns": [
+                "因为xxx，所以xxx（逻辑通但前提离谱）",
+                "xxx不xxx，xxx怎么xxx（循环论证）",
+                "既然xxx，那xxx不就xxx了吗（偷换概念）",
+                "我xxx了，说明xxx（因果倒置）"
+            ],
+            "triggerScene": "角色一本正经地胡说八道/诡辩/自我安慰时",
+            "buildupRule": "先提出一个看似正常的问题，再用离谱逻辑推导",
+            "densityLimit": "每5章最多1次",
+            "exampleUsage": "'既然打不过，那不打不就行了？'他一本正经，'打不过说明不需要打，不需要打说明已经赢了。'"
+        }
+    ],
+    "globalRules": {
+        "maxParodyPerChapter": 1,
+        "mustMatchCharacter": true,
+        "forbidden": [
+            "禁止文学戏仿和角色性格严重冲突（冷酷杀手突然林黛玉腔）",
+            "禁止每章用超过1种文学戏仿",
+            "文学戏仿需要读者有基本文学常识才能get到，别用太冷门的",
+            "戏仿是调味料，用了要自然融入对话，不能像背课文"
+        ]
+    }
+}

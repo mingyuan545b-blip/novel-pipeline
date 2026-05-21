@@ -1,0 +1,32 @@
+{
+  "id": "00_叙事之魂部_05_情感巅峰设计_02",
+  "category_path": "00_叙事之魂部/05_情感巅峰设计/02_复合情感叠加",
+  "display_name": "复合情感叠加",
+  "department": "00_叙事之魂部",
+  "subcategory": "05_情感巅峰设计",
+  "applicable_modes": [
+    "novel",
+    "shuangwen"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "复合情感叠加",
+    "情感巅峰设计",
+    "叙事之魂部"
+  ],
+  "context_slot": "L0",
+  "context_priority": 100,
+  "injection_point": "intent-planner",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.194Z"
+}

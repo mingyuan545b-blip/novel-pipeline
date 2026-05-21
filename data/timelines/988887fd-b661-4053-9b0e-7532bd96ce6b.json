@@ -1,0 +1,26 @@
+{
+  "id": "988887fd-b661-4053-9b0e-7532bd96ce6b",
+  "projectId": "d4808c1a-3378-4372-b672-9d0a6bd075f8",
+  "title": "第7章IP方向",
+  "description": "严格维持1980年代九龙城寨地下博弈语境，禁用任何现代系统/游戏/UI词汇。",
+  "eventType": "revelation",
+  "storyOrder": 58,
+  "sortOrder": 58,
+  "storyTime": "第7章",
+  "chapterIds": [
+    "3be80dd3-065b-47a7-99a6-8a433652f538"
+  ],
+  "questIds": [],
+  "materialIds": [],
+  "characterIds": [],
+  "location": "",
+  "importance": "high",
+  "isKeyEvent": true,
+  "notes": "",
+  "tags": [
+    "auto-generated",
+    "ip-direction"
+  ],
+  "createdAt": "2026-05-13T16:28:14.751Z",
+  "updatedAt": "2026-05-13T16:28:14.751Z"
+}

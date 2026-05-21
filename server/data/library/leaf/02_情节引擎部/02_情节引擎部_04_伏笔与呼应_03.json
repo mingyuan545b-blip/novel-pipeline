@@ -1,0 +1,33 @@
+{
+  "id": "02_情节引擎部_04_伏笔与呼应_03",
+  "category_path": "02_情节引擎部/04_伏笔与呼应/03_场景伏笔",
+  "display_name": "场景伏笔",
+  "department": "02_情节引擎部",
+  "subcategory": "04_伏笔与呼应",
+  "applicable_modes": [
+    "novel",
+    "shuangwen",
+    "tomato-short"
+  ],
+  "trigger_condition": {
+    "chapter_range": [
+      1,
+      999
+    ],
+    "narrative_state": [],
+    "emotion_curve": "any"
+  },
+  "implementation_rules": [],
+  "anti_patterns": [],
+  "word_count_impact": "+0~+10%",
+  "retrieval_tags": [
+    "场景伏笔",
+    "伏笔与呼应",
+    "情节引擎部"
+  ],
+  "context_slot": "L3",
+  "context_priority": 70,
+  "injection_point": "writer",
+  "version": "1.0.0",
+  "last_updated": "2026-04-29T15:39:35.225Z"
+}
