@@ -48,7 +48,8 @@ const R1_WHITELIST = new Set([
     'materialLifecycle.js',
     'materialMarkdownExtractor.js',
     'materialPostProcessor.js',
-    'materialRelationProcessor.js',
+    // materialRelationProcessor 拆分后，store读取(关系存在性检查)迁移至 materialRelationSync
+    'materialRelationSync.js',
     'materialUpdateHelpers.js',
     'materialCreateHelpers.js',
     'materialFieldUtils.js',

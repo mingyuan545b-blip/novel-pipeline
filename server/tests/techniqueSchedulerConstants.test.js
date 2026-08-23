@@ -79,9 +79,11 @@ describe('techniqueScheduler constants', () => {
 
     describe('GENRE_DEPARTMENT_AFFINITY', () => {
         test('has key genre mappings', () => {
-            expect(GENRE_DEPARTMENT_AFFINITY['tomato-sweet']).toBeDefined();
-            expect(GENRE_DEPARTMENT_AFFINITY['urban-fantasy']).toBeDefined();
-            expect(GENRE_DEPARTMENT_AFFINITY['rule-horror']).toBeDefined();
+            // 修复：tomato-sweet/urban-fantasy/rule-horror 题材已从系统移除，
+            // 断言未同步（铁律原则2：显式契约）。当前映射表权威值见
+            // techniqueScheduler.js 的 GENRE_DEPARTMENT_AFFINITY。
+            expect(GENRE_DEPARTMENT_AFFINITY['high-martial-comedy']).toBeDefined();
+            expect(GENRE_DEPARTMENT_AFFINITY['tomato-sweet']).toBeUndefined();
         });
 
         test('each genre maps to department arrays', () => {

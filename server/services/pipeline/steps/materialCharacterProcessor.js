@@ -177,24 +177,7 @@ async function processTraitNotes(charUpdate, existingMat, chapter, projectId, sc
     }
 }
 
-function findCharacterMaterial(projectId, materials, name) {
-    const exact = materials.find(m =>
-        m.projectId === projectId &&
-        m.type === 'character' &&
-        !m.archived &&
-        m.name === name
-    );
-    if (exact) return exact;
-
-    if (name) {
-        const normalizedName = name.toLowerCase().replace(/[\s\-_··]/g, '');
-        return materials.find(m => {
-            if (m.projectId !== projectId || m.type !== 'character' || m.archived) return false;
-            const mName = (m.name || '').toLowerCase().replace(/[\s\-_··]/g, '');
-            return mName === normalizedName || mName.includes(normalizedName) || normalizedName.includes(mName);
-        });
-    }
-    return null;
-}
+// findCharacterMaterial 已提取到 materialCharacterFinder.js（行为不变，保持原导出签名）
+const { findCharacterMaterial } = require('./materialCharacterFinder');
 
 module.exports = { processCharacterUpdates, findCharacterMaterial };
