@@ -22,7 +22,9 @@ jest.mock('../../server/services/healthCheckers', () => ({
     checkPipelineState: jest.fn().mockReturnValue([]),
     checkMemoryUsage: jest.fn().mockReturnValue([]),
     checkDataIntegrity: jest.fn().mockReturnValue([]),
-    cleanupOldFiles: jest.fn().mockReturnValue([])
+    cleanupOldFiles: jest.fn().mockReturnValue([]),
+    // 修复：代码新增第8个检查函数后mock未同步，导致TypeError崩溃（铁律原则2：显式契约）
+    checkMaterialDepth: jest.fn().mockResolvedValue([])
 }));
 
 // mock store
@@ -41,6 +43,7 @@ function loadFreshModule() {
     healthCheckers.checkMemoryUsage.mockReturnValue([]);
     healthCheckers.checkDataIntegrity.mockReturnValue([]);
     healthCheckers.cleanupOldFiles.mockReturnValue([]);
+    healthCheckers.checkMaterialDepth.mockResolvedValue([]);
     const store = require('../../server/store');
     store.listItemsSync.mockReturnValue([]);
     return require('../../server/services/healthMonitor');
@@ -98,7 +101,9 @@ describe('healthMonitor (R2)', () => {
             expect(result.checkedAt).toBeTruthy();
             expect(result.issues).toEqual({
                 stuckChapters: 0, orphanBrowsers: 0, disk: 0,
-                pipeline: 0, memory: 0, integrity: 0
+                pipeline: 0, memory: 0, integrity: 0,
+                // 修复：代码新增materialDepth计数后断言未同步（铁律原则2：显式契约）
+                materialDepth: 0
             });
         });
 
@@ -211,6 +216,7 @@ describe('healthMonitor (R2)', () => {
             expect(result.issues).toHaveProperty('pipeline');
             expect(result.issues).toHaveProperty('memory');
             expect(result.issues).toHaveProperty('integrity');
+            expect(result.issues).toHaveProperty('materialDepth');
         });
     });
 

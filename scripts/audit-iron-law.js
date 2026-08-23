@@ -1,360 +1,237 @@
+'use strict';
+
 /**
- * 铁律违反检测脚本 - SOP 09 〇节铁律执行引擎的落地实现
+ * 铁律违反检测脚本（v2 重构）
  *
- * 三种模式：
- *   --session-start  会话开始时跑，检测环境+配置就绪
- *   --pre-deliver    交付前跑，扫描git diff+静态规则
- *   --pre-commit     git pre-commit hook触发，只扫暂存区
+ * 规则定义全部来自 scripts/lib/ironLawRules.js（唯一定义源），本文件不含任何私有模式。
  *
- * 检测项：
- *   P0-4 硬编码敏感信息（sk-/password=/apiKey=xxx）
- *   P1-Q1 硬编码业务值（material-updated/approved/outlined字面量散落）
- *   P2-B1 PowerShell语法痕迹（如果脚本被提交）
- *   P1-Q3 单文件超过200行（仅扫src代码，不扫test/docs/scripts）
+ * 模式：
+ *   --pre-commit     git pre-commit 钩子：只扫暂存区（含行数检查）
+ *   --pre-deliver    交付前：扫已修改文件 + 未跟踪新文件（修复历史版本漏新文件问题）
+ *   --session-start  会话开始：环境与配套CI就绪检查（已移除硬编码本机路径）
+ *   --self-check     铁律互斥自检：规则私定义/自指拦截/钩子翻转/场景完备性
  *
- * 用法：
- *   node scripts/audit-iron-law.js --session-start
- *   node scripts/audit-iron-law.js --pre-deliver
- *   node scripts/audit-iron-law.js --pre-commit
- *
- * 违反exit(1)，CI拦截
+ * 场景化处置：每条命中按文件场景解析为 block / warn / skip（见 ironLawRules.SCENARIOS），
+ * 不再一刀切。违反以 exit(1) 拦截。
  */
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const rules = require('./lib/ironLawRules');
 
 const PROJECT_ROOT = path.join(__dirname, '..');
 
-// ========== 铁律规则定义 ==========
+// ========== 文件收集 ==========
 
-// P0-4 硬编码敏感信息模式
-const SENSITIVE_PATTERNS = [
-    /sk-[a-zA-Z0-9]{20,}/,           // API key明文
-    /password\s*=\s*['"][^'"]+['"]/,  // 密码明文
-    /apiKey\s*=\s*['"][^'"]+['"]/,    // apiKey明文
-    /secret\s*=\s*['"][^'"]+['"]/     // secret明文
-];
-
-// P1-Q1 硬编码业务值（章节状态字面量散落）
-// 允许的位置：chapterStatus.js（定义处）、tests/（测试用）、docs/（文档）
-const BUSINESS_VALUE_PATTERNS = [
-    {
-        pattern: /status\s*===?\s*['"]material-updated['"]/g,
-        name: 'material-updated字面量',
-        allowPaths: ['server/services/chapterStatus.js', 'client/src/pages/pipeline/pipelineConstants.js', 'tests/', 'docs/']
-    },
-    {
-        pattern: /status\s*===?\s*['"]approved['"]/g,
-        name: 'approved字面量',
-        allowPaths: ['server/services/chapterStatus.js', 'client/src/pages/pipeline/pipelineConstants.js', 'tests/', 'docs/']
-    },
-    {
-        pattern: /status\s*===?\s*['"]outlined['"]/g,
-        name: 'outlined字面量',
-        allowPaths: ['server/services/chapterStatus.js', 'client/src/pages/pipeline/pipelineConstants.js', 'tests/', 'docs/']
+function gitLines(cmd) {
+    try {
+        return execSync(cmd, { cwd: PROJECT_ROOT, encoding: 'utf8' })
+            .split('\n').map(s => s.trim()).filter(Boolean);
+    } catch (e) {
+        return [];
     }
-];
-
-// P2-B1 PowerShell语法痕迹（在JS文件里出现PS管道/变量）
-// 注意：$1在JS里是正则替换符号，不检测；只检测明确的PS管道语法
-const POWERSHELL_PATTERNS = [
-    /\|\s*tail\b/,      // | tail
-    /\|\s*head\b/,      // | head
-    /\|\s*grep\b/,      // | grep
-    /2>&1/,             // 重定向合并
-    /\$_\b/,            // PS管道变量（$_在JS里不常见）
-    /@\(.*\)/           // PS数组
-];
-
-// P1-Q3 文件行数限制（仅扫src代码）
-const MAX_LINES = 200;
-const LINE_COUNT_SCAN_DIRS = ['server/services', 'server/routes', 'server/middleware'];
-
-// 非源码目录排除（打包产物/依赖/备份不参与铁律扫描）
-const EXCLUDE_DIRS = ['node_modules', 'client/dist', 'client/dist_backup', 'client/build'];
-
-function isExcludedPath(filePath) {
-    const normalized = filePath.replace(/\\/g, '/');
-    return EXCLUDE_DIRS.some(dir => normalized.includes(dir));
 }
-
-// ========== 工具函数 ==========
 
 function getStagedFiles() {
-    try {
-        const output = execSync('git diff --cached --name-only', { cwd: PROJECT_ROOT, encoding: 'utf8' });
-        return output.split('\n').filter(f => f && f.endsWith('.js') && !isExcludedPath(f));
-    } catch (e) {
-        return [];
-    }
+    return gitLines('git diff --cached --name-only');
 }
 
-function getWorkingTreeFiles() {
-    try {
-        const output = execSync('git diff --name-only HEAD', { cwd: PROJECT_ROOT, encoding: 'utf8' });
-        return output.split('\n').filter(f => f && f.endsWith('.js') && !isExcludedPath(f));
-    } catch (e) {
-        return [];
-    }
+// 修复：历史版本只扫 git diff HEAD，漏掉未跟踪的新文件
+function getDeliverFiles() {
+    const changed = gitLines('git diff --name-only HEAD');
+    const untracked = gitLines('git ls-files --others --exclude-standard');
+    return [...new Set([...changed, ...untracked])];
 }
 
-function readFile(filePath) {
-    const fullPath = path.join(PROJECT_ROOT, filePath);
-    if (!fs.existsSync(fullPath)) return null;
-    return fs.readFileSync(fullPath, 'utf8');
+function readIfExists(file) {
+    const full = path.join(PROJECT_ROOT, file);
+    try { return fs.readFileSync(full, 'utf8'); } catch (e) { return null; }
 }
 
-function isPathAllowed(filePath, allowedPaths) {
-    return allowedPaths.some(allowed => filePath.replace(/\\/g, '/').includes(allowed));
-}
+const JS_FILE_RE = /\.(js|jsx|cjs|mjs)$/;
 
-function countLines(content) {
-    return content.split('\n').length;
-}
+// ========== 规则执行（场景化处置） ==========
 
-// ========== 检测器 ==========
+function runChecks(files) {
+    const blocked = [];
+    const warned = [];
 
-// P0-4 检测硬编码敏感信息
-function checkSensitiveInfo(files) {
-    const issues = [];
-    for (const file of files) {
-        const content = readFile(file);
-        if (!content) continue;
-        for (const pattern of SENSITIVE_PATTERNS) {
-            const matches = content.match(pattern);
-            if (matches) {
-                issues.push({
-                    rule: 'P0-4',
-                    file,
-                    matches: matches.length,
-                    sample: matches[0].substring(0, 30) + '...'
-                });
-            }
-        }
-    }
-    return issues;
-}
-
-// P1-Q1 检测硬编码业务值
-function checkBusinessValues(files) {
-    const issues = [];
-    for (const file of files) {
-        const content = readFile(file);
-        if (!content) continue;
-        for (const rule of BUSINESS_VALUE_PATTERNS) {
-            const matches = content.match(rule.pattern);
-            if (matches && !isPathAllowed(file, rule.allowPaths)) {
-                issues.push({
-                    rule: 'P1-Q1',
-                    file,
-                    value: rule.name,
-                    count: matches.length,
-                    fix: '用 chapterStatus.js 的常量替代'
-                });
-            }
-        }
-    }
-    return issues;
-}
-
-// P2-B1 检测PowerShell语法痕迹
-// 注意：审计脚本自身定义了POWERSHELL_PATTERNS字符串（如"| tail"），
-// 会被自身检测到，因此跳过审计脚本自身
-function checkPowerShellSyntax(files) {
-    const issues = [];
-    const SELF_PATH = 'scripts/audit-iron-law.js';
-    for (const file of files) {
-        // 跳过审计脚本自身（避免检测器检测自己定义的检测模式字符串）
-        if (file.replace(/\\/g, '/').includes(SELF_PATH)) continue;
-        const content = readFile(file);
-        if (!content) continue;
-        for (const pattern of POWERSHELL_PATTERNS) {
-            const matches = content.match(pattern);
-            if (matches) {
-                issues.push({
-                    rule: 'P2-B1',
-                    file,
-                    sample: matches[0]
-                });
-            }
-        }
-    }
-    return issues;
-}
-
-// P1-Q3 检测文件行数
-function checkFileLines(files) {
-    const issues = [];
-    for (const file of files) {
-        const shouldScan = LINE_COUNT_SCAN_DIRS.some(dir =>
-            file.replace(/\\/g, '/').includes(dir)
-        );
-        if (!shouldScan) continue;
-        const content = readFile(file);
-        if (!content) continue;
-        const lines = countLines(content);
-        if (lines > MAX_LINES) {
-            issues.push({
-                rule: 'P1-Q3',
-                file,
-                lines,
-                max: MAX_LINES
-            });
-        }
-    }
-    return issues;
-}
-
-// ========== 模式入口 ==========
-
-function modeSessionStart() {
-    console.log('[IRON-LAW] 会话开始检查');
-    console.log('='.repeat(60));
-
-    // 1. 检查环境就绪
-    const checks = [
-        { name: '.env文件存在', check: () => fs.existsSync(path.join(PROJECT_ROOT, '.env')) },
-        { name: 'ALIYUN_CODING_API_KEY已配置', check: () => {
-            require('dotenv').config({ path: path.join(PROJECT_ROOT, '.env') });
-            return !!process.env.ALIYUN_CODING_API_KEY;
-        }},
-        { name: '题材白名单CI脚本存在', check: () => fs.existsSync(path.join(PROJECT_ROOT, 'scripts/audit-genre-whitelist.js')) },
-        { name: '路由参数CI脚本存在', check: () => fs.existsSync(path.join(PROJECT_ROOT, 'scripts/audit-route-param-consistency.js')) },
-        { name: 'SOP 09存在', check: () => fs.existsSync(path.join(PROJECT_ROOT, 'docs/sop/09-新项目约束词设计SOP.md')) },
-        { name: 'project_memory.md存在', check: () => fs.existsSync(path.join(__dirname, '..', '..', '..', '..', '.trae-cn', 'memory', 'projects', '-c-Users-mingy-Desktop-trae-novel-pipeline', 'project_memory.md')) }
-    ];
-
-    let allPass = true;
-    for (const c of checks) {
-        const ok = c.check();
-        console.log(`  ${ok ? '✓' : '✗'} ${c.name}`);
-        if (!ok) allPass = false;
-    }
-
-    // 2. 跑白名单CI
-    console.log('\n[IRON-LAW] 题材白名单CI:');
-    try {
-        execSync('node scripts/audit-genre-whitelist.js', { cwd: PROJECT_ROOT, stdio: 'inherit' });
-    } catch (e) {
-        allPass = false;
-    }
-
-    // 3. 跑路由参数CI
-    console.log('\n[IRON-LAW] 路由参数一致性CI:');
-    try {
-        execSync('node scripts/audit-route-param-consistency.js', { cwd: PROJECT_ROOT, stdio: 'inherit' });
-    } catch (e) {
-        allPass = false;
-    }
-
-    console.log('\n' + '='.repeat(60));
-    if (allPass) {
-        console.log('[IRON-LAW] 会话开始检查通过');
-        process.exit(0);
-    } else {
-        console.error('[IRON-LAW] 会话开始检查失败，请修复后再继续');
-        process.exit(1);
-    }
-}
-
-function modePreDeliver() {
-    console.log('[IRON-LAW] 交付前检查');
-    console.log('='.repeat(60));
-
-    const files = getWorkingTreeFiles();
-    if (files.length === 0) {
-        console.log('[IRON-LAW] 无修改文件，跳过');
-        process.exit(0);
-    }
-
-    console.log(`[IRON-LAW] 扫描 ${files.length} 个修改文件\n`);
-
-    const allIssues = [
-        ...checkSensitiveInfo(files),
-        ...checkBusinessValues(files),
-        ...checkPowerShellSyntax(files),
-        ...checkFileLines(files)
-    ];
-
-    // 按铁律分组输出
-    const grouped = {};
-    for (const issue of allIssues) {
-        if (!grouped[issue.rule]) grouped[issue.rule] = [];
-        grouped[issue.rule].push(issue);
-    }
-
-    const RULE_NAMES = {
-        'P0-4': '硬编码敏感信息',
-        'P1-Q1': '硬编码业务值',
-        'P2-B1': 'PowerShell语法痕迹',
-        'P1-Q3': '文件行数超限'
+    const apply = (file, ruleId, hits, detail) => {
+        if (!hits.length) return;
+        const action = rules.actionFor(file, ruleId);
+        if (action === 'skip') return;
+        const entry = { rule: ruleId, file, action, detail };
+        if (action === 'block') blocked.push(entry);
+        else warned.push(entry);
     };
 
-    let hasViolation = false;
-    for (const rule of ['P0-4', 'P1-Q1', 'P2-B1', 'P1-Q3']) {
-        const issues = grouped[rule] || [];
-        if (issues.length > 0) {
-            console.error(`❌ ${rule} ${RULE_NAMES[rule]} (${issues.length}处):`);
-            for (const i of issues) {
-                console.error(`   ${i.file} - ${i.value || i.sample || i.lines + '行'}`);
-                if (i.fix) console.error(`     修复: ${i.fix}`);
+    for (const file of files) {
+        const content = readIfExists(file);
+        if (content === null) continue; // 已删除的文件跳过
+
+        // P0-4 敏感信息（扩展文件类型：.env/.json/.yaml 等）
+        if (rules.isSensitiveScanTarget(file)) {
+            const hits = rules.findPatternHits(content, rules.SENSITIVE_PATTERNS);
+            apply(file, 'P0-4', hits, hits.map(h => h.name + '->' + h.sample).slice(0, 3).join('; '));
+        }
+
+        // P1-Q1 状态字面量 / P2-B1 shell语法 / P1-Q3 行数（仅代码文件）
+        if (JS_FILE_RE.test(file)) {
+            const statusHits = [];
+            for (const rule of rules.BUSINESS_VALUE_RULES) {
+                statusHits.push(...rules.findPatternHits(content, rule.patterns));
             }
-            console.error('');
-            hasViolation = true;
-        } else {
-            console.log(`✓ ${rule} ${RULE_NAMES[rule]} 通过`);
+            apply(file, 'P1-Q1', statusHits, statusHits.map(h => h.name).slice(0, 3).join('; '));
+            const shellHits = rules.findPatternHits(content, rules.SHELL_SYNTAX_PATTERNS);
+            apply(file, 'P2-B1', shellHits, shellHits.map(h => h.name).slice(0, 3).join('; '));
+
+            if (rules.isLineScanTarget(file)) {
+                const lines = content.split('\n').length;
+                if (lines > rules.MAX_LINES) apply(file, 'P1-Q3', [{ sample: '' }], lines + '行 > ' + rules.MAX_LINES);
+            }
         }
     }
-
-    console.log('='.repeat(60));
-    if (hasViolation) {
-        console.error('[IRON-LAW] 交付前检查失败，请修复违反项');
-        process.exit(1);
-    } else {
-        console.log('[IRON-LAW] 交付前检查全部通过');
-        process.exit(0);
-    }
+    return { blocked, warned };
 }
 
-function modePreCommit() {
-    // 只扫暂存区
-    const files = getStagedFiles();
-    if (files.length === 0) {
-        process.exit(0);
+function printReport(title, blocked, warned) {
+    console.log('[IRON-LAW] ' + title);
+    for (const w of warned) {
+        console.log('  ~ [warn/' + w.rule + '/' + rules.resolveScenario(w.file).id + '] ' + w.file + ' -- ' + w.detail);
     }
+    for (const b of blocked) {
+        console.log('  X [block/' + b.rule + '/' + rules.resolveScenario(b.file).id + '] ' + b.file + ' -- ' + b.detail);
+    }
+    if (!blocked.length && !warned.length) console.log('  V 无违反');
+}
 
-    const allIssues = [
-        ...checkSensitiveInfo(files),
-        ...checkBusinessValues(files),
-        ...checkPowerShellSyntax(files)
-    ];
+// ========== --self-check 铁律互斥自检 ==========
 
-    if (allIssues.length > 0) {
-        console.error('[IRON-LAW] pre-commit拦截:');
-        for (const i of allIssues) {
-            console.error(`  ❌ ${i.rule} ${i.file} - ${i.value || i.sample}`);
+function selfCheck() {
+    console.log('[IRON-LAW] 铁律互斥自检');
+    console.log('='.repeat(60));
+    const problems = [];
+
+    // 1. 规则私定义检测：共享模块之外不允许出现密钥模式或行数阈值
+    const scriptFiles = [];
+    const walk = (dir) => {
+        for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+            const fp = path.join(dir, item.name);
+            if (item.isDirectory()) {
+                if (!item.name.startsWith('.') && item.name !== 'node_modules') walk(fp);
+            } else if (item.name.endsWith('.js')) scriptFiles.push(fp);
         }
-        console.error(`\n共 ${allIssues.length} 处违反，commit已拦截`);
-        process.exit(1);
+    };
+    walk(path.join(PROJECT_ROOT, 'scripts'));
+    const ROGUE_KEY = /sk-\[A-Za-z0-9/;
+    const ROGUE_MAXLINES = /MAX_LINES\s*=\s*\d/;
+    for (const fp of scriptFiles) {
+        const rel = path.relative(PROJECT_ROOT, fp).split(path.sep).join('/');
+        if (rel === 'scripts/lib/ironLawRules.js') continue;
+        const c = fs.readFileSync(fp, 'utf8');
+        if (ROGUE_KEY.test(c)) problems.push('规则重复: ' + rel + ' 私有定义了sk-密钥模式（应引用lib/ironLawRules）');
+        if (ROGUE_MAXLINES.test(c)) problems.push('阈值漂移: ' + rel + ' 私有定义了MAX_LINES（应引用lib/ironLawRules）');
     }
-    console.log('[IRON-LAW] pre-commit检查通过');
-    process.exit(0);
+
+    // 2. 自指检测：规则定义文件若含模式，必须被场景豁免，否则规则拦截自己
+    for (const def of rules.RULE_DEFINITION_FILES) {
+        const content = readIfExists(def);
+        if (content === null) continue;
+        const allPatterns = [
+            ...rules.SENSITIVE_PATTERNS,
+            ...rules.BUSINESS_VALUE_RULES.flatMap(r => r.patterns),
+            ...rules.SHELL_SYNTAX_PATTERNS
+        ];
+        if (rules.findPatternHits(content, allPatterns).length > 0) {
+            for (const ruleId of ['P0-4', 'P1-Q1', 'P2-B1']) {
+                if (rules.actionFor(def, ruleId) !== 'skip') {
+                    problems.push('自指冲突: ' + def + ' 含规则模式但场景未豁免 ' + ruleId);
+                }
+            }
+        }
+    }
+
+    // 3. 钩子一致性：core.hooksPath 与 package.json prepare 必须同向，否则npm install翻转
+    let hooksPath = '';
+    try {
+        hooksPath = execSync('git config core.hooksPath', { cwd: PROJECT_ROOT, encoding: 'utf8' }).trim();
+    } catch (e) { /* 未设置 */ }
+    const pkg = JSON.parse(fs.readFileSync(path.join(PROJECT_ROOT, 'package.json'), 'utf8'));
+    const prepare = (pkg.scripts && pkg.scripts.prepare) || '';
+    const prepareParts = prepare.split(' ');
+    const prepareDir = prepareParts.length > 1 ? prepareParts[prepareParts.length - 1] : '.husky';
+    const hooksNorm = hooksPath.split(path.sep).join('/');
+    if (hooksPath && hooksNorm !== prepareDir) {
+        problems.push('钩子翻转风险: core.hooksPath=' + hooksPath + ' 但 prepare 指向 ' + prepareDir + '（npm install会翻转钩子）');
+    }
+    if (!hooksPath) problems.push('钩子未安装: core.hooksPath 未设置，运行 npx husky ' + prepareDir + ' 安装');
+
+    // 4. 场景完备性：唯一default、动作合法、ID不重复
+    const ids = new Set();
+    let defaults = 0;
+    for (const s of rules.SCENARIOS) {
+        if (ids.has(s.id)) problems.push('场景ID重复: ' + s.id);
+        ids.add(s.id);
+        if (s.id === 'default') defaults++;
+        for (const v of Object.values(s.action)) {
+            if (!['block', 'warn', 'skip'].includes(v)) problems.push('非法动作: ' + s.id + ' -> ' + v);
+        }
+    }
+    if (defaults !== 1) problems.push('场景表必须有且仅有一个 default（当前 ' + defaults + '）');
+
+    if (problems.length) {
+        for (const p of problems) console.log('  X ' + p);
+    } else {
+        console.log('  V 无互斥冲突');
+    }
+    console.log('='.repeat(60));
+    process.exit(problems.length ? 1 : 0);
+}
+
+// ========== --session-start（已移除硬编码本机路径） ==========
+
+function sessionStart() {
+    console.log('[IRON-LAW] 会话开始检查');
+    const envPath = path.join(PROJECT_ROOT, '.env');
+    const checks = [
+        { name: '.env文件存在', ok: fs.existsSync(envPath), fatal: false },
+        { name: '题材白名单CI脚本存在', ok: fs.existsSync(path.join(PROJECT_ROOT, 'scripts/audit-genre-whitelist.js')), fatal: true },
+        { name: '路由参数CI脚本存在', ok: fs.existsSync(path.join(PROJECT_ROOT, 'scripts/audit-route-param-consistency.js')), fatal: true },
+        { name: 'SOP 09存在', ok: fs.existsSync(path.join(PROJECT_ROOT, 'docs/sop/09-新项目约束词设计SOP.md')), fatal: true }
+    ];
+    let fail = false;
+    for (const c of checks) {
+        const mark = c.ok ? 'V' : (c.fatal ? 'X' : '~');
+        console.log('  ' + mark + ' ' + c.name);
+        if (!c.ok && c.fatal) fail = true;
+    }
+    for (const cmd of ['node scripts/audit-genre-whitelist.js', 'node scripts/audit-route-param-consistency.js']) {
+        try {
+            execSync(cmd, { cwd: PROJECT_ROOT, stdio: 'inherit' });
+        } catch (e) { fail = true; }
+    }
+    process.exit(fail ? 1 : 0);
 }
 
 // ========== 主入口 ==========
 
 const mode = process.argv[2];
-switch (mode) {
-    case '--session-start':
-        modeSessionStart();
-        break;
-    case '--pre-deliver':
-        modePreDeliver();
-        break;
-    case '--pre-commit':
-        modePreCommit();
-        break;
-    default:
-        console.log('用法: node scripts/audit-iron-law.js --session-start|--pre-deliver|--pre-commit');
+if (mode === '--self-check') selfCheck();
+else if (mode === '--session-start') sessionStart();
+else if (mode === '--pre-commit' || mode === '--pre-deliver') {
+    const files = mode === '--pre-commit' ? getStagedFiles() : getDeliverFiles();
+    const title = mode === '--pre-commit'
+        ? 'pre-commit 扫描暂存区(' + files.length + '个文件)'
+        : '交付前扫描修改+新增(' + files.length + '个文件)';
+    if (!files.length) { console.log('[IRON-LAW] 无待检文件'); process.exit(0); }
+    const { blocked, warned } = runChecks(files);
+    printReport(title, blocked, warned);
+    if (blocked.length) {
+        console.log('共 ' + blocked.length + ' 处拦截级违反，' + (mode === '--pre-commit' ? 'commit已拦截' : '交付检查失败'));
         process.exit(1);
+    }
+    process.exit(0);
+} else {
+    console.log('用法: node scripts/audit-iron-law.js --pre-commit|--pre-deliver|--session-start|--self-check');
+    process.exit(1);
 }

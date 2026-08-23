@@ -1,9 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
+// 规则来源：scripts/lib/ironLawRules.js（唯一定义源），禁止在本文件私自定义阈值/密钥模式
+const { MAX_LINES, SENSITIVE_PATTERNS, maskSample } = require('./lib/ironLawRules');
+
 const SCAN_DIRS = ['server/services', 'server/routes', 'server/core', 'server/config', 'server/middleware'];
 const SKIP_PATTERNS = ['.test.', '.spec.', 'Legacy', 'legacy', '__tests__'];
-const MAX_LINES = 200;
 
 const HARDCODE_RULES = [
     {
@@ -32,8 +34,8 @@ const HARDCODE_RULES = [
     },
     {
         name: 'hardcoded-api-key',
-        pattern: /sk-[a-zA-Z0-9]{10,}/g,
-        extract: (m) => m[0].substring(0, 15) + '...',
+        pattern: SENSITIVE_PATTERNS[0].pattern,
+        extract: (m) => maskSample(m[0]),
         reason: 'API Key绝对不能硬编码'
     }
 ];

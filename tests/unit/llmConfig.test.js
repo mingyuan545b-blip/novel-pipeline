@@ -118,13 +118,17 @@ describe('llmConfig + providerRegistry (S3)', () => {
     });
 
     describe('DEFAULT_STEP_ASSIGNMENTS', () => {
-        test('aliyunCoding 覆盖所有 10 个 Agent step', () => {
+        test('aliyunCoding 覆盖所有 11 个 Agent step', () => {
+            // 修复：代码已扩展至11个step（新增final-editor等），测试断言未同步（铁律原则2：显式契约）
+            // 权威来源：server/config/providerDefs.js 的 DEFAULT_STEP_ASSIGNMENTS
             const steps = DEFAULT_STEP_ASSIGNMENTS.aliyunCoding;
             expect(steps).toContain('writer');
             expect(steps).toContain('reader');
             expect(steps).toContain('reviser');
             expect(steps).toContain('first-review');
-            expect(steps).toHaveLength(10);
+            expect(steps).toContain('final-editor');
+            expect(steps).toContain('material-organizer');
+            expect(steps).toHaveLength(11);
         });
     });
 

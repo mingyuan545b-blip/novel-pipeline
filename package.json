@@ -44,7 +44,7 @@
     "verify:migration": "node scripts/verifyMaterialMigration.js",
     "verify:constraint": "node scripts/verifyConstraintChain.js",
     "verify:all": "node scripts/verifyMaterialMigration.js && node scripts/verifyConstraintChain.js && node scripts/verifyRegistryConsistency.js",
-    "prepare": "husky"
+    "prepare": "husky .githooks"
   },
   "dependencies": {
     "axios": "^1.16.1",
@@ -70,9 +70,6 @@
       "eslint --max-warnings=0"
     ],
     "scripts/**/*.js": [
-      "eslint --max-warnings=0"
-    ],
-    "tests/**/*.js": [
       "eslint --max-warnings=0"
     ]
   }

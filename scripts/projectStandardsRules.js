@@ -93,8 +93,8 @@ const R3_FORBIDDEN_BUSINESS_TERMS = [
     '金手指强度',
 ];
 
-/** R4文件行数上限 */
-const R4_MAX_LINES = 200;
+/** R4文件行数上限（统一来源：scripts/lib/ironLawRules.js） */
+const R4_MAX_LINES = require('./lib/ironLawRules').MAX_LINES;
 
 /** R5字数检查必须覆盖的输出点
  *  路径已通过D6审查修正（原路径指向writer.js/reviser.js等，但实际字数检查在以下位置）：

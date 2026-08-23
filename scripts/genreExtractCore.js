@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const MAX_LINES = 200;
+// 行数阈值统一来源：scripts/lib/ironLawRules.js
+const { MAX_LINES } = require('./lib/ironLawRules');
 
 function extractCodeBlock(srcContent, key) {
     const startMarker = `${key}: {`;

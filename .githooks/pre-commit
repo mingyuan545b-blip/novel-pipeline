@@ -1,26 +1,22 @@
 #!/bin/bash
-# git pre-commit hook - 铁律违反检测
-#
-# 安装方法（一次性）：
-#   git config core.hooksPath .githooks
-#
-# 作用：commit前自动扫描暂存区，检测硬编码+PS语法
-# 违反则拦截commit
+# 统一 pre-commit 质量门禁（单一入口，消除 husky/.githooks 双钩子互斥）
+# 顺序：铁律(快) -> lint-staged -> 硬编码审计 -> 级联删除 -> 项目标准
+# 规则定义统一在 scripts/lib/ironLawRules.js，由 --self-check 保证互斥一致性
 
-echo "[PRE-COMMIT] 铁律违反检测..."
+echo "[PRE-COMMIT] 铁律违反检测（场景化分支+共享规则）..."
+node scripts/audit-iron-law.js --pre-commit || exit 1
 
-# 跑铁律检测脚本（pre-commit模式，只扫暂存区）
-node scripts/audit-iron-law.js --pre-commit
+echo "[PRE-COMMIT] lint-staged（ESLint --max-warnings=0）..."
+npx lint-staged || exit 1
 
-if [ $? -ne 0 ]; then
-    echo ""
-    echo "[PRE-COMMIT] ❌ commit已拦截，请修复违反项后再提交"
-    echo "[PRE-COMMIT] 修复指南："
-    echo "  - P0-4 硬编码敏感信息 → 移到.env或配置文件"
-    echo "  - P1-Q1 硬编码业务值 → 用 chapterStatus.js 的 STATUS_VALUES 常量"
-    echo "  - P2-B1 PowerShell语法 → 改用node脚本"
-    exit 1
-fi
+echo "[PRE-COMMIT] 硬编码审计（共享规则）..."
+node scripts/audit-hardcode.js || exit 1
 
-echo "[PRE-COMMIT] ✓ 铁律检测通过，允许commit"
+echo "[PRE-COMMIT] 级联删除注册检查..."
+node scripts/audit-cascade-delete.js --ci || exit 1
+
+echo "[PRE-COMMIT] 项目标准校验..."
+node scripts/verifyProjectStandards.js || exit 1
+
+echo "[PRE-COMMIT] ✅ 全部检查通过"
 exit 0

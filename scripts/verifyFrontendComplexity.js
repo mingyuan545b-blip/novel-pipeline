@@ -11,7 +11,8 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const MAX_LINES = 200;
+// 行数阈值统一来源：scripts/lib/ironLawRules.js
+const { MAX_LINES } = require('./lib/ironLawRules');
 const MAX_USE_STATE = 5;
 let errorCount = 0;
 let warnCount = 0;
