@@ -1,0 +1,542 @@
+{
+  "version": "2.0.0",
+  "description": "Novel Pipeline 渐进式改造清单 v2 - 基于系统总工审计报告，Phase 0-3已完成，Phase 4+为新增",
+  "changelog": "v2.0.0: 新增Phase 4-10，覆盖SQLite后端修复、原子写入、锁优化、Pipeline拆分、前端状态管理等",
+  "items": [
+    {
+      "id": "P0-01", "phase": 0, "title": "修复store.test.js async问题",
+      "description": "store.setItem是async，测试中必须await", "files": ["tests/unit/store.test.js"],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/store.test.js --verbose 2>&1", "assertions": [{"type": "stdout_not_contains", "value": "FAIL"}, {"type": "test_pass_count", "min": 20}] },
+      "status": "completed", "risk": "low", "principle": "只改测试文件，不动生产代码"
+    },
+    {
+      "id": "P0-02", "phase": 0, "title": "删除pipelinePhases.test.js",
+      "description": "该测试引用了已删除的模块pipelinePhases", "files": ["tests/unit/pipelinePhases.test.js"],
+      "verification": { "command": "node -e \"const fs=require('fs'); console.log('file_exists:', fs.existsSync('tests/unit/pipelinePhases.test.js'))\"", "assertions": [{"type": "stdout_contains", "value": "file_exists: false"}] },
+      "status": "completed", "risk": "low", "principle": "删除无效文件，零副作用"
+    },
+    {
+      "id": "P0-03", "phase": 0, "title": "修复authMiddleware query token认证",
+      "description": "query参数token认证失败", "files": ["server/middleware/authMiddleware.js", "tests/unit/authMiddleware.test.js"],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/authMiddleware.test.js --verbose 2>&1", "assertions": [{"type": "stdout_not_contains", "value": "FAIL"}, {"type": "test_pass_count", "min": 7}] },
+      "status": "completed", "risk": "low", "principle": "只修bug，不改架构"
+    },
+    {
+      "id": "P0-04", "phase": 0, "title": "修复rateLimiter测试SQLite初始化",
+      "description": "rateLimiter测试中SQLite未初始化", "files": ["tests/unit/rateLimiter.test.js"],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/rateLimiter.test.js --verbose 2>&1", "assertions": [{"type": "stdout_not_contains", "value": "FAIL"}, {"type": "test_pass_count", "min": 12}] },
+      "status": "completed", "risk": "low", "principle": "只改测试文件"
+    },
+    {
+      "id": "P0-GATE", "phase": 0, "title": "Phase 0 全量验证门",
+      "description": "所有测试必须通过", "files": [],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1", "assertions": [{"type": "test_fail_count", "max": 0}] },
+      "status": "completed", "risk": "none", "principle": "全量通过才算Phase 0完成"
+    },
+    {
+      "id": "P1-01", "phase": 1, "title": "提取downstreamMap到pipelineUtils.js",
+      "description": "fullPipeline.js和orchestrator.js中有完全相同的downstreamMap定义", "files": ["server/services/pipeline/pipelineUtils.js", "server/services/pipeline/fullPipeline.js", "server/core/pipeline/orchestrator.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const path=require('path');const dirs=['server/services/pipeline','server/core/pipeline'];let count=0;dirs.forEach(d=>{const files=fs.readdirSync(d).filter(f=>f.endsWith('.js'));files.forEach(f=>{const c=fs.readFileSync(path.join(d,f),'utf8');if(c.includes('downstreamMap')&&f!=='pipelineUtils.js')count++})});console.log('downstreamMap_duplicate_count:',count)\"", "assertions": [{"type": "stdout_contains", "value": "downstreamMap_duplicate_count: 0"}] },
+      "status": "completed", "risk": "medium", "principle": "只做提取，不改逻辑"
+    },
+    {
+      "id": "P1-02", "phase": 1, "title": "提取generateOverrideOutput到pipelineUtils.js",
+      "description": "fullPipeline.js和orchestrator.js中有完全相同的generateOverrideOutput函数", "files": ["server/services/pipeline/pipelineUtils.js", "server/services/pipeline/fullPipeline.js", "server/core/pipeline/orchestrator.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const path=require('path');const dirs=['server/services/pipeline','server/core/pipeline'];let count=0;dirs.forEach(d=>{const files=fs.readdirSync(d).filter(f=>f.endsWith('.js'));files.forEach(f=>{const c=fs.readFileSync(path.join(d,f),'utf8');if(c.includes('function generateOverrideOutput')&&f!=='pipelineUtils.js')count++})});console.log('generateOverrideOutput_duplicate_count:',count)\"", "assertions": [{"type": "stdout_contains", "value": "generateOverrideOutput_duplicate_count: 0"}] },
+      "status": "completed", "risk": "medium", "principle": "只做提取，不改逻辑"
+    },
+    {
+      "id": "P1-03", "phase": 1, "title": "提取clearDownstreamOutputs到pipelineUtils.js",
+      "description": "fullPipeline.js和orchestrator.js中有完全相同的clearDownstreamOutputs函数", "files": ["server/services/pipeline/pipelineUtils.js", "server/services/pipeline/fullPipeline.js", "server/core/pipeline/orchestrator.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const path=require('path');const dirs=['server/services/pipeline','server/core/pipeline'];let count=0;dirs.forEach(d=>{const files=fs.readdirSync(d).filter(f=>f.endsWith('.js'));files.forEach(f=>{const c=fs.readFileSync(path.join(d,f),'utf8');if(c.includes('function clearDownstreamOutputs')&&f!=='pipelineUtils.js')count++})});console.log('clearDownstreamOutputs_duplicate_count:',count)\"", "assertions": [{"type": "stdout_contains", "value": "clearDownstreamOutputs_duplicate_count: 0"}] },
+      "status": "completed", "risk": "medium", "principle": "只做提取，不改逻辑"
+    },
+    {
+      "id": "P1-GATE", "phase": 1, "title": "Phase 1 全量验证门",
+      "description": "重复代码清零 + 测试全通过", "files": [],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1", "assertions": [{"type": "test_fail_count", "max": 0}] },
+      "status": "completed", "risk": "none", "principle": "重复代码清零+测试全通过"
+    },
+    {
+      "id": "P2-01", "phase": 2, "title": "修复主角名硬编码'沈渡'",
+      "description": "改为动态读取styleProfile.protagonistName", "files": ["server/services/pipeline/outlineGenerator.js", "server/services/genres/high-martial-crossplane.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const files=['server/services/pipeline/outlineGenerator.js','server/services/genres/high-martial-crossplane.js'];let count=0;files.forEach(f=>{if(fs.existsSync(f)){const c=fs.readFileSync(f,'utf8');const matches=c.match(/沈渡/g);count+=(matches?matches.length:0)}});console.log('hardcoded_protagonist_count:',count)\"", "assertions": [{"type": "stdout_contains", "value": "hardcoded_protagonist_count: 0"}] },
+      "status": "completed", "risk": "medium", "principle": "改为动态读取，不改逻辑"
+    },
+    {
+      "id": "P2-02", "phase": 2, "title": "修复前端14个空catch",
+      "description": "catch(_){}空catch块改为console.warn", "files": ["client/src/components/CreateProjectModal.jsx", "client/src/pages/MaterialsPage.jsx", "client/src/pages/PublishPage.jsx", "client/src/pages/ComicConfigPage.jsx"],
+      "verification": { "command": "node -e \"const fs=require('fs');const path=require('path');function scan(dir){let count=0;fs.readdirSync(dir).forEach(f=>{const fp=path.join(dir,f);const st=fs.statSync(fp);if(st.isDirectory()&&!f.includes('node_modules'))count+=scan(fp);else if(f.endsWith('.jsx')||f.endsWith('.js')){const c=fs.readFileSync(fp,'utf8');const m=c.match(/catch\\s*\\(\\s*\\w*\\s*\\)\\s*\\{\\s*\\}/g);count+=(m?m.length:0)}});return count}console.log('empty_catch_count:',scan('client/src'))\"", "assertions": [{"type": "stdout_contains", "value": "empty_catch_count: 0"}] },
+      "status": "completed", "risk": "low", "principle": "只加console.warn，不改逻辑"
+    },
+    {
+      "id": "P2-03", "phase": 2, "title": "后端services目录console.log替换为logger",
+      "description": "156处console.log替换为logger.info/warn/error", "files": ["server/services/"],
+      "verification": { "command": "node -e \"const fs=require('fs');const path=require('path');function scan(dir){let count=0;fs.readdirSync(dir).forEach(f=>{const fp=path.join(dir,f);const st=fs.statSync(fp);if(st.isDirectory()&&!f.includes('node_modules'))count+=scan(fp);else if(f.endsWith('.js')){const c=fs.readFileSync(fp,'utf8');const m=c.match(/console\\.log\\(/g);count+=(m?m.length:0)}});return count}console.log('console_log_count:',scan('server/services'))\"", "assertions": [{"type": "stdout_contains", "value": "console_log_count: 0"}] },
+      "status": "completed", "risk": "medium", "principle": "逐文件替换，每次替换后跑测试"
+    },
+    {
+      "id": "P2-GATE", "phase": 2, "title": "Phase 2 全量验证门",
+      "description": "硬编码清零+空catch清零+console.log清零+测试全通过", "files": [],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1", "assertions": [{"type": "test_fail_count", "max": 0}] },
+      "status": "completed", "risk": "none", "principle": "所有代码质量问题清零"
+    },
+    {
+      "id": "P3-01", "phase": 3, "title": "提取风味解析到materialFlavorParser.js",
+      "description": "INTENSITY_MAP和parseFlavorTag重复定义，提取到独立模块", "files": ["server/services/pipeline/steps/materialFlavorParser.js", "server/services/pipeline/steps/materialUpdateProcessor.js", "server/services/pipeline/steps/materialManager.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const files=['server/services/pipeline/steps/materialManager.js','server/services/pipeline/steps/materialUpdateProcessor.js'];let count=0;files.forEach(f=>{if(fs.existsSync(f)){const c=fs.readFileSync(f,'utf8');if(/const INTENSITY_MAP/.test(c))count++}});console.log('intensityMap_dup_count:',count)\"", "assertions": [{"type": "stdout_contains", "value": "intensityMap_dup_count: 0"}] },
+      "status": "completed", "risk": "low", "principle": "只做提取，不改逻辑"
+    },
+    {
+      "id": "P3-02", "phase": 3, "title": "提取素材匹配逻辑到materialMatcher.js",
+      "description": "findExistingMaterial+findExistingForArchive+determineAction+normalizeReferences提取到materialMatcher.js", "files": ["server/services/pipeline/steps/materialMatcher.js", "server/services/pipeline/steps/materialUpdateProcessor.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/services/pipeline/steps/materialUpdateProcessor.js','utf8');let count=0;if(c.includes('function findExistingMaterial'))count++;if(c.includes('function findExistingForArchive'))count++;console.log('matcher_dup_count:',count)\"", "assertions": [{"type": "stdout_contains", "value": "matcher_dup_count: 0"}] },
+      "status": "completed", "risk": "low", "principle": "只做提取，不改逻辑"
+    },
+    {
+      "id": "P3-03", "phase": 3, "title": "提取素材操作逻辑到materialActions.js",
+      "description": "handleArchiveAction+handleUpdateAction+handleCreateAction提取到materialActions.js", "files": ["server/services/pipeline/steps/materialActions.js", "server/services/pipeline/steps/materialUpdateProcessor.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/services/pipeline/steps/materialUpdateProcessor.js','utf8');const lines=c.split('\\n').length;console.log('processor_line_count:',lines)\"", "assertions": [{"type": "stdout_regex", "pattern": "processor_line_count: (1?[0-9]{2}|2[0-5][0-9])$"}] },
+      "status": "completed", "risk": "medium", "principle": "只做提取，不改逻辑"
+    },
+    {
+      "id": "P3-04", "phase": 3, "title": "修复空catch块",
+      "description": "materialUpdateProcessor.js中4处catch(_){}改为logger.warn", "files": ["server/services/pipeline/steps/materialUpdateProcessor.js", "server/services/pipeline/steps/materialActions.js"],
+      "verification": { "command": "node -e \"const fs=require('fs');const path=require('path');function scan(dir){let count=0;fs.readdirSync(dir).forEach(f=>{const fp=path.join(dir,f);const st=fs.statSync(fp);if(st.isDirectory())count+=scan(fp);else if(f.endsWith('.js')){const c=fs.readFileSync(fp,'utf8');const m=c.match(/catch\\s*\\(\\s*_\\s*\\)\\s*\\{\\s*\\}/g);count+=(m?m.length:0)}});return count}console.log('empty_catch_steps:',scan('server/services/pipeline/steps'))\"", "assertions": [{"type": "stdout_contains", "value": "empty_catch_steps: 0"}] },
+      "status": "completed", "risk": "low", "principle": "只改catch块，不改逻辑"
+    },
+    {
+      "id": "P3-GATE", "phase": 3, "title": "Phase 3 全量验证门",
+      "description": "所有模块提取完成+测试全通过+单文件行数控制", "files": [],
+      "verification": { "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1", "assertions": [{"type": "test_fail_count", "max": 0}] },
+      "status": "completed", "risk": "none", "principle": "测试全通过+单文件不超过250行"
+    },
+
+    {
+      "id": "P4-01",
+      "phase": 4,
+      "title": "SQLite后端添加updateItem方法",
+      "description": "server/db/store.js缺少updateItem方法，但上层store.js会调用getBackend().updateItem()。SQLite后端被选中时会运行时报错。需要在server/db/store.js中实现updateItem：读取当前值→调用updateFn→写回。参考jsonStore.js的updateItem实现",
+      "files": ["server/db/store.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/db/store.js','utf8');const hasUpdateItem=c.includes('async function updateItem');console.log('has_updateItem:',hasUpdateItem)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_updateItem: true"}]
+      },
+      "status": "completed",
+      "risk": "high",
+      "principle": "只添加缺失方法，不改已有方法。实现后必须跑store.test.js验证"
+    },
+    {
+      "id": "P4-02",
+      "phase": 4,
+      "title": "SQLite saveToFile原子写入保护",
+      "description": "server/db/database.js的saveToFile()直接writeFileSync覆盖原文件，进程崩溃时可能损坏数据库。需要改为：先写.tmp文件→验证写入→rename替换原文件。参考jsonStore.js的原子写入模式",
+      "files": ["server/db/database.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/db/database.js','utf8');const hasTmp=c.includes('.tmp');const hasRename=c.includes('renameSync');console.log('atomic_write:',hasTmp&&hasRename?'yes':'no')\"",
+        "assertions": [{"type": "stdout_contains", "value": "atomic_write: yes"}]
+      },
+      "status": "completed",
+      "risk": "high",
+      "principle": "只改saveToFile函数内部实现，不改函数签名和调用方式"
+    },
+    {
+      "id": "P4-03",
+      "phase": 4,
+      "title": "SQLite锁改为Promise链式锁",
+      "description": "server/db/store.js的acquireLock使用setTimeout(r,50)自旋轮询，高并发下CPU空转。需要改为与jsonStore相同的Promise链式锁：prevTurn→nextTurn排队机制。消除while循环和setTimeout轮询",
+      "files": ["server/db/store.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/db/store.js','utf8');const hasSpinLoop=c.includes('setTimeout(r, 50)');console.log('has_spin_lock:',hasSpinLoop)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_spin_lock: false"}]
+      },
+      "status": "completed",
+      "risk": "high",
+      "principle": "只改锁实现，不改锁接口（acquireLock/releaseLock签名不变）。改后跑lockMechanism.test.js"
+    },
+    {
+      "id": "P4-04",
+      "phase": 4,
+      "title": "SQLite isFoundationMaterial添加缓存层",
+      "description": "server/db/store.js的isFoundationMaterial每次递归都调用getItem，无缓存。jsonStore有_foundationCache和_factionMap。需要为SQLite版本添加相同的缓存机制，避免N+1查询",
+      "files": ["server/db/store.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/db/store.js','utf8');const hasCache=c.includes('_foundationCache')||c.includes('_factionMap');console.log('has_foundation_cache:',hasCache)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_foundation_cache: true"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "只添加缓存，不改判定逻辑。缓存失效策略与jsonStore一致"
+    },
+    {
+      "id": "P4-GATE",
+      "phase": 4,
+      "title": "Phase 4 全量验证门 - SQLite后端完整性",
+      "description": "SQLite后端必须：有updateItem+原子写入+链式锁+缓存层+测试全通过",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "SQLite后端功能完整+测试全通过"
+    },
+
+    {
+      "id": "P5-01",
+      "phase": 5,
+      "title": "提取trimItemData到storeCommon.js",
+      "description": "jsonStore.js和store.js(SQLite)都有trimItemData函数，逻辑几乎相同。提取到server/db/storeCommon.js，两个后端共享。消除双后端代码重复",
+      "files": ["server/db/storeCommon.js", "server/db/jsonStore.js", "server/db/store.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');let count=0;['server/db/jsonStore.js','server/db/store.js'].forEach(f=>{if(fs.existsSync(f)){const c=fs.readFileSync(f,'utf8');if(c.includes('function trimItemData'))count++}});console.log('trimItemData_dup_count:',count)\"",
+        "assertions": [{"type": "stdout_contains", "value": "trimItemData_dup_count: 0"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "只做提取，两个后端import共享模块。提取后分别跑测试"
+    },
+    {
+      "id": "P5-02",
+      "phase": 5,
+      "title": "提取isFoundationMaterial判定逻辑到storeCommon.js",
+      "description": "jsonStore.js和store.js都有isFoundationMaterial函数，判定规则相同但缓存策略不同。提取判定逻辑为纯函数isFoundationMaterialCheck(mat, getFactionFn)，各后端自行包装缓存",
+      "files": ["server/db/storeCommon.js", "server/db/jsonStore.js", "server/db/store.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c1=fs.readFileSync('server/db/storeCommon.js','utf8');const hasCheck=c1.includes('isFoundationMaterialCheck');console.log('has_shared_check:',hasCheck)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_shared_check: true"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "提取判定逻辑为纯函数，缓存层各后端自行实现"
+    },
+    {
+      "id": "P5-03",
+      "phase": 5,
+      "title": "提取queryItems通用过滤到storeCommon.js",
+      "description": "两个后端的queryItems都有相同的filter匹配逻辑（Object.keys(filter).every(key=>item[key]===filter[key])）。提取为applyFilter(items, filter)共享函数",
+      "files": ["server/db/storeCommon.js", "server/db/jsonStore.js", "server/db/store.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/db/storeCommon.js','utf8');const hasApplyFilter=c.includes('applyFilter');console.log('has_applyFilter:',hasApplyFilter)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_applyFilter: true"}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只提取通用过滤函数，各后端调用即可"
+    },
+    {
+      "id": "P5-GATE",
+      "phase": 5,
+      "title": "Phase 5 全量验证门 - 双后端去重",
+      "description": "共享逻辑提取完成+两个后端各自测试通过+无重复逻辑",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "双后端去重+测试全通过"
+    },
+
+    {
+      "id": "P6-01",
+      "phase": 6,
+      "title": "提取素材管理器补跑逻辑为catchupMaterialManager.js",
+      "description": "素材管理器补跑逻辑在batchExecutor.js出现2次+orchestrator.js出现1次，共3处重复。提取到server/services/pipeline/materialManagerCatchup.js，统一调用",
+      "files": ["server/services/pipeline/materialManagerCatchup.js", "server/services/pipeline/infinite/batchExecutor.js", "server/core/pipeline/orchestrator.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');let count=0;['server/services/pipeline/infinite/batchExecutor.js','server/core/pipeline/orchestrator.js'].forEach(f=>{if(fs.existsSync(f)){const c=fs.readFileSync(f,'utf8');if(c.includes('material-manager')&&c.includes('补跑'))count++}});console.log('catchup_dup_count:',count)\"",
+        "assertions": [{"type": "stdout_regex", "pattern": "catchup_dup_count: [01]$"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "提取为独立函数，原调用点改为import调用。补跑逻辑不变"
+    },
+    {
+      "id": "P6-02",
+      "phase": 6,
+      "title": "Orchestrator提取预检逻辑为PreflightChecker",
+      "description": "orchestrator.js的_runPreflightChecks方法(~45行)提取到server/core/pipeline/preflightChecker.js。包括：补跑素材管理器+恢复空素材",
+      "files": ["server/core/pipeline/preflightChecker.js", "server/core/pipeline/orchestrator.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/core/pipeline/orchestrator.js','utf8');const hasMethod=c.includes('_runPreflightChecks');const lines=c.split('\\n').length;console.log('orch_has_preflight:',hasMethod);console.log('orch_lines:',lines)\"",
+        "assertions": [{"type": "stdout_contains", "value": "orch_has_preflight: false"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "只做提取，预检逻辑不变。orchestrator行数应减少40+行"
+    },
+    {
+      "id": "P6-03",
+      "phase": 6,
+      "title": "Orchestrator提取审核处理为ReviewHandler",
+      "description": "orchestrator.js中_handleReviewOverride+first-review/fast-review/second-review/final-editor的审核处理逻辑(~150行)提取到server/core/pipeline/reviewHandler.js",
+      "files": ["server/core/pipeline/reviewHandler.js", "server/core/pipeline/orchestrator.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/core/pipeline/orchestrator.js','utf8');const hasHandleReview=c.includes('_handleReviewOverride');console.log('orch_has_reviewHandler:',hasHandleReview)\"",
+        "assertions": [{"type": "stdout_contains", "value": "orch_has_reviewHandler: false"}]
+      },
+      "status": "completed",
+      "risk": "high",
+      "principle": "提取审核处理逻辑，但审核覆盖规则不变。改后必须跑reviewOverride.test.js"
+    },
+    {
+      "id": "P6-04",
+      "phase": 6,
+      "title": "Orchestrator提取错误恢复为ErrorRecoveryHandler",
+      "description": "orchestrator.js中catch块内的错误分类(isOverloaded/isContextErr/isTimeout)+重试逻辑+章节状态更新(~60行)提取到server/core/pipeline/errorRecovery.js",
+      "files": ["server/core/pipeline/errorRecovery.js", "server/core/pipeline/orchestrator.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/core/pipeline/orchestrator.js','utf8');const hasIsOverloaded=c.includes('isOverloaded');console.log('orch_has_errorClassify:',hasIsOverloaded)\"",
+        "assertions": [{"type": "stdout_contains", "value": "orch_has_errorClassify: false"}]
+      },
+      "status": "completed",
+      "risk": "high",
+      "principle": "提取错误分类和重试逻辑，行为不变。改后跑infinitePipeline.test.js"
+    },
+    {
+      "id": "P6-GATE",
+      "phase": 6,
+      "title": "Phase 6 全量验证门 - Pipeline拆分",
+      "description": "Orchestrator拆分完成+补跑逻辑统一+测试全通过+orchestrator.js行数<400",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "Pipeline拆分+测试全通过+单文件行数控制"
+    },
+
+    {
+      "id": "P7-01",
+      "phase": 7,
+      "title": "前端AUTH_TOKEN动态读取",
+      "description": "client/src/services/api.js的AUTH_TOKEN在模块加载时读取一次，之后不更新。需要将token读取移到拦截器内部，每次请求时动态获取localStorage.getItem('request_secret')",
+      "files": ["client/src/services/api.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('client/src/services/api.js','utf8');const hasStaticToken=c.match(/const AUTH_TOKEN\\s*=\\s*import\\.meta/);console.log('has_static_token:',!!hasStaticToken)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_static_token: false"}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只改token读取位置，不改认证逻辑"
+    },
+    {
+      "id": "P7-02",
+      "phase": 7,
+      "title": "认证中间件空secret强制配置",
+      "description": "server/middleware/auth.js中secret为空时跳过认证。server/index.js中未配置REQUEST_SECRET时生成随机值导致前端无法使用。需要：启动时检测未配置→输出明确警告→建议配置步骤",
+      "files": ["server/index.js", "server/middleware/auth.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/index.js','utf8');const hasWarn=c.includes('REQUEST_SECRET')&&c.includes('配置');console.log('has_secret_config_warning:',hasWarn)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_secret_config_warning: true"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "不改认证逻辑，只改善提示信息。不强制阻断启动"
+    },
+    {
+      "id": "P7-03",
+      "phase": 7,
+      "title": "无限Pipeline日志持久化频率优化",
+      "description": "batchExecutor.js每5条日志就持久化一次状态，高频写入磁盘。改为每30秒或每章完成后持久化。减少磁盘I/O",
+      "files": ["server/services/pipeline/infinite/batchExecutor.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/services/pipeline/infinite/batchExecutor.js','utf8');const has5Count=c.includes('% 5 === 0');console.log('has_5count_persist:',has5Count)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_5count_persist: false"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "只改持久化频率，不改日志内容。确保章完成时仍会持久化"
+    },
+    {
+      "id": "P7-04",
+      "phase": 7,
+      "title": "无限Pipeline状态循环引用清理",
+      "description": "batchExecutor.js中state对象挂载_clearHeartbeat函数引用，addLog闭包捕获state，形成循环引用。需要在finally块中显式断开：delete state._clearHeartbeat; state.addLog = null",
+      "files": ["server/services/pipeline/infinite/batchExecutor.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/services/pipeline/infinite/batchExecutor.js','utf8');const hasCleanup=c.includes('delete state._clearHeartbeat')||c.includes('state._clearHeartbeat = null');console.log('has_circ_ref_cleanup:',hasCleanup)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_circ_ref_cleanup: true"}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只加清理代码，不改业务逻辑"
+    },
+    {
+      "id": "P7-GATE",
+      "phase": 7,
+      "title": "Phase 7 全量验证门 - 安全与性能",
+      "description": "认证改善+日志优化+内存清理+测试全通过",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "安全与性能修复+测试全通过"
+    },
+
+    {
+      "id": "P8-01",
+      "phase": 8,
+      "title": "题材插件启动校验",
+      "description": "5个genre插件没有启动时校验。需要在genreConfig.js中添加validatePlugin()方法，检查必要字段(id/label/isMatch/styleProfile/reviewRules)是否存在。启动时自动校验所有注册插件",
+      "files": ["server/services/genreConfig.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/services/genreConfig.js','utf8');const hasValidate=c.includes('validatePlugin');console.log('has_plugin_validation:',hasValidate)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_plugin_validation: true"}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只添加校验，不改插件逻辑。校验失败输出warn不阻断启动"
+    },
+    {
+      "id": "P8-02",
+      "phase": 8,
+      "title": "加密工具添加密钥版本标识",
+      "description": "cryptoUtil.js加密数据无版本标识，密钥轮换时无法区分新旧密钥加密的数据。需要在加密输出中添加版本前缀：v1:salt:iv:tag:encrypted。解密时支持多版本",
+      "files": ["server/services/cryptoUtil.js", "tests/unit/cryptoUtil.test.js"],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/cryptoUtil.test.js --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "添加版本前缀，保持向后兼容（无前缀的按v0处理）"
+    },
+    {
+      "id": "P8-03",
+      "phase": 8,
+      "title": "CORS开发模式允许私有网络",
+      "description": "server/index.js的CORS只允许localhost。开发模式下需要支持局域网访问（手机预览等）。当CORS_ORIGINS未配置时，默认允许192.168.*.*和10.*.*.*等私有网络IP",
+      "files": ["server/index.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('server/index.js','utf8');const hasPrivate=c.includes('192.168')||c.includes('private');console.log('has_private_network_cors:',hasPrivate)\"",
+        "assertions": [{"type": "stdout_contains", "value": "has_private_network_cors: true"}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只在开发模式（未配置CORS_ORIGINS）时放宽，生产模式不变"
+    },
+    {
+      "id": "P8-GATE",
+      "phase": 8,
+      "title": "Phase 8 全量验证门 - 安全加固",
+      "description": "插件校验+密钥版本+CORS放宽+测试全通过",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "安全加固+测试全通过"
+    },
+
+    {
+      "id": "P9-01",
+      "phase": 9,
+      "title": "添加SQLite后端专项测试",
+      "description": "当前测试主要针对jsonStore。需要添加server/db/store.test.js专项测试：updateItem原子性、锁机制、isFoundationMaterial缓存、trimItemData、原子写入恢复。至少15个测试用例",
+      "files": ["tests/unit/sqliteStore.test.js"],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/sqliteStore.test.js --verbose 2>&1",
+        "assertions": [{"type": "test_pass_count", "min": 15}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只添加测试，不改生产代码"
+    },
+    {
+      "id": "P9-02",
+      "phase": 9,
+      "title": "添加Pipeline拆分后集成测试",
+      "description": "Phase 6拆分了Orchestrator，需要添加集成测试验证：PreflightChecker补跑、ReviewHandler覆盖、ErrorRecovery重试。至少10个测试用例",
+      "files": ["tests/unit/pipelineOrchestrator.test.js"],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/pipelineOrchestrator.test.js --verbose 2>&1",
+        "assertions": [{"type": "test_pass_count", "min": 10}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只添加测试，mock LLM调用"
+    },
+    {
+      "id": "P9-03",
+      "phase": 9,
+      "title": "添加双后端一致性测试",
+      "description": "验证jsonStore和SQLite store在相同操作下产生相同结果：setItem→getItem、listItems、queryItems、deleteItem、isFoundationMaterial判定。至少12个测试用例",
+      "files": ["tests/unit/storeBackendConsistency.test.js"],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit/storeBackendConsistency.test.js --verbose 2>&1",
+        "assertions": [{"type": "test_pass_count", "min": 12}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只添加测试，验证双后端行为一致"
+    },
+    {
+      "id": "P9-GATE",
+      "phase": 9,
+      "title": "Phase 9 全量验证门 - 测试覆盖",
+      "description": "新增测试37+个+全量测试通过",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "测试覆盖提升+全量通过"
+    },
+
+    {
+      "id": "P10-01",
+      "phase": 10,
+      "title": "前端API层添加AbortController集成",
+      "description": "client/src/services/api.js有createAbortController工具但无API调用使用。需要在projectsApi.list、chaptersApi.list、materialsApi.list等列表API中添加signal参数支持",
+      "files": ["client/src/services/api.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('client/src/services/api.js','utf8');const signalCount=(c.match(/signal/g)||[]).length;console.log('signal_usage_count:',signalCount)\"",
+        "assertions": [{"type": "stdout_regex", "pattern": "signal_usage_count: [3-9]\\d*$"}]
+      },
+      "status": "completed",
+      "risk": "low",
+      "principle": "只添加signal参数，不改API行为。不传signal时行为不变"
+    },
+    {
+      "id": "P10-02",
+      "phase": 10,
+      "title": "前端useAppStore拆分pipeline状态",
+      "description": "useAppStore.js中pipelineState相关状态(6个字段+4个方法)提取到usePipelineStore.js。useAppStore保留项目/章节/素材等核心状态",
+      "files": ["client/src/store/useAppStore.js", "client/src/store/usePipelineStore.js"],
+      "verification": {
+        "command": "node -e \"const fs=require('fs');const c=fs.readFileSync('client/src/store/useAppStore.js','utf8');const hasPipelineState=c.includes('pipelineState');console.log('appStore_has_pipeline:',hasPipelineState)\"",
+        "assertions": [{"type": "stdout_contains", "value": "appStore_has_pipeline: false"}]
+      },
+      "status": "completed",
+      "risk": "medium",
+      "principle": "只做状态拆分，组件引用更新。PipelinePage等页面改用usePipelineStore"
+    },
+    {
+      "id": "P10-GATE",
+      "phase": 10,
+      "title": "Phase 10 全量验证门 - 前端优化",
+      "description": "API取消支持+Store拆分+全量测试通过",
+      "files": [],
+      "verification": {
+        "command": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose 2>&1",
+        "assertions": [{"type": "test_fail_count", "max": 0}]
+      },
+      "status": "completed",
+      "risk": "none",
+      "principle": "前端优化+测试全通过"
+    }
+  ]
+}

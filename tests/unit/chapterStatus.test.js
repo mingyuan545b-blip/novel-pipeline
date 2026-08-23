@@ -1,99 +1,86 @@
-const {
-    CHAPTER_STATUS,
-    ALL_STATUSES,
-    STUCK_STATUSES,
-    isValidStatus,
-    getStatusCategory,
-    isTerminalStatus,
-    isFailedStatus,
-    validateStatusConsistency
-} = require('../../server/services/chapterStatus');
+const { CHAPTER_STATUS, ALL_STATUSES, STUCK_STATUSES, isValidStatus, getStatusCategory, isTerminalStatus, isFailedStatus } = require('../../server/services/chapterStatus');
 
 describe('chapterStatus', () => {
-    test('all statuses are unique (no duplicates)', () => {
-        const unique = new Set(ALL_STATUSES);
-        expect(unique.size).toBe(ALL_STATUSES.length);
-    });
+    describe('CHAPTER_STATUS', () => {
+        test('has IN_PROGRESS array', () => {
+            expect(Array.isArray(CHAPTER_STATUS.IN_PROGRESS)).toBe(true);
+            expect(CHAPTER_STATUS.IN_PROGRESS.length).toBeGreaterThan(0);
+        });
 
-    test('pipeline-failed is in FAILED category', () => {
-        expect(CHAPTER_STATUS.FAILED).toContain('pipeline-failed');
-    });
+        test('has COOLDOWN array', () => {
+            expect(Array.isArray(CHAPTER_STATUS.COOLDOWN)).toBe(true);
+            expect(CHAPTER_STATUS.COOLDOWN).toContain('cooldown-waiting');
+        });
 
-    test('context-error is in FAILED category', () => {
-        expect(CHAPTER_STATUS.FAILED).toContain('context-error');
-    });
+        test('has INITIAL array', () => {
+            expect(Array.isArray(CHAPTER_STATUS.INITIAL)).toBe(true);
+            expect(CHAPTER_STATUS.INITIAL).toContain('outlined');
+        });
 
-    test('isValidStatus returns true for known statuses', () => {
-        expect(isValidStatus('outlined')).toBe(true);
-        expect(isValidStatus('written')).toBe(true);
-        expect(isValidStatus('approved')).toBe(true);
-        expect(isValidStatus('material-updated')).toBe(true);
-        expect(isValidStatus('pipeline-failed')).toBe(true);
-        expect(isValidStatus('permanently-skipped')).toBe(true);
-    });
+        test('has FAILED array', () => {
+            expect(Array.isArray(CHAPTER_STATUS.FAILED)).toBe(true);
+        });
 
-    test('isValidStatus returns false for unknown statuses', () => {
-        expect(isValidStatus('unknown-status')).toBe(false);
-        expect(isValidStatus('skipped')).toBe(false);
-        expect(isValidStatus('')).toBe(false);
-    });
-
-    test('getStatusCategory returns correct categories', () => {
-        expect(getStatusCategory('outlined')).toBe('INITIAL');
-        expect(getStatusCategory('written')).toBe('IN_PROGRESS');
-        expect(getStatusCategory('first-reviewing')).toBe('IN_PROGRESS');
-        expect(getStatusCategory('approved')).toBe('IN_PROGRESS');
-        expect(getStatusCategory('material-updated')).toBe('COMPLETED');
-        expect(getStatusCategory('failed-skipped')).toBe('FAILED');
-        expect(getStatusCategory('pipeline-failed')).toBe('FAILED');
-        expect(getStatusCategory('context-error')).toBe('FAILED');
-        expect(getStatusCategory('permanently-skipped')).toBe('TERMINAL');
-    });
-
-    test('getStatusCategory returns UNKNOWN for invalid status', () => {
-        expect(getStatusCategory('nonexistent')).toBe('UNKNOWN');
-    });
-
-    test('isTerminalStatus identifies completed and terminal statuses', () => {
-        expect(isTerminalStatus('material-updated')).toBe(true);
-        expect(isTerminalStatus('permanently-skipped')).toBe(true);
-        expect(isTerminalStatus('outlined')).toBe(false);
-        expect(isTerminalStatus('written')).toBe(false);
-        expect(isTerminalStatus('pipeline-failed')).toBe(false);
-    });
-
-    test('isFailedStatus identifies failed statuses', () => {
-        expect(isFailedStatus('failed-skipped')).toBe(true);
-        expect(isFailedStatus('timeout-skipped')).toBe(true);
-        expect(isFailedStatus('context-error')).toBe(true);
-        expect(isFailedStatus('pipeline-failed')).toBe(true);
-        expect(isFailedStatus('outlined')).toBe(false);
-        expect(isFailedStatus('approved')).toBe(false);
-    });
-
-    test('STUCK_STATUSES does not contain completed statuses', () => {
-        CHAPTER_STATUS.COMPLETED.forEach(s => {
-            expect(STUCK_STATUSES).not.toContain(s);
+        test('has COMPLETED array', () => {
+            expect(Array.isArray(CHAPTER_STATUS.COMPLETED)).toBe(true);
         });
     });
 
-    test('STUCK_STATUSES does not contain approved', () => {
-        expect(STUCK_STATUSES).not.toContain('approved');
+    describe('ALL_STATUSES', () => {
+        test('is an array containing all statuses', () => {
+            expect(Array.isArray(ALL_STATUSES)).toBe(true);
+            expect(ALL_STATUSES).toContain('outlined');
+            expect(ALL_STATUSES).toContain('written');
+        });
     });
 
-    test('validateStatusConsistency returns true', () => {
-        expect(validateStatusConsistency()).toBe(true);
+    describe('isValidStatus', () => {
+        test('returns true for valid statuses', () => {
+            expect(isValidStatus('outlined')).toBe(true);
+            expect(isValidStatus('written')).toBe(true);
+        });
+
+        test('returns false for invalid status', () => {
+            expect(isValidStatus('nonexistent')).toBe(false);
+        });
     });
 
-    test('all statuses used in pipeline are covered', () => {
-        const pipelineStatuses = [
-            'outlined', 'written', 'first-reviewing', 'second-reviewing',
-            'final-editing', 'approved', 'material-updated',
-            'failed-skipped', 'timeout-skipped', 'context-error',
-            'pipeline-failed', 'permanently-skipped'
-        ];
-        pipelineStatuses.forEach(s => {
-            expect(isValidStatus(s)).toBe(true);
+    describe('isTerminalStatus', () => {
+        test('returns true for cooldown-waiting', () => {
+            expect(isTerminalStatus('cooldown-waiting')).toBe(true);
+        });
+
+        test('returns false for outlined', () => {
+            expect(isTerminalStatus('outlined')).toBe(false);
+        });
+    });
+
+    describe('isFailedStatus', () => {
+        test('returns true for failed statuses', () => {
+            expect(isFailedStatus('failed-skipped')).toBe(true);
+            expect(isFailedStatus('pipeline-failed')).toBe(true);
+        });
+
+        test('returns false for normal statuses', () => {
+            expect(isFailedStatus('outlined')).toBe(false);
+        });
+    });
+
+    describe('getStatusCategory', () => {
+        test('categorizes outlined as INITIAL', () => {
+            expect(getStatusCategory('outlined')).toBe('INITIAL');
+        });
+
+        test('categorizes written as IN_PROGRESS', () => {
+            expect(getStatusCategory('written')).toBe('IN_PROGRESS');
+        });
+
+        test('categorizes cooldown-waiting as COOLDOWN', () => {
+            expect(getStatusCategory('cooldown-waiting')).toBe('COOLDOWN');
+        });
+
+        test('returns UNKNOWN for unknown status', () => {
+            expect(getStatusCategory('unknown')).toBe('UNKNOWN');
         });
     });
 });

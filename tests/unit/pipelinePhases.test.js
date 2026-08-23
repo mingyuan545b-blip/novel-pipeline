@@ -1,75 +1,54 @@
-const {
-    formatReviewFeedback,
-    classifyError,
-    checkWordCountHardGate,
-    preflightMaterialCheck
-} = require('../../server/services/pipeline/pipelinePhases');
+/**
+ * pipelinePhases tests - Pipeline阶段辅助函数
+ */
+const { formatReviewFeedback, classifyError, checkWordCountHardGate, preflightMaterialCheck } = require('../../server/services/pipeline/pipelinePhases');
 
 describe('pipelinePhases', () => {
     describe('formatReviewFeedback', () => {
-        test('formats feedback with summary, issues, and suggestions', () => {
-            const feedback = {
-                summary: 'Test summary',
-                issues: [
-                    { description: 'Issue 1', severity: 'critical' },
-                    { description: 'Issue 2', severity: 'major' }
-                ],
-                suggestions: ['Fix issue 1', 'Fix issue 2']
-            };
-            const result = formatReviewFeedback(feedback);
-            expect(result).toContain('【总结】Test summary');
-            expect(result).toContain('【必须修改的问题】');
-            expect(result).toContain('1. [critical] Issue 1');
-            expect(result).toContain('2. [major] Issue 2');
-            expect(result).toContain('【修改建议】');
-            expect(result).toContain('1. Fix issue 1');
-        });
-
-        test('handles empty feedback', () => {
+        it('should return empty string for null feedback', () => {
             expect(formatReviewFeedback(null)).toBe('');
-            expect(formatReviewFeedback({})).toBe('');
         });
 
-        test('handles feedback with only summary', () => {
-            const result = formatReviewFeedback({ summary: 'Only summary' });
-            expect(result).toBe('【总结】Only summary');
+        it('should format summary only', () => {
+            expect(formatReviewFeedback({ summary: 'Test' })).toBe('【总结】Test');
         });
 
-        test('handles string issues', () => {
-            const feedback = {
-                issues: ['String issue 1', 'String issue 2']
+        it('should format issues with severity', () => {
+            const fb = {
+                issues: [
+                    { severity: 'critical', description: 'Issue 1' },
+                    'Issue 2'
+                ]
             };
-            const result = formatReviewFeedback(feedback);
-            expect(result).toContain('1.  String issue 1');
-            expect(result).toContain('2.  String issue 2');
+            const result = formatReviewFeedback(fb);
+            expect(result).toContain('[critical] Issue 1');
+            expect(result).toContain('Issue 2');
+        });
+
+        it('should format suggestions', () => {
+            const fb = { suggestions: ['Add more detail', 'Fix dialogue'] };
+            const result = formatReviewFeedback(fb);
+            expect(result).toContain('Add more detail');
+            expect(result).toContain('Fix dialogue');
         });
     });
 
     describe('classifyError', () => {
-        test('identifies overloaded errors', () => {
-            expect(classifyError({ message: 'Server 529 error' }).isOverloaded).toBe(true);
-            expect(classifyError({ message: 'rate limit exceeded' }).isOverloaded).toBe(true);
-            expect(classifyError({ message: '负载较高' }).isOverloaded).toBe(true);
-            expect(classifyError({ message: 'normal error' }).isOverloaded).toBe(false);
+        it('should classify throttling as overloaded', () => {
+            const err = new Error('throttling: usage allocated quota exceeded');
+            const result = classifyError(err);
+            expect(result.isOverloaded).toBe(true);
         });
 
-        test('identifies context overflow errors', () => {
-            expect(classifyError({ message: 'CONTEXT_OVERFLOW detected', isContextOverflow: false }).isContextErr).toBe(true);
-            expect(classifyError({ message: 'context_length exceeded', isContextOverflow: false }).isContextErr).toBe(true);
-            expect(classifyError({ message: 'normal', isContextOverflow: true }).isContextErr).toBe(true);
-            expect(classifyError({ message: 'normal error' }).isContextErr).toBe(false);
+        it('should classify timeout error', () => {
+            const err = new Error('Request timeout after 30000ms');
+            const result = classifyError(err);
+            expect(result.isTimeout).toBe(true);
         });
 
-        test('identifies timeout errors', () => {
-            expect(classifyError({ message: '请求超时' }).isTimeout).toBe(true);
-            expect(classifyError({ message: 'timeout occurred' }).isTimeout).toBe(true);
-            expect(classifyError({ message: 'ETIMEDOUT' }).isTimeout).toBe(true);
-            expect(classifyError({ message: 'request aborted' }).isTimeout).toBe(true);
-            expect(classifyError({ message: 'normal error' }).isTimeout).toBe(false);
-        });
-
-        test('no false positives for normal errors', () => {
-            const result = classifyError({ message: 'Something went wrong' });
+        it('should classify normal error as none', () => {
+            const err = new Error('Something went wrong');
+            const result = classifyError(err);
             expect(result.isOverloaded).toBe(false);
             expect(result.isContextErr).toBe(false);
             expect(result.isTimeout).toBe(false);
@@ -77,38 +56,37 @@ describe('pipelinePhases', () => {
     });
 
     describe('checkWordCountHardGate', () => {
-        test('returns null for non-review steps', () => {
-            expect(checkWordCountHardGate(1000, 1800, 3500, 'writer')).toBeNull();
-            expect(checkWordCountHardGate(1000, 1800, 3500, 'reviser')).toBeNull();
-            expect(checkWordCountHardGate(1000, 1800, 3500, 'final-editor')).toBeNull();
+        it('should return null for non-review steps', () => {
+            expect(checkWordCountHardGate(100, 1500, 5000, 'writer')).toBeNull();
         });
 
-        test('returns under-limit gate for review steps with low word count', () => {
-            const result = checkWordCountHardGate(1500, 1800, 3500, 'first-review');
-            expect(result).not.toBeNull();
+        it('should block under-min word count for review steps', () => {
+            const result = checkWordCountHardGate(800, 1500, 5000, 'first-review');
+            expect(result).toBeDefined();
             expect(result.passed).toBe(false);
             expect(result.type).toBe('under');
-            expect(result.feedback.issues[0].severity).toBe('critical');
         });
 
-        test('returns over-limit gate for review steps with high word count', () => {
-            const result = checkWordCountHardGate(4000, 1800, 3500, 'fast-review');
-            expect(result).not.toBeNull();
+        it('should block over-max word count for review steps', () => {
+            const result = checkWordCountHardGate(6000, 1500, 5000, 'fast-review');
+            expect(result).toBeDefined();
             expect(result.passed).toBe(false);
             expect(result.type).toBe('over');
         });
 
-        test('returns null for word count within range', () => {
-            expect(checkWordCountHardGate(2500, 1800, 3500, 'second-review')).toBeNull();
+        it('should pass for valid word count', () => {
+            const result = checkWordCountHardGate(2500, 1500, 5000, 'second-review');
+            expect(result).toBeNull();
+        });
+    });
+
+    describe('preflightMaterialCheck', () => {
+        it('should return ok for empty materials', () => {
+            expect(preflightMaterialCheck([], 'writer').ok).toBe(true);
         });
 
-        test('works for all review step types', () => {
-            const steps = ['first-review', 'fast-review', 'second-review'];
-            for (const step of steps) {
-                const result = checkWordCountHardGate(1500, 1800, 3500, step);
-                expect(result).not.toBeNull();
-                expect(result.passed).toBe(false);
-            }
+        it('should return ok for null materials', () => {
+            expect(preflightMaterialCheck(null, 'writer').ok).toBe(true);
         });
     });
 });

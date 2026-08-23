@@ -48,7 +48,7 @@ async function main() {
     const updateRes = await fetch(`${BASE}/projects/${projectId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'active', currentChapter: 0, chapters: chapters.map(c => c.chapterNumber), chapterIntents: { chapters: [] }, hookBudget: { active: [], resolved: [], budget: 12 } })
+        body: JSON.stringify({ status: 'active', currentChapter: 0, chapters: chapters.map(c => c.chapterNumber), chapterIntents: { chapters: {} }, hookBudget: { hooks: [], lastUpdated: null } })
     });
     const updated = await updateRes.json();
     console.log('Project updated:', updated.name, 'status:', updated.status);

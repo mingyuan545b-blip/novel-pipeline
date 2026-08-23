@@ -1,7 +1,7 @@
 const { initDatabaseAsync, closeDatabase } = require('../../server/db/database');
 const store = require('../../server/db/store');
 const { VALID_MATERIAL_TYPES, HIERARCHY_RULES, MATERIAL_STANDARDS } = require('../../server/config/materialTypes');
-const { getModeConfig, getModePipelineConfig, getAgentConfig } = require('../../server/config/systemConfig');
+const { resolveConfig } = require('../../server/config');
 const materialValidator = require('../../server/services/materialValidator');
 const genreConfig = require('../../server/services/genreConfig');
 const { v4: uuidv4 } = require('uuid');
@@ -19,7 +19,7 @@ afterAll(() => {
 });
 
 describe('Integration: Project Creation with 30-Chapter Outline', () => {
-    test('create project with high-martial-crossplane genre', () => {
+    test('create project with high-martial-crossplane genre', async () => {
         projectId = uuidv4();
         const project = {
             id: projectId,
@@ -32,19 +32,19 @@ describe('Integration: Project Creation with 30-Chapter Outline', () => {
                 dialogueRule: '对话推动剧情',
                 toneRule: '反套路喜剧'
             },
-            wordConfig: getModeConfig('novel'),
+            wordConfig: resolveConfig({ mode: 'novel' }).wordConfig,
             description: '测试项目：位面掠夺系统，高武反套路喜剧题材，30章大纲，验证无污染',
             chapters: [],
-            chapterIntents: { chapters: [] }
+            chapterIntents: { chapters: {} }
         };
-        store.setItem('projects', projectId, project);
-        const retrieved = store.getItem('projects', projectId);
+        await store.setItem('projects', projectId, project);
+        const retrieved = await store.getItem('projects', projectId);
         expect(retrieved).not.toBeNull();
         expect(retrieved.name).toBe('位面掠夺·测试版');
         expect(retrieved.genre).toBe('high-martial-comedy');
     });
 
-    test('create 30 chapter outlines without pollution', () => {
+    test('create 30 chapter outlines without pollution', async () => {
         const outlines = [
             '系统觉醒，主角获得位面掠夺能力',
             '初次进入规则怪谈位面，学习基本规则',
@@ -93,10 +93,10 @@ describe('Integration: Project Creation with 30-Chapter Outline', () => {
                 _reviewRounds: 0,
                 _wordCountRetry: 0
             };
-            store.setItem('chapters', chapterId, chapter);
+            await store.setItem('chapters', chapterId, chapter);
         }
 
-        const allChapters = store.queryItems('chapters', { projectId });
+        const allChapters = await store.queryItems('chapters', { projectId });
         expect(allChapters.length).toBe(30);
 
         const chapterNumbers = allChapters.map(c => c.chapterNumber).sort((a, b) => a - b);
@@ -105,27 +105,27 @@ describe('Integration: Project Creation with 30-Chapter Outline', () => {
         }
     });
 
-    test('no cross-project pollution', () => {
+    test('no cross-project pollution', async () => {
         const otherProjectId = uuidv4();
-        store.setItem('projects', otherProjectId, {
+        await store.setItem('projects', otherProjectId, {
             id: otherProjectId,
             name: '其他项目',
             mode: 'shuangwen'
         });
 
-        const otherChapters = store.queryItems('chapters', { projectId: otherProjectId });
+        const otherChapters = await store.queryItems('chapters', { projectId: otherProjectId });
         expect(otherChapters.length).toBe(0);
 
-        const ourChapters = store.queryItems('chapters', { projectId });
+        const ourChapters = await store.queryItems('chapters', { projectId });
         expect(ourChapters.length).toBe(30);
     });
 });
 
 describe('Integration: Foundation Materials Setup', () => {
-    test('create main world materials (worldview, power-system, faction, character)', () => {
+    test('create main world materials (worldview, power-system, faction, character)', async () => {
         const worldviewId = uuidv4();
         foundationMaterialIds.push(worldviewId);
-        store.setItem('materials', worldviewId, {
+        await store.setItem('materials', worldviewId, {
             id: worldviewId,
             projectId,
             type: 'worldview',
@@ -137,7 +137,7 @@ describe('Integration: Foundation Materials Setup', () => {
 
         const powerSystemId = uuidv4();
         foundationMaterialIds.push(powerSystemId);
-        store.setItem('materials', powerSystemId, {
+        await store.setItem('materials', powerSystemId, {
             id: powerSystemId,
             projectId,
             type: 'power-system',
@@ -149,7 +149,7 @@ describe('Integration: Foundation Materials Setup', () => {
 
         const factionId = uuidv4();
         foundationMaterialIds.push(factionId);
-        store.setItem('materials', factionId, {
+        await store.setItem('materials', factionId, {
             id: factionId,
             projectId,
             type: 'faction',
@@ -161,7 +161,7 @@ describe('Integration: Foundation Materials Setup', () => {
 
         const characterId = uuidv4();
         foundationMaterialIds.push(characterId);
-        store.setItem('materials', characterId, {
+        await store.setItem('materials', characterId, {
             id: characterId,
             projectId,
             type: 'character',
@@ -172,21 +172,21 @@ describe('Integration: Foundation Materials Setup', () => {
             isFoundation: true
         });
 
-        const mats = store.queryItems('materials', { projectId });
+        const mats = await store.queryItems('materials', { projectId });
         expect(mats.length).toBe(4);
     });
 
-    test('foundation materials cannot be deleted', () => {
+    test('foundation materials cannot be deleted', async () => {
         for (const id of foundationMaterialIds) {
-            const result = store.deleteItem('materials', id);
+            const result = await store.deleteItem('materials', id);
             expect(result).toBe(false);
-            expect(store.getItem('materials', id)).not.toBeNull();
+            expect(await store.getItem('materials', id)).not.toBeNull();
         }
     });
 
-    test('create sub-plane materials with correct hierarchy', () => {
+    test('create sub-plane materials with correct hierarchy', async () => {
         const subPlaneId = uuidv4();
-        store.setItem('materials', subPlaneId, {
+        await store.setItem('materials', subPlaneId, {
             id: subPlaneId,
             projectId,
             type: 'sub-plane',
@@ -196,7 +196,7 @@ describe('Integration: Foundation Materials Setup', () => {
         });
 
         const spFactionId = uuidv4();
-        store.setItem('materials', spFactionId, {
+        await store.setItem('materials', spFactionId, {
             id: spFactionId,
             projectId,
             type: 'faction',
@@ -206,7 +206,7 @@ describe('Integration: Foundation Materials Setup', () => {
         });
 
         const spCharId = uuidv4();
-        store.setItem('materials', spCharId, {
+        await store.setItem('materials', spCharId, {
             id: spCharId,
             projectId,
             type: 'character',
@@ -216,34 +216,34 @@ describe('Integration: Foundation Materials Setup', () => {
             parentPlane: subPlaneId
         });
 
-        const spFaction = store.getItem('materials', spFactionId);
+        const spFaction = await store.getItem('materials', spFactionId);
         expect(spFaction.parentPlane).toBe(subPlaneId);
 
-        const spChar = store.getItem('materials', spCharId);
+        const spChar = await store.getItem('materials', spCharId);
         expect(spChar.parentPlane).toBe(subPlaneId);
         expect(spChar.parentFaction).toBe(spFactionId);
 
-        expect(store.isFoundationMaterial(spFaction)).toBe(false);
-        expect(store.isFoundationMaterial(spChar)).toBe(false);
+        expect(await store.isFoundationMaterial(spFaction)).toBe(false);
+        expect(await store.isFoundationMaterial(spChar)).toBe(false);
     });
 });
 
 describe('Integration: 10-Chapter Pipeline Simulation', () => {
     const writtenChapters = [];
 
-    test('simulate writer → first-review → final-editor for 10 chapters', () => {
+    test('simulate writer → first-review → final-editor for 10 chapters', async () => {
         for (let i = 0; i < 10; i++) {
             const chapterId = chapterIds[i];
-            let chapter = store.getItem('chapters', chapterId);
+            let chapter = await store.getItem('chapters', chapterId);
             expect(chapter.status).toBe('outlined');
 
             chapter.status = 'written';
             chapter.content = `第${i + 1}章正文内容：${chapter.outline}。张玄站在山巅，灵气如潮水般涌来。他深吸一口气，感受着体内翻涌的力量。远处的天机宗灯火通明，宗门大比即将开始。`;
             chapter.writerOutput = chapter.content;
             chapter._reviewRounds = 1;
-            store.setItem('chapters', chapterId, chapter);
+            await store.setItem('chapters', chapterId, chapter);
 
-            chapter = store.getItem('chapters', chapterId);
+            chapter = await store.getItem('chapters', chapterId);
             chapter.status = 'first-reviewing';
             chapter.firstReviewOutput = JSON.stringify({
                 verdict: 'pass',
@@ -251,33 +251,33 @@ describe('Integration: 10-Chapter Pipeline Simulation', () => {
                 score: 85
             });
             chapter.status = 'first-review-passed';
-            store.setItem('chapters', chapterId, chapter);
+            await store.setItem('chapters', chapterId, chapter);
 
-            chapter = store.getItem('chapters', chapterId);
+            chapter = await store.getItem('chapters', chapterId);
             chapter.status = 'final-editing';
             chapter.finalEditorOutput = chapter.content + '\n[定稿完成]';
             chapter.content = chapter.finalEditorOutput;
             chapter.status = 'approved';
-            store.setItem('chapters', chapterId, chapter);
+            await store.setItem('chapters', chapterId, chapter);
 
             writtenChapters.push(chapterId);
         }
 
-        const approved = store.queryItems('chapters', c => c.projectId === projectId && c.status === 'approved');
+        const approved = await store.queryItems('chapters', c => c.projectId === projectId && c.status === 'approved');
         expect(approved.length).toBe(10);
     });
 
-    test('chapter content is not polluted between chapters', () => {
+    test('chapter content is not polluted between chapters', async () => {
         for (let i = 0; i < 10; i++) {
-            const chapter = store.getItem('chapters', chapterIds[i]);
+            const chapter = await store.getItem('chapters', chapterIds[i]);
             expect(chapter.content).toContain(`第${i + 1}章`);
             expect(chapter.content).not.toContain(`第${i === 0 ? 10 : i}章`);
         }
     });
 
-    test('review rounds tracked correctly', () => {
+    test('review rounds tracked correctly', async () => {
         for (let i = 0; i < 10; i++) {
-            const chapter = store.getItem('chapters', chapterIds[i]);
+            const chapter = await store.getItem('chapters', chapterIds[i]);
             expect(chapter._reviewRounds).toBe(1);
             expect(chapter.status).toBe('approved');
         }
@@ -285,9 +285,9 @@ describe('Integration: 10-Chapter Pipeline Simulation', () => {
 });
 
 describe('Integration: Material Management', () => {
-    test('material-manager creates new materials with correct hierarchy', () => {
+    test('material-manager creates new materials with correct hierarchy', async () => {
         const newEquipId = uuidv4();
-        store.setItem('materials', newEquipId, {
+        await store.setItem('materials', newEquipId, {
             id: newEquipId,
             projectId,
             type: 'equipment',
@@ -297,48 +297,48 @@ describe('Integration: Material Management', () => {
             sourceChapter: 3
         });
 
-        const mat = store.getItem('materials', newEquipId);
+        const mat = await store.getItem('materials', newEquipId);
         expect(mat.type).toBe('equipment');
         expect(mat.sourceChapter).toBe(3);
-        expect(store.isFoundationMaterial(mat)).toBe(false);
+        expect(await store.isFoundationMaterial(mat)).toBe(false);
     });
 
-    test('material-manager updates existing materials', () => {
+    test('material-manager updates existing materials', async () => {
         const worldviewId = foundationMaterialIds[0];
-        const worldview = store.getItem('materials', worldviewId);
+        const worldview = await store.getItem('materials', worldviewId);
         const originalContent = worldview.currentContent;
 
         worldview.currentContent = originalContent + '\n更新：灵气浓度随位面探索递增';
         worldview.changeLog = [
             { chapter: 5, change: '灵气浓度更新', timestamp: new Date().toISOString() }
         ];
-        store.setItem('materials', worldviewId, worldview);
+        await store.setItem('materials', worldviewId, worldview);
 
-        const updated = store.getItem('materials', worldviewId);
+        const updated = await store.getItem('materials', worldviewId);
         expect(updated.currentContent).toContain('灵气浓度随位面探索递增');
         expect(updated.changeLog.length).toBe(1);
     });
 
-    test('new material validation works correctly', () => {
+    test('new material validation works correctly', async () => {
         const validMaterial = {
             type: 'character',
             name: '新角色测试',
             currentContent: '核心欲望：证道。内在矛盾：情劫。行为模式：独行。',
             parentFaction: foundationMaterialIds[2]
         };
-        const result = materialValidator.validateMaterial(validMaterial);
+        const result = await materialValidator.validateMaterial(validMaterial);
         expect(result.valid).toBe(true);
 
         const invalidMaterial = {
             type: 'character',
             name: '无效角色'
         };
-        const invalidResult = materialValidator.validateMaterial(invalidMaterial);
+        const invalidResult = await materialValidator.validateMaterial(invalidMaterial);
         expect(invalidResult.valid).toBe(false);
     });
 
-    test('material type validation rejects unknown types', () => {
-        const result = materialValidator.validateMaterial({
+    test('material type validation rejects unknown types', async () => {
+        const result = await materialValidator.validateMaterial({
             type: 'unknown-type',
             name: '测试'
         });
@@ -349,7 +349,7 @@ describe('Integration: Material Management', () => {
 describe('Integration: Foreshadow Recovery Mechanism', () => {
     const foreshadowIds = [];
 
-    test('create foreshadowing materials with recovery windows', () => {
+    test('create foreshadowing materials with recovery windows', async () => {
         const foreshadows = [
             { name: '镜中预言', targetChapter: 21, content: '镜中世界预言：当三镜合一，位面门将开。预期回收窗口：第21章。关联角色：张玄、镜灵。' },
             { name: '宗门密令', targetChapter: 22, content: '天机宗密令：关于位面掠夺的真相。预期回收窗口：第22章。关联角色：宗主。' },
@@ -359,7 +359,7 @@ describe('Integration: Foreshadow Recovery Mechanism', () => {
         for (const f of foreshadows) {
             const id = uuidv4();
             foreshadowIds.push(id);
-            store.setItem('materials', id, {
+            await store.setItem('materials', id, {
                 id,
                 projectId,
                 type: 'foreshadowing',
@@ -371,37 +371,37 @@ describe('Integration: Foreshadow Recovery Mechanism', () => {
             });
         }
 
-        const allForeshadows = store.queryItems('materials', m => m.projectId === projectId && m.type === 'foreshadowing');
+        const allForeshadows = await store.queryItems('materials', m => m.projectId === projectId && m.type === 'foreshadowing');
         expect(allForeshadows.length).toBe(3);
     });
 
-    test('foreshadowing validation works', () => {
+    test('foreshadowing validation works', async () => {
         for (const id of foreshadowIds) {
-            const f = store.getItem('materials', id);
+            const f = await store.getItem('materials', id);
             const validation = MATERIAL_STANDARDS.foreshadowing.check(f.currentContent);
             expect(validation.valid).toBe(true);
         }
     });
 
-    test('foreshadow recovery updates status', () => {
-        const f = store.getItem('materials', foreshadowIds[0]);
+    test('foreshadow recovery updates status', async () => {
+        const f = await store.getItem('materials', foreshadowIds[0]);
         f.status = 'recovered';
         f.recoveredInChapter = 21;
         f.recoveryContent = '三镜合一，位面门开启，张玄踏入新世界';
-        store.setItem('materials', foreshadowIds[0], f);
+        await store.setItem('materials', foreshadowIds[0], f);
 
-        const updated = store.getItem('materials', foreshadowIds[0]);
+        const updated = await store.getItem('materials', foreshadowIds[0]);
         expect(updated.status).toBe('recovered');
         expect(updated.recoveredInChapter).toBe(21);
     });
 
-    test('unrecovered foreshadows remain planted', () => {
-        const planted = store.queryItems('materials', m =>
+    test('unrecovered foreshadows remain planted', async () => {
+        const planted = await store.queryItems('materials', m =>
             m.projectId === projectId && m.type === 'foreshadowing' && m.status === 'planted'
         );
         expect(planted.length).toBe(2);
 
-        const recovered = store.queryItems('materials', m =>
+        const recovered = await store.queryItems('materials', m =>
             m.projectId === projectId && m.type === 'foreshadowing' && m.status === 'recovered'
         );
         expect(recovered.length).toBe(1);
@@ -440,8 +440,8 @@ describe('Integration: Genre Plugin Isolation', () => {
 });
 
 describe('Integration: Data Integrity Across Operations', () => {
-    test('project material count is consistent', () => {
-        const allMats = store.queryItems('materials', { projectId });
+    test('project material count is consistent', async () => {
+        const allMats = await store.queryItems('materials', { projectId });
         const matTypes = {};
         for (const m of allMats) {
             matTypes[m.type] = (matTypes[m.type] || 0) + 1;
@@ -449,41 +449,41 @@ describe('Integration: Data Integrity Across Operations', () => {
         expect(allMats.length).toBeGreaterThan(0);
     });
 
-    test('chapter ordering is preserved', () => {
-        const chapters = store.queryItems('chapters', { projectId });
+    test('chapter ordering is preserved', async () => {
+        const chapters = await store.queryItems('chapters', { projectId });
         const sorted = [...chapters].sort((a, b) => a.chapterNumber - b.chapterNumber);
         for (let i = 1; i < sorted.length; i++) {
             expect(sorted[i].chapterNumber).toBeGreaterThan(sorted[i - 1].chapterNumber);
         }
     });
 
-    test('no data loss after multiple updates', () => {
+    test('no data loss after multiple updates', async () => {
         const chapterId = chapterIds[0];
-        const original = store.getItem('chapters', chapterId);
+        const original = await store.getItem('chapters', chapterId);
 
         for (let i = 0; i < 10; i++) {
-            const ch = store.getItem('chapters', chapterId);
+            const ch = await store.getItem('chapters', chapterId);
             ch._reviewRounds = (ch._reviewRounds || 0) + 1;
-            store.setItem('chapters', chapterId, ch);
+            await store.setItem('chapters', chapterId, ch);
         }
 
-        const final = store.getItem('chapters', chapterId);
+        const final = await store.getItem('chapters', chapterId);
         expect(final._reviewRounds).toBe((original._reviewRounds || 0) + 10);
         expect(final.outline).toBe(original.outline);
         expect(final.projectId).toBe(projectId);
     });
 
-    test('concurrent material updates do not corrupt data', () => {
+    test('concurrent material updates do not corrupt data', async () => {
         const matId = foundationMaterialIds[0];
-        const original = store.getItem('materials', matId);
+        const original = await store.getItem('materials', matId);
 
         for (let i = 0; i < 20; i++) {
-            const mat = store.getItem('materials', matId);
+            const mat = await store.getItem('materials', matId);
             mat.updateCount = (mat.updateCount || 0) + 1;
-            store.setItem('materials', matId, mat);
+            await store.setItem('materials', matId, mat);
         }
 
-        const final = store.getItem('materials', matId);
+        const final = await store.getItem('materials', matId);
         expect(final.updateCount).toBe(20);
         expect(final.name).toBe(original.name);
         expect(final.type).toBe('worldview');

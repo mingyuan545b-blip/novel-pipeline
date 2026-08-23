@@ -14,7 +14,13 @@ describe('auth middleware', () => {
             statusCode: 200,
             body: null,
             status(code) { res.statusCode = code; return res; },
-            json(data) { res.body = data; return res; }
+            json(data) { res.body = data; return res; },
+            apiError(status, error, code, details = null) {
+                res.statusCode = status;
+                res.body = { success: false, error, code, traceId: 'test-trace', timestamp: new Date().toISOString() };
+                if (details) res.body.details = details;
+                return res;
+            }
         };
         return res;
     }

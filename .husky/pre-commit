@@ -1,0 +1,15 @@
+# pre-commit hook: 运行PROJECT_STANDARDS校验 + lint-staged快速校验暂存区 + 质量审计
+# 违规代码将被阻止提交
+echo "▶ Running verifyProjectStandards..."
+node scripts/verifyProjectStandards.js || exit 1
+
+echo "▶ Running lint-staged..."
+npx lint-staged || exit 1
+
+echo "▶ Running audit-hardcode (硬编码+行数审计)..."
+node scripts/audit-hardcode.js || exit 1
+
+echo "▶ Running audit-cascade-delete --ci (级联删除注册检查)..."
+node scripts/audit-cascade-delete.js --ci || exit 1
+
+echo "✅ All pre-commit checks passed"

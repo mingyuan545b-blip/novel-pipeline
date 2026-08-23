@@ -1,0 +1,12 @@
+# pre-push hook: 运行文档同步检查 + 配置测试同步检查
+# 提醒性质（不阻断推送，仅输出警告），避免历史积累的git diff误报阻断正常推送
+echo "▶ Running audit-doc-sync (文档同步检查)..."
+node scripts/audit-doc-sync.js
+# 不用 || exit 1，因为是提醒性质，历史积累的变更会触发误报
+
+echo "▶ Running audit-config-test-sync (配置-测试同步检查)..."
+node scripts/audit-config-test-sync.js
+# 同上，提醒性质
+
+echo "ℹ 以上为同步提醒，请人工确认是否需更新文档/测试"
+echo "✅ Pre-push check completed (warnings only, non-blocking)"

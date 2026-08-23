@@ -134,8 +134,8 @@ describe('MaterialValidator integration', () => {
         validator = require('../../server/services/materialValidator');
     });
 
-    test('validateHierarchy rejects faction without parentPlane', () => {
-        const result = validator.validateHierarchy({
+    test('validateHierarchy rejects faction without parentPlane', async () => {
+        const result = await validator.validateHierarchy({
             type: 'faction',
             name: '测试势力',
             parentPlane: undefined
@@ -143,8 +143,8 @@ describe('MaterialValidator integration', () => {
         expect(result.valid).toBe(false);
     });
 
-    test('validateHierarchy accepts faction with parentPlane', () => {
-        const result = validator.validateHierarchy({
+    test('validateHierarchy accepts faction with parentPlane', async () => {
+        const result = await validator.validateHierarchy({
             type: 'faction',
             name: '测试势力',
             parentPlane: null
@@ -152,8 +152,8 @@ describe('MaterialValidator integration', () => {
         expect(result.valid).toBe(true);
     });
 
-    test('validateHierarchy rejects character without parentFaction', () => {
-        const result = validator.validateHierarchy({
+    test('validateHierarchy rejects character without parentFaction', async () => {
+        const result = await validator.validateHierarchy({
             type: 'character',
             name: '测试角色',
             parentFaction: undefined
@@ -161,8 +161,8 @@ describe('MaterialValidator integration', () => {
         expect(result.valid).toBe(false);
     });
 
-    test('validateHierarchy accepts character with parentFaction', () => {
-        const result = validator.validateHierarchy({
+    test('validateHierarchy accepts character with parentFaction', async () => {
+        const result = await validator.validateHierarchy({
             type: 'character',
             name: '测试角色',
             parentFaction: 'fac-1'
@@ -170,8 +170,8 @@ describe('MaterialValidator integration', () => {
         expect(result.valid).toBe(true);
     });
 
-    test('validateMaterial rejects invalid type', () => {
-        const result = validator.validateMaterial({
+    test('validateMaterial rejects invalid type', async () => {
+        const result = await validator.validateMaterial({
             type: 'invalid-type',
             name: '测试'
         });
@@ -179,8 +179,8 @@ describe('MaterialValidator integration', () => {
         expect(result.message).toBeDefined();
     });
 
-    test('validateMaterial accepts valid material', () => {
-        const result = validator.validateMaterial({
+    test('validateMaterial accepts valid material', async () => {
+        const result = await validator.validateMaterial({
             type: 'worldview',
             name: '测试世界观',
             currentContent: '边界：不可。违反后果：天谴。',
@@ -189,13 +189,13 @@ describe('MaterialValidator integration', () => {
         expect(result.valid).toBe(true);
     });
 
-    test('validateMaterialBatch processes multiple materials', () => {
+    test('validateMaterialBatch processes multiple materials', async () => {
         const materials = [
             { type: 'worldview', name: '世界1', currentContent: '边界：不可。违反后果：天谴。', parentPlane: null },
             { type: 'character', name: '角色1', parentFaction: 'fac-1' },
             { type: 'invalid', name: '无效' }
         ];
-        const result = validator.validateMaterialBatch(materials);
+        const result = await validator.validateMaterialBatch(materials);
         expect(result.total).toBe(3);
         expect(result.invalid).toBeGreaterThanOrEqual(1);
     });

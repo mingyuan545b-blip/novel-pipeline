@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - run: npx eslint server --max-warnings=0
+
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - run: npx jest tests/unit --coverage --ci
+      - name: Upload backend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: coverage/
+
+  backend-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - name: Integration tests
+        run: node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration --testTimeout=120000
+
+  backend-e2e-material:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - name: E2E material injection tests
+        run: node --experimental-vm-modules node_modules/jest/bin/jest.js tests/e2e/e2eMaterialInjection.test.js --testTimeout=60000
+
+  frontend-lint:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: client } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - run: npx eslint src --ignore-pattern "__tests__" --max-warnings=0
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: client } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - run: npx vitest run --coverage
+      - name: Upload frontend coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: client/coverage/
+
+  line-count-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check 200-line limit
+        run: |
+          node -e "
+          const fs=require('fs'),p=require('path');
+          function walk(d,skip){
+            let r=[];
+            try{fs.readdirSync(d).forEach(f=>{
+              const fp=p.join(d,f),s=fs.statSync(fp);
+              if(s.isDirectory()&&!f.startsWith('.')&&f!=='node_modules'&&!skip.some(s=>fp.includes(s)))
+                r=r.concat(walk(fp,skip));
+              else if((f.endsWith('.js')||f.endsWith('.jsx'))&&!skip.some(s=>fp.includes(s))){
+                const c=fs.readFileSync(fp,'utf8').split('\n').length;
+                if(c>200) r.push(c+' '+fp);
+              }
+            })}catch(e){}
+            return r;
+          }
+          const over=[...walk('./server',['/scripts/','/__tests__/']),...walk('./client/src',['/__tests__/'])];
+          if(over.length){console.error('Files over 200 lines:');over.forEach(f=>console.error(f));process.exit(1)}
+          else console.log('All files within 200-line limit');
+          "
+
+  doc-freshness-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - run: node scripts/verifyDocFreshness.js
+
+  e2e-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20.x }
+      - run: npm install
+      - name: Module load smoke test
+        run: node tests/e2e/e2eSmokeTest.js

@@ -1,134 +1,156 @@
-const { PROVIDERS, resolveStepConfig, resolveConfig, validateConfig, getAvailableProviders, getOutlineApiConfig, fillProviderConfig } = require('../../server/config/providerRegistry');
+const { PROVIDERS, getProviderList, resolveProviderKey, getProviderConfig, fillProviderConfig, validateConfig, getAvailableProviders, getOutlineApiConfig } = require('../../server/config/providerRegistry');
 
-describe('Provider Registry', () => {
-    test('PROVIDERS has expected providers', () => {
-        const expected = ['aliyunCoding', 'minimax', 'openai', 'deepseek', 'siliconflow', 'lmstudio', 'zhipu', 'moonshot', 'custom'];
-        for (const id of expected) {
-            expect(PROVIDERS[id]).toBeDefined();
-            expect(PROVIDERS[id].id).toBe(id);
-            expect(PROVIDERS[id].name).toBeDefined();
-            expect(PROVIDERS[id].baseURL).toBeDefined();
-        }
+describe('providerRegistry', () => {
+    const originalEnv = { ...process.env };
+
+    afterEach(() => {
+        process.env = { ...originalEnv };
     });
 
-    test('each provider has required fields', () => {
-        for (const [id, p] of Object.entries(PROVIDERS)) {
-            expect(p.id).toBe(id);
-            expect(p.name).toBeTruthy();
-            expect(p.defaultModel).toBeDefined();
-            expect(p.models).toBeInstanceOf(Array);
-            expect(typeof p.needsGroupId).toBe('boolean');
-        }
-    });
+    describe('PROVIDERS', () => {
+        test('has aliyunCoding', () => {
+            expect(PROVIDERS.aliyunCoding).toBeDefined();
+            expect(PROVIDERS.aliyunCoding.name).toContain('阿里云');
+            expect(PROVIDERS.aliyunCoding.envKey).toBe('ALIYUN_CODING_API_KEY');
+        });
 
-    test('minimax needs groupId', () => {
-        expect(PROVIDERS.minimax.needsGroupId).toBe(true);
-        expect(PROVIDERS.minimax.envGroupId).toBe('MINIMAX_GROUP_ID');
-    });
+        test('has deepseek', () => {
+            expect(PROVIDERS.deepseek).toBeDefined();
+            expect(PROVIDERS.deepseek.envKey).toBe('DEEPSEEK_API_KEY');
+        });
 
-    test('lmstudio has noApiKey', () => {
-        expect(PROVIDERS.lmstudio.noApiKey).toBe(true);
-    });
-});
-
-describe('fillProviderConfig', () => {
-    test('fills missing fields from provider defaults', () => {
-        const config = fillProviderConfig({ provider: 'minimax' });
-        expect(config.provider).toBe('minimax');
-        expect(config.model).toBe('MiniMax-M2.7');
-        expect(config.baseURL).toContain('minimaxi');
-    });
-
-    test('preserves explicit values', () => {
-        const config = fillProviderConfig({ provider: 'minimax', model: 'MiniMax-Text-01', apiKey: 'test-key' });
-        expect(config.model).toBe('MiniMax-Text-01');
-        expect(config.apiKey).toBe('test-key');
-    });
-
-    test('lmstudio gets default apiKey', () => {
-        const config = fillProviderConfig({ provider: 'lmstudio' });
-        expect(config.apiKey).toBe('lmstudio');
-    });
-});
-
-describe('validateConfig', () => {
-    test('valid config passes', () => {
-        const result = validateConfig({ provider: 'minimax', apiKey: 'test', model: 'MiniMax-M2.7' });
-        expect(result.valid).toBe(true);
-    });
-
-    test('missing provider fails', () => {
-        const result = validateConfig({ apiKey: 'test', model: 'test' });
-        expect(result.valid).toBe(false);
-    });
-
-    test('missing apiKey fails for non-lmstudio', () => {
-        const result = validateConfig({ provider: 'minimax', model: 'test' });
-        expect(result.valid).toBe(false);
-    });
-
-    test('lmstudio without apiKey is valid', () => {
-        const result = validateConfig({ provider: 'lmstudio', model: 'default' });
-        expect(result.valid).toBe(true);
-    });
-});
-
-describe('resolveStepConfig', () => {
-    test('returns default config without project', () => {
-        const config = resolveStepConfig('writer', null);
-        expect(config.provider).toBeDefined();
-        expect(config.model).toBeDefined();
-    });
-
-    test('project-level config takes priority', () => {
-        const project = {
-            agentModelConfig: {
-                writer: { provider: 'deepseek', apiKey: 'test-key', model: 'deepseek-chat' }
+        test('each provider has required fields', () => {
+            for (const [id, p] of Object.entries(PROVIDERS)) {
+                expect(p.name).toBeDefined();
+                if (id === 'custom') continue;
+                expect(p.defaultModel).toBeDefined();
+                if (!p.noApiKey) expect(p.envKey).toBeDefined();
             }
-        };
-        const config = resolveStepConfig('writer', project);
-        expect(config.provider).toBe('deepseek');
-        expect(config.model).toBe('deepseek-chat');
-    });
-
-    test('keyId-based config resolves from store', () => {
-        const project = {
-            agentModelConfig: {
-                writer: { keyId: 'nonexistent-key', provider: 'minimax' }
-            }
-        };
-        const config = resolveStepConfig('writer', project);
-        expect(config).toBeDefined();
-    });
-});
-
-describe('getAvailableProviders', () => {
-    test('returns list of all providers', () => {
-        const providers = getAvailableProviders();
-        expect(providers.length).toBeGreaterThanOrEqual(8);
-        providers.forEach(p => {
-            expect(p.id).toBeDefined();
-            expect(p.label).toBeDefined();
-            expect(typeof p.available).toBe('boolean');
         });
     });
-});
 
-describe('llmConfig backward compatibility', () => {
-    test('llmConfig re-exports resolveStepConfig', () => {
-        const llmConfig = require('../../server/services/llmConfig');
-        expect(llmConfig.resolveStepConfig).toBeDefined();
-        expect(typeof llmConfig.resolveStepConfig).toBe('function');
+    describe('getProviderList', () => {
+        test('returns array of provider info', () => {
+            const list = getProviderList();
+            expect(Array.isArray(list)).toBe(true);
+            expect(list.length).toBeGreaterThan(0);
+        });
+
+        test('each item has key, name, available', () => {
+            const list = getProviderList();
+            for (const p of list) {
+                expect(p.key).toBeDefined();
+                expect(p.name).toBeDefined();
+                expect(typeof p.available).toBe('boolean');
+            }
+        });
     });
 
-    test('llmConfig re-exports resolveConfig', () => {
-        const llmConfig = require('../../server/services/llmConfig');
-        expect(llmConfig.resolveConfig).toBeDefined();
-        expect(typeof llmConfig.resolveConfig).toBe('function');
+    describe('resolveProviderKey', () => {
+        test('resolves direct key', () => {
+            expect(resolveProviderKey('aliyunCoding')).toBe('aliyunCoding');
+        });
+
+        test('resolves alias', () => {
+            expect(resolveProviderKey('aliyun-coding')).toBe('aliyunCoding');
+            expect(resolveProviderKey('aliyun')).toBe('aliyunCoding');
+        });
+
+        test('returns null for unknown key', () => {
+            expect(resolveProviderKey('unknown-provider')).toBeNull();
+        });
     });
 
-    test('llmConfig PROVIDER_DEFAULTS is PROVIDERS', () => {
-        const llmConfig = require('../../server/services/llmConfig');
-        expect(llmConfig.PROVIDER_DEFAULTS).toBe(PROVIDERS);
+    describe('getProviderConfig', () => {
+        test('returns provider config by key', () => {
+            const config = getProviderConfig('aliyunCoding');
+            expect(config).toBeDefined();
+            expect(config.name).toContain('阿里云');
+        });
+
+        test('returns null for unknown provider', () => {
+            expect(getProviderConfig('unknown')).toBeNull();
+        });
+
+        test('resolves aliases', () => {
+            const config = getProviderConfig('aliyun');
+            expect(config).toBeDefined();
+        });
+    });
+
+    describe('fillProviderConfig', () => {
+        test('fills aliyunCoding from env', () => {
+            process.env.ALIYUN_CODING_API_KEY = 'sk-test';
+            const config = fillProviderConfig({ provider: 'aliyunCoding' });
+            expect(config.apiKey).toBe('sk-test');
+            expect(config.model).toBeDefined();
+            expect(config.baseURL).toBeDefined();
+        });
+
+        test('preserves explicit values', () => {
+            const config = fillProviderConfig({ provider: 'aliyunCoding', apiKey: 'explicit', model: 'custom' });
+            expect(config.apiKey).toBe('explicit');
+            expect(config.model).toBe('custom');
+        });
+
+        test('falls back unknown provider to aliyunCoding', () => {
+            const config = fillProviderConfig({ provider: 'unknown', apiKey: 'test' });
+            expect(config.provider).toBe('aliyunCoding');
+        });
+    });
+
+    describe('validateConfig', () => {
+        test('validates complete config', () => {
+            const result = validateConfig({ provider: 'aliyunCoding', apiKey: 'sk-test', model: 'qwen' });
+            expect(result.valid).toBe(true);
+            expect(result.errors).toEqual([]);
+        });
+
+        test('invalidates missing apiKey', () => {
+            const result = validateConfig({ provider: 'aliyunCoding', model: 'qwen' });
+            expect(result.valid).toBe(false);
+            expect(result.errors.length).toBeGreaterThan(0);
+        });
+
+        test('invalidates missing model', () => {
+            const result = validateConfig({ provider: 'aliyunCoding', apiKey: 'sk-test' });
+            expect(result.valid).toBe(false);
+        });
+    });
+
+    describe('getAvailableProviders', () => {
+        test('returns providers with availability info', () => {
+            process.env.ALIYUN_CODING_API_KEY = 'sk-test';
+            const providers = getAvailableProviders();
+            expect(providers.length).toBeGreaterThan(0);
+            const ac = providers.find(p => p.id === 'aliyunCoding');
+            expect(ac).toBeDefined();
+            expect(ac.available).toBe(true);
+        });
+    });
+
+    describe('getOutlineApiConfig', () => {
+        test('returns aliyunCoding config by default', () => {
+            process.env.ALIYUN_CODING_API_KEY = 'sk-test';
+            delete process.env.LLM_PROVIDER;
+            const config = getOutlineApiConfig();
+            expect(config).toBeDefined();
+            expect(config.provider).toBe('aliyunCoding');
+        });
+
+        test('returns deepseek when configured', () => {
+            process.env.LLM_PROVIDER = 'deepseek';
+            process.env.DEEPSEEK_API_KEY = 'ds-test';
+            const config = getOutlineApiConfig();
+            expect(config.provider).toBe('deepseek');
+        });
+
+        test('returns undefined when no keys available', () => {
+            delete process.env.ALIYUN_CODING_API_KEY;
+            delete process.env.LLM_PROVIDER;
+            delete process.env.DEEPSEEK_API_KEY;
+            const config = getOutlineApiConfig();
+            expect(config).toBeUndefined();
+        });
     });
 });

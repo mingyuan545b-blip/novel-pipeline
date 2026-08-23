@@ -6,25 +6,74 @@
   "scripts": {
     "check": "node scripts/health-check.js",
     "check:all": "node scripts/health-check.js && node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose",
-    "start": "node server/index.js",
+    "start": "node scripts/serverStart.js --start",
+    "stop": "node scripts/serverStart.js --stop",
+    "restart": "node scripts/serverStart.js --restart",
+    "server:status": "node scripts/serverStart.js --status",
+    "kill:port": "node scripts/killPort.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --verbose",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration --verbose --testTimeout=120000",
     "migrate": "node server/db/migrate.js migrate",
     "migrate:verify": "node server/db/migrate.js verify",
-    "migrate:backup": "node server/db/migrate.js backup"
+    "migrate:backup": "node server/db/migrate.js backup",
+    "lint": "npx eslint server/services/ server/core/ server/config/ server/middleware/ server/shared/ --ext .js",
+    "lint:fix": "npx eslint server/services/ server/core/ server/config/ server/middleware/ server/shared/ --ext .js --fix",
+    "test:smoke": "node server/scripts/smoke-test.js",
+    "test:e2e": "node server/scripts/e2e-test.js",
+    "test:integrity": "node server/scripts/data-integrity-test.js",
+    "test:errors": "node server/scripts/comprehensiveStartupVerify.js",
+    "test:all": "node server/scripts/smoke-test.js && node server/scripts/e2e-test.js && node server/scripts/data-integrity-test.js",
+    "test:e2e-smoke": "node -e \"process.env.NODE_PATH='server';require('./tests/e2e/e2eSmokeTest')\"",
+    "test:e2e-api": "node tests/e2e/e2eApiTest.js",
+    "ci:check": "node -e \"process.env.NODE_PATH='server';require('./tests/e2e/e2eSmokeTest')\" && node scripts/importAudit.js && node scripts/verifyMaterialMigration.js && node scripts/verifyConstraintChain.js && node scripts/verifyProjectStandards.js && node scripts/verifyGuardChain.js && node scripts/verifyAuditConsistency.js && node scripts/verifyWordConfigSchema.js && node scripts/verifyTargetChaptersSchema.js && node scripts/verifyStyleProfileSchema.js && node scripts/verifyApiContract.js && node scripts/verifyChapterIntentsSchema.js && node scripts/verifyGenrePluginConsistency.js && node scripts/verifyCascadeDelete.js && node scripts/verifyFrontendComplexity.js && node scripts/verifyRouteRegistration.js && node scripts/auditApiRegistry.js && node scripts/verifyDataSourceConsistency.js && node scripts/verifyDocFreshness.js && node scripts/verifyErrorTraceability.js && node scripts/deepAudit.js && npx eslint server/ --ext .js --max-warnings=0 && npm run coverage:check && node scripts/perfBaselineCheck.js && node scripts/audit-leak-fix.js --ci",
+    "audit:api": "node scripts/apiLiveAudit.js",
+    "audit:api-registry": "node scripts/auditApiRegistry.js",
+    "audit:imports": "node scripts/importAudit.js && node scripts/frontendImportAudit.js",
+    "audit:dead": "node scripts/deadCodeAudit.js",
+    "audit:hardcode": "node scripts/audit-hardcode.js",
+    "audit:cascade": "node scripts/audit-cascade-delete.js --ci",
+    "audit:doc-sync": "node scripts/audit-doc-sync.js",
+    "audit:config-test-sync": "node scripts/audit-config-test-sync.js",
+    "audit:leak-fix": "node scripts/audit-leak-fix.js --full",
+    "audit:perf-baseline": "node scripts/perfBaselineCheck.js",
+    "audit:all": "node scripts/importAudit.js && node scripts/frontendImportAudit.js && node scripts/deadCodeAudit.js && node scripts/audit-hardcode.js && node scripts/audit-cascade-delete.js --ci && node scripts/audit-doc-sync.js && node scripts/audit-config-test-sync.js && node scripts/audit-leak-fix.js --full",
+    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --coverage",
+    "coverage:summary": "node scripts/coverage-summary.js",
+    "coverage:check": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit --coverage --ci",
+    "verify:migration": "node scripts/verifyMaterialMigration.js",
+    "verify:constraint": "node scripts/verifyConstraintChain.js",
+    "verify:all": "node scripts/verifyMaterialMigration.js && node scripts/verifyConstraintChain.js && node scripts/verifyRegistryConsistency.js",
+    "prepare": "husky"
   },
   "dependencies": {
-    "axios": "^1.7.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.0",
-    "express": "^4.21.0",
+    "axios": "^1.16.1",
+    "better-sqlite3": "^12.10.0",
+    "dotenv": "^17.4.2",
     "express-rate-limit": "^8.5.2",
     "express-validator": "^7.3.2",
+    "js-yaml": "^5.2.0",
+    "pg": "^8.21.0",
     "sql.js": "^1.11.0",
-    "uuid": "^9.0.0"
+    "ws": "^8.21.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "@vitest/coverage-v8": "^4.1.9",
+    "eslint": "^9.0.0",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "lint-staged": "^15.2.0",
+    "vitest": "^4.1.9"
+  },
+  "lint-staged": {
+    "server/**/*.js": [
+      "eslint --max-warnings=0"
+    ],
+    "scripts/**/*.js": [
+      "eslint --max-warnings=0"
+    ],
+    "tests/**/*.js": [
+      "eslint --max-warnings=0"
+    ]
   }
 }

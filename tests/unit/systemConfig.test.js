@@ -1,44 +1,36 @@
-const { getModeConfig, getModePipelineConfig, getAgentConfig, resolveModelBudget, resolveModelCategory, MODE_CONFIGS, MODE_PIPELINE_CONFIGS, AGENT_DEFAULTS, CONTEXT_BUDGET_MODELS, STORE_SIZE_LIMITS, PIPELINE } = require('../../server/config/systemConfig');
+const { resolveConfig } = require('../../server/config/index');
+const { getDefaultsForGenre, NOVEL_DEFAULTS } = require('../../server/config/genreDefaults');
+const { getAgentConfig, resolveModelBudget, resolveModelCategory, AGENT_DEFAULTS, CONTEXT_BUDGET_MODELS, STORE_SIZE_LIMITS, PIPELINE } = require('../../server/config/systemConfig');
 
-describe('SystemConfig - Mode Configs', () => {
-    test('novel mode has correct defaults', () => {
-        const config = getModeConfig('novel');
-        expect(config.TARGET_MIN_WORDS).toBe(2200);
-        expect(config.MAX_CHAPTER_WORDS).toBe(3500);
+describe('SystemConfig - Genre Defaults', () => {
+    test('novel defaults have correct values', () => {
+        expect(NOVEL_DEFAULTS.targetMinWords).toBe(2400);
+        expect(NOVEL_DEFAULTS.maxChapterWords).toBe(3500);
+        expect(NOVEL_DEFAULTS.maxRounds).toBe(7);
     });
 
-    test('shuangwen mode has correct defaults', () => {
-        const config = getModeConfig('shuangwen');
-        expect(config.TARGET_MIN_WORDS).toBe(1800);
-        expect(config.MAX_CHAPTER_WORDS).toBe(2800);
-    });
-
-    test('tomato-short mode has correct defaults', () => {
-        const config = getModeConfig('tomato-short');
-        expect(config.TARGET_MIN_WORDS).toBe(1900);
-        expect(config.REJECT_MIN_WORDS).toBe(1850);
-    });
-
-    test('unknown mode falls back to novel', () => {
-        const config = getModeConfig('unknown');
-        expect(config.TARGET_MIN_WORDS).toBe(2200);
+    test('unknown mode falls back to novel defaults', () => {
+        const defaults = getDefaultsForGenre(null, { mode: 'unknown' });
+        expect(defaults.targetMinWords).toBe(2400);
+        expect(defaults.maxRounds).toBe(7);
     });
 });
 
-describe('SystemConfig - Pipeline Configs', () => {
-    test('novel pipeline has 7 max rounds', () => {
-        const config = getModePipelineConfig('novel');
-        expect(config.MAX_ROUNDS).toBe(7);
+describe('SystemConfig - resolveConfig', () => {
+    test('novel mode resolves with correct word config', () => {
+        const config = resolveConfig(null, { mode: 'novel' });
+        expect(config.word.targetMin).toBe(2400);
+        expect(config.chapter.maxRounds).toBe(7);
     });
 
-    test('shuangwen pipeline has 3 max rounds', () => {
-        const config = getModePipelineConfig('shuangwen');
-        expect(config.MAX_ROUNDS).toBe(3);
+    test('project wordConfig overrides defaults', () => {
+        const config = resolveConfig(null, { mode: 'novel', wordConfig: { targetMin: 3000 } });
+        expect(config.word.targetMin).toBe(3000);
     });
 
     test('unknown mode falls back to novel', () => {
-        const config = getModePipelineConfig('unknown');
-        expect(config.MAX_ROUNDS).toBe(7);
+        const config = resolveConfig(null, { mode: 'unknown' });
+        expect(config.chapter.maxRounds).toBe(7);
     });
 });
 
@@ -63,7 +55,7 @@ describe('SystemConfig - Agent Configs', () => {
 describe('SystemConfig - Model Budget Resolution', () => {
     test('known models return correct budget', () => {
         expect(resolveModelBudget('qwen3.6-plus')).toBe(800000);
-        expect(resolveModelBudget('MiniMax-M2.7')).toBe(32000);
+        expect(resolveModelBudget('qwen-turbo')).toBe(32000);
         expect(resolveModelBudget('deepseek-chat')).toBe(24000);
     });
 
@@ -84,7 +76,7 @@ describe('SystemConfig - Model Category Resolution', () => {
     });
 
     test('compact models identified correctly', () => {
-        expect(resolveModelCategory('MiniMax-M2.7')).toBe('compact');
+        expect(resolveModelCategory('qwen-turbo')).toBe('compact');
         expect(resolveModelCategory('gpt-4o-mini')).toBe('compact');
     });
 

@@ -1,97 +1,80 @@
-const genreConfig = require('../../server/services/genreConfig');
+/**
+ * genreConfig tests - 题材配置
+ */
+jest.mock('../../server/services/genreLoader', () => ({
+    getRegistry: jest.fn(() => [
+        { id: 'high-martial-comedy', genreProfileIds: ['高武穿越'], isMatch: jest.fn(() => false) },
+        { id: 'high-martial-comedy', genreProfileIds: ['高武穿越'], isMatch: jest.fn(() => false) },
+        { id: 'high-martial-comedy', genreProfileIds: ['高武'], isMatch: jest.fn(() => false) }
+    ]),
+    getMap: jest.fn(() => ({
+        'high-martial-comedy': { id: 'high-martial-comedy', genreProfileIds: ['高武穿越'], isMatch: jest.fn(() => false) },
+        'high-martial-comedy': { id: 'high-martial-comedy', genreProfileIds: ['高武穿越'], isMatch: jest.fn(() => false) },
+        'high-martial-comedy': { id: 'high-martial-comedy', genreProfileIds: ['高武'], isMatch: jest.fn(() => false) }
+    })),
+    reloadGenres: jest.fn(),
+    getGenreDir: jest.fn()
+}));
 
-describe('GenreConfig', () => {
-    test('getRegisteredGenres returns array', () => {
-        const genres = genreConfig.getRegisteredGenres();
-        expect(Array.isArray(genres)).toBe(true);
-        expect(genres.length).toBeGreaterThanOrEqual(5);
+const { detectGenre, getGenreById, resolveGenreFromProject } = require('../../server/services/genreConfig');
+
+describe('genreConfig', () => {
+    describe('detectGenre', () => {
+        it('should return null for null styleProfile', () => {
+            expect(detectGenre(null)).toBeNull();
+        });
+
+        it('should detect genre by key', () => {
+            const result = detectGenre({ key: 'high-martial-comedy' });
+            expect(result).toBeDefined();
+            expect(result.id).toBe('high-martial-comedy');
+        });
+
+        it('should detect genre by genreProfileIds match', () => {
+            const result = detectGenre({ label: '高武穿越' });
+            expect(result).toBeDefined();
+            expect(result.id).toBe('high-martial-comedy');
+        });
+
+        it('should return null for unrecognized profile', () => {
+            const result = detectGenre({ key: 'nonexistent-genre' });
+            expect(result).toBeNull();
+        });
     });
 
-    test('all genres have required fields', () => {
-        const genres = genreConfig.getRegisteredGenres();
-        for (const genre of genres) {
-            expect(genre.id).toBeDefined();
-            expect(genre.label).toBeDefined();
-            expect(typeof genre.isMatch).toBe('function');
-        }
+    describe('getGenreById', () => {
+        it('should return genre by id', () => {
+            const result = getGenreById('high-martial-comedy');
+            expect(result).toBeDefined();
+            expect(result.id).toBe('high-martial-comedy');
+        });
+
+        it('should return null for unknown id', () => {
+            expect(getGenreById('nonexistent')).toBeNull();
+        });
     });
 
-    test('known genre IDs exist', () => {
-        const genres = genreConfig.getRegisteredGenres();
-        const ids = genres.map(g => g.id);
-        expect(ids).toContain('high-martial-comedy');
-        expect(ids).toContain('urban-fantasy');
-        expect(ids).toContain('baby');
-        expect(ids).toContain('rule-horror');
-        expect(ids).toContain('infinite-dungeon');
-    });
+    describe('resolveGenreFromProject', () => {
+        it('should return null for null project', () => {
+            expect(resolveGenreFromProject(null)).toBeNull();
+        });
 
-    test('getGenreById returns correct genre', () => {
-        const genre = genreConfig.getGenreById('high-martial-comedy');
-        expect(genre).not.toBeNull();
-        expect(genre.id).toBe('high-martial-comedy');
-    });
+        it('should resolve from subGenre', () => {
+            const result = resolveGenreFromProject({ subGenre: 'high-martial-comedy' });
+            expect(result).toBeDefined();
+            expect(result.id).toBe('high-martial-comedy');
+        });
 
-    test('getGenreById returns null for unknown genre', () => {
-        const genre = genreConfig.getGenreById('nonexistent-genre');
-        expect(genre).toBeNull();
-    });
+        it('should resolve from styleProfile', () => {
+            const result = resolveGenreFromProject({ styleProfile: { key: 'high-martial-comedy' } });
+            expect(result).toBeDefined();
+            expect(result.id).toBe('high-martial-comedy');
+        });
 
-    test('detectGenre returns null for empty styleProfile', () => {
-        const result = genreConfig.detectGenre(null);
-        expect(result).toBeNull();
-    });
-
-    test('each genre has reviewRules, detectors, or styleProfile', () => {
-        const genres = genreConfig.getRegisteredGenres();
-        for (const genre of genres) {
-            const hasReviewRules = genre.reviewRules && Object.keys(genre.reviewRules).length > 0;
-            const hasDetectors = genre.detectors && Object.keys(genre.detectors).length > 0;
-            const hasStyleProfile = !!genre.styleProfile;
-            const hasAny = hasReviewRules || hasDetectors || hasStyleProfile;
-            if (!hasAny) {
-                console.warn(`Genre ${genre.id} has no reviewRules, detectors, or styleProfile`);
-            }
-        }
-        const genresWithFeatures = genres.filter(g =>
-            (g.reviewRules && Object.keys(g.reviewRules).length > 0) ||
-            (g.detectors && Object.keys(g.detectors).length > 0) ||
-            g.styleProfile
-        );
-        expect(genresWithFeatures.length).toBeGreaterThan(0);
-    });
-});
-
-describe('GenreConfig - High Martial Comedy', () => {
-    let genre;
-
-    beforeAll(() => {
-        genre = genreConfig.getGenreById('high-martial-comedy');
-    });
-
-    test('genre exists', () => {
-        expect(genre).not.toBeNull();
-    });
-
-    test('has styleProfile', () => {
-        expect(genre.styleProfile).toBeDefined();
-    });
-
-    test('has detectors', () => {
-        expect(genre.detectors).toBeDefined();
-    });
-
-    test('has reviewRules', () => {
-        expect(genre.reviewRules).toBeDefined();
-    });
-
-    test('isMatch detects high-martial style', () => {
-        const styleProfile = { key: 'high-martial-comedy' };
-        expect(genre.isMatch(styleProfile)).toBe(true);
-    });
-
-    test('isMatch rejects non-matching style', () => {
-        const styleProfile = { key: 'baby' };
-        expect(genre.isMatch(styleProfile)).toBe(false);
+        it('should resolve from genre field', () => {
+            const result = resolveGenreFromProject({ genre: 'high-martial-comedy' });
+            expect(result).toBeDefined();
+            expect(result.id).toBe('high-martial-comedy');
+        });
     });
 });

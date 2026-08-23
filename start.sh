@@ -26,9 +26,8 @@ echo "[3/4] Checking environment config..."
 if [ ! -f "server/.env" ]; then
     echo "Creating default .env..."
     cat > server/.env << 'EOF'
-MINIMAX_API_KEY=your_api_key_here
-MINIMAX_GROUP_ID=your_group_id_here
-MINIMAX_MODEL=MiniMax-M2.7
+ALIYUN_CODING_API_KEY=your_api_key_here
+ALIYUN_CODING_MODEL=qwen3-plus
 PORT=3001
 EOF
     echo "[NOTE] Created server/.env - Please edit with your API Key!"
