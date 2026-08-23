@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import useAppStore from '../../store/useAppStore';
 import { getProvider } from './settingsConstants';
+// 修复：原实现用原生fetch绕过了鉴权拦截器（无token导致401），改用统一的带鉴权api实例
+import { api } from '../../services/api';
 
 export default function useSettingsState() {
     const settingsRaw = useAppStore(s => s.settings);
@@ -30,8 +32,8 @@ export default function useSettingsState() {
     const reloadKeys = async () => {
         try {
             const [keysRes, bindingsRes] = await Promise.all([
-                fetch('/api/api-keys').then(r => r.json()),
-                fetch('/api/api-keys/agent-bindings').then(r => r.json())
+                api.get('/api-keys').then(r => r.data),
+                api.get('/api-keys/agent-bindings').then(r => r.data)
             ]);
             setApiKeys(Array.isArray(keysRes) ? keysRes : (keysRes?.keys || []));
             setAgentBindings(Array.isArray(bindingsRes) ? bindingsRes : (bindingsRes?.bindings || bindingsRes?.data || []));
@@ -52,8 +54,8 @@ export default function useSettingsState() {
         try {
             const data = { ...form };
             if (!data.apiKey && settings.hasKey) delete data.apiKey;
-            await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-            const res = await fetch('/api/settings').then(r => r.json());
+            await api.post('/settings', data);
+            const res = await api.get('/settings').then(r => r.data);
             if (res) setSettings(res);
             setSaveMsg({ type: 'success', text: '设置已保存' });
         } catch (e) { setSaveMsg({ type: 'error', text: '保存失败: ' + (e.message || '未知错误') }); }
@@ -63,7 +65,7 @@ export default function useSettingsState() {
     const testConnection = async () => {
         setTesting(true); setTestResult(null);
         try {
-            const res = await fetch('/api/settings/test', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiConfig: { apiKey: form.apiKey || undefined, groupId: form.groupId || undefined, model: form.model, provider: form.provider, baseURL: form.baseURL || undefined, agentLabel: currentProvider.name } }) });
+            const res = await api.post('/settings/test', { apiConfig: { apiKey: form.apiKey || undefined, groupId: form.groupId || undefined, model: form.model, provider: form.provider, baseURL: form.baseURL || undefined, agentLabel: currentProvider.name } }).then(r => r.data);
             const data = await res.json();
             setTestResult(data || { success: false, message: '无响应数据' });
         } catch (e) { setTestResult({ success: false, message: e.message || '网络请求失败' }); }
@@ -73,7 +75,7 @@ export default function useSettingsState() {
     const addApiKey = async () => {
         if (!newKey.apiKey) { alert('请输入API Key'); return; }
         try {
-            await fetch('/api/api-keys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(newKey) });
+            await api.post('/api-keys', newKey);
             setNewKey({ name: '', apiKey: '', groupId: '', model: 'qwen3.6-plus', provider: 'aliyunCoding', baseURL: '' });
             setShowAddKey(false);
             await reloadKeys();
@@ -81,13 +83,13 @@ export default function useSettingsState() {
     };
 
     const deleteApiKey = async (id) => {
-        await fetch(`/api/api-keys/${id}`, { method: 'DELETE' });
+        await api.delete(`/api-keys/${id}`);
         await reloadKeys();
     };
 
     const bindAgent = async (agentType, keyId) => {
         try {
-            await fetch('/api/api-keys/agent-bindings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agentType, keyId: keyId || null }) });
+            await api.post('/api-keys/agent-bindings', { agentType, keyId: keyId || null });
             await reloadKeys();
         } catch { /* ignore */ }
     };

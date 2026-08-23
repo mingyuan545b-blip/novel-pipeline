@@ -38,7 +38,10 @@ function setupMiddleware(app, REQUEST_SECRET) {
     app.use(traceIdMiddleware);
     app.use(httpMetricsMiddleware);
 
-    const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false, message: { success: false, error: '请求过于频繁，请稍后再试' } });
+    // 2026-08: 200/min对本地单用户过严——所有请求同IP(127.0.0.1)，前端页面+3秒轮询
+    // 叠加即超限，导致UI大面积429加载失败（uiBugCheck巡检123/125问题为此因）。
+    // 提升至1200/min（20/s），仍防止失控循环；debug路由另有30/min独立限流不受影响。
+    const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 1200, standardHeaders: true, legacyHeaders: false, message: { success: false, error: '请求过于频繁，请稍后再试' } });
     app.use(globalLimiter);
 
     const pipelineLimiter = rateLimit({ windowMs: 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false, message: { success: false, error: 'Pipeline操作过于频繁，每分钟最多60次' } });
