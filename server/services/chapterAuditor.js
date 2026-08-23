@@ -1,3 +1,2 @@
-const legacy = require('./_chapterAuditorLegacy');
-
-module.exports = legacy;
+const { ChapterAuditor } = require('./chapterAuditor/index');
+module.exports = { ChapterAuditor };

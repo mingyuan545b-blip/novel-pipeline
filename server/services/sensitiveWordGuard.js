@@ -69,6 +69,35 @@ function initCustomReplacements() {
 
 initCustomReplacements();
 
+// 修复陷阱#53：敏感词无词边界匹配
+// 原代码 new RegExp(word, 'g') 会误命中子串，如"大麻"误命中"大麻烦"
+// 修复策略：维护已知子串冲突表，只对有冲突的词加后缀排除断言
+//   - "大麻"在"大麻烦"里：后面是"烦" → (?!烦)断言失败 → 不匹配 ✓
+//   - "大麻"在"他种植了大麻，"里：后面是"，"→ 匹配 ✓
+//   - "大麻"在"大麻也得处理"里：后面是"也"→ 匹配 ✓（不漏）
+//   - "K粉若干"：无冲突 → 无边界匹配 ✓
+function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// 已知子串冲突表：敏感词 → 会产生误匹配的后续字符列表
+// 新增冲突时往此表添加条目即可
+const SUBSTRING_CONFLICTS = {
+    '大麻': ['烦'],  // "大麻"+"烦"="大麻烦"是合法常用词
+};
+
+function buildWordBoundaryRegex(word, flags = 'g') {
+    const escaped = escapeRegExp(word);
+    const conflicts = SUBSTRING_CONFLICTS[word];
+    if (conflicts && conflicts.length > 0) {
+        // 有已知子串冲突：后面不能跟冲突字符
+        const negativeLookahead = conflicts.map(c => escapeRegExp(c)).join('|');
+        return new RegExp(`${escaped}(?!${negativeLookahead})`, flags);
+    }
+    // 无已知冲突：无边界匹配
+    return new RegExp(escaped, flags);
+}
+
 function scanContent(content) {
     if (!content) return { clean: true, hits: [], replacedContent: content };
 
@@ -77,20 +106,21 @@ function scanContent(content) {
 
     for (const [category, words] of Object.entries(SENSITIVE_WORDS)) {
         for (const word of words) {
-            const regex = new RegExp(word, 'g');
+            const regex = buildWordBoundaryRegex(word);
             const matches = content.match(regex);
             if (matches) {
                 hits.push({ word, category, count: matches.length, severity: getSeverity(category) });
                 if (REPLACEMENT_MAP[word]) {
-                    replacedContent = replacedContent.replace(new RegExp(word, 'g'), REPLACEMENT_MAP[word]);
+                    replacedContent = replacedContent.replace(buildWordBoundaryRegex(word), REPLACEMENT_MAP[word]);
                 }
             }
         }
     }
 
+    // AI腔调短语不需要词边界，短语本身就是违规，"仿佛他发现"就是AI痕迹
     let aiHallucCount = 0;
     for (const phrase of AI_HALLUCINATION_PHRASES) {
-        const regex = new RegExp(phrase, 'g');
+        const regex = new RegExp(escapeRegExp(phrase), 'g');
         const matches = content.match(regex);
         if (matches) {
             aiHallucCount += matches.length;
@@ -121,4 +151,4 @@ function getReplacementSuggestion(word) {
     return REPLACEMENT_MAP[word] || null;
 }
 
-module.exports = { scanContent, getReplacementSuggestion, addCustomReplacement, loadCustomReplacements, SENSITIVE_WORDS, REPLACEMENT_MAP, AI_HALLUCINATION_PHRASES };
+module.exports = { scanContent, getReplacementSuggestion, addCustomReplacement, loadCustomReplacements, SENSITIVE_WORDS, REPLACEMENT_MAP, AI_HALLUCINATION_PHRASES, buildWordBoundaryRegex, escapeRegExp, SUBSTRING_CONFLICTS };

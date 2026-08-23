@@ -1,3 +1,3 @@
-const legacy = require('./_multiPlatformPublisherLegacy');
+const publishers = require('./publishers/index');
 
-module.exports = legacy;
+module.exports = publishers;

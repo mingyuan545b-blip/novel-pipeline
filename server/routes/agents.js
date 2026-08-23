@@ -3,48 +3,103 @@ const path = require('path');
 const router = require('express').Router();
 
 const AGENTS_DIR = path.join(__dirname, '..', '..', 'mcp-agents');
+const { FALLBACK_AGENT_TEMPLATES, getAgentTemplate, buildFoundationPrompt } = require('../services/prompts/promptBuilder');
+const { getGenreById, detectGenre, GENRE_REGISTRY } = require('../services/genreConfig');
+const { ERROR_CODES } = require('../shared/errorCodes');
+const { projectIdParam } = require('../middleware/validators');
 
-router.get('/', (req, res) => {
+const { VALIDATION_ERROR, NOT_FOUND } = ERROR_CODES;
+
+const AGENT_META = {
+    writer: { name: '执笔人', icon: '✍', color: 'var(--neon-blue)', category: '创作' },
+    'intent-planner': { name: '意图规划', icon: '📋', color: '#2ed573', category: '规划' },
+    'first-review': { name: '初审', icon: '✓', color: 'var(--neon-green)', category: '审核' },
+    'second-review': { name: '复审', icon: '★', color: 'var(--neon-orange)', category: '审核' },
+    'fast-review': { name: '快审', icon: '⚡', color: '#ffa502', category: '审核' },
+    'final-editor': { name: '定稿人', icon: '♛', color: 'var(--neon-pink)', category: '编辑' },
+    'material-manager': { name: '素材管理', icon: '⬡', color: 'var(--neon-purple)', category: '管理' },
+    reader: { name: '阅读者', icon: '📖', color: '#e17055', category: '审核' },
+    polisher: { name: '润色师', icon: '✦', color: '#a29bfe', category: '编辑' },
+    reviser: { name: '返修员', icon: '🔧', color: '#00d2d3', category: '编辑' }
+};
+
+router.get('/', async (req, res) => {
+    const mode = req.query.mode || 'novel';
     const agents = [];
+
+    for (const [type, fallback] of Object.entries(FALLBACK_AGENT_TEMPLATES)) {
+        const template = await getAgentTemplate(type, mode).catch(() => null);
+        const active = template || fallback;
+        const meta = AGENT_META[type] || {};
+        agents.push({
+            type,
+            name: meta.name || active.agentType,
+            icon: meta.icon || '🤖',
+            color: meta.color || 'var(--neon-cyan)',
+            category: meta.category || '其他',
+            mode: active.mode || mode,
+            role: active.role || 'user',
+            tool: active.tool || '',
+            hasCustomTemplate: !!template,
+            systemLength: (active.system || '').length,
+            source: template ? 'database' : 'fallback'
+        });
+    }
+
     if (fs.existsSync(AGENTS_DIR)) {
         const dirs = fs.readdirSync(AGENTS_DIR, { withFileTypes: true })
             .filter(d => d.isDirectory())
             .map(d => d.name);
         for (const dir of dirs) {
+            if (agents.find(a => a.type === dir)) continue;
             const manifestPath = path.join(AGENTS_DIR, dir, 'manifest.json');
             if (fs.existsSync(manifestPath)) {
                 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-                agents.push({ directory: dir, ...manifest });
+                agents.push({ type: dir, directory: dir, source: 'mcp-agents', ...manifest });
             } else {
-                agents.push({ directory: dir, name: dir, status: 'no-manifest' });
+                agents.push({ type: dir, directory: dir, name: dir, source: 'mcp-agents', status: 'no-manifest' });
             }
         }
     }
+
     res.json(agents);
 });
 
-router.get('/:type', (req, res) => {
-    const agentDir = path.join(AGENTS_DIR, req.params.type);
-    if (!fs.existsSync(agentDir)) return res.status(404).json({ error: 'Agent not found' });
+router.get('/:type', async (req, res) => {
+    const agentType = req.params.type;
+    const mode = req.query.mode || 'novel';
+    const meta = AGENT_META[agentType] || {};
 
-    const result = { directory: req.params.type };
-    const manifestPath = path.join(agentDir, 'manifest.json');
-    if (fs.existsSync(manifestPath)) {
-        result.manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
-    }
-    const serverPath = path.join(agentDir, 'server.js');
-    if (fs.existsSync(serverPath)) {
-        result.serverCode = fs.readFileSync(serverPath, 'utf-8');
-    }
-    res.json(result);
-});
+    const template = await getAgentTemplate(agentType, mode).catch(() => null);
+    const fallback = FALLBACK_AGENT_TEMPLATES[agentType];
+    const active = template || fallback;
 
-router.put('/:type/manifest', (req, res) => {
-    const agentDir = path.join(AGENTS_DIR, req.params.type);
-    if (!fs.existsSync(agentDir)) fs.mkdirSync(agentDir, { recursive: true });
-    const manifestPath = path.join(agentDir, 'manifest.json');
-    fs.writeFileSync(manifestPath, JSON.stringify(req.body, null, 2), 'utf-8');
-    res.json({ success: true });
+    if (!active) {
+        const agentDir = path.join(AGENTS_DIR, agentType);
+        if (fs.existsSync(agentDir)) {
+            const manifestPath = path.join(agentDir, 'manifest.json');
+            if (fs.existsSync(manifestPath)) {
+                const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+                return res.json({ type: agentType, source: 'mcp-agents', ...manifest });
+            }
+        }
+        return res.apiError(NOT_FOUND.statusCode, `Agent type "${agentType}" not found`, NOT_FOUND.code);
+    }
+
+    res.json({
+        type: agentType,
+        name: meta.name || active.agentType,
+        icon: meta.icon || '🤖',
+        color: meta.color || 'var(--neon-cyan)',
+        category: meta.category || '其他',
+        mode: active.mode || mode,
+        role: active.role || 'user',
+        tool: active.tool || '',
+        systemPrompt: active.system || '',
+        hasCustomTemplate: !!template,
+        systemLength: (active.system || '').length,
+        source: template ? 'database' : 'fallback'
+    });
 });
 
 router.put('/:type/server', (req, res) => {
@@ -57,37 +112,51 @@ router.put('/:type/server', (req, res) => {
 
 router.put('/:type/prompt', async (req, res) => {
     const { systemPrompt, projectId } = req.body;
-    if (!systemPrompt) return res.status(400).json({ error: 'systemPrompt is required' });
+    if (!systemPrompt) return res.apiError(VALIDATION_ERROR.statusCode, 'systemPrompt is required', VALIDATION_ERROR.code);
     const store = require('../store');
     const agentType = req.params.type;
 
     if (projectId) {
-        const project = store.getItem('projects', projectId);
-        if (!project) return res.status(404).json({ error: 'Project not found' });
+        const project = await store.getItem('projects', projectId);
+        if (!project) return res.apiError(NOT_FOUND.statusCode, 'Project not found', NOT_FOUND.code);
         const overrides = project.agentOverrides || {};
         overrides[agentType] = systemPrompt;
         await store.setItem('projects', projectId, { ...project, agentOverrides: overrides });
         return res.json({ success: true, scope: 'project' });
     }
 
-    const templates = store.listItems('agent-templates');
+    const templates = await store.listItems('agent-templates');
     const existing = templates.find(t => t.agentType === agentType);
     if (existing) {
         await store.setItem('agent-templates', existing.id, { ...existing, system: systemPrompt });
         return res.json({ success: true, scope: 'global' });
     }
-    return res.status(404).json({ error: 'Agent template not found. Create it via agent-templates first.' });
+
+    const fallback = FALLBACK_AGENT_TEMPLATES[agentType];
+    const id = `at-${agentType}-${Date.now()}`;
+    const newTemplate = {
+        id,
+        agentType,
+        mode: fallback?.mode || 'novel',
+        role: fallback?.role || 'user',
+        system: systemPrompt,
+        tool: fallback?.tool || '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    await store.setItem('agent-templates', id, newTemplate);
+    return res.json({ success: true, scope: 'global', created: true });
 });
 
-router.get('/prompt-preview/:projectId/:agentType', (req, res) => {
+router.get('/prompt-preview/:projectId/:agentType', projectIdParam, async (req, res) => {
     const { projectId, agentType } = req.params;
     const mode = req.query.mode || 'novel';
     const store = require('../store');
-    const project = store.getItem('projects', projectId);
-    if (!project) return res.status(404).json({ error: 'Project not found' });
-    const { getAgentPrompt } = require('../services/_agentPromptsLegacy');
-    const agent = getAgentPrompt(agentType, mode, projectId);
-    if (!agent) return res.status(404).json({ error: `Agent type "${agentType}" not found` });
+    const project = await store.getItem('projects', projectId);
+    if (!project) return res.apiError(NOT_FOUND.statusCode, 'Project not found', NOT_FOUND.code);
+    const { getAgentPrompt } = require('../services/agentPrompts');
+    const agent = await getAgentPrompt(agentType, mode, projectId);
+    if (!agent) return res.apiError(NOT_FOUND.statusCode, `Agent type "${agentType}" not found`, NOT_FOUND.code);
     res.json({
         agentType,
         mode,
@@ -100,3 +169,4 @@ router.get('/prompt-preview/:projectId/:agentType', (req, res) => {
 });
 
 module.exports = router;
+module.exports.AGENT_META = AGENT_META;

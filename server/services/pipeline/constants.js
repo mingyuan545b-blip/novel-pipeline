@@ -1,11 +1,12 @@
+const logger = require('../../shared/logger');
 const { CHAPTER_STATUS, STUCK_STATUSES, validateStatusConsistency } = require('../chapterStatus');
 
-function getOutlineApiConfig() {
+async function getOutlineApiConfig() {
     try {
         const { resolveStepConfig } = require('../llmConfig');
-        const config = resolveStepConfig('intent-planner');
+        const config = await resolveStepConfig('intent-planner');
         if (config) return config;
-    } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+    } catch(_) { logger.warn('pipelineConst', _.message || _); }
     return null;
 }
 

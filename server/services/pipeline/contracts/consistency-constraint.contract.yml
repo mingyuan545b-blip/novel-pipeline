@@ -1,0 +1,36 @@
+# consistency-constraint节点契约定义
+# 一致性约束：检查整章约束一致性，需项目信息+章节正文
+agent: consistency-constraint
+format: full
+
+# 输入素材契约
+input:
+  required:
+    - path: chapter
+      type: object
+      severity: CRITICAL
+      errorCode: CC-IN-001
+      message: 章节信息必须存在
+
+    - path: project
+      type: object
+      severity: CRITICAL
+      errorCode: CC-IN-002
+      message: 项目信息必须存在
+
+    - path: chapter.content
+      type: string
+      minLength: 100
+      severity: HIGH
+      errorCode: CC-IN-003
+      message: 章节正文应存在且≥100字
+
+# 输出契约
+output:
+  required:
+    - field: constraints
+      type: array
+      minLength: 0
+      severity: CRITICAL
+      errorCode: CC-OUT-001
+      message: consistency-constraint必须输出constraints数组（可为空表示无冲突）

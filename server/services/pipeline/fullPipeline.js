@@ -1,20 +1,17 @@
+const logger = require('../../shared/logger');
 const store = require('../../store');
-const { getModeConfig } = require('../contentUtils');
-const { getModePipelineConfig } = require('../pipelineConfig');
 const { getInfinitePipelineStatus } = require('./infinitePipeline');
 const { getMetrics } = require('../metricsCollector');
 const { getCircuitBreaker } = require('../reviewCircuitBreaker');
 const { createVersionTag } = require('../versionControl');
-const { detectGenre } = require('../genreConfig');
 const { getStyleProfileForProject } = require('../agentPrompts');
 const { checkAlertLoop, runBranchingWrite } = require('./pipelineUtils');
-const { buildVolumeRhythmGuidance, getVisibleMaterials, enforceVolumeSubplaneLocks } = require('./volumeHelpers');
-const { buildGenreOutlineInjection } = require('./outlineHelpers');
+const { getVisibleMaterials, enforceVolumeSubplaneLocks } = require('./volumeHelpers');
+const { buildVolumeRhythmGuidance } = require('./volumeRhythm');
 const { getHookBudgetForProject } = require('../hookBudget');
 const { ContextBudget } = require('../contextBudget');
 const memory = require('../memory');
-const { PIPELINE_CONFIG } = require('../pipelineConfig');
-const { AGENT_PROMPTS, SHUANGWEN_AGENT_PROMPTS, TOMATO_SHORT_AGENT_PROMPTS } = require('../agentPrompts');
+const { AGENT_PROMPTS } = require('../agentPrompts');
 const { getChapterIntentPlanner } = require('../chapterIntent');
 const { saveAgentOutput, AGENT_ROLE_NAMES } = require('../fileOutput');
 const { getRuleStackForProject } = require('../ruleStack');
@@ -22,7 +19,6 @@ const { getContextTraceForProject } = require('../contextTrace');
 const { extractJSON } = require('../jsonUtils');
 const stateSnapshot = require('../stateSnapshot');
 const consistency = require('../consistency');
-const imageGen = require('../imageGen');
 const { shouldOverrideReviewRejection } = require('./reviewOverride');
 const speechStyleRegistry = require('../speechStyleRegistry');
 const pipelineRegistry = require('../pipelineRegistry');
@@ -42,19 +38,23 @@ function getRunPipelineStep() {
 
 async function clearDownstreamOutputs(chapterId, failedStep) {
     const downstreamMap = {
-        'writer': ['firstReviewOutput', 'secondReviewOutput', 'finalEditorOutput', 'reviserOutput', 'materialManagerOutput', 'polisherOutput'],
-        'first-review': ['secondReviewOutput', 'finalEditorOutput', 'materialManagerOutput', 'polisherOutput'],
-        'fast-review': ['finalEditorOutput', 'materialManagerOutput', 'polisherOutput'],
-        'second-review': ['finalEditorOutput', 'materialManagerOutput', 'polisherOutput'],
-        'final-editor': ['materialManagerOutput', 'polisherOutput']
+        'writer': ['firstReviewOutput', 'secondReviewOutput', 'finalEditorOutput', 'reviserOutput', 'materialManagerOutput', 'materialOrganizerOutput', 'materialRegistrarOutput', 'polisherOutput'],
+        'first-review': ['secondReviewOutput', 'finalEditorOutput', 'materialManagerOutput', 'materialOrganizerOutput', 'materialRegistrarOutput', 'polisherOutput'],
+        'fast-review': ['finalEditorOutput', 'materialManagerOutput', 'materialOrganizerOutput', 'materialRegistrarOutput', 'polisherOutput'],
+        'second-review': ['finalEditorOutput', 'materialManagerOutput', 'materialOrganizerOutput', 'materialRegistrarOutput', 'polisherOutput'],
+        'final-editor': ['materialManagerOutput', 'materialOrganizerOutput', 'materialRegistrarOutput', 'polisherOutput'],
+        'polisher': ['materialManagerOutput', 'materialOrganizerOutput', 'materialRegistrarOutput'],
+        'material-organizer': ['materialRegistrarOutput']
     };
     const fields = downstreamMap[failedStep] || [];
     if (fields.length === 0) return;
-    const ch = store.getItem('chapters', chapterId);
+    const ch = await store.getItem('chapters', chapterId);
     if (!ch) return;
     let cleared = false;
+    const clearedFields = [];
     for (const f of fields) {
         if (ch[f]) {
+            clearedFields.push(`${f}=${ch[f].substring(0, 30)}...`);
             delete ch[f];
             cleared = true;
         }
@@ -62,7 +62,7 @@ async function clearDownstreamOutputs(chapterId, failedStep) {
     if (cleared) {
         ch.updatedAt = new Date().toISOString();
         await store.setItem('chapters', chapterId, ch);
-        console.log(`[PIPELINE] ${failedStep}失败，已清除后续步骤输出: ${fields.filter(f => !ch[f]).join(', ') || '(已清除)'}`);
+        logger.debug('fullPipeline', `clearDownstreamOutputs: failedStep=${failedStep}, chapterId=${chapterId}, cleared: ${clearedFields.join(', ')}`);
     }
 }
 

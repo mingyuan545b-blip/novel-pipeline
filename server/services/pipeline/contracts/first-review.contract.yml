@@ -1,0 +1,51 @@
+# first-review节点契约定义
+# 审核员必须拿到深度字段才能判断工具人化
+agent: first-review
+format: review
+
+# 输入素材契约
+input:
+  required:
+    - path: chapter.content
+      type: string
+      minLength: 100
+      severity: CRITICAL
+      errorCode: FR-IN-001
+      message: 章节正文必须存在且≥100字
+
+    - path: project
+      type: object
+      severity: HIGH
+      errorCode: FR-IN-002
+      message: 项目信息必须存在
+
+  # 审核员素材深度字段校验
+  materialFields:
+    character:
+      requireMinCount:
+        min: 1
+        severity: CRITICAL
+        errorCode: FR-IN-004
+        message: CH2+审核员无未归档角色素材，无法判断工具人化
+        exceptFirstChapter: true
+
+      stateJson:
+        anyOf:
+          - innerConflict
+          - independentStance
+          - fateArc
+        severity: CRITICAL
+        errorCode: FR-IN-003
+        message: 审核员缺少角色深度字段，无法判断工具人化（陷阱#79断链）
+        exceptFirstChapter: true
+
+# 输出契约
+# 注：agent实际输出 { response: string }，passed/issues在feedback对象中
+output:
+  required:
+    - field: response
+      type: string
+      minLength: 10
+      severity: CRITICAL
+      errorCode: FR-OUT-001
+      message: first-review输出response必须存在且≥10字（审核结果）

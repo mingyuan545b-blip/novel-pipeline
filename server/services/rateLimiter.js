@@ -1,5 +1,8 @@
+const { TokenBucketLimiter } = require('./tokenBucketLimiter');
+
 const DEFAULT_RPM = 30;
 const DEFAULT_BURST = 5;
+const DEFAULT_TPM = 200000;
 
 class RateLimiter {
     constructor(options = {}) {
@@ -84,6 +87,7 @@ class RateLimiter {
 }
 
 const _limiters = new Map();
+const _tokenBuckets = new Map();
 
 function getRateLimiter(provider, options = {}) {
     const key = provider || 'default';
@@ -95,8 +99,19 @@ function getRateLimiter(provider, options = {}) {
     return _limiters.get(key);
 }
 
-function resetAllLimiters() {
-    _limiters.clear();
+function getTokenBucket(provider, options = {}) {
+    const key = provider || 'default';
+    if (!_tokenBuckets.has(key)) {
+        const tpm = options.tpm || DEFAULT_TPM;
+        const rate = tpm / 60;
+        _tokenBuckets.set(key, new TokenBucketLimiter(rate, tpm));
+    }
+    return _tokenBuckets.get(key);
 }
 
-module.exports = { RateLimiter, getRateLimiter, resetAllLimiters };
+function resetAllLimiters() {
+    _limiters.clear();
+    _tokenBuckets.clear();
+}
+
+module.exports = { RateLimiter, getRateLimiter, getTokenBucket, resetAllLimiters };

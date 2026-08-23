@@ -1,6 +1,8 @@
+const logger = require('../shared/logger');
 const store = require('../store');
+const { getDataContext } = require('./dataContext');
 
-function createVersionTag(projectId, chapterId, chapterNumber, version, content, commitMeta = {}) {
+async function createVersionTag(projectId, chapterId, chapterNumber, version, content, commitMeta = {}) {
     const timestamp = Date.now();
     const tag = `ch${chapterNumber}_v${version}_${timestamp}`;
 
@@ -10,13 +12,13 @@ function createVersionTag(projectId, chapterId, chapterNumber, version, content,
     let hookSnapshot = null;
     try {
         const hb = hookBudget.getHookBudgetForProject(projectId);
-        const status = hb.getBudgetStatus(chapterNumber);
+        const status = await hb.getBudgetStatus(chapterNumber);
         hookSnapshot = {
             activeHooks: status.active || 0,
             maxHooks: status.max || 0,
             staleDebt: status.staleDebt || 0
         };
-    } catch (e) {}
+    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
 
     let characterStateSnapshot = null;
     try {
@@ -32,13 +34,14 @@ function createVersionTag(projectId, chapterId, chapterNumber, version, content,
                 };
             }
         }
-    } catch (e) {}
+    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
 
     let memoryVersion = null;
     try {
-        const project = store.getItem('projects', projectId);
+        const _vcCtx = await getDataContext(projectId);
+        const project = await _vcCtx.getProject();
         memoryVersion = project?._memoryVersion || 0;
-    } catch (e) {}
+    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
 
     const snapshot = {
         tag,
@@ -59,7 +62,7 @@ function createVersionTag(projectId, chapterId, chapterNumber, version, content,
         }
     };
 
-    const chapter = store.getItem('chapters', chapterId);
+    const chapter = await store.getItem('chapters', chapterId);
     if (!chapter) return null;
 
     if (!chapter._versionTags) chapter._versionTags = [];
@@ -68,26 +71,26 @@ function createVersionTag(projectId, chapterId, chapterNumber, version, content,
         const removedTags = chapter._versionTags.slice(0, chapter._versionTags.length - 20);
         chapter._versionTags = chapter._versionTags.slice(-20);
         for (const rt of removedTags) {
-            try { store.removeItem('version-snapshots', rt); } catch (e) {}
+            try { await store.removeItem('version-snapshots', rt); } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
         }
     }
 
-    store.setItem('chapters', chapterId, chapter);
-    store.setItem('version-snapshots', tag, snapshot);
+    await store.setItem('chapters', chapterId, chapter);
+    await store.setItem('version-snapshots', tag, snapshot);
 
-    console.log(`[VERSION] Tag created: ${tag} (${snapshot.contentLength}字, branch=${commitMeta.branch || 'main'})`);
+    logger.info('versionControl', `[VERSION] Tag created: ${tag} (${snapshot.contentLength}字, branch=${commitMeta.branch || 'main'})`);
     return tag;
 }
 
-function getVersionSnapshot(tag) {
-    return store.getItem('version-snapshots', tag);
+async function getVersionSnapshot(tag) {
+    return await store.getItem('version-snapshots', tag);
 }
 
-function listVersionTags(chapterId) {
-    const chapter = store.getItem('chapters', chapterId);
+async function listVersionTags(chapterId) {
+    const chapter = await store.getItem('chapters', chapterId);
     if (!chapter?._versionTags) return [];
-    return chapter._versionTags.map(tag => {
-        const snap = store.getItem('version-snapshots', tag);
+    return await Promise.all(chapter._versionTags.map(async tag => {
+        const snap = await store.getItem('version-snapshots', tag);
         return snap ? {
             tag,
             version: snap.version,
@@ -96,14 +99,14 @@ function listVersionTags(chapterId) {
             branch: snap.commitTag?.branch || 'main',
             reason: snap.commitTag?.reason || ''
         } : { tag };
-    });
+    }));
 }
 
-function rollbackToTag(chapterId, tag, rollbackMemory = true) {
-    const snapshot = store.getItem('version-snapshots', tag);
+async function rollbackToTag(chapterId, tag, rollbackMemory = true) {
+    const snapshot = await store.getItem('version-snapshots', tag);
     if (!snapshot) return { success: false, error: `Tag ${tag} not found` };
 
-    const chapter = store.getItem('chapters', chapterId);
+    const chapter = await store.getItem('chapters', chapterId);
     if (!chapter) return { success: false, error: 'Chapter not found' };
 
     const previousContent = chapter.content;
@@ -115,13 +118,13 @@ function rollbackToTag(chapterId, tag, rollbackMemory = true) {
     if (!chapter._versionTags) chapter._versionTags = [];
     chapter._versionTags.push(`rollback_${tag}_${Date.now()}`);
 
-    store.setItem('chapters', chapterId, chapter);
+    await store.setItem('chapters', chapterId, chapter);
 
     if (rollbackMemory && snapshot.commitTag?.character_state_snapshot) {
-        console.log(`[VERSION] Memory snapshot available for tag ${tag}, manual restore may be needed`);
+        logger.info('versionControl', `[VERSION] Memory snapshot available for tag ${tag}, manual restore may be needed`);
     }
 
-    console.log(`[VERSION] Rollback: ${chapterId} -> ${tag} (from ${previousContent?.length || 0}字 to ${snapshot.contentLength}字)`);
+    logger.info('versionControl', `[VERSION] Rollback: ${chapterId} -> ${tag} (from ${previousContent?.length || 0}字 to ${snapshot.contentLength}字)`);
     return {
         success: true,
         tag,
@@ -131,12 +134,12 @@ function rollbackToTag(chapterId, tag, rollbackMemory = true) {
     };
 }
 
-function findSafeRollbackPoint(chapterId) {
-    const chapter = store.getItem('chapters', chapterId);
+async function findSafeRollbackPoint(chapterId) {
+    const chapter = await store.getItem('chapters', chapterId);
     if (!chapter?._versionTags) return null;
 
     for (let i = chapter._versionTags.length - 1; i >= 0; i--) {
-        const snap = store.getItem('version-snapshots', chapter._versionTags[i]);
+        const snap = await store.getItem('version-snapshots', chapter._versionTags[i]);
         if (snap?.commitTag?.branch === 'main' && snap?.commitTag?.reason === 'auto-commit') {
             return { tag: snap.tag, chapterNumber: snap.chapterNumber, version: snap.version };
         }

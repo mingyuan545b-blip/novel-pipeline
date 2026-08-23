@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const {
     VALID_MATERIAL_TYPES,
     HIERARCHY_RULES,
@@ -6,7 +7,7 @@ const {
     inferTypeFromContent
 } = require('../config/materialTypes');
 
-function validateHierarchy(material) {
+async function validateHierarchy(material) {
     const type = material.type || '';
     const rule = HIERARCHY_RULES[type];
     if (!rule) return { valid: true, missing: [], message: '' };
@@ -19,15 +20,14 @@ function validateHierarchy(material) {
     }
 
     if (type === 'character' && material.parentFaction && !material.parentPlane) {
-        const allMaterials = [];
         try {
             const store = require('../store');
-            const mats = store.listItems('materials');
+            const mats = await store.listItems('materials');
             const faction = mats.find(m => m.id === material.parentFaction);
             if (faction && faction.parentPlane) {
                 missing.push('parentPlane');
             }
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('materialValidator', _.message || _); }
     }
 
     if (missing.length > 0) {
@@ -40,7 +40,7 @@ function validateHierarchy(material) {
     return { valid: true, missing: [], message: '' };
 }
 
-function validateMaterial(material) {
+async function validateMaterial(material) {
     const type = material.type || material.category || '';
     const content = material.currentContent || material.initialContent || '';
     const name = material.name || '';
@@ -56,7 +56,7 @@ function validateMaterial(material) {
         };
     }
 
-    const hierarchyResult = validateHierarchy(material);
+    const hierarchyResult = await validateHierarchy(material);
     if (!hierarchyResult.valid) {
         return {
             valid: false,
@@ -89,19 +89,19 @@ function validateMaterial(material) {
     return { valid: result.valid, type, missing: result.missing, message: result.message };
 }
 
-function validateMaterialBatch(materials) {
+async function validateMaterialBatch(materials) {
     const results = [];
     let invalidCount = 0;
     for (const m of materials) {
-        const result = validateMaterial(m);
+        const result = await validateMaterial(m);
         results.push({ id: m.id, name: m.name, ...result });
         if (!result.valid) invalidCount++;
     }
     return { results, total: materials.length, valid: materials.length - invalidCount, invalid: invalidCount };
 }
 
-function getMaterialValidationPrompt(material) {
-    const result = validateMaterial(material);
+async function getMaterialValidationPrompt(material) {
+    const result = await validateMaterial(material);
     if (result.valid) return '';
     return `\n【⚠ 素材标准校验未通过】${result.message}。请在更新素材时补充这些必要字段。`;
 }

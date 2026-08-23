@@ -1,0 +1,29 @@
+# outline-generator节点契约定义
+# 大纲生成：生成章节大纲，需项目信息+题材可解析
+agent: outline-generator
+format: full
+
+# 输入素材契约
+input:
+  required:
+    - path: project
+      type: object
+      severity: CRITICAL
+      errorCode: PF-OG-001
+      message: "预检: 项目信息必须存在"
+
+    - path: project.styleProfile
+      type: object
+      severity: HIGH
+      errorCode: PF-OG-002
+      message: "预检: 题材信息必须可解析（styleProfile）"
+
+# 输出契约
+output:
+  required:
+    - field: outlines
+      type: array
+      minLength: 1
+      severity: CRITICAL
+      errorCode: OG-OUT-001
+      message: outline-generator必须输出outlines数组（至少1条）

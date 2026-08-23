@@ -20,7 +20,7 @@ async function connectBrowser(platform, cdpUrl) {
         } catch (e) {
             addLog(platform, `现有浏览器已失效(${e.message?.substring(0, 60)})，重新连接...`);
         }
-        try { await s.context.close(); } catch (e) { }
+        try { await s.context.close(); } catch (e) { /* cleanup */ }
         s.context = null;
         s.browser = null;
     }
@@ -61,7 +61,7 @@ async function checkLoginStatus(platform, page) {
     try {
         await page.goto(cfg.writerUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await page.waitForTimeout(5000);
-        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+        await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => { /* timeout ok */ });
         const currentUrl = page.url();
         addLog(platform, `登录检测URL: ${currentUrl}`);
         if (cfg.loginUrlKeywords.some(k => currentUrl.includes(k))) {
@@ -115,7 +115,7 @@ async function waitForLogin(platform, page, timeout = 600000) {
                 s2.loginStatus = 'logged-in';
                 return true;
             }
-        } catch (e) {}
+        } catch (e) { /* browser cleanup */ }
     }
     addLog(platform, '登录超时');
     const s3 = ensureState(platform);
@@ -139,7 +139,7 @@ async function ensureLogin(platform, page, maxWait = 600000) {
                     return true;
                 }
             }
-        } catch (e) {}
+        } catch (e) { /* browser cleanup */ }
     }
 
     const loginStatus = await checkLoginStatus(platform, page);
@@ -162,12 +162,12 @@ async function closeBrowser(platform) {
     if (!s) return;
     try {
         if (s.context) {
-            try { await s.context.close(); } catch (e) {}
+            try { await s.context.close(); } catch (e) { /* cleanup */ }
         }
         if (s.browser) {
-            try { await s.browser.close(); } catch (e) {}
+            try { await s.browser.close(); } catch (e) { /* cleanup */ }
         }
-    } catch (e) {}
+    } catch (e) { /* cleanup */ }
     s.browser = null; s.context = null; s.page = null;
     s.loginStatus = null;
     addLog(platform, '浏览器已关闭');

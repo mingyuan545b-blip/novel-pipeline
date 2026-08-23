@@ -4,36 +4,33 @@ const fs = require('fs');
 const path = require('path');
 const techIndex = require('../services/techIndex');
 const { ValidationEngine } = require('../services/validationEngine');
+const { getBatchSuccessRates, deleteFeedbackByProject } = require('../services/pipeline/techniqueFeedback');
+const store = require('../store');
+const { ERROR_CODES } = require('../shared/errorCodes');
+
+const { VALIDATION_ERROR, NOT_FOUND, INTERNAL_ERROR } = ERROR_CODES;
 
 const LIBRARY_DIR = path.join(__dirname, '..', 'data', 'library');
 const LEAF_DIR = path.join(LIBRARY_DIR, 'leaf');
 const META_DIR = path.join(LIBRARY_DIR, 'metadata');
-
 const ve = new ValidationEngine();
 
-function readJson(filePath) {
-    if (!fs.existsSync(filePath)) return null;
-    return JSON.parse(fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, ''));
-}
-
-function writeJson(filePath, data) {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-}
+function readJson(fp) { if (!fs.existsSync(fp)) return null; return JSON.parse(fs.readFileSync(fp, 'utf-8').replace(/^\uFEFF/, '')); }
+function writeJson(fp, data) { const d = path.dirname(fp); if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(fp, JSON.stringify(data, null, 2), 'utf-8'); }
 
 router.get('/index', (req, res) => {
     try {
         const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
         if (!index) return res.json({ entries: [], total_entries: 0 });
-        const { mode, injection_point, department } = req.query;
+        const { mode, injection_point, department, worldviewDepth } = req.query;
         let entries = index.entries;
         if (mode) entries = entries.filter(e => e.modes.includes(mode));
         if (injection_point) entries = entries.filter(e => e.injection_point === injection_point);
         if (department) entries = entries.filter(e => e.department === department);
+        if (worldviewDepth) entries = entries.filter(e => e.worldviewDepth === worldviewDepth);
         res.json({ ...index, entries, filtered_count: entries.length });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -51,7 +48,7 @@ router.get('/departments', (req, res) => {
         }
         res.json(Object.values(depts).map(d => ({ ...d, subcategories: Object.values(d.subcategories) })));
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -60,13 +57,13 @@ router.get('/technique/:id', (req, res) => {
         const { id } = req.params;
         const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
         const entry = index?.entries?.find(e => e.id === id);
-        if (!entry) return res.status(404).json({ error: 'Technique not found' });
+        if (!entry) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
 
         const leaf = readJson(path.join(LIBRARY_DIR, entry.path));
         const meta = readJson(path.join(META_DIR, `${id}.json`));
         res.json({ ...leaf, _meta: meta || { id, success_rate: 50, attempts: 0, auto_disabled: false } });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -75,7 +72,7 @@ router.put('/technique/:id', (req, res) => {
         const { id } = req.params;
         const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
         const entry = index?.entries?.find(e => e.id === id);
-        if (!entry) return res.status(404).json({ error: 'Technique not found' });
+        if (!entry) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
 
         const leafPath = path.join(LIBRARY_DIR, entry.path);
         const existing = readJson(leafPath) || {};
@@ -91,7 +88,7 @@ router.put('/technique/:id', (req, res) => {
         techIndex.refreshIndex();
         res.json({ success: true, technique: existing });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -106,7 +103,7 @@ router.get('/search', (req, res) => {
         });
         res.json(results);
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -124,7 +121,7 @@ router.put('/meta/:id', (req, res) => {
         writeJson(metaPath, existing);
         res.json({ success: true, meta: existing });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -136,7 +133,7 @@ router.post('/meta/:id/reset', (req, res) => {
         writeJson(metaPath, reset);
         res.json({ success: true, meta: reset });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -161,19 +158,39 @@ router.get('/stats', (req, res) => {
             byDepartment: byDept
         });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
 router.post('/validate/platform', (req, res) => {
     try {
         const { content, platform } = req.body;
-        if (!content || !platform) return res.status(400).json({ error: 'content and platform required' });
+        if (!content || !platform) return res.apiError(VALIDATION_ERROR.statusCode, 'content and platform required', VALIDATION_ERROR.code);
         const result = ve.validatePlatformCompliance(content, platform);
         res.json(result);
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
+});
+
+router.get('/technique-feedback/:projectId', async (req, res) => {
+    try {
+        const items = await store.queryItems('technique-feedback', { projectId: req.params.projectId });
+        const rates = {};
+        for (const item of items) {
+            if (!rates[item.techniqueId]) rates[item.techniqueId] = { passed: 0, failed: 0, total: 0 };
+            rates[item.techniqueId].total++;
+            item.passed ? rates[item.techniqueId].passed++ : rates[item.techniqueId].failed++;
+        }
+        const summary = Object.entries(rates).map(([id, r]) => ({ techniqueId: id, ...r, successRate: r.total > 0 ? (r.passed / r.total * 100).toFixed(1) : '0.0' }));
+        summary.sort((a, b) => parseFloat(b.successRate) - parseFloat(a.successRate));
+        res.json({ projectId: req.params.projectId, totalRecords: items.length, techniques: summary });
+    } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
+});
+
+router.delete('/technique-feedback/:projectId', async (req, res) => {
+    try { const count = await deleteFeedbackByProject(req.params.projectId); res.json({ success: true, deletedCount: count }); }
+    catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
 
 module.exports = router;

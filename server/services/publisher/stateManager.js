@@ -1,3 +1,4 @@
+const logger = require('../../shared/logger');
 const path = require('path');
 const fs = require('fs');
 const { PLATFORMS } = require('./platformConfig');
@@ -36,7 +37,7 @@ function addLog(platform, msg) {
     const s = publishStates[platform];
     const time = new Date().toISOString();
     s.logs.push({ time, msg });
-    console.log(`[${platform.toUpperCase()}-PUBLISH] ${msg}`);
+    logger.info('stateManager', `[${platform.toUpperCase()}-PUBLISH] ${msg}`);
     if (s.logs.length > 500) s.logs = s.logs.slice(-300);
 }
 
@@ -45,7 +46,7 @@ async function takeScreenshot(page, platform, label) {
         const screenshotDir = path.join(__dirname, '..', '..', 'output', 'screenshots');
         if (!fs.existsSync(screenshotDir)) fs.mkdirSync(screenshotDir, { recursive: true });
         await page.screenshot({ path: path.join(screenshotDir, `${platform}-${label}-${Date.now()}.png`), fullPage: true });
-    } catch (e) {}
+    } catch (e) { /* screenshot optional */ }
 }
 
 function getRawState(platform) {

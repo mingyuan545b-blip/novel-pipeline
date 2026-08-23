@@ -18,7 +18,8 @@
       "display_name": "复仇",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_01_故事母题_02",
@@ -35,7 +36,8 @@
       "display_name": "成长",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_01_故事母题_03",
@@ -52,7 +54,8 @@
       "display_name": "爱情",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_01_故事母题_04",
@@ -69,7 +72,8 @@
       "display_name": "求生",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_01_故事母题_05",
@@ -86,7 +90,8 @@
       "display_name": "寻找",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_01_故事母题_06",
@@ -103,7 +108,8 @@
       "display_name": "归来",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_01_故事母题_07",
@@ -120,7 +126,8 @@
       "display_name": "牺牲",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_02_高概念内核_01",
@@ -137,7 +144,8 @@
       "display_name": "时间循环",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_02_高概念内核_02",
@@ -154,7 +162,8 @@
       "display_name": "身份错位",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_02_高概念内核_03",
@@ -171,7 +180,8 @@
       "display_name": "规则游戏",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_02_高概念内核_04",
@@ -188,7 +198,8 @@
       "display_name": "平行世界",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_02_高概念内核_05",
@@ -205,7 +216,8 @@
       "display_name": "末世生存",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_02_高概念内核_06",
@@ -222,7 +234,8 @@
       "display_name": "反乌托邦",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_03_叙事模型_01",
@@ -239,7 +252,8 @@
       "display_name": "公路片模型",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_03_叙事模型_02",
@@ -256,7 +270,8 @@
       "display_name": "密室模型",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_03_叙事模型_03",
@@ -273,7 +288,8 @@
       "display_name": "倒计时模型",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_03_叙事模型_04",
@@ -290,7 +306,8 @@
       "display_name": "破案模型",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_03_叙事模型_05",
@@ -307,7 +324,8 @@
       "display_name": "起义模型",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_04_读者心理操控_01",
@@ -324,7 +342,8 @@
       "display_name": "信息差设计",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_04_读者心理操控_02",
@@ -341,7 +360,8 @@
       "display_name": "情绪过山车",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_04_读者心理操控_03",
@@ -358,7 +378,8 @@
       "display_name": "道德困境引导",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_05_情感巅峰设计_01",
@@ -375,7 +396,8 @@
       "display_name": "单一情感引爆",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "00_叙事之魂部_05_情感巅峰设计_02",
@@ -392,7 +414,8 @@
       "display_name": "复合情感叠加",
       "department": "00_叙事之魂部",
       "context_slot": "L0",
-      "injection_point": "intent-planner"
+      "injection_point": "intent-planner",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_01_故事模型_01",
@@ -408,7 +431,8 @@
       "display_name": "英雄之旅",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_01_故事模型_02",
@@ -424,7 +448,8 @@
       "display_name": "三幕剧",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_01_故事模型_03",
@@ -440,7 +465,8 @@
       "display_name": "起承转合",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_01_故事模型_04",
@@ -456,7 +482,8 @@
       "display_name": "环形叙事",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_01_故事模型_05",
@@ -472,7 +499,8 @@
       "display_name": "多线并行",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_01_故事模型_06",
@@ -488,7 +516,8 @@
       "display_name": "反结构",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_02_叙事视角_01",
@@ -504,7 +533,8 @@
       "display_name": "第一人称亲历者",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_02_叙事视角_02",
@@ -520,7 +550,8 @@
       "display_name": "第一人称旁观者",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_02_叙事视角_03",
@@ -536,7 +567,8 @@
       "display_name": "第三人称有限",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_02_叙事视角_04",
@@ -552,7 +584,8 @@
       "display_name": "第三人称全知",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_02_叙事视角_05",
@@ -568,7 +601,8 @@
       "display_name": "多人称切换",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_02_叙事视角_06",
@@ -584,7 +618,8 @@
       "display_name": "不可靠叙述者",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_03_时间线设计_01",
@@ -600,7 +635,8 @@
       "display_name": "顺叙",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_03_时间线设计_02",
@@ -616,7 +652,8 @@
       "display_name": "倒叙",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_03_时间线设计_03",
@@ -632,7 +669,8 @@
       "display_name": "插叙",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_03_时间线设计_04",
@@ -648,7 +686,8 @@
       "display_name": "双线并行",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_03_时间线设计_05",
@@ -664,7 +703,8 @@
       "display_name": "碎片化拼贴",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_04_开篇设计_01",
@@ -680,7 +720,8 @@
       "display_name": "冲突式开头",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_04_开篇设计_02",
@@ -696,7 +737,8 @@
       "display_name": "悬念式开头",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_04_开篇设计_03",
@@ -712,7 +754,8 @@
       "display_name": "氛围式开头",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_04_开篇设计_04",
@@ -728,7 +771,8 @@
       "display_name": "声明式开头",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_04_开篇设计_05",
@@ -744,7 +788,8 @@
       "display_name": "日常颠覆式开头",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_05_结尾设计_01",
@@ -760,7 +805,8 @@
       "display_name": "闭合式",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_05_结尾设计_02",
@@ -776,7 +822,8 @@
       "display_name": "开放式",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_05_结尾设计_03",
@@ -792,7 +839,8 @@
       "display_name": "反转式",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_05_结尾设计_04",
@@ -808,7 +856,8 @@
       "display_name": "首尾呼应式",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_05_结尾设计_05",
@@ -824,7 +873,8 @@
       "display_name": "戛然而止式",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_06_章节结构_01",
@@ -840,7 +890,8 @@
       "display_name": "章节断点设计",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_06_章节结构_02",
@@ -856,7 +907,8 @@
       "display_name": "多视角章节排布",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_06_章节结构_03",
@@ -872,7 +924,8 @@
       "display_name": "幕间过渡技法",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_07_情感节奏设计_01",
@@ -888,7 +941,8 @@
       "display_name": "单章情绪曲线",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_07_情感节奏设计_02",
@@ -904,7 +958,8 @@
       "display_name": "全本情绪分布",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "01_顶层设计部_07_情感节奏设计_03",
@@ -920,7 +975,8 @@
       "display_name": "情绪转换阀",
       "department": "01_顶层设计部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "macro"
     },
     {
       "id": "02_情节引擎部_01_冲突类型_01",
@@ -938,7 +994,8 @@
       "display_name": "人与环境",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_01_冲突类型_02",
@@ -956,7 +1013,8 @@
       "display_name": "人与人",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_01_冲突类型_03",
@@ -974,7 +1032,8 @@
       "display_name": "人与自我",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_01_冲突类型_04",
@@ -992,7 +1051,8 @@
       "display_name": "复合型",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_02_悬念编码_01",
@@ -1010,7 +1070,8 @@
       "display_name": "桌下炸弹",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_02_悬念编码_02",
@@ -1028,7 +1089,8 @@
       "display_name": "谜题盒子",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_02_悬念编码_03",
@@ -1046,7 +1108,8 @@
       "display_name": "命运悬丝",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_02_悬念编码_04",
@@ -1064,7 +1127,8 @@
       "display_name": "虚假情报",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_03_反转设计_01",
@@ -1082,7 +1146,8 @@
       "display_name": "身份反转",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_03_反转设计_02",
@@ -1100,7 +1165,8 @@
       "display_name": "信息反转",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_03_反转设计_03",
@@ -1118,7 +1184,8 @@
       "display_name": "目标反转",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_03_反转设计_04",
@@ -1136,7 +1203,8 @@
       "display_name": "情感反转",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_03_反转设计_05",
@@ -1154,7 +1222,8 @@
       "display_name": "结构反转",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_04_伏笔与呼应_01",
@@ -1172,7 +1241,8 @@
       "display_name": "物件伏笔",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_04_伏笔与呼应_02",
@@ -1190,7 +1260,8 @@
       "display_name": "台词伏笔",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_04_伏笔与呼应_03",
@@ -1208,7 +1279,8 @@
       "display_name": "场景伏笔",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_04_伏笔与呼应_04",
@@ -1226,7 +1298,8 @@
       "display_name": "行为伏笔",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_05_高潮设计_01",
@@ -1244,7 +1317,8 @@
       "display_name": "物理高潮",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_05_高潮设计_02",
@@ -1262,7 +1336,8 @@
       "display_name": "心理高潮",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_05_高潮设计_03",
@@ -1280,7 +1355,8 @@
       "display_name": "复合型高潮",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_05_高潮设计_04",
@@ -1298,7 +1374,8 @@
       "display_name": "反高潮",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_06_节拍与节奏_01",
@@ -1316,7 +1393,8 @@
       "display_name": "单章内部节拍",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_06_节拍与节奏_02",
@@ -1334,7 +1412,8 @@
       "display_name": "多章间起承转合",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_06_节拍与节奏_03",
@@ -1352,7 +1431,8 @@
       "display_name": "整本书节拍控制",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_07_因果链设计_01",
@@ -1370,7 +1450,8 @@
       "display_name": "直线因果",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_07_因果链设计_02",
@@ -1388,7 +1469,8 @@
       "display_name": "蝴蝶效应",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "02_情节引擎部_07_因果链设计_03",
@@ -1406,7 +1488,8 @@
       "display_name": "宿命因果",
       "department": "02_情节引擎部",
       "context_slot": "L3",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_01_人物出场塑造_01",
@@ -1424,7 +1507,8 @@
       "display_name": "行动定义法",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_01_人物出场塑造_02",
@@ -1442,7 +1526,8 @@
       "display_name": "反差破除法",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_01_人物出场塑造_03",
@@ -1460,7 +1545,8 @@
       "display_name": "第三方介绍法",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_01_人物出场塑造_04",
@@ -1478,7 +1564,8 @@
       "display_name": "环境映射法",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_01_人物出场塑造_05",
@@ -1496,7 +1583,8 @@
       "display_name": "逐步揭示法",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_02_人物标签系统_01",
@@ -1514,7 +1602,8 @@
       "display_name": "口头禅",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_02_人物标签系统_02",
@@ -1532,7 +1621,8 @@
       "display_name": "标志性动作",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_02_人物标签系统_03",
@@ -1550,7 +1640,8 @@
       "display_name": "外貌特征",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_02_人物标签系统_04",
@@ -1568,7 +1659,8 @@
       "display_name": "偏好与怪癖",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_03_人物源动力_01",
@@ -1586,7 +1678,8 @@
       "display_name": "生存需求",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_03_人物源动力_02",
@@ -1604,7 +1697,8 @@
       "display_name": "情感需求",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_03_人物源动力_03",
@@ -1622,7 +1716,8 @@
       "display_name": "尊严需求",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_03_人物源动力_04",
@@ -1640,7 +1735,8 @@
       "display_name": "超越性需求",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_04_人物关系网_01",
@@ -1658,7 +1754,8 @@
       "display_name": "分身关系",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_04_人物关系网_02",
@@ -1676,7 +1773,8 @@
       "display_name": "对立关系",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_04_人物关系网_03",
@@ -1694,7 +1792,8 @@
       "display_name": "师徒关系",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_04_人物关系网_04",
@@ -1712,7 +1811,8 @@
       "display_name": "变数关系",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_04_人物关系网_05",
@@ -1730,7 +1830,8 @@
       "display_name": "镜像关系",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_05_人物弧光_01",
@@ -1748,7 +1849,8 @@
       "display_name": "成长型",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_05_人物弧光_02",
@@ -1766,7 +1868,8 @@
       "display_name": "堕落型",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_05_人物弧光_03",
@@ -1784,7 +1887,8 @@
       "display_name": "坚定型",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_05_人物弧光_04",
@@ -1802,7 +1906,8 @@
       "display_name": "幻灭型",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_06_配角功能化_01",
@@ -1820,7 +1925,8 @@
       "display_name": "情报提供者",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_06_配角功能化_02",
@@ -1838,7 +1944,8 @@
       "display_name": "麻烦制造者",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_06_配角功能化_03",
@@ -1856,7 +1963,8 @@
       "display_name": "道德标尺",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_06_配角功能化_04",
@@ -1874,7 +1982,8 @@
       "display_name": "气氛调节器",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_06_配角功能化_05",
@@ -1892,7 +2001,8 @@
       "display_name": "主题传达者",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_07_群像设计_01",
@@ -1910,7 +2020,8 @@
       "display_name": "平衡式群像",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_07_群像设计_02",
@@ -1928,7 +2039,8 @@
       "display_name": "主次分明式群像",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "03_人物熔炉部_07_群像设计_03",
@@ -1946,7 +2058,8 @@
       "display_name": "多中心式群像",
       "department": "03_人物熔炉部",
       "context_slot": "L2",
-      "injection_point": "writer"
+      "injection_point": "writer",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_01_对白功能_01",
@@ -1964,7 +2077,8 @@
       "display_name": "推进剧情",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_01_对白功能_02",
@@ -1982,7 +2096,8 @@
       "display_name": "展示性格",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_01_对白功能_03",
@@ -2000,7 +2115,8 @@
       "display_name": "营造氛围",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_01_对白功能_04",
@@ -2018,7 +2134,8 @@
       "display_name": "传达主题",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_02_潜台词设计_01",
@@ -2036,7 +2153,8 @@
       "display_name": "话说一半",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_02_潜台词设计_02",
@@ -2054,7 +2172,8 @@
       "display_name": "正话反说",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_02_潜台词设计_03",
@@ -2072,7 +2191,8 @@
       "display_name": "答非所问",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_02_潜台词设计_04",
@@ -2090,7 +2210,8 @@
       "display_name": "用沉默说话",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_03_角色语言区分_01",
@@ -2108,7 +2229,8 @@
       "display_name": "用词习惯",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_03_角色语言区分_02",
@@ -2126,7 +2248,8 @@
       "display_name": "句式长短",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_03_角色语言区分_03",
@@ -2144,7 +2267,8 @@
       "display_name": "专业性术语",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_03_角色语言区分_04",
@@ -2162,7 +2286,8 @@
       "display_name": "敬语粗口",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_04_多人对话调度_01",
@@ -2180,7 +2305,8 @@
       "display_name": "交替式",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_04_多人对话调度_02",
@@ -2198,7 +2324,8 @@
       "display_name": "插话打断",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_04_多人对话调度_03",
@@ -2216,7 +2343,8 @@
       "display_name": "一方主导",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_05_特殊对话场景_01",
@@ -2234,7 +2362,8 @@
       "display_name": "审讯谈判",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_05_特殊对话场景_02",
@@ -2252,7 +2381,8 @@
       "display_name": "告白分手",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_05_特殊对话场景_03",
@@ -2270,7 +2400,8 @@
       "display_name": "临终遗言",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_05_特殊对话场景_04",
@@ -2288,7 +2419,8 @@
       "display_name": "公开演讲",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_06_对白与叙述衔接_01",
@@ -2306,7 +2438,8 @@
       "display_name": "独白内心戏",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "04_对白艺术部_06_对白与叙述衔接_02",
@@ -2324,7 +2457,8 @@
       "display_name": "动作与对白配合",
       "department": "04_对白艺术部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "meso"
     },
     {
       "id": "05_文笔滤镜部_01_句式与节奏_01",
@@ -2342,7 +2476,8 @@
       "display_name": "极短句",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_01_句式与节奏_02",
@@ -2360,7 +2495,8 @@
       "display_name": "长句",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_01_句式与节奏_03",
@@ -2378,7 +2514,8 @@
       "display_name": "长短交错",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_01_句式与节奏_04",
@@ -2396,7 +2533,8 @@
       "display_name": "密集分段",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_01_句式与节奏_05",
@@ -2414,7 +2552,8 @@
       "display_name": "标点留白",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_02_感官调度_01",
@@ -2432,7 +2571,8 @@
       "display_name": "视觉主导",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_02_感官调度_02",
@@ -2450,7 +2590,8 @@
       "display_name": "听觉主导",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_02_感官调度_03",
@@ -2468,7 +2609,8 @@
       "display_name": "嗅觉味觉主导",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_02_感官调度_04",
@@ -2486,7 +2628,8 @@
       "display_name": "体感触觉主导",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_02_感官调度_05",
@@ -2504,7 +2647,8 @@
       "display_name": "多感官交织",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_03_修辞系统_01",
@@ -2522,7 +2666,8 @@
       "display_name": "比喻",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_03_修辞系统_02",
@@ -2540,7 +2685,8 @@
       "display_name": "通感",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_03_修辞系统_03",
@@ -2558,7 +2704,8 @@
       "display_name": "拟人拟物",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_03_修辞系统_04",
@@ -2576,7 +2723,8 @@
       "display_name": "排比反复",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_03_修辞系统_05",
@@ -2594,7 +2742,8 @@
       "display_name": "反讽",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_04_描写技法_01",
@@ -2612,7 +2761,8 @@
       "display_name": "白描",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_04_描写技法_02",
@@ -2630,7 +2780,8 @@
       "display_name": "工笔细描",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_04_描写技法_03",
@@ -2648,7 +2799,8 @@
       "display_name": "印象派描写",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_04_描写技法_04",
@@ -2666,7 +2818,8 @@
       "display_name": "动态描写",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_01",
@@ -2684,7 +2837,8 @@
       "display_name": "克制冷峻",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_02",
@@ -2702,7 +2856,8 @@
       "display_name": "热烈奔放",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_03",
@@ -2720,7 +2875,8 @@
       "display_name": "幽默诙谐",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_04",
@@ -2738,7 +2894,8 @@
       "display_name": "沉郁顿挫",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_05",
@@ -2756,7 +2913,8 @@
       "display_name": "诗性哲思",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_06",
@@ -2774,7 +2932,8 @@
       "display_name": "民间说书人腔",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_05_叙事腔调_07",
@@ -2792,7 +2951,8 @@
       "display_name": "日记书信体",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_06_文字质感_01",
@@ -2810,7 +2970,8 @@
       "display_name": "清丽",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_06_文字质感_02",
@@ -2828,7 +2989,8 @@
       "display_name": "冷硬",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_06_文字质感_03",
@@ -2846,7 +3008,8 @@
       "display_name": "绮丽",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "05_文笔滤镜部_06_文字质感_04",
@@ -2864,7 +3027,8 @@
       "display_name": "简洁",
       "department": "05_文笔滤镜部",
       "context_slot": "L3",
-      "injection_point": "polisher"
+      "injection_point": "polisher",
+      "worldviewDepth": "micro"
     },
     {
       "id": "06_世界构建部_01_世界规则_01",
@@ -2880,7 +3044,8 @@
       "display_name": "物理法则",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_01_世界规则_02",
@@ -2896,7 +3061,8 @@
       "display_name": "魔法科技体系",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_01_世界规则_03",
@@ -2912,7 +3078,8 @@
       "display_name": "社会制度",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_01_世界规则_04",
@@ -2928,7 +3095,8 @@
       "display_name": "文化习俗",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_02_规则揭示方式_01",
@@ -2944,7 +3112,8 @@
       "display_name": "角色经历揭示",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_02_规则揭示方式_02",
@@ -2960,7 +3129,8 @@
       "display_name": "对话交代",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_02_规则揭示方式_03",
@@ -2976,7 +3146,8 @@
       "display_name": "附录序章说明",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_02_规则揭示方式_04",
@@ -2992,7 +3163,8 @@
       "display_name": "细节暗示",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_03_空间构建_01",
@@ -3008,7 +3180,8 @@
       "display_name": "地图地理",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_03_空间构建_02",
@@ -3024,7 +3197,8 @@
       "display_name": "标志性建筑",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_03_空间构建_03",
@@ -3040,7 +3214,8 @@
       "display_name": "空间转换技法",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_04_历史纵深感_01",
@@ -3056,7 +3231,8 @@
       "display_name": "古籍传说",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_04_历史纵深感_02",
@@ -3072,7 +3248,8 @@
       "display_name": "遗迹废墟",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_04_历史纵深感_03",
@@ -3088,7 +3265,8 @@
       "display_name": "代际恩怨",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_05_日常生活_01",
@@ -3104,7 +3282,8 @@
       "display_name": "衣食住行",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_05_日常生活_02",
@@ -3120,7 +3299,8 @@
       "display_name": "节庆仪式",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_05_日常生活_03",
@@ -3136,7 +3316,8 @@
       "display_name": "货币交易",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_06_权力结构_01",
@@ -3152,7 +3333,8 @@
       "display_name": "政治权力",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_06_权力结构_02",
@@ -3168,7 +3350,8 @@
       "display_name": "经济权力",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     },
     {
       "id": "06_世界构建部_06_权力结构_03",
@@ -3184,7 +3367,8 @@
       "display_name": "文化话语权力",
       "department": "06_世界构建部",
       "context_slot": "L4",
-      "injection_point": "material-manager"
+      "injection_point": "material-manager",
+      "worldviewDepth": "macro"
     }
   ]
 }

@@ -1,0 +1,48 @@
+# material-manager节点契约定义
+# 素材落库后必须校验深度字段已写入stateKVIndex
+agent: material-manager
+format: full
+
+# 输入素材契约
+input:
+  required:
+    - path: chapter
+      type: object
+      severity: CRITICAL
+      errorCode: MM-IN-001
+      message: 章节信息必须存在
+
+    - path: materials
+      type: array
+      severity: HIGH
+      errorCode: MM-IN-002
+      message: 素材列表必须可获取
+
+# 输出契约
+output:
+  required:
+    - field: response
+      type: string
+      minLength: 10
+      severity: CRITICAL
+      errorCode: MM-OUT-001
+      message: material-manager输出response必须存在且≥10字（素材管理结果）
+
+# post-material校验：深度字段必须已写入stateKVIndex
+# 陷阱#79防护：material-manager执行后，深度字段必须落库
+postMaterial:
+  # 校验character-states表是否有本章记录
+  characterStates:
+    severity: CRITICAL
+    errorCode: MM-POST-001
+    message: material-manager执行后character-states表无本章记录，深度字段未落库（陷阱#79断链）
+    # 检查条件：本章character-states记录数>0
+    check: hasChapterState
+
+  # 校验entityCenter角色数≥1
+  entityCenterCharacters:
+    severity: CRITICAL
+    errorCode: MM-POST-002
+    message: material-manager执行后entityCenter无角色实体
+    check: hasCharacters
+    minCount: 1

@@ -1,4 +1,5 @@
 const store = require('../store');
+const { getDataContext } = require('./dataContext');
 
 const BEAT_TEMPLATES = {
     novel: {
@@ -7,20 +8,6 @@ const BEAT_TEMPLATES = {
         pattern: ['setup', 'tension', 'escalation', 'climax', 'resolution'],
         requiredBeats: ['setup', 'climax'],
         chapterEndBeat: 'hook'
-    },
-    shuangwen: {
-        name: '爽文节拍',
-        beatsPerChapter: { min: 4, max: 7 },
-        pattern: ['setup', 'provocation', 'escalation', 'reversal', 'face_slap', 'aftermath'],
-        requiredBeats: ['provocation', 'face_slap'],
-        chapterEndBeat: 'hook'
-    },
-    'tomato-short': {
-        name: '短篇节拍',
-        beatsPerChapter: { min: 5, max: 8 },
-        pattern: ['hook', 'setup', 'tension', 'escalation', 'climax', 'twist', 'resolution'],
-        requiredBeats: ['hook', 'climax', 'twist'],
-        chapterEndBeat: 'cliffhanger'
     }
 };
 
@@ -44,12 +31,13 @@ class BeatAllocator {
         this.projectId = projectId;
     }
 
-    _getProject() {
-        return store.getItem('projects', this.projectId);
+    async _getProject() {
+        const _baCtx = await getDataContext(this.projectId);
+        return await _baCtx.getProject();
     }
 
-    _getBeatStore() {
-        const project = this._getProject();
+    async _getBeatStore() {
+        const project = await this._getProject();
         if (!project) return null;
         if (!project._beatAllocator) {
             project._beatAllocator = {
@@ -60,14 +48,14 @@ class BeatAllocator {
         return project._beatAllocator;
     }
 
-    _saveBeatStore(bs) {
-        const project = this._getProject();
+    async _saveBeatStore(bs) {
+        const project = await this._getProject();
         if (!project) return;
         project._beatAllocator = bs;
         store.setItem('projects', this.projectId, project);
     }
 
-    allocateBeatsForChapter(chapterNumber, chapterOutline, mode) {
+    async allocateBeatsForChapter(chapterNumber, chapterOutline, mode) {
         const template = BEAT_TEMPLATES[mode] || BEAT_TEMPLATES.novel;
         const beats = [];
         const outline = chapterOutline || '';
@@ -99,10 +87,10 @@ class BeatAllocator {
             });
         }
 
-        const bs = this._getBeatStore();
+        const bs = await this._getBeatStore();
         if (bs) {
             bs.chapterBeats[chapterNumber] = beats;
-            this._saveBeatStore(bs);
+            await this._saveBeatStore(bs);
         }
 
         return beats;
@@ -133,16 +121,16 @@ class BeatAllocator {
         return hints[beatType] || [];
     }
 
-    bindTechniqueToBeat(chapterNumber, beatIndex, techId) {
-        const bs = this._getBeatStore();
+    async bindTechniqueToBeat(chapterNumber, beatIndex, techId) {
+        const bs = await this._getBeatStore();
         if (!bs) return;
         const key = `${chapterNumber}_${beatIndex}`;
         bs.techniqueBindings[key] = techId;
-        this._saveBeatStore(bs);
+        await this._saveBeatStore(bs);
     }
 
-    formatBeatsForPrompt(chapterNumber, mode, beatsOverride) {
-        const bs = this._getBeatStore();
+    async formatBeatsForPrompt(chapterNumber, mode, beatsOverride) {
+        const bs = await this._getBeatStore();
         const beats = beatsOverride || bs?.chapterBeats?.[chapterNumber];
         if (!beats || !beats.length) return '';
 
@@ -155,8 +143,8 @@ class BeatAllocator {
         return lines.join('\n');
     }
 
-    getChapterBeats(chapterNumber) {
-        const bs = this._getBeatStore();
+    async getChapterBeats(chapterNumber) {
+        const bs = await this._getBeatStore();
         return bs?.chapterBeats?.[chapterNumber] || [];
     }
 }

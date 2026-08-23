@@ -79,7 +79,7 @@ function synthesize(text, options = {}) {
         });
 
         proc.on('close', (code) => {
-            try { fs.unlinkSync(paramFile); } catch {}
+            try { fs.unlinkSync(paramFile); } catch { /* cleanup */ }
             if (code === 0) {
                 resolve({
                     success: true,

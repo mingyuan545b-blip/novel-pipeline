@@ -12,7 +12,7 @@ const VALID_MATERIAL_TYPES = [
 
 const MATERIAL_TYPE_LABELS = {
     worldview: '世界观', character: '人物卡', equipment: '装备', relationship: '人物关系',
-    'power-system': '战力体系', 'sub-plane': '次位面', faction: '势力', institution: '机构',
+    'power-system': '战力体系', 'sub-plane': '小世界', faction: '势力', institution: '机构',
     catchphrase: '金句/热梗', 'famous-scene': '名场面', 'growth-history': '成长史',
     foreshadowing: '伏笔', location: '地点', 'narrative-bridge': '叙事衔接',
     'writing-technique': '写作手法', mechanism: '机制', other: '其他',
@@ -66,9 +66,9 @@ const CRAFT_TYPES = new Set(['mechanism', 'writing-technique', 'index', 'craft']
 
 const HIERARCHY_RULES = {
     'sub-plane': { parentRequired: false, parentFields: [] },
-    'faction': { parentRequired: true, parentFields: ['parentPlane'], description: '势力必须归属一个位面（次位面或主世界），parentPlane字段必填' },
-    'character': { parentRequired: true, parentFields: ['parentFaction'], description: '人物必须归属一个势力，parentFaction字段必填；若属于次位面势力，还需parentPlane' },
-    'equipment': { parentRequired: false, parentFields: ['parentPlane'], description: '道具可归属次位面，parentPlane可选' },
+    'faction': { parentRequired: true, parentFields: ['parentPlane'], description: '势力必须归属一个位面（小世界或主世界），parentPlane字段必填' },
+    'character': { parentRequired: true, parentFields: ['parentFaction'], description: '人物必须归属一个势力，parentFaction字段必填；若属于小世界势力，还需parentPlane' },
+    'equipment': { parentRequired: false, parentFields: ['parentPlane'], description: '道具可归属小世界，parentPlane可选' },
     'institution': { parentRequired: true, parentFields: ['parentPlane'], description: '机构必须归属一个位面，parentPlane字段必填' },
     'worldview': { parentRequired: false, parentFields: [] },
     'power-system': { parentRequired: false, parentFields: [] },

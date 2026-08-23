@@ -1,5 +1,7 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
+const { normalizeWordConfig } = require('../config/wordConfigNormalizer');
 
 const PROFILE_DIR = path.join(__dirname, '../../data/genre-profiles');
 
@@ -13,7 +15,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(PROFILE_DIR, file), 'utf8'));
             profiles.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('genreProfileRegistry', _.message || _); }
     }
     return profiles.size;
 }
@@ -31,13 +33,18 @@ function resolve(genreId) {
         '玄幻修仙': '玄幻', '修仙': '玄幻', '修真': '玄幻', '仙侠': '玄幻',
         '都市玄幻': '都市异能', '都市': '都市异能', '异能': '都市异能',
         '科幻未来': '科幻', '未来': '科幻', '末世': '科幻',
-        '武侠江湖': '武侠', '江湖': '武侠',
-        '灵异悬疑': '灵异', '悬疑': '灵异', '恐怖': '灵异', '规则怪谈': '灵异',
-        '网游虚拟': '网游', '游戏': '网游', '虚拟': '网游', '无限流': '网游',
+        '武侠江湖': '武侠', '江湖': '武侠', '高武': '武侠',
+        '灵异悬疑': '灵异', '悬疑': '灵异', '恐怖': '灵异', '规则怪谈': '灵异', '推理': '灵异',
+        '网游虚拟': '网游', '游戏': '网游', '虚拟': '网游', '无限流': '网游', '系统': '网游', '副本': '网游',
         '历史穿越': '历史', '穿越': '历史', '权谋': '历史',
         '奇幻冒险': '奇幻', '冒险': '奇幻', '魔法': '奇幻',
         '都市商战': '商战', '商业': '商战', '职场': '商战',
-        '言情古言': '言情', '古言': '言情', '甜宠': '言情', '虐恋': '言情'
+        '言情古言': '言情', '古言': '言情', '虐恋': '言情',
+        '甜宠匠心': '甜宠匠心', '甜宠': '甜宠匠心',
+        '复仇': '商战', '逆袭': '商战',
+        '符箓': '武侠', '符文': '武侠', '道术': '武侠',
+        '番茄悬疑': '灵异', '番茄复仇': '商战', '番茄甜宠': '甜宠匠心',
+        '番茄甜宠匠心': '甜宠匠心', '番茄系统': '网游', '番茄符箓': '武侠'
     };
     const resolved = aliases[genreId] || aliases[genreStr];
     return resolved ? get(resolved) : null;
@@ -63,7 +70,7 @@ function buildFullConfig(genreId, overrides = {}) {
             tone: overrides.tone || profile.styleHints?.tone || '',
             style: overrides.style || profile.styleHints?.style || ''
         },
-        wordConfig: overrides.wordConfig || profile.wordConfig || { minWords: 2200, targetWords: 2800, maxWords: 4000 },
+        wordConfig: normalizeWordConfig(overrides.wordConfig || profile.wordConfig || { minWords: 2200, targetWords: 2800, maxWords: 4000 }),
         constraintOverrides: profile.constraintOverrides || [],
         reviewFocus: profile.reviewFocus || [],
         materialFocus: profile.materialFocus || []

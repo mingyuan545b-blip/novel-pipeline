@@ -1,4 +1,5 @@
 const { getVolumeOrder } = require('../volumeHelpers');
+const logger = require('../../../shared/logger');
 
 const MATERIAL_TYPE_RULES = `【素材类型选择规则——严格遵守】
 - 含"结构+功能+触发"的装置/机制 → type: "mechanism"（不是foreshadowing！）
@@ -27,7 +28,7 @@ const OUTPUT_FORMAT_RULES = `【输出JSON格式规范——严格遵守】
   "content": "纯文本字符串，用【标签】值 格式组织内容，不要用JSON对象！",
   "reason": "操作原因",
   "parentFaction": "势力素材ID(character必填)",
-  "parentPlane": "位面素材ID(次位面素材必填)"
+  "parentPlane": "位面素材ID(小世界素材必填)"
 }
 
 ⚠️ content字段规范：
@@ -58,9 +59,9 @@ const CATCHPHRASE_RULES = `【金句/热梗提取规则】
 - 跨界混搭名场面（如"林黛玉大战孙悟空"）
 提取格式: type=catchphrase, name=金句内容, content=出处场景+角色+上下文`;
 
-function getVolumeGuidance(projectId, chapterNum, protagonistName) {
+async function getVolumeGuidance(projectId, chapterNum, protagonistName) {
     try {
-        const volumeOrder = getVolumeOrder(projectId);
+        const volumeOrder = await getVolumeOrder(projectId);
         const currentVolume = volumeOrder.volumeOrder.find(v => {
             const match = v.chapters.match(/Ch(\d+)-(\d+)/);
             if (match) return chapterNum >= parseInt(match[1]) && chapterNum <= parseInt(match[2]);
@@ -69,17 +70,17 @@ function getVolumeGuidance(projectId, chapterNum, protagonistName) {
         if (!currentVolume) return '';
 
         return `\n\n【⚠️ 当前章节位面归属——强制执行】
-第${chapterNum}章属于 第${currentVolume.volume}卷 (${currentVolume.chapters})，次位面: ${currentVolume.subplaneName} (ID: ${currentVolume.subplaneId})
+第${chapterNum}章属于 第${currentVolume.volume}卷 (${currentVolume.chapters})，小世界: ${currentVolume.subplaneName} (ID: ${currentVolume.subplaneId})
 
 归属规则：
-- 本章出现的所有角色/装备/机制/地点/势力，如果属于次位面"${currentVolume.subplaneName}"，必须设置 parentPlane: "${currentVolume.subplaneId}"
+- 本章出现的所有角色/装备/机制/地点/势力，如果属于小世界"${currentVolume.subplaneName}"，必须设置 parentPlane: "${currentVolume.subplaneId}"
 - 主角·${protagonistName}属于主世界，parentPlane留空！主角随身携带的装备也属于主世界，parentPlane留空
-- 主角当前在次位面活动，设置 currentPlaneId: "${currentVolume.subplaneId}"
-- 次位面角色必须同时设置 parentFaction 为该位面下的势力ID
-- 次位面装备/道具必须设置 parentPlane，可设parentFaction为该位面下对应势力
+- 主角当前在小世界活动，设置 currentPlaneId: "${currentVolume.subplaneId}"
+- 小世界角色必须同时设置 parentFaction 为该位面下的势力ID
+- 小世界装备/道具必须设置 parentPlane，可设parentFaction为该位面下对应势力
 - 伏笔(foreshadowing)和世界观(worldview)根据内容判断归属`;
     } catch (e) {
-        console.warn('[PIPELINE] 读取volume-order失败:', e.message);
+        logger.warn('materialPrompt', '读取volume-order失败:', { errorMessage: e.message });
         return '';
     }
 }
@@ -118,7 +119,7 @@ function getFlavorRules(projectId, protagonistName) {
 判定规则:
 - 主角默认与项目设定一致（当前项目主角${protagonistName}）
 - NPC根据出身地标注方言，根据性格标注风格
-- 同一次位面的角色可能来自不同地区，不要一刀切
+- 同一小世界的角色可能来自不同地区，不要一刀切
 - 方言和风格服务于角色辨识度，同一场景中不同风味的角色更容易区分`;
 
     try {
@@ -138,12 +139,12 @@ function getFlavorRules(projectId, protagonistName) {
 - 项目级命名风格由题材自动推断，角色级可覆盖
 - 有命名风格的角色，新出场NPC名字必须符合该风格`;
         }
-    } catch (_) { console.warn('[SILENT-CATCH]', _.message || _); }
+    } catch (_) { logger.warn('materialPrompt', _.message || _); }
 
     return content;
 }
 
-function buildMaterialManagerPrompt(params) {
+async function buildMaterialManagerPrompt(params) {
     const { chapter, materialSummary, archiveHints, styleProfile, context } = params;
     const chapterNum = chapter.chapterNumber;
     const protagonistName = styleProfile?.protagonistName || '主角';
@@ -165,7 +166,7 @@ ${MATERIAL_TYPE_RULES}
 ${OUTPUT_FORMAT_RULES}`;
 
     const creationStandardsSection = `\n\n${CREATION_STANDARDS}`;
-    const volumeGuidance = getVolumeGuidance(chapter.projectId, chapterNum, protagonistName);
+    const volumeGuidance = await getVolumeGuidance(chapter.projectId, chapterNum, protagonistName);
     const flavorRules = getFlavorRules(chapter.projectId, protagonistName);
     const catchphraseSection = CATCHPHRASE_RULES;
     const materialGuidance = context.materialGuidance ? `\n\n【定稿人素材更新指引】\n${context.materialGuidance}` : '';

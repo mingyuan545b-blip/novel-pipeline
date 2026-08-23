@@ -1,0 +1,36 @@
+/**
+ * 大纲生成器常量定义
+ * 素材类型标签、描述、命名规则
+ */
+
+const TYPE_LABELS = {
+    'worldview': '世界观设定', 'character': '人物卡', 'equipment': '重要物品/工具',
+    'relationship': '人物关系', 'power-system': '力量/能力体系', 'catchphrase': '金句/热梗',
+    'famous-scene': '名场面', 'growth-history': '成长史', 'foreshadowing': '伏笔设计',
+    'faction': '阵营/势力', 'institution': '机构/组织', 'character-combat': '角色战斗设定'
+};
+
+const TYPE_DESCS = {
+    'worldview': '详细描述世界背景、规则、社区特征，至少300字',
+    'character': '按角色等级差异化要求，见下方详细规则',
+    'equipment': '每个关键物件单独一个素材！name用物件名，content描述特征+使用场景+情感/职业意义，至少150字/件',
+    'relationship': '每对关系单独一个素材！name用"角色A与角色B"，content描述互动模式+称呼变化+情感递进节点，至少200字',
+    'power-system': '详细描述等级划分、突破条件、能力特征，至少300字',
+    'catchphrase': '每条金句单独一个素材！name就是金句原文，content写说话人+场景+情感含义',
+    'famous-scene': '每个名场面单独一个素材！name用场景名，content描述场景氛围+感官细节+情感转折点，至少150字',
+    'growth-history': '描述主角成长路线，至少300字',
+    'foreshadowing': '每个伏笔单独一个素材！name用伏笔名，content描述埋设位置+预期回收窗口+关联角色',
+    'faction': '描述阵营/势力的特征、目标、关系，至少200字',
+    'institution': '描述机构/组织的结构、规则、功能，至少200字',
+    'character-combat': '描述角色战斗能力、招式、风格，至少150字'
+};
+
+const TYPE_NAMING_RULES = {
+    'catchphrase': 'name必须是金句原文，禁止叫"经典台词集""金句合集"',
+    'famous-scene': 'name必须是具体场景名，禁止叫"名场面1""高光场景"',
+    'foreshadowing': 'name必须是伏笔内容，禁止叫"伏笔1""伏笔设计"',
+    'equipment': 'name必须是物件名，禁止叫"装备列表""重要物品"',
+    'relationship': 'name必须是"角色A与角色B"，禁止叫"人物关系图"'
+};
+
+module.exports = { TYPE_LABELS, TYPE_DESCS, TYPE_NAMING_RULES };

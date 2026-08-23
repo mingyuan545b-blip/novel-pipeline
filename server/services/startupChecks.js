@@ -1,5 +1,7 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
+const { registerPipelineChecks } = require('./startupChecksPipeline');
 
 const STARTUP_CHECKS = [];
 
@@ -7,34 +9,51 @@ function registerCheck(name, fn) {
     STARTUP_CHECKS.push({ name, fn });
 }
 
-function runStartupChecks() {
+async function runStartupChecks() {
     const results = [];
     let hasCritical = false;
 
-    for (const check of STARTUP_CHECKS) {
+    // 并行执行所有启动检查
+    const checkPromises = STARTUP_CHECKS.map(async (check) => {
         try {
-            const result = check.fn();
-            results.push({ name: check.name, ...result });
-            if (result.level === 'critical') hasCritical = true;
+            const result = await check.fn();
+            return { name: check.name, ...result };
         } catch (e) {
-            results.push({ name: check.name, level: 'critical', message: e.message });
-            hasCritical = true;
+            return { name: check.name, level: 'critical', message: e.message };
         }
+    });
+
+    const checkResults = await Promise.all(checkPromises);
+
+    for (const r of checkResults) {
+        results.push(r);
+        if (r.level === 'critical') hasCritical = true;
     }
 
     if (results.length > 0) {
-        console.log(`\n${'═'.repeat(50)}`);
-        console.log('  启动自检报告');
-        console.log(`${'═'.repeat(50)}`);
+        logger.info('startupChecks', `\n${'═'.repeat(50)}`);
+        logger.info('startupChecks', '  启动自检报告');
+        logger.info('startupChecks', `${'═'.repeat(50)}`);
         for (const r of results) {
             const icon = r.level === 'critical' ? '❌' : r.level === 'warning' ? '⚠️' : '✅';
-            console.log(`  ${icon} ${r.name}: ${r.message}`);
+            logger.info('startupChecks', `  ${icon} ${r.name}: ${r.message}`);
         }
-        console.log(`${'═'.repeat(50)}\n`);
+        logger.info('startupChecks', `${'═'.repeat(50)}\n`);
     }
 
     return { results, hasCritical };
 }
+
+// === 环境配置检查 ===
+registerCheck('LLM_API_KEY', () => {
+    const { getLLMConfigSummary } = require('../config/configManifest');
+    const summary = getLLMConfigSummary();
+    if (!summary.hasAnyKey) {
+        return { level: 'critical', message: '未配置任何LLM API密钥！所有AI生成功能不可用。请在.env中设置ALIYUN_CODING_API_KEY' };
+    }
+    const providerNames = summary.providers.map(p => `${p.name}(${p.keyPrefix})`).join(', ');
+    return { level: 'ok', message: `当前: ${summary.currentProvider}, 已配置: ${providerNames}` };
+});
 
 registerCheck('ENCRYPTION_SECRET', () => {
     if (!process.env.ENCRYPTION_SECRET) {
@@ -50,6 +69,7 @@ registerCheck('REQUEST_SECRET', () => {
     return { level: 'ok', message: '已配置' };
 });
 
+// === 数据完整性检查 ===
 registerCheck('数据目录', () => {
     const dataDir = path.join(__dirname, '..', '..', 'data');
     if (!fs.existsSync(dataDir)) {
@@ -102,7 +122,7 @@ registerCheck('素材类型注册', () => {
 registerCheck('题材插件', () => {
     try {
         const genreConfig = require('./genreConfig');
-        const plugins = genreConfig.getRegisteredPlugins ? genreConfig.getRegisteredPlugins() : [];
+        const plugins = genreConfig.getRegisteredGenres ? genreConfig.getRegisteredGenres() : [];
         if (plugins.length < 3) {
             return { level: 'warning', message: `仅${plugins.length}个插件注册` };
         }
@@ -111,5 +131,8 @@ registerCheck('题材插件', () => {
         return { level: 'warning', message: `检查失败: ${e.message}` };
     }
 });
+
+// === Pipeline完整性检查（从startupChecksPipeline.js加载）===
+registerPipelineChecks(registerCheck);
 
 module.exports = { runStartupChecks, registerCheck };

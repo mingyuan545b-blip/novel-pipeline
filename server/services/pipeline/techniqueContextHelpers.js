@@ -1,0 +1,56 @@
+/**
+ * techniqueContextHelpers.js — 技法上下文辅助函数
+ * 从agentRunner提取的技法相关异步数据获取逻辑
+ */
+const { getAccessByProject } = require('../knowledgeBase/knowledgeAccess');
+const { resolveGenreFromProject } = require('../genreConfig');
+const { getBatchSuccessRates, recordFeedback } = require('./techniqueFeedback');
+const techIndex = require('../techIndex');
+
+/** 选中技法缓存：projectId:chapterNumber → techniqueId[] */
+const _selectedCache = new Map();
+
+async function buildKnowledgeContext(projectId) {
+    if (!projectId) return null;
+    try {
+        const records = await getAccessByProject(projectId);
+        if (!records.length) return null;
+        const counts = { certain: 0, suspect: 0, misinformed: 0, unknown: 0 };
+        for (const r of records) { if (counts[r.confidence] !== undefined) counts[r.confidence]++; }
+        return counts;
+    } catch (_) { return null; }
+}
+
+async function resolveGenre(projectId) {
+    if (!projectId) return null;
+    try { return await resolveGenreFromProject(projectId); } catch (_) { return null; }
+}
+
+async function buildFeedbackRates(projectId) {
+    if (!projectId) return null;
+    try {
+        const techIds = techIndex.getTechniquesByInjectionPoint('writer', 'novel').map(t => t.id).slice(0, 20);
+        if (!techIds.length) return null;
+        return await getBatchSuccessRates(techIds, projectId);
+    } catch (_) { return null; }
+}
+
+/** 缓存选中技法ID（agentRunner调用） */
+function cacheSelectedTechniques(projectId, chapterNumber, techniqueIds) {
+    if (!projectId || !techniqueIds?.length) return;
+    _selectedCache.set(`${projectId}:${chapterNumber}`, techniqueIds);
+}
+
+/** 获取缓存的技法ID并记录反馈（审核步骤后调用） */
+async function recordReviewFeedback(projectId, chapterNumber, passed) {
+    if (!projectId) return;
+    const key = `${projectId}:${chapterNumber}`;
+    const techIds = _selectedCache.get(key);
+    if (!techIds?.length) return;
+    try {
+        await recordFeedback(projectId, chapterNumber, techIds, passed);
+        _selectedCache.delete(key);
+    } catch (_) { /* non-critical */ }
+}
+
+module.exports = { buildKnowledgeContext, resolveGenre, buildFeedbackRates, cacheSelectedTechniques, recordReviewFeedback };

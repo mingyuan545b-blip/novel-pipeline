@@ -1,5 +1,7 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
+const { getDataContext } = require('./dataContext');
 
 const MEME_DIR = path.join(__dirname, '../../data/meme-lexicon');
 const HUMOR_DIR = path.join(__dirname, '../../data/humor-devices');
@@ -17,7 +19,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(MEME_DIR, file), 'utf8'));
             memeEntries.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('memeLexicon', _.message || _); }
     }
 
     if (!fs.existsSync(HUMOR_DIR)) return 0;
@@ -26,7 +28,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(HUMOR_DIR, file), 'utf8'));
             humorDevices.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('memeLexicon', _.message || _); }
     }
 
     return { memes: memeEntries.size, devices: humorDevices.size };
@@ -37,9 +39,10 @@ function listDevices() { return Array.from(humorDevices.values()); }
 function getMeme(id) { return memeEntries.get(id) || null; }
 function getDevice(id) { return humorDevices.get(id) || null; }
 
-function buildWriterPrompt(projectId) {
+async function buildWriterPrompt(projectId) {
     const store = require('../store');
-    const project = store.getItem('projects', projectId);
+    const _mlCtx = await getDataContext(projectId);
+    const project = await _mlCtx.getProject();
     if (!project) return '';
 
     const genre = project.genre || project.styleProfile?.genre || '';
@@ -100,9 +103,10 @@ function buildWriterPrompt(projectId) {
     return parts.length > 0 ? parts.join('\n') : '';
 }
 
-function buildReviewerPrompt(projectId) {
+async function buildReviewerPrompt(projectId) {
     const store = require('../store');
-    const project = store.getItem('projects', projectId);
+    const _mlrCtx = await getDataContext(projectId);
+    const project = await _mlrCtx.getProject();
     if (!project) return '';
 
     const genre = project.genre || project.styleProfile?.genre || '';

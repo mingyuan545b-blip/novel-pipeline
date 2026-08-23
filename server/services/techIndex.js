@@ -13,6 +13,22 @@ class TechIndex {
         this._avgDocLen = 0;
         this._docCount = 0;
         this._idfCache = {};
+        this._injectionCache = {};
+        this._watcher = null;
+        this._watchDebounce = null;
+        this._startWatcher();
+    }
+
+    _startWatcher() {
+        const idxPath = path.join(LIBRARY_DIR, 'index.json');
+        if (!fs.existsSync(idxPath)) return;
+        try {
+            this._watcher = fs.watch(idxPath, { persistent: false }, () => {
+                clearTimeout(this._watchDebounce);
+                this._watchDebounce = setTimeout(() => this.refreshIndex(), 300);
+            });
+            this._watcher.on('error', () => { /* ignore watch errors */ });
+        } catch (_) { /* fs.watch not available */ }
     }
 
     _loadIndex() {
@@ -126,8 +142,10 @@ class TechIndex {
     }
 
     getTechniquesByInjectionPoint(injectionPoint, mode) {
+        const cacheKey = `${injectionPoint}:${mode || '*'}`;
+        if (this._injectionCache[cacheKey]) return this._injectionCache[cacheKey];
         const index = this._loadIndex();
-        return index.entries
+        const result = index.entries
             .filter(e => {
                 if (e.injection_point !== injectionPoint) return false;
                 if (mode && !e.modes.includes(mode)) return false;
@@ -135,6 +153,8 @@ class TechIndex {
             })
             .map(e => this._loadLeaf(e.id))
             .filter(Boolean);
+        this._injectionCache[cacheKey] = result;
+        return result;
     }
 
     formatTechniquesForPrompt(techniques, maxTokens = 800) {
@@ -161,6 +181,7 @@ class TechIndex {
         this._idfCache = {};
         this._docCount = 0;
         this._avgDocLen = 0;
+        this._injectionCache = {};
         this._loadIndex();
     }
 }

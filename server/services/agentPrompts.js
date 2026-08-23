@@ -1,3 +1,3 @@
-const legacy = require('./_agentPromptsLegacy');
+const prompts = require('./prompts');
 
-module.exports = legacy;
+module.exports = prompts;

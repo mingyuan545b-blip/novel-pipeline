@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const axios = require('axios');
 
 const TRENDING_CACHE = {
@@ -36,11 +37,11 @@ async function searchTrendingMemes(genre, keywords) {
                     const words = res.data.result.map(r => r[0]).filter(Boolean);
                     results.hotWords.push(...words);
                 }
-            } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+            } catch(_) { logger.warn('trendingSearch', _.message || _); }
         }
 
         results.hotWords = [...new Set(results.hotWords)].slice(0, 20);
-    } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+    } catch(_) { logger.warn('trendingSearch', _.message || _); }
 
     const genreMemes = getGenreDefaultMemes(genre);
     results.memes = genreMemes.memes;

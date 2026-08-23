@@ -1,0 +1,57 @@
+# second-review节点契约定义
+# 二审：基于一审结果做深度审核，必须拿到深度字段+一审结果
+agent: second-review
+format: review
+
+# 输入素材契约
+input:
+  required:
+    - path: chapter.content
+      type: string
+      minLength: 100
+      severity: CRITICAL
+      errorCode: SR-IN-001
+      message: 章节正文必须存在且≥100字
+
+    - path: chapter.firstReviewOutput
+      type: string
+      minLength: 10
+      severity: HIGH
+      errorCode: SR-IN-002
+      message: 二审依赖一审结果（firstReviewOutput）
+
+    - path: project
+      type: object
+      severity: HIGH
+      errorCode: SR-IN-003
+      message: 项目信息必须存在
+
+  # 二审素材深度字段校验
+  materialFields:
+    character:
+      requireMinCount:
+        min: 1
+        severity: CRITICAL
+        errorCode: SR-IN-005
+        message: CH2+二审无未归档角色素材，无法深度审核
+        exceptFirstChapter: true
+
+      stateJson:
+        anyOf:
+          - innerConflict
+          - independentStance
+          - fateArc
+        severity: CRITICAL
+        errorCode: SR-IN-004
+        message: 二审缺少角色深度字段，无法判断工具人化（陷阱#79断链）
+        exceptFirstChapter: true
+
+# 输出契约
+output:
+  required:
+    - field: response
+      type: string
+      minLength: 10
+      severity: CRITICAL
+      errorCode: SR-OUT-001
+      message: second-review输出response必须存在且≥10字

@@ -1,0 +1,64 @@
+# writer节点契约定义
+# 陷阱#79防护：writer必须拿到深度字段才能避免工具人化
+agent: writer
+format: full
+
+# 输入素材契约（pre-execution校验）
+# path直接对应ctx对象的字段路径（无ctx前缀）
+input:
+  required:
+    - path: chapter.outline
+      type: string
+      minLength: 10
+      severity: CRITICAL
+      errorCode: WR-IN-001
+      message: 章节大纲必须存在且≥10字
+
+    - path: materials
+      type: array
+      severity: WARN
+      errorCode: WR-IN-002
+      message: 素材列表应可获取
+
+    - path: project
+      type: object
+      severity: CRITICAL
+      errorCode: WR-IN-003
+      message: 项目信息必须存在
+
+  # 角色素材深度字段校验（真实数据校验，不只查length）
+  materialFields:
+    character:
+      # CH2+至少1个未归档角色素材（陷阱#79变体防护）
+      requireMinCount:
+        min: 1
+        severity: CRITICAL
+        errorCode: WR-IN-005
+        message: CH2+无未归档角色素材，素材注入链路断链（CH1 material-manager未落库）
+        exceptFirstChapter: true
+
+      # 角色stateJson必须包含深度字段（至少1个）
+      # 陷阱#79：深度字段断链会导致工具人化
+      stateJson:
+        anyOf:
+          - innerConflict
+          - independentStance
+          - fateArc
+          - protagonistMirror
+          - personality
+        severity: CRITICAL
+        errorCode: WR-IN-004
+        message: 角色素材stateJson缺少所有深度字段，writer无法体现角色深度（陷阱#79断链）
+        # 首章例外：首章无前序深度字段，CH2+必须通过
+        exceptFirstChapter: true
+
+# 输出契约（post-execution校验）
+# 注：agent实际输出结构是 { response: string }，content/wordCount在chapter对象上
+output:
+  required:
+    - field: response
+      type: string
+      minLength: 100
+      severity: CRITICAL
+      errorCode: WR-OUT-001
+      message: writer输出response必须存在且≥100字（正文内容）

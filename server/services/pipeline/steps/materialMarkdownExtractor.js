@@ -1,11 +1,12 @@
 const { v4: uuidv4 } = require('uuid');
+const logger = require('../../../shared/logger');
 const store = require('../../../store');
 const { validateNewMaterial } = require('../../genreConfig');
 
-function extractFromMarkdown(mdText, chapter, projectId, materials, styleProfile) {
+async function extractFromMarkdown(mdText, chapter, projectId, materials, styleProfile) {
     const appliedUpdates = [];
 
-    console.log(`[PIPELINE] material-manager JSON parse failed, trying markdown extraction for ch${chapter.chapterNumber}`);
+    logger.info('materialMdExtract', `material-manager JSON parse failed, trying markdown extraction for ch${chapter.chapterNumber}`);
 
     const headingRegex = /#{1,5}\s*\[(character|worldview|power-system|foreshadowing|relationship|equipment|location|famous-scene|catchphrase|growth-history)\]\s*([^(]+?)\s*\(v\d+\)/gi;
     const headingMatches = [...mdText.matchAll(headingRegex)];
@@ -28,7 +29,7 @@ function extractFromMarkdown(mdText, chapter, projectId, materials, styleProfile
         const existing = materials.find(m => m.projectId === projectId && !m.archived && m.type === type && m.name === name);
 
         if (existing) {
-            store.setItem('materials', existing.id, {
+            await store.setItem('materials', existing.id, {
                 ...existing,
                 currentContent: content,
                 sourceChapter: chapter.chapterNumber,
@@ -42,17 +43,17 @@ function extractFromMarkdown(mdText, chapter, projectId, materials, styleProfile
                 version: (existing.version || 1) + 1,
                 updatedAt: new Date().toISOString()
             });
-            console.log(`[PIPELINE] Markdown extraction: updated ${type} "${name}"`);
+            logger.info('materialMdExtract', `Markdown extraction: updated ${type} "${name}"`);
             appliedUpdates.push({ action: 'update', type, name, reason: 'Markdown extraction update' });
         } else {
             const genreVal = validateNewMaterial({ type, name, currentContent: content, initialContent: content }, styleProfile, materials);
             if (genreVal.errors.length > 0) {
-                console.warn(`[PIPELINE] Markdown素材校验拦截: "${name}" - ${genreVal.errors.join('; ')}`);
+                logger.warn('materialMdExtract', `Markdown素材校验拦截: "${name}" - ${genreVal.errors.join('; ')}`);
                 continue;
             }
 
             const newMatId = uuidv4();
-            store.setItem('materials', newMatId, {
+            await store.setItem('materials', newMatId, {
                 id: newMatId, projectId, type, name,
                 initialContent: content, currentContent: content,
                 parentPlane: null, parentFaction: null, version: 1, status: 'active',
@@ -60,7 +61,7 @@ function extractFromMarkdown(mdText, chapter, projectId, materials, styleProfile
                 changeLog: [{ action: 'import', from: 'markdown-extraction', at: new Date().toISOString() }],
                 createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
             });
-            console.log(`[PIPELINE] Markdown extraction: created ${type} "${name}"`);
+            logger.info('materialMdExtract', `Markdown extraction: created ${type} "${name}"`);
             appliedUpdates.push({ action: 'create', type, name, reason: 'Markdown extraction create' });
         }
     }
@@ -85,7 +86,7 @@ function extractBlockContent(block) {
                         .replace(/[\u2018\u2019]/g, "'")
                         .replace(/,\s*([}\]])/g, '$1'));
                 } catch (__) {
-                    console.warn('[SILENT-CATCH]', __.message || __);
+                    logger.warn('materialMdExtract', __.message || __);
                 }
             }
             content = parsed ? (parsed['内容'] || parsed.content || parsed['描述'] || parsed.description || JSON.stringify(parsed, null, 2)) : jsonStr;

@@ -33,9 +33,8 @@ echo [3/4] 检查环境配置...
 if not exist "server\.env" (
     echo 正在创建默认配置...
     (
-        echo MINIMAX_API_KEY=你的API_KEY
-        echo MINIMAX_GROUP_ID=你的GROUP_ID
-        echo MINIMAX_MODEL=MiniMax-M2.7
+        echo ALIYUN_CODING_API_KEY=你的API_KEY
+        echo ALIYUN_CODING_MODEL=qwen3-plus
         echo PORT=3001
     ) > server\.env
     echo [注意] 已创建 server\.env 默认配置文件，请编辑填入你的 API Key！

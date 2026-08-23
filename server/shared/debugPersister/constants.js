@@ -1,0 +1,24 @@
+'use strict';
+
+/**
+ * 调试日志持久化常量
+ * 文件位置：server/shared/debugPersister/constants.js
+ */
+
+const { DEBUG_FALLBACK } = require('../../config/systemConfigDefs');
+
+const FLUSH_INTERVAL_MS = parseInt(process.env.DEBUG_PERSIST_FLUSH_MS, 10) || 5000;
+const FLUSH_BATCH_SIZE = parseInt(process.env.DEBUG_PERSIST_BATCH_SIZE, 10) || 50;
+const RETENTION_DAYS = parseInt(process.env.DEBUG_PERSIST_RETENTION_DAYS, 10) || 7;
+const CLEANUP_INTERVAL_MS = 60 * 60 * 1000;
+const BUFFER_FORCE_FALLBACK_THRESHOLD = DEBUG_FALLBACK.BUFFER_FORCE_FALLBACK_THRESHOLD;
+const CONSECUTIVE_FAILURES_THRESHOLD = DEBUG_FALLBACK.CONSECUTIVE_FAILURES_THRESHOLD;
+
+module.exports = {
+    FLUSH_INTERVAL_MS,
+    FLUSH_BATCH_SIZE,
+    RETENTION_DAYS,
+    CLEANUP_INTERVAL_MS,
+    BUFFER_FORCE_FALLBACK_THRESHOLD,
+    CONSECUTIVE_FAILURES_THRESHOLD
+};

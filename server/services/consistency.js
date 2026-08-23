@@ -1,3 +1,2 @@
-const legacy = require('./_consistencyLegacy');
-
-module.exports = legacy;
+const engine = require('./consistencyEngine/index');
+module.exports = engine;

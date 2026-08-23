@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,12 +16,12 @@ function startWatcher() {
             if (!filename || !filename.endsWith('.json')) return;
             if (_watchDebounce) clearTimeout(_watchDebounce);
             _watchDebounce = setTimeout(() => {
-                console.log(`[DialectRegistry] File change detected (${filename}), reloading...`);
+                logger.info('dialectRegistry', `[DialectRegistry] File change detected (${filename}), reloading...`);
                 invalidateCache();
             }, 500);
         });
         _watcher.on('error', () => {});
-    } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+    } catch(_) { logger.warn('dialectRegistry', _.message || _); }
 }
 
 function loadAll() {
@@ -37,12 +38,12 @@ function loadAll() {
                     _cache[data.region] = data;
                 }
             } catch (e) {
-                console.warn(`[DialectRegistry] 加载方言文件失败: ${file}`, e.message);
+                logger.warn('dialectRegistry', `[DialectRegistry] 加载方言文件失败: ${file}`, e.message);
             }
         }
-        console.log(`[DialectRegistry] 已加载 ${Object.keys(_cache).length} 个方言: ${Object.keys(_cache).join(', ')}`);
+        logger.info('dialectRegistry', `[DialectRegistry] 已加载 ${Object.keys(_cache).length} 个方言: ${Object.keys(_cache).join(', ')}`);
     } catch (e) {
-        console.warn('[DialectRegistry] 方言目录不存在或无法读取:', e.message);
+        logger.warn('dialectRegistry', '[DialectRegistry] 方言目录不存在或无法读取:', e.message);
     }
     return _cache;
 }

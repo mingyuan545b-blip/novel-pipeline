@@ -1,0 +1,51 @@
+# reviser节点契约定义
+# 返修员：基于一审反馈修改正文，必须拿到深度字段才能避免返修后工具人化
+agent: reviser
+format: brief
+
+# 输入素材契约（pre-execution校验）
+input:
+  required:
+    - path: chapter.content
+      type: string
+      minLength: 100
+      severity: CRITICAL
+      errorCode: RV-IN-001
+      message: 章节正文必须存在且≥100字（返修员需要原文）
+
+    - path: project
+      type: object
+      severity: HIGH
+      errorCode: RV-IN-002
+      message: 项目信息必须存在
+
+  # 返修员素材深度字段校验（brief格式，但需知道深度字段避免返修后工具人化）
+  materialFields:
+    character:
+      requireMinCount:
+        min: 1
+        severity: CRITICAL
+        errorCode: RV-IN-004
+        message: CH2+返修员无未归档角色素材，无法避免返修后工具人化
+        exceptFirstChapter: true
+
+      stateJson:
+        anyOf:
+          - innerConflict
+          - independentStance
+          - fateArc
+          - protagonistMirror
+        severity: CRITICAL
+        errorCode: RV-IN-003
+        message: 返修员缺少角色深度字段，返修后可能工具人化（陷阱#79断链）
+        exceptFirstChapter: true
+
+# 输出契约（post-execution校验）
+output:
+  required:
+    - field: response
+      type: string
+      minLength: 100
+      severity: CRITICAL
+      errorCode: RV-OUT-001
+      message: reviser必须输出response（返修后正文）

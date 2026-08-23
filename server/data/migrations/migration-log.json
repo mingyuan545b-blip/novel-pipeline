@@ -1,0 +1,77 @@
+{
+  "applied": [],
+  "rolledBack": [
+    {
+      "version": 4,
+      "name": "field-normalization",
+      "rolledBackAt": "2026-05-21T07:08:09.907Z",
+      "durationMs": 0
+    },
+    {
+      "version": 3,
+      "name": "operational-tables-and-audit",
+      "rolledBackAt": "2026-05-21T07:08:09.913Z",
+      "durationMs": 4
+    },
+    {
+      "version": 2,
+      "name": "json-to-sqlite-migration",
+      "rolledBackAt": "2026-05-21T07:08:09.914Z",
+      "durationMs": 1
+    },
+    {
+      "version": 1,
+      "name": "schema-expansion",
+      "rolledBackAt": "2026-05-21T07:08:09.917Z",
+      "durationMs": 2
+    },
+    {
+      "version": 4,
+      "name": "field-normalization",
+      "rolledBackAt": "2026-05-21T07:15:49.960Z",
+      "durationMs": 0
+    },
+    {
+      "version": 3,
+      "name": "operational-tables-and-audit",
+      "rolledBackAt": "2026-05-21T07:15:49.968Z",
+      "durationMs": 7
+    },
+    {
+      "version": 2,
+      "name": "json-to-sqlite-migration",
+      "rolledBackAt": "2026-05-21T07:15:49.972Z",
+      "durationMs": 3
+    },
+    {
+      "version": 1,
+      "name": "schema-expansion",
+      "rolledBackAt": "2026-05-21T07:15:49.976Z",
+      "durationMs": 4
+    },
+    {
+      "version": 4,
+      "name": "field-normalization",
+      "rolledBackAt": "2026-05-21T07:16:30.431Z",
+      "durationMs": 0
+    },
+    {
+      "version": 3,
+      "name": "operational-tables-and-audit",
+      "rolledBackAt": "2026-05-21T07:16:30.439Z",
+      "durationMs": 7
+    },
+    {
+      "version": 2,
+      "name": "json-to-sqlite-migration",
+      "rolledBackAt": "2026-05-21T07:16:30.443Z",
+      "durationMs": 3
+    },
+    {
+      "version": 1,
+      "name": "schema-expansion",
+      "rolledBackAt": "2026-05-21T07:16:30.448Z",
+      "durationMs": 4
+    }
+  ]
+}

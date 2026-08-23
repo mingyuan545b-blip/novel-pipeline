@@ -19,15 +19,6 @@ const PLATFORM_RULES = {
         dialogueRatioMax: 0.5,
         bannedPatterns: [],
         requiredElements: ['chapter_title', 'content_body']
-    },
-    'tomato-short': {
-        name: '番茄短篇',
-        minWords: 1850,
-        maxWords: 2150,
-        dialogueRatioMax: 0.28,
-        bannedPatterns: [/第[零一二三四五六七八九十百千万\d]+章/],
-        readerTriggers: [7, 14],
-        requiredElements: ['chapter_title', 'content_body', 'reader_trigger']
     }
 };
 
@@ -106,10 +97,7 @@ class ValidationEngine {
             if (pattern.test(content)) errors.push(`包含禁止模式: ${pattern.source}`);
         }
 
-        if (platform === 'tomato-short' && rules.readerTriggers) {
-            const hasTrigger = /爽点|高潮|反转|悬念|钩子/.test(content);
-            if (!hasTrigger) warnings.push('番茄短篇建议包含读者触发点');
-        }
+        // tomato-short platform rules removed - all projects use novel mode
 
         return { valid: errors.length === 0, errors, warnings, wordCount, dialogueRatio };
     }

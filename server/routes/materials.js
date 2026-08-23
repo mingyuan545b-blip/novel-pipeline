@@ -2,8 +2,13 @@ const { v4: uuidv4 } = require('uuid');
 const store = require('../store');
 const memory = require('../services/memory');
 const { validateHierarchy, HIERARCHY_RULES } = require('../services/materialValidator');
+const { validateMaterialDepth } = require('../services/materialDepthValidator');
+const { validateMaterialDepthBatch } = require('../services/materialDepthBatch');
 const { checkIntegrity, autoFix, normalizeMaterial } = require('../services/materialIntegrity');
 const { createMaterial, updateMaterial, materialIdParam } = require('../middleware/validators');
+const { ERROR_CODES } = require('../shared/errorCodes');
+
+const { NOT_FOUND, VALIDATION_ERROR, FORBIDDEN } = ERROR_CODES;
 
 const router = require('express').Router();
 
@@ -14,15 +19,34 @@ router.get('/integrity/:projectId', (req, res) => {
     res.json(report);
 });
 
+// 陷阱#22修复：素材深度校验端点
+// GET /api/materials/depth/:projectId - 批量校验项目下所有素材深度
+// GET /api/materials/depth/:projectId/:materialId - 校验单个素材深度
+router.get('/depth/:projectId', async (req, res) => {
+    let materials = await store.listItems('materials');
+    materials = materials.filter(m => m.projectId === req.params.projectId && !m.archived);
+    const result = validateMaterialDepthBatch(materials);
+    res.json(result);
+});
+
+router.get('/depth/:projectId/:materialId', async (req, res) => {
+    const material = await store.getItem('materials', req.params.materialId);
+    if (!material || material.projectId !== req.params.projectId) {
+        return res.apiError(NOT_FOUND.statusCode, 'Material not found', NOT_FOUND.code);
+    }
+    const result = validateMaterialDepth(material);
+    res.json({ id: material.id, name: material.name, type: material.type, ...result });
+});
+
 router.post('/integrity/:projectId/fix', (req, res) => {
     const { dryRun, fixBroken, fixNameRefs, fixDuplicates } = req.body;
     const result = autoFix(req.params.projectId, { dryRun: dryRun !== false, fixBroken: fixBroken !== false, fixNameRefs: fixNameRefs !== false, fixDuplicates: fixDuplicates !== false });
     res.json(result);
 });
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const { projectId, type } = req.query;
-    let materials = store.listItems('materials');
+    let materials = await store.listItems('materials');
     if (projectId) materials = materials.filter(m => m.projectId === projectId);
     if (type) materials = materials.filter(m => m.type === type);
     res.json(materials);
@@ -32,9 +56,9 @@ router.get('/types', (req, res) => {
     res.json(VALID_MATERIAL_TYPES);
 });
 
-router.get('/:id', (req, res) => {
-    const material = store.getItem('materials', req.params.id);
-    if (!material) return res.status(404).json({ error: 'Material not found' });
+router.get('/:id', async (req, res) => {
+    const material = await store.getItem('materials', req.params.id);
+    if (!material) return res.apiError(NOT_FOUND.statusCode, 'Material not found', NOT_FOUND.code);
     res.json(material);
 });
 
@@ -57,19 +81,23 @@ router.post('/', createMaterial, async (req, res) => {
         if (factionResult?.parentFaction) parentFaction = factionResult.parentFaction;
     }
 
-    const hierarchyCheck = validateHierarchy({
+    const hierarchyCheck = await validateHierarchy({
         type: materialType,
         parentPlane,
         parentFaction
     });
 
     if (!hierarchyCheck.valid) {
-        return res.status(400).json({
-            error: '层级归属校验失败',
-            message: hierarchyCheck.message,
-            missingFields: hierarchyCheck.missing,
-            hint: getHierarchyHint(materialType)
-        });
+        return res.apiError(
+            VALIDATION_ERROR.statusCode,
+            '层级归属校验失败',
+            VALIDATION_ERROR.code,
+            {
+                message: hierarchyCheck.message,
+                missingFields: hierarchyCheck.missing,
+                hint: getHierarchyHint(materialType)
+            }
+        );
     }
 
     const material = {
@@ -103,21 +131,21 @@ router.post('/', createMaterial, async (req, res) => {
         updatedAt: now
     };
     await store.setItem('materials', id, material);
-    res.status(201).json(material);
+    res.apiOk(material, null, 201);
 });
 
 function getHierarchyHint(type) {
     const rule = HIERARCHY_RULES[type];
     if (!rule) return '';
-    if (type === 'faction') return '势力必须归属位面。主世界势力设parentPlane=null，次位面势力设parentPlane为对应次位面素材ID';
-    if (type === 'character') return '人物必须归属势力。设parentFaction为对应势力素材ID；若势力属于次位面，还需设parentPlane';
-    if (type === 'institution') return '机构必须归属位面。主世界机构设parentPlane=null，次位面机构设parentPlane为对应次位面素材ID';
+    if (type === 'faction') return '势力必须归属位面。主世界势力设parentPlane=null，小世界势力设parentPlane为对应小世界素材ID';
+    if (type === 'character') return '人物必须归属势力。设parentFaction为对应势力素材ID；若势力属于小世界，还需设parentPlane';
+    if (type === 'institution') return '机构必须归属位面。主世界机构设parentPlane=null，小世界机构设parentPlane为对应小世界素材ID';
     return rule.description || '';
 }
 
 router.put('/:id', updateMaterial, async (req, res) => {
-    const material = store.getItem('materials', req.params.id);
-    if (!material) return res.status(404).json({ error: 'Material not found' });
+    const material = await store.getItem('materials', req.params.id);
+    if (!material) return res.apiError(NOT_FOUND.statusCode, 'Material not found', NOT_FOUND.code);
     const now = new Date().toISOString();
 
     let normalizedRefs = {};
@@ -154,16 +182,16 @@ router.put('/:id', updateMaterial, async (req, res) => {
         }];
     }
     await store.setItem('materials', material.id, updated);
-    memory._invalidateCache(material.projectId);
+    memory.invalidateCache(material.projectId);
     res.json(updated);
 });
 
-router.delete('/:id', (req, res) => {
-    const material = store.getItem('materials', req.params.id);
-    if (!material) return res.status(404).json({ error: 'Material not found' });
-    if (store.isFoundationMaterial(material)) return res.status(403).json({ error: 'Cannot delete foundation material', name: material.name, message: '基底素材受保护，不可删除。如需修改请编辑内容。' });
-    const deleted = store.deleteItem('materials', req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Material not found' });
+router.delete('/:id', async (req, res) => {
+    const material = await store.getItem('materials', req.params.id);
+    if (!material) return res.apiError(NOT_FOUND.statusCode, 'Material not found', NOT_FOUND.code);
+    if (await store.isFoundationMaterial(material)) return res.apiError(FORBIDDEN.statusCode, 'Cannot delete foundation material', FORBIDDEN.code, { name: material.name, message: '基底素材受保护，不可删除。如需修改请编辑内容。' });
+    const deleted = await store.deleteItem('materials', req.params.id);
+    if (!deleted) return res.apiError(NOT_FOUND.statusCode, 'Material not found', NOT_FOUND.code);
     res.json({ success: true });
 });
 

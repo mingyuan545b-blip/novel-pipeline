@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -9,7 +10,7 @@ function loadJsonFile(filePath) {
     try {
         return JSON.parse(fs.readFileSync(absPath, 'utf8'));
     } catch (e) {
-        console.warn(`[RULES_LOADER] Failed to load ${absPath}: ${e.message}`);
+        logger.warn('rulesLoader', `[RULES_LOADER] Failed to load ${absPath}: ${e.message}`);
         return null;
     }
 }
@@ -84,7 +85,7 @@ function getAgentRoleName(agentType) {
         writer: '执笔人', reviser: '返修员', 'first-review': '初审编辑',
         'second-review': '复审编辑', 'final-editor': '定稿编辑',
         'material-manager': '素材管理员', 'fast-review': '快审编辑',
-        'intent-planner': '意图规划师', reader: '读者代理', adjuster: '调整员'
+        'intent-planner': '意图规划师', reader: '读者代理'
     };
     return names[agentType] || agentType;
 }
@@ -97,7 +98,7 @@ function getAgentTaskDesc(agentType) {
         'second-review': '对初审结果二次校验，纠正初审误判',
         'final-editor': '最终润色定稿，确保无错别字/标点规范',
         'material-manager': '从正文中提取/更新角色、世界观、伏笔等素材',
-        'fast-review': '快速审核爽点密度和节奏',
+        'fast-review': '快速审核节奏和关键节点',
         'intent-planner': '规划章节写作意图'
     };
     return descs[agentType] || '完成指定任务';

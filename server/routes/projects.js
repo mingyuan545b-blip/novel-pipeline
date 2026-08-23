@@ -1,3 +1,2 @@
-const legacy = require('./_projectsLegacy');
-
-module.exports = legacy;
+const router = require('./projects/index');
+module.exports = router;

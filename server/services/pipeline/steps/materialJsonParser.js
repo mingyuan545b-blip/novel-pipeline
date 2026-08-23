@@ -1,3 +1,4 @@
+const logger = require('../../../shared/logger');
 const { extractJSON } = require('../../jsonUtils');
 
 function parseMaterialManagerOutput(rawResponse) {
@@ -22,7 +23,7 @@ function parseMaterialManagerOutput(rawResponse) {
         throw new Error('JSON extraction failed');
     }
 
-    console.log(`[PIPELINE] material-manager解析出${allUpdates.length}条素材更新指令`);
+    logger.info('materialJsonParse', `material-manager解析出${allUpdates.length}条素材更新指令`);
     return allUpdates;
 }
 
@@ -59,14 +60,14 @@ function tryParseJson(block) {
     try {
         return JSON.parse(block);
     } catch (_) {
-        console.warn('[SILENT-CATCH]', _.message || _);
+        logger.warn('materialJsonParse', _.message || _);
     }
 
     const cleaned = block.replace(/,\s*([}\]])/g, '$1');
     try {
         return JSON.parse(cleaned);
     } catch (__) {
-        console.warn('[SILENT-CATCH]', __.message || __);
+        logger.warn('materialJsonParse', __.message || __);
     }
 
     return null;
@@ -79,7 +80,7 @@ function parseForeshadowTracking(response) {
             return parsed.foreshadowTracking;
         }
     } catch (ftErr) {
-        console.warn('[PIPELINE] Foreshadowtracking hook sync failed:', ftErr.message);
+        logger.warn('materialJsonParse', 'Foreshadowtracking hook sync failed:', ftErr.message);
     }
     return [];
 }

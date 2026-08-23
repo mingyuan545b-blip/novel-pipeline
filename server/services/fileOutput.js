@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -14,8 +15,7 @@ const AGENT_ROLE_NAMES = {
     'hook-budget': '伏笔预算',
     'rule-stack': '规则栈',
     polisher: '润色师',
-    reader: '阅读者',
-    adjuster: '调整员'
+    reader: '阅读者'
 };
 
 function ensureOutputDir(projectId, subDir) {
@@ -48,13 +48,13 @@ function saveFinalContent(projectId, chapter) {
     const filePath = path.join(dir, fileName);
     const content = cleanFinalContent(chapter.content || '');
     fs.writeFileSync(filePath, content, 'utf-8');
-    console.log(`[PIPELINE] Final content saved: ${filePath} (${content.length} chars)`);
+    logger.info('fileOutput', `Final content saved: ${filePath} (${content.length} chars)`);
     return filePath;
 }
 
 function getAgentOutputPaths(projectId, chapter) {
     const dir = ensureOutputDir(projectId, 'chapters');
-    const agentTypes = ['intent-planner', 'writer', 'reviser', 'first-review', 'second-review', 'final-editor', 'polisher', 'material-manager', 'reader', 'adjuster'];
+    const agentTypes = ['intent-planner', 'writer', 'reviser', 'first-review', 'second-review', 'final-editor', 'polisher', 'material-manager', 'reader'];
     const paths = {};
     for (const type of agentTypes) {
         const fileName = getChapterFileName(chapter, type);

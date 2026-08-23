@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -13,7 +14,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(TEMPLATE_DIR, file), 'utf8'));
             templates.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('worldviewTemplateReg', _.message || _); }
     }
     return templates.size;
 }

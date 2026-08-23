@@ -1,3 +1,4 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
 
@@ -13,7 +14,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(ARCHETYPE_DIR, file), 'utf8'));
             archetypes.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('characterArchetypeRe', _.message || _); }
     }
     return archetypes.size;
 }
@@ -94,13 +95,14 @@ function buildReviewerPrompt(archetypeId) {
     return parts.join('\n');
 }
 
-function buildCombinedWriterPrompt(projectId) {
+async function buildCombinedWriterPrompt(projectId) {
     const store = require('../store');
-    const materials = store.listItems('materials').filter(m => m.projectId === projectId && !m.archived && m.type === 'character' && m.archetype);
-    if (materials.length === 0) return '';
+    const materials = await store.listItems('materials');
+    const projectMats = materials.filter(m => m.projectId === projectId && !m.archived && m.type === 'character' && m.archetype);
+    if (projectMats.length === 0) return '';
 
     const blocks = [];
-    for (const ch of materials) {
+    for (const ch of projectMats) {
         const block = buildWriterPrompt(ch.archetype);
         if (block) blocks.push(`角色"${ch.name}"：\n${block}`);
     }
@@ -108,13 +110,14 @@ function buildCombinedWriterPrompt(projectId) {
     return blocks.length > 0 ? `【配角人设规范】\n${blocks.join('\n\n---\n\n')}` : '';
 }
 
-function buildCombinedReviewerPrompt(projectId) {
+async function buildCombinedReviewerPrompt(projectId) {
     const store = require('../store');
-    const materials = store.listItems('materials').filter(m => m.projectId === projectId && !m.archived && m.type === 'character' && m.archetype);
-    if (materials.length === 0) return '';
+    const materials = await store.listItems('materials');
+    const projectMats = materials.filter(m => m.projectId === projectId && !m.archived && m.type === 'character' && m.archetype);
+    if (projectMats.length === 0) return '';
 
     const blocks = [];
-    for (const ch of materials) {
+    for (const ch of projectMats) {
         const block = buildReviewerPrompt(ch.archetype);
         if (block) blocks.push(`角色"${ch.name}"：\n${block}`);
     }

@@ -1,29 +1,32 @@
 const store = require('../store');
+const { getDataContext } = require('./dataContext');
 
 class ContextTrace {
     constructor(projectId) {
         this.projectId = projectId;
     }
 
-    _getTraceStore() {
-        const project = store.getItem('projects', this.projectId);
+    async _getTraceStore() {
+        const _ctCtx = await getDataContext(this.projectId);
+        const project = await _ctCtx.getProject();
         if (!project) return { chapters: {} };
         if (!project.contextTraces) {
             project.contextTraces = { chapters: {} };
-            store.setItem('projects', this.projectId, project);
+            await store.setItem('projects', this.projectId, project);
         }
         return project.contextTraces;
     }
 
-    _saveTraceStore(data) {
-        const project = store.getItem('projects', this.projectId);
+    async _saveTraceStore(data) {
+        const _ctsCtx = await getDataContext(this.projectId);
+        const project = await _ctsCtx.getProject();
         if (!project) return;
         project.contextTraces = data;
-        store.setItem('projects', this.projectId, project);
+        await store.setItem('projects', this.projectId, project);
     }
 
-    recordChapterTrace(chapterNumber, traceData) {
-        const traceStore = this._getTraceStore();
+    async recordChapterTrace(chapterNumber, traceData) {
+        const traceStore = await this._getTraceStore();
 
         const trace = {
             chapter: chapterNumber,
@@ -39,12 +42,12 @@ class ContextTrace {
         };
 
         traceStore.chapters[`chapter-${String(chapterNumber).padStart(4, '0')}`] = trace;
-        this._saveTraceStore(traceStore);
+        await this._saveTraceStore(traceStore);
         return trace;
     }
 
-    addContextSelection(chapterNumber, selection) {
-        const traceStore = this._getTraceStore();
+    async addContextSelection(chapterNumber, selection) {
+        const traceStore = await this._getTraceStore();
         const key = `chapter-${String(chapterNumber).padStart(4, '0')}`;
 
         if (!traceStore.chapters[key]) {
@@ -69,22 +72,22 @@ class ContextTrace {
             traceStore.chapters[key].selectedSources.push(selection.source);
         }
 
-        this._saveTraceStore(traceStore);
+        await this._saveTraceStore(traceStore);
     }
 
-    getChapterTrace(chapterNumber) {
-        const traceStore = this._getTraceStore();
+    async getChapterTrace(chapterNumber) {
+        const traceStore = await this._getTraceStore();
         const key = `chapter-${String(chapterNumber).padStart(4, '0')}`;
         return traceStore.chapters[key] || null;
     }
 
-    getAllTraces() {
-        const traceStore = this._getTraceStore();
+    async getAllTraces() {
+        const traceStore = await this._getTraceStore();
         return traceStore.chapters;
     }
 
-    formatTraceForPrompt(chapterNumber) {
-        const trace = this.getChapterTrace(chapterNumber);
+    async formatTraceForPrompt(chapterNumber) {
+        const trace = await this.getChapterTrace(chapterNumber);
         if (!trace) return '';
 
         const lines = [];
@@ -112,8 +115,8 @@ class ContextTrace {
         return lines.join('\n');
     }
 
-    getContextSelectionReasoning(chapterNumber) {
-        const trace = this.getChapterTrace(chapterNumber);
+    async getContextSelectionReasoning(chapterNumber) {
+        const trace = await this.getChapterTrace(chapterNumber);
         if (!trace || !trace.selectedContext) return [];
 
         return trace.selectedContext.map(ctx => ({

@@ -1,273 +1,183 @@
+const logger = require('../../shared/logger');
 const store = require('../../store');
 const llm = require('../../services/llm');
-const { AGENT_DEFAULTS } = require('../../config/systemConfig');
-const { AGENT_PROMPTS, SHUANGWEN_AGENT_PROMPTS, TOMATO_SHORT_AGENT_PROMPTS, buildConstraintInjection, buildFoundationPrompt, getAgentPrompt, deduplicateSystemPrompt } = require('../agentPrompts');
+const { AGENT_DEFAULTS, PROVIDER_DEFAULTS } = require('../../config/systemConfig');
+const { DEFAULT_MODEL } = require('../../config/modelResolver');
+const { getStyleProfileForProject } = require('../agentPrompts');
+const { assembleAgentPrompt } = require('../prompts/agentPromptAssembler');
 const { ContextBudget, estimateTokens, truncateToTokens } = require('../contextBudget');
 const promptAuditor = require('../promptAuditor');
-const techIndex = require('../techIndex');
 const { getBeatAllocator } = require('../beatAllocator');
 const { getMetrics } = require('../metricsCollector');
-const { detectGenre, getStyleProfileForProject } = require('../genreConfig');
+const { resolveGenreFromProject } = require('../genreConfig');
+const { getDataContext } = require('../dataContext');
+const { classifyMaterials, allocateMaterialsToBudget, buildUserContent, truncateUserContent, getMaterialAccessConfig } = require('./unifiedBudgetPool');
+const { scheduleTechniques } = require('./techniqueScheduler');
+const { detectSceneTypes, resolveChapterPhase } = require('./contextDecisionRules');
+const { buildKnowledgeContext, resolveGenre, buildFeedbackRates, cacheSelectedTechniques } = require('./techniqueContextHelpers');
 
 async function runAgent(agentType, context) {
     const mode = context.mode || 'novel';
     const projectId = context.projectId || null;
-    let agent = getAgentPrompt(agentType, mode, projectId);
-    if (!agent) throw new Error(`Unknown agent type: ${agentType}`);
 
-    const defaultMaxTokens = (agentType === 'writer' || agentType === 'final-editor') ? 32768 : 8192;
+    const agentCfg = AGENT_DEFAULTS[agentType] || { maxTokens: 8192 };
+    const defaultMaxTokens = agentCfg.maxTokens;
     const maxTokens = context.maxTokens || defaultMaxTokens;
-    const model = context.apiConfig?.model || process.env.MINIMAX_MODEL || 'default';
+    const model = context.apiConfig?.model || process.env.ALIYUN_CODING_MODEL || DEFAULT_MODEL;
     const budget = new ContextBudget(model, maxTokens);
 
-    const foundationPrompt = buildFoundationPrompt(agentType, mode, projectId);
-    const constraintInjection = projectId ? buildConstraintInjection(projectId) : '';
-    const rawSystem = foundationPrompt + '\n\n' + (agent.system || '') + constraintInjection;
-    const fullSystem = deduplicateSystemPrompt(rawSystem, agentType);
+    const assembled = projectId
+        ? await assembleAgentPrompt(agentType, mode, projectId, { chapterNumber: context.chapterNumber })
+        : await _buildFallbackPrompt(agentType, mode);
+    if (!assembled) throw new Error(`Unknown agent type: ${agentType}`);
 
     let genreId = null;
+    let profile = null;
+    let resolvedGenre = null;  // 陷阱#86修复：保留完整genre对象，避免后续只传styleProfile重新解析丢失subGenre/branchKey
     if (projectId) {
         try {
-            const profile = getStyleProfileForProject(projectId);
-            const genre = detectGenre(profile);
-            genreId = genre?.id || null;
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+            profile = await getStyleProfileForProject(projectId);
+            const _arCtx = await getDataContext(projectId);
+            const _arProject = await _arCtx.getProject();
+            resolvedGenre = resolveGenreFromProject(_arProject);
+            genreId = resolvedGenre?.id || null;
+        } catch(_) { logger.warn('agentRunner', _.message || _); }
     }
 
+    const fullSystem = assembled.system;
     const auditResult = promptAuditor.audit(fullSystem, '', agentType, genreId);
-    let auditedSystem = fullSystem;
-    if (auditResult.healthScore < 70) {
-        const dedupResult = promptAuditor.autoDeduplicate(fullSystem, agentType);
-        auditedSystem = dedupResult.text;
-        if (dedupResult.removed > 0) {
-            console.log(`[PIPELINE] PromptAuditor auto-dedup: ${agentType} removed ${dedupResult.removed} blocks, saved ${dedupResult.saved} chars, health ${auditResult.healthScore}->re-audit`);
-            const reAudit = promptAuditor.audit(auditedSystem, '', agentType, genreId);
-            console.log(`[PIPELINE] PromptAuditor re-audit: ${agentType} health=${reAudit.healthScore} duplicates=${reAudit.totalDuplicates} inflation=${reAudit.totalInflation}`);
-        }
-    }
+    const auditedSystem = fullSystem;
 
     budget.allocate('agent_prompt', auditedSystem);
-
-    if (context.memoryContext) {
-        budget.allocate('memory_context', `【记忆】{context.memoryContext}`);
-    }
+    if (context.memoryContext) budget.allocate('memory_context', `【记忆】${context.memoryContext}`);
 
     if (context.materials && !context.materialSummary) {
-        const worldviewMats = [];
-        const characterMats = [];
-        const otherMats = [];
-        const indexMats = [];
-        const matArray = Array.isArray(context.materials) ? context.materials :
-            (typeof context.materials === 'object' ? Object.values(context.materials) : []);
-
-        for (const m of matArray) {
-            const type = m.type || m.category || '';
-            if (type === 'worldview' || type === 'power-system' || type === 'relationship' || type === 'scene' || type === 'phenomenon' || type === 'institution' || type === 'organization' || type === 'faction' || type === 'geography' || type === 'technology') {
-                worldviewMats.push(m);
-            } else if (type === 'character' || type === 'character-psychology' || type === 'character-combat' || type === 'character-personality' || type === 'character-relationship' || type === 'character-dialogue' || type === 'character-behavior' || type === 'foreshadowing') {
-                characterMats.push(m);
-            } else if (type === 'index') {
-                indexMats.push(m);
-            } else {
-                otherMats.push(m);
-            }
-        }
-
-        if (budget.isUltraLongContext) {
-            if (worldviewMats.length > 0) {
-                budget.allocate('worldview_materials', `【世界观素材】\n${worldviewMats.map(m => `--- ${m.name} ---\n${m.currentContent || ''}`).join('\n\n')}`);
-            }
-            if (characterMats.length > 0) {
-                budget.allocate('character_materials', `【角色素材】\n${characterMats.map(m => `--- ${m.name} ---\n${m.currentContent || ''}`).join('\n\n')}`);
-            }
-            if (otherMats.length > 0) {
-                budget.allocate('other_materials', `【其他素材】\n${otherMats.map(m => `--- ${m.name} ---\n${m.currentContent || ''}`).join('\n\n')}`);
-            }
-        } else {
-            if (indexMats.length > 0) {
-                budget.allocate('worldview_materials', `【素材索引（按需加载）】\n${indexMats.map(m => m.currentContent || '').join('\n\n')}`);
-            } else {
-                if (worldviewMats.length > 0) {
-                    budget.allocate('worldview_materials', `【世界观素材】${worldviewMats.map(m => `[${m.name}]: ${(m.currentContent || '').substring(0, 200)}`).join('\n')}`);
-                }
-                if (characterMats.length > 0) {
-                    budget.allocate('character_materials', `【角色素材】${characterMats.map(m => `[${m.name}]: ${(m.currentContent || '').substring(0, 200)}`).join('\n')}`);
-                }
-            }
-            if (otherMats.length > 0) {
-                budget.allocate('other_materials', `【其他素材】${otherMats.map(m => `[${m.name}]: ${(m.currentContent || '').substring(0, 150)}`).join('\n')}`);
-            }
-        }
+        const genre = resolvedGenre || resolveGenreFromProject({ styleProfile: profile, genre: genreId });
+        const accessConfig = getMaterialAccessConfig(genre, agentType);
+        const allowedTypes = accessConfig.needs ? new Set(accessConfig.needs) : null;
+        const classified = classifyMaterials(context.materials, allowedTypes);
+        allocateMaterialsToBudget(budget, classified, accessConfig.detail, budget.isUltraLongContext);
     }
 
-    if (context.chapterOutline) {
-        budget.allocate('chapter_outline', `【大纲】{context.chapterOutline}`);
-    }
+    if (context.chapterOutline) budget.allocate('chapter_outline', `【大纲】${context.chapterOutline}`);
+    if (context.previousChapter) budget.allocate('previous_chapter', `【上章结尾参考 - 用于推断承接，禁止逐字复制任何段落】${context.previousChapter}`);
+    if (context.reviewContext) budget.allocate('review_feedback', `【审核】${context.reviewContext}`);
+    if (context.styleTemplate) budget.allocate('style_template', `【风格】${context.styleTemplate}`);
+    if (context.chapterContent) budget.allocate('chapter_content', `【正文】\n${context.chapterContent}`);
+    if (context.materialSummary) budget.allocate('material_summary', context.materialSummary);
 
-    if (context.previousChapter) {
-        budget.allocate('previous_chapter', `【上章】{context.previousChapter}`);
-    }
-
-    if (context.reviewContext) {
-        budget.allocate('review_feedback', `【审核】{context.reviewContext}`);
-    }
-
-    if (context.styleTemplate) {
-        budget.allocate('style_template', `【风格】{context.styleTemplate}`);
-    }
-
-    if (context.chapterContent) {
-        budget.allocate('chapter_content', `【正文】\n${context.chapterContent}`);
-    }
-
-    if (context.materialSummary) {
-        budget.allocate('material_summary', context.materialSummary);
-    }
-
-    if (context.projectId && (agentType === 'writer' || agentType === 'polisher' || agentType === 'intent-planner')) {
-        try {
-            const project = store.getItem('projects', context.projectId);
-            const mode = project?.mode || 'novel';
-            const techniques = techIndex.getTechniquesByInjectionPoint(agentType, mode);
-            const techPrompt = techIndex.formatTechniquesForPrompt(techniques.slice(0, 5), 600);
-            if (techPrompt) {
-                budget.allocate('technique_injection', techPrompt);
-            }
-
-            if (context.chapterNumber) {
-                const beatAllocator = getBeatAllocator(context.projectId);
-                let beats = beatAllocator.getChapterBeats(context.chapterNumber);
-                if (!beats.length && context.chapterOutline) {
-                    beats = beatAllocator.allocateBeatsForChapter(context.chapterNumber, context.chapterOutline, mode);
-                }
-                const beatPrompt = beatAllocator.formatBeatsForPrompt(context.chapterNumber, mode, beats);
-                if (beatPrompt) {
-                    budget.allocate('beat_allocation', beatPrompt);
-                }
-            }
-        } catch (techErr) {
-            console.warn(`[PIPELINE] Technique injection failed: ${techErr.message}`);
-        }
+    if (projectId && ['writer', 'polisher', 'intent-planner'].includes(agentType)) {
+        await _injectTechniquesAndBeats(budget, context, agentType, mode);
     }
 
     const systemContent = budget.buildSystemPrompt();
-
-    let userContent = '';
-    if (context.content) {
-        userContent += context.content;
-    }
-
-    const userSlots = ['chapter_outline', 'review_feedback', 'chapter_content'];
-    for (const slotName of userSlots) {
-        const slot = budget.slots[slotName];
-        if (slot?.content) {
-            if (userContent) userContent += '\n\n';
-            userContent += slot.content;
-        }
-    }
-
-    if (context.userMessage) {
-        if (userContent) userContent += '\n\n';
-        userContent += context.userMessage;
-    }
-
-    const userTokenEstimate = estimateTokens(userContent);
-    const isInputHeavyAgent = ['material-manager', 'first-review', 'second-review', 'final-editor'].includes(agentType);
-    const userBudgetRatio = isInputHeavyAgent ? 0.55 : 0.25;
-    const userBudget = budget.inputBudget * userBudgetRatio;
-    if (userTokenEstimate > userBudget) {
-        userContent = truncateToTokens(userContent, Math.floor(userBudget));
-    }
+    let userContent = buildUserContent(budget, context);
+    userContent = truncateUserContent(userContent, budget, agentType);
 
     const messages = [{ role: 'system', content: systemContent }];
     if (userContent) messages.push({ role: 'user', content: userContent });
 
     const report = budget.getReport();
-    console.log(`[PIPELINE] runAgent: agent=${agentType}, model=${model}, budget=${report.totalBudget}, allocated=${report.allocated}(${report.utilization}), slots=${Object.keys(report.slots).length}`);
+    logger.info('agentRunner', `runAgent: agent=${agentType}, model=${model}, budget=${report.totalBudget}, allocated=${report.allocated}(${report.utilization})`);
 
-    const chatOptions = {
-        temperature: context.temperature || 0.7,
-        maxTokens
-    };
+    const chatOptions = _buildChatOptions(context, agentType, maxTokens);
+    const result = await _executeWithRetry(messages, chatOptions, context, budget, assembled, userContent, agentType);
+
+    const responseText = result.choices?.[0]?.message?.content || '';
+    if (projectId) try { getMetrics(projectId).recordAgentTiming(agentType, Date.now() - (context._startTime || Date.now()), result.usage?.total_tokens || 0); } catch(_) { logger.warn('agentRunner', _.message || _); }
+
+    return { agent: agentType, role: assembled.role, response: responseText, usage: result.usage, contextReport: report, promptAudit: auditResult, timestamp: new Date().toISOString() };
+}
+
+async function _injectTechniquesAndBeats(budget, context, agentType, mode) {
+    try {
+        const outlineText = (context.chapterOutline || '').substring(0, 2000).toLowerCase();
+        const chapterNumber = context.chapterNumber || 1;
+        const phase = resolveChapterPhase(chapterNumber);
+        const sceneTypes = detectSceneTypes(outlineText);
+
+        const [knowledgeContext, genre, feedbackRates] = await Promise.all([
+            buildKnowledgeContext(context.projectId),
+            resolveGenre(context.projectId),
+            buildFeedbackRates(context.projectId),
+        ]);
+
+        const techResult = scheduleTechniques({
+            agentType, mode, sceneTypes, phase, outlineText, maxTokens: 600, knowledgeContext, genre, feedbackRates,
+        });
+        if (techResult.formattedPrompt) budget.allocate('technique_injection', techResult.formattedPrompt);
+        if (techResult.techniques?.length && context.projectId && context.chapterNumber) {
+            cacheSelectedTechniques(context.projectId, context.chapterNumber, techResult.techniques.map(t => t.id));
+        }
+
+        if (context.chapterNumber) {
+            const _arCtx = await getDataContext(context.projectId);
+            const project = await _arCtx.getProject();
+            const pMode = project?.mode || 'novel';
+            const beatAllocator = getBeatAllocator(context.projectId);
+            let beats = await beatAllocator.getChapterBeats(context.chapterNumber);
+            if (!beats.length && context.chapterOutline) {
+                beats = await beatAllocator.allocateBeatsForChapter(context.chapterNumber, context.chapterOutline, pMode);
+            }
+            const beatPrompt = await beatAllocator.formatBeatsForPrompt(context.chapterNumber, pMode, beats);
+            if (beatPrompt) budget.allocate('beat_allocation', beatPrompt);
+        }
+    } catch (techErr) {
+        logger.warn('agentRunner', `Technique injection failed: ${techErr.message}`);
+    }
+}
+
+function _buildChatOptions(context, agentType, maxTokens) {
+    const chatOptions = { temperature: context.temperature || 0.7, maxTokens };
     const agentDefaults = AGENT_DEFAULTS[agentType];
     if (agentDefaults?.timeoutMs) chatOptions.timeout = agentDefaults.timeoutMs;
     if (context.apiConfig) chatOptions.apiConfig = context.apiConfig;
+    if (context.signal) chatOptions.signal = context.signal;
+    return chatOptions;
+}
 
-    let result;
-
-    const agentStartTime = Date.now();
+async function _executeWithRetry(messages, chatOptions, context, budget, assembled, userContent, agentType) {
     try {
-        result = await llm.chat(messages, chatOptions);
+        return await llm.chat(messages, chatOptions);
     } catch (err) {
         if (context.projectId) {
-            try { getMetrics(context.projectId).recordError(agentType, err.isContextOverflow ? 'context_overflow' : 'llm_error'); } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+            try { getMetrics(context.projectId).recordError(agentType, err.isContextOverflow ? 'context_overflow' : 'llm_error'); } catch(_) { logger.warn('agentRunner', _.message || _); }
         }
-        if (err.isContextOverflow) {
-            console.log(`[PIPELINE] Context overflow detected, retrying with compressed context...`);
-            const compressedBudget = new ContextBudget(model, maxTokens);
-            compressedBudget.allocate('agent_prompt', agent.system);
-            if (context.memoryContext) compressedBudget.allocate('memory_context', `【分层记忆上下文】\n${truncateToTokens(context.memoryContext, Math.floor(budget.inputBudget * 0.10))}`);
-            if (context.materials) {
-                const matSummary = Array.isArray(context.materials)
-                    ? context.materials.map(m => `[${m.type||''}]${m.name||''}:${(m.currentContent||'').substring(0, 60)}`).join('\n')
-                    : JSON.stringify(context.materials).substring(0, 2000);
-                compressedBudget.allocate('materials', `【素材库参考】\n${matSummary}`);
-            }
-            const compressedSystem = compressedBudget.buildSystemPrompt();
-            const compressedUser = userContent ? truncateToTokens(userContent, Math.floor(budget.inputBudget * 0.30)) : '';
-            const compressedMessages = [{ role: 'system', content: compressedSystem }];
-            if (compressedUser) compressedMessages.push({ role: 'user', content: compressedUser });
-            console.log(`[PIPELINE] Compressed retry: systemLen=${compressedSystem.length}, userLen=${compressedUser.length}`);
-            try {
-                result = await llm.chat(compressedMessages, chatOptions);
-            } catch (retryErr) {
-                console.error(`[PIPELINE] Compressed retry also failed: ${retryErr.message}`);
-                if (isInputHeavyAgent && context.apiConfig?.provider === 'minimax' && process.env.LLM_PROVIDER === 'lmstudio') {
-                    console.log(`[PIPELINE] Falling back to LM Studio for ${agentType}...`);
-                    const fallbackConfig = {
-                        provider: 'lmstudio',
-                        apiKey: 'lmstudio',
-                        model: process.env.LMSTUDIO_MODEL || 'default',
-                        baseURL: process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234/v1'
-                    };
-                    const fallbackBudget = new ContextBudget(fallbackConfig.model, maxTokens);
-                    fallbackBudget.allocate('agent_prompt', agent.system);
-                    if (context.memoryContext) fallbackBudget.allocate('memory_context', context.memoryContext);
-                    if (context.materials) fallbackBudget.allocate('materials', `【素材库参考】\n${matSummary || JSON.stringify(context.materials).substring(0, 2000)}`);
-                    const fallbackSystem = fallbackBudget.buildSystemPrompt();
-                    const fallbackUser = userContent || '';
-                    const fallbackMessages = [{ role: 'system', content: fallbackSystem }];
-                    if (fallbackUser) fallbackMessages.push({ role: 'user', content: fallbackUser });
-                    result = await llm.chat(fallbackMessages, { ...chatOptions, apiConfig: fallbackConfig });
-                    console.log(`[PIPELINE] LM Studio fallback succeeded for ${agentType}`);
-                } else {
-                    throw retryErr;
-                }
-            }
-        } else {
-            throw err;
-        }
-    }
+        if (!err.isContextOverflow) throw err;
 
-    const responseText = result.choices?.[0]?.message?.content || '';
-
-    if (context.projectId) {
+        logger.info('agentRunner', 'Context overflow detected, retrying with compressed context...');
+        const compressed = _buildCompressedMessages(budget, assembled, context, userContent);
         try {
-            const agentDuration = Date.now() - agentStartTime;
-            const tokenCount = result.usage?.total_tokens || 0;
-            getMetrics(context.projectId).recordAgentTiming(agentType, agentDuration, tokenCount);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+            return await llm.chat(compressed.messages, chatOptions);
+        } catch (retryErr) {
+            throw retryErr;
+        }
     }
+}
 
-    return {
-        agent: agentType,
-        role: agent.role,
-        response: responseText,
-        usage: result.usage,
-        contextReport: report,
-        promptAudit: auditResult,
-        timestamp: new Date().toISOString()
-    };
+function _buildCompressedMessages(budget, assembled, context, userContent) {
+    const model = budget.modelName;
+    const compressedBudget = new ContextBudget(model, budget.maxTokens);
+    compressedBudget.allocate('agent_prompt', assembled.system);
+    if (context.memoryContext) compressedBudget.allocate('memory_context', `【分层记忆上下文】\n${truncateToTokens(context.memoryContext, Math.floor(budget.inputBudget * 0.10))}`);
+    if (context.materials) {
+        const matSummary = Array.isArray(context.materials)
+            ? context.materials.map(m => `[${m.type||''}]${m.name||''}:${(m.currentContent||'').substring(0, 60)}`).join('\n')
+            : JSON.stringify(context.materials).substring(0, 2000);
+        compressedBudget.allocate('materials', `【素材库参考】\n${matSummary}`);
+    }
+    const compressedSystem = compressedBudget.buildSystemPrompt();
+    const compressedUser = userContent ? truncateToTokens(userContent, Math.floor(budget.inputBudget * 0.30)) : '';
+    const compressedMessages = [{ role: 'system', content: compressedSystem }];
+    if (compressedUser) compressedMessages.push({ role: 'user', content: compressedUser });
+    return { messages: compressedMessages, system: compressedSystem, user: compressedUser };
+}
+
+async function _buildFallbackPrompt(agentType, mode) {
+    const { getAgentTemplate } = require('../prompts/promptBuilder');
+    const template = await getAgentTemplate(agentType, mode);
+    if (!template) return null;
+    return { system: template.system, role: template.role, tool: template.tool, buildLog: [{ slot: 'fallback-template' }] };
 }
 
 module.exports = { runAgent };

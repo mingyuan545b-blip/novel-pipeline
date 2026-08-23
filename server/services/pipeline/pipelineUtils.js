@@ -1,16 +1,19 @@
+const logger = require('../../shared/logger');
 const store = require('../../store');
 const { getMetrics } = require('../metricsCollector');
 const { getCircuitBreaker } = require('../reviewCircuitBreaker');
 const { createVersionTag } = require('../versionControl');
-const { getModeConfig } = require('../contentUtils');
+const { resolveConfig } = require('../../config');
+const { resolveGenreFromProject } = require('../genreConfig');
+const { getDataContext } = require('../dataContext');
 const { PIPELINE_CONFIG } = require('../pipelineConfig');
 
-function checkAlertLoop(projectId) {
+async function checkAlertLoop(projectId) {
     const ALERT_CONSECUTIVE_CHAPTERS = PIPELINE_CONFIG.ALERT_CONSECUTIVE_CHAPTERS;
     const ALERT_FAIL_RATE_THRESHOLD = PIPELINE_CONFIG.ALERT_FAIL_RATE_THRESHOLD;
 
     const metrics = getMetrics(projectId);
-    const report = metrics.getReport();
+    const report = await metrics.getReport();
     if (!report?.agentPassRates) return null;
 
     const alerts = [];
@@ -42,7 +45,7 @@ function checkAlertLoop(projectId) {
     try {
         const cb = getCircuitBreaker(projectId);
         diagnosticReport.circuitBreakerStatus = cb.getStats();
-    } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+    } catch(_) { logger.warn('pipelineUtils', _.message || _); }
 
     for (const alert of alerts) {
         if (['first-review', 'second-review', 'fast-review'].includes(alert.agentType)) {
@@ -58,8 +61,8 @@ function checkAlertLoop(projectId) {
         diagnosticReport.suggestions.push('熔断器已激活，建议：1.检查提示词冲突 2.降低约束强度 3.人工审核最近3章内容');
     }
 
-    console.error(`[PIPELINE] 🚨 ALERT_LOOP TRIGGERED: ${alerts.map(a => `${a.agentType}=${a.failRate}`).join(', ')}`);
-    console.error(`[PIPELINE] Diagnostic suggestions: ${diagnosticReport.suggestions.join('; ')}`);
+    logger.error('pipelineUtils', `🚨 ALERT_LOOP TRIGGERED: ${alerts.map(a => `${a.agentType}=${a.failRate}`).join(', ')}`);
+    logger.error('pipelineUtils', `Diagnostic suggestions: ${diagnosticReport.suggestions.join('; ')}`);
 
     return diagnosticReport;
 }
@@ -68,7 +71,7 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
     const mode = context.mode || 'novel';
     const metrics = getMetrics(projectId);
 
-    console.log('[PIPELINE] A/B branching: running two writer versions...');
+    logger.info('pipelineUtils', 'A/B branching: running two writer versions...');
 
     const branchAContext = { ...context, temperature: (context.temperature || 0.7) };
     const branchBContext = { ...context, temperature: Math.min((context.temperature || 0.7) + PIPELINE_CONFIG.BRANCHING_TEMPERATURE_BOOST, PIPELINE_CONFIG.BRANCHING_MAX_TEMPERATURE) };
@@ -87,9 +90,12 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
     let selectedBranch = 'A';
     let reason = '';
 
-    const modeConfig = getModeConfig(mode);
-    const minWords = modeConfig.minWords || 1500;
-    const maxWords = modeConfig.maxWords || 3500;
+    const _branchCtx = await getDataContext(projectId);
+    const project = await _branchCtx.getProject();
+    const _branchGenre = resolveGenreFromProject(project);
+    const _branchConfig = resolveConfig(_branchGenre, project);
+    const minWords = _branchConfig.word.targetMin;
+    const maxWords = _branchConfig.word.maxChapter;
 
     const aInRange = wordCountA >= minWords && wordCountA <= maxWords;
     const bInRange = wordCountB >= minWords && wordCountB <= maxWords;
@@ -111,7 +117,7 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
 
     const selectedContent = selectedBranch === 'A' ? contentA : contentB;
 
-    console.log(`[PIPELINE] Branching result: A=${wordCountA}字 B=${wordCountB}字 → Selected ${selectedBranch} (${reason})`);
+    logger.info('pipelineUtils', `Branching result: A=${wordCountA}字 B=${wordCountB}字 → Selected ${selectedBranch} (${reason})`);
 
     try {
         metrics.recordBranching(
@@ -121,7 +127,7 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
             selectedBranch,
             reason
         );
-    } catch (e) {}
+    } catch (e) { logger.warn('pipelineUtils', '[pipeline-utils]', e.message || e); }
 
     try {
         createVersionTag(projectId, chapterId, chapter.chapterNumber || 0, (chapter.version || 0) + 1, selectedBranch === 'A' ? contentB : contentA, {
@@ -129,7 +135,7 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
             parentTag: null,
             reason: 'branching-unselected'
         });
-    } catch (e) {}
+    } catch (e) { logger.warn('pipelineUtils', '[pipeline-utils]', e.message || e); }
 
     return {
         content: selectedContent,

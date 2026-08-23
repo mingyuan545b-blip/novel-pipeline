@@ -1,5 +1,6 @@
 const store = require('../../../store');
 const { getVolumeOrder } = require('../volumeHelpers');
+const logger = require('../../../shared/logger');
 
 const MATERIAL_LIFECYCLE = {
     permanent: new Set(['worldview', 'power-system', 'sub-plane', 'craft', 'writing-technique']),
@@ -18,16 +19,16 @@ function getMaterialLifecycle(m) {
     return 'ephemeral';
 }
 
-function getCurrentVolumeSubplaneId(projectId, chapterNum) {
+async function getCurrentVolumeSubplaneId(projectId, chapterNum) {
     try {
-        const volOrder = getVolumeOrder(projectId);
+        const volOrder = await getVolumeOrder(projectId);
         const entry = volOrder.volumeOrder.find(v => {
             const match = v.chapters.match(/Ch(\d+)-(\d+)/);
             return match && chapterNum >= parseInt(match[1]) && chapterNum <= parseInt(match[2]);
         });
         return entry ? entry.subplaneId : null;
     } catch (e) {
-        console.warn('[PIPELINE] 读取volume-order失败:', e.message);
+        logger.warn('materialLifecycle', '读取volume-order失败:', { errorMessage: e.message });
         return null;
     }
 }
@@ -35,7 +36,7 @@ function getCurrentVolumeSubplaneId(projectId, chapterNum) {
 function archiveMaterials(materialsToArchive, chapterNum, reason) {
     for (const mat of materialsToArchive) {
         if (mat.name && (mat.name.includes('主角') || mat.isLocked)) {
-            console.warn(`[PIPELINE] 素材重建保护: "${mat.name}" 是主角/锁定素材，跳过归档`);
+            logger.warn('materialLifecycle', `素材重建保护: "${mat.name}" 是主角/锁定素材，跳过归档`);
             continue;
         }
         store.setItem('materials', mat.id, {
@@ -51,7 +52,7 @@ function archiveMaterials(materialsToArchive, chapterNum, reason) {
 function cleanChapterMaterials(allMaterials, projectId, chapterNum) {
     const chapterMaterials = allMaterials.filter(m => m.projectId === projectId && m.sourceChapter === chapterNum && !m.archived);
     if (chapterMaterials.length > 0) {
-        console.log(`[PIPELINE] Deleting ${chapterMaterials.length} old materials from chapter ${chapterNum} before re-creating`);
+        logger.info('materialLifecycle', `Deleting ${chapterMaterials.length} old materials from chapter ${chapterNum} before re-creating`);
         archiveMaterials(
             chapterMaterials,
             chapterNum,
@@ -107,67 +108,6 @@ function getArchiveHints(activeMaterials, chapterNum, currentVolumeSubplaneId) {
     return hints.join('');
 }
 
-function autoArchiveStaleMaterials(activeMaterials, chapterNum, currentVolumeSubplaneId, options = {}) {
-    const STALE_THRESHOLD_EPHEMERAL = options.staleThresholdEphemeral || 15;
-    const STALE_THRESHOLD_SEMI = options.staleThresholdSemi || 30;
-    const archived = [];
-
-    const stale = activeMaterials.filter(m => {
-        const lifecycle = getMaterialLifecycle(m);
-        if (lifecycle === 'permanent') return false;
-        if (m.isLocked) return false;
-        if (m.name && m.name.includes('主角')) return false;
-        const lastUpdated = m.sourceChapter || 0;
-        const age = chapterNum - lastUpdated;
-        if (lifecycle === 'semiPermanent') {
-            if (m.parentPlane === currentVolumeSubplaneId) return false;
-            return age > STALE_THRESHOLD_SEMI;
-        }
-        return age > STALE_THRESHOLD_EPHEMERAL;
-    });
-
-    for (const mat of stale) {
-        const lifecycle = getMaterialLifecycle(mat);
-        store.setItem('materials', mat.id, {
-            ...mat,
-            archived: true,
-            archivedReason: `素材过期自动归档（${lifecycle}级，${mat.sourceChapter ? 'Ch' + mat.sourceChapter : '项目级'}→Ch${chapterNum}）`,
-            archivedAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
-        console.log(`[PIPELINE] Auto-archived stale ${lifecycle} material: ${mat.name}`);
-        archived.push(mat);
-    }
-
-    return archived;
-}
-
-function autoArchiveForExpansion(activeMaterials, dynamicMaxMaterials) {
-    const archived = [];
-
-    if (activeMaterials.length <= dynamicMaxMaterials) return archived;
-
-    const excess = activeMaterials.length - dynamicMaxMaterials;
-    const candidates = [...activeMaterials]
-        .filter(m => getMaterialLifecycle(m) === 'ephemeral')
-        .sort((a, b) => (a.sourceChapter || 0) - (b.sourceChapter || 0));
-    const toArchive = candidates.slice(0, excess);
-
-    for (const mat of toArchive) {
-        store.setItem('materials', mat.id, {
-            ...mat,
-            archived: true,
-            archivedReason: `素材库膨胀自动归档（活跃${activeMaterials.length}>上限${dynamicMaxMaterials}，仅归档临时素材）`,
-            archivedAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
-        console.log(`[PIPELINE] Auto-archived ephemeral material: ${mat.name}`);
-        archived.push(mat);
-    }
-
-    return archived;
-}
-
 function getLockedEntities(allMaterials, projectId) {
     const lockedSubplaneIds = allMaterials
         .filter(m => m.projectId === projectId && m.type === 'sub-plane' && m.isLocked)
@@ -195,8 +135,6 @@ module.exports = {
     getActiveMaterials,
     getMaterialSummary,
     getArchiveHints,
-    autoArchiveStaleMaterials,
-    autoArchiveForExpansion,
     getLockedEntities,
     getDynamicMaxMaterials,
     MATERIAL_LIFECYCLE

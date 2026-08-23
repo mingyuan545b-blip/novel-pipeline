@@ -1,9 +1,10 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
 const { initDatabase, getDatabase, closeDatabase, DATA_DIR } = require('./database');
 
 function migrateFromJson(dbPath) {
-    console.log('[MIGRATE] Starting JSON → SQLite migration...');
+    logger.info('migrate', '[MIGRATE] Starting JSON → SQLite migration...');
 
     const db = initDatabase(dbPath);
     const stats = { projects: 0, materials: 0, chapters: 0, reviews: 0, other: 0, errors: [] };
@@ -11,12 +12,12 @@ function migrateFromJson(dbPath) {
     const migrateType = (type) => {
         const dir = path.join(DATA_DIR, type);
         if (!fs.existsSync(dir)) {
-            console.log(`[MIGRATE] Skipping ${type}/ (directory not found)`);
+            logger.info('migrate', `[MIGRATE] Skipping ${type}/ (directory not found)`);
             return;
         }
 
         const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-        console.log(`[MIGRATE] Found ${files.length} files in ${type}/`);
+        logger.info('migrate', `[MIGRATE] Found ${files.length} files in ${type}/`);
 
         const store = require('./store');
 
@@ -38,7 +39,7 @@ function migrateFromJson(dbPath) {
                 else stats.other++;
             } catch (err) {
                 const msg = `Failed to migrate ${type}/${file}: ${err.message}`;
-                console.error(`[MIGRATE] ${msg}`);
+                logger.error('migrate', `[MIGRATE] ${msg}`);
                 stats.errors.push(msg);
             }
         }
@@ -57,33 +58,33 @@ function migrateFromJson(dbPath) {
         migrateType(type);
     }
 
-    console.log(`[MIGRATE] Migration complete:`);
-    console.log(`  Projects: ${stats.projects}`);
-    console.log(`  Materials: ${stats.materials}`);
-    console.log(`  Chapters: ${stats.chapters}`);
-    console.log(`  Reviews: ${stats.reviews}`);
-    console.log(`  Other: ${stats.other}`);
+    logger.info('migrate', `[MIGRATE] Migration complete:`);
+    logger.info('migrate', `  Projects: ${stats.projects}`);
+    logger.info('migrate', `  Materials: ${stats.materials}`);
+    logger.info('migrate', `  Chapters: ${stats.chapters}`);
+    logger.info('migrate', `  Reviews: ${stats.reviews}`);
+    logger.info('migrate', `  Other: ${stats.other}`);
     if (stats.errors.length > 0) {
-        console.log(`  Errors: ${stats.errors.length}`);
-        stats.errors.forEach(e => console.log(`    - ${e}`));
+        logger.info('migrate', `  Errors: ${stats.errors.length}`);
+        stats.errors.forEach(e => logger.info('migrate', `    - ${e}`));
     }
 
     return stats;
 }
 
-function verifyMigration(dbPath) {
-    console.log('[VERIFY] Verifying migration integrity...');
+async function verifyMigration(dbPath) {
+    logger.info('migrate', '[VERIFY] Verifying migration integrity...');
 
     const db = initDatabase(dbPath);
     const issues = [];
 
-    const verifyType = (type) => {
+    const verifyType = async (type) => {
         const dir = path.join(DATA_DIR, type);
         if (!fs.existsSync(dir)) return;
 
         const jsonFiles = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
         const store = require('./store');
-        const dbItems = store.listItems(type);
+        const dbItems = await store.listItems(type);
 
         const dbIds = new Set(dbItems.map(i => i.id));
         const jsonIds = new Set(jsonFiles.map(f => f.replace('.json', '')));
@@ -109,18 +110,20 @@ function verifyMigration(dbPath) {
                     if (jsonData.name && item.name && jsonData.name !== item.name) {
                         issues.push(`NAME MISMATCH: ${type}/${item.id} JSON="${jsonData.name}" DB="${item.name}"`);
                     }
-                } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+                } catch(_) { logger.warn('migrate', _.message || _); }
             }
         }
     };
 
-    ['projects', 'materials', 'chapters', 'reviews'].forEach(verifyType);
+    for (const type of ['projects', 'materials', 'chapters', 'reviews']) {
+        await verifyType(type);
+    }
 
     if (issues.length === 0) {
-        console.log('[VERIFY] ✅ All data verified successfully');
+        logger.info('migrate', '[VERIFY] ✅ All data verified successfully');
     } else {
-        console.log(`[VERIFY] ❌ Found ${issues.length} issues:`);
-        issues.forEach(i => console.log(`  - ${i}`));
+        logger.info('migrate', `[VERIFY] ❌ Found ${issues.length} issues:`);
+        issues.forEach(i => logger.info('migrate', `  - ${i}`));
     }
 
     return issues;
@@ -129,11 +132,11 @@ function verifyMigration(dbPath) {
 function backupJsonData() {
     const backupDir = path.join(DATA_DIR, '..', 'data-json-backup');
     if (fs.existsSync(backupDir)) {
-        console.log('[BACKUP] Backup directory already exists, skipping');
+        logger.info('migrate', '[BACKUP] Backup directory already exists, skipping');
         return backupDir;
     }
 
-    console.log('[BACKUP] Creating JSON data backup...');
+    logger.info('migrate', '[BACKUP] Creating JSON data backup...');
     fs.mkdirSync(backupDir, { recursive: true });
 
     const dirs = fs.readdirSync(DATA_DIR).filter(f => {
@@ -152,7 +155,7 @@ function backupJsonData() {
         }
     }
 
-    console.log(`[BACKUP] ✅ Backup created at ${backupDir}`);
+    logger.info('migrate', `[BACKUP] ✅ Backup created at ${backupDir}`);
     return backupDir;
 }
 
@@ -171,7 +174,7 @@ if (require.main === module) {
     } else if (command === 'backup') {
         backupJsonData();
     } else {
-        console.log('Usage: node migrate.js <migrate|verify|backup> [dbPath]');
+        logger.info('migrate', 'Usage: node migrate.js <migrate|verify|backup> [dbPath]');
         process.exit(1);
     }
 }

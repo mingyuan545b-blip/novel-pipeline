@@ -1,0 +1,50 @@
+# fast-review节点契约定义
+# 快审：快速校验正文是否达标，必须拿到深度字段才能判断工具人化
+agent: fast-review
+format: review
+
+# 输入素材契约
+input:
+  required:
+    - path: chapter.content
+      type: string
+      minLength: 100
+      severity: CRITICAL
+      errorCode: FA-IN-001
+      message: 章节正文必须存在且≥100字
+
+    - path: project
+      type: object
+      severity: HIGH
+      errorCode: FA-IN-002
+      message: 项目信息必须存在
+
+  # 快审素材深度字段校验
+  materialFields:
+    character:
+      requireMinCount:
+        min: 1
+        severity: CRITICAL
+        errorCode: FA-IN-004
+        message: CH2+快审无未归档角色素材，无法判断工具人化
+        exceptFirstChapter: true
+
+      stateJson:
+        anyOf:
+          - innerConflict
+          - independentStance
+          - fateArc
+        severity: CRITICAL
+        errorCode: FA-IN-003
+        message: 快审缺少角色深度字段，无法判断工具人化（陷阱#79断链）
+        exceptFirstChapter: true
+
+# 输出契约
+output:
+  required:
+    - field: response
+      type: string
+      minLength: 10
+      severity: CRITICAL
+      errorCode: FA-OUT-001
+      message: fast-review输出response必须存在且≥10字

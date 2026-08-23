@@ -1,5 +1,7 @@
+const logger = require('../shared/logger');
 const fs = require('fs');
 const path = require('path');
+const { getDataContext } = require('./dataContext');
 
 const PERSONA_DIR = path.join(__dirname, '../../data/system-personas');
 
@@ -13,7 +15,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(PERSONA_DIR, file), 'utf8'));
             personas.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
+        } catch(_) { logger.warn('systemPersonaRegistr', _.message || _); }
     }
     return personas.size;
 }
@@ -98,9 +100,10 @@ function buildReviewerPrompt(personaId) {
     return parts.join('\n');
 }
 
-function buildCombinedWriterPrompt(projectId) {
+async function buildCombinedWriterPrompt(projectId) {
     const store = require('../store');
-    const project = store.getItem('projects', projectId);
+    const _sprCtx = await getDataContext(projectId);
+    const project = await _sprCtx.getProject();
     if (!project) return '';
 
     const personaId = project.styleProfile?.systemPersona || '';
@@ -110,9 +113,10 @@ function buildCombinedWriterPrompt(projectId) {
     return block ? `【系统人格配置】\n${block}` : '';
 }
 
-function buildCombinedReviewerPrompt(projectId) {
+async function buildCombinedReviewerPrompt(projectId) {
     const store = require('../store');
-    const project = store.getItem('projects', projectId);
+    const _sprrCtx = await getDataContext(projectId);
+    const project = await _sprrCtx.getProject();
     if (!project) return '';
 
     const personaId = project.styleProfile?.systemPersona || '';

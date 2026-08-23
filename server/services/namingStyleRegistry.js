@@ -1,208 +1,114 @@
-const fs = require('fs');
-const path = require('path');
+const { GENRE_NAMING_MAP, inferFromGenre } = require('./namingGenreMap');
 
-const DATA_DIR = path.join(__dirname, '../../data/naming-styles');
-let styles = new Map();
+const NAMING_STYLES = {
+    classical: {
+        id: 'classical', label: '古典雅致', tag: 'classical',
+        description: '取自古诗词典故，意境深远',
+        surnamePool: ['白', '苏', '柳', '沈', '顾', '谢', '林', '秦', '楚', '温'],
+        maleGivenPool: ['清', '远', '逸', '尘', '墨', '轩', '泽', '渊', '明', '玄'],
+        femaleGivenPool: ['瑶', '月', '雪', '灵', '芷', '婉', '素', '梦', '烟', '清'],
+        compoundRate: 0.3, maxSurnameLen: 1, titleWords: ['先生', '姑娘', '公子', '小姐']
+    },
+    modern: {
+        id: 'modern', label: '现代简约', tag: 'modern',
+        description: '现代常见姓名，接地气',
+        surnamePool: ['张', '李', '王', '刘', '陈', '杨', '赵', '黄', '周', '吴'],
+        maleGivenPool: ['浩', '磊', '鑫', '鹏', '强', '伟', '军', '杰', '涛', '明'],
+        femaleGivenPool: ['婷', '雪', '静', '敏', '丽', '芳', '娟', '燕', '玲', '琳'],
+        compoundRate: 0.1, maxSurnameLen: 1, titleWords: ['总', '哥', '姐', '老师']
+    },
+    fantasy: { ...GENRE_NAMING_MAP['xuanhuan'], id: 'fantasy', label: '玄幻修仙', tag: 'fantasy', description: '修仙玄幻风格命名' },
+    wuxia: { ...GENRE_NAMING_MAP['wuxia'], id: 'wuxia', label: '武侠江湖', tag: 'wuxia', description: '武侠江湖风格命名' },
+    scifi: { ...GENRE_NAMING_MAP['scifi'], id: 'scifi', label: '科幻未来', tag: 'scifi', description: '科幻未来风格命名' }
+};
 
-function load() {
-    styles.clear();
-    if (!fs.existsSync(DATA_DIR)) return;
-    const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith('.json'));
-    for (const file of files) {
-        try {
-            const raw = fs.readFileSync(path.join(DATA_DIR, file), 'utf-8');
-            const data = JSON.parse(raw);
-            if (data.id) styles.set(data.id, data);
-        } catch(_) { console.warn('[SILENT-CATCH]', _.message || _); }
-    }
+function getAllStyles() {
+    return Object.values(NAMING_STYLES).map(s => ({
+        id: s.id, label: s.label, tag: s.tag, description: s.description,
+        surnameCount: s.surnamePool.length, givenCount: s.maleGivenPool.length + s.femaleGivenPool.length
+    }));
 }
 
-load();
+function get(styleId) {
+    return NAMING_STYLES[styleId] || null;
+}
 
-function list() { return Array.from(styles.values()); }
-
-function get(id) { return styles.get(id) || null; }
-
-function buildPromptBlock(namingStyleId, intensity) {
-    const style = get(namingStyleId);
+function buildPromptBlock(styleId, intensity = 'medium') {
+    const style = get(styleId);
     if (!style) return '';
-
-    const level = intensity || 'medium';
-    const lines = [];
-
-    lines.push(`【命名规范·${style.label}(${style.tag})】`);
-    lines.push(`核心原则: ${style.corePrinciple}`);
-    lines.push('');
-
-    lines.push('姓氏池:');
-    for (const [category, surnames] of Object.entries(style.surnamePool || {})) {
-        lines.push(`  ${category}: ${surnames.join('、')}`);
-    }
-    lines.push('');
-
-    lines.push('命名模式:');
-    for (const p of (style.givenNamePatterns || [])) {
-        lines.push(`  ${p.pattern}: ${p.examples.join('、')}`);
-        lines.push(`    规则: ${p.rule}`);
-    }
-    lines.push('');
-
-    if (style.epithetPatterns) {
-        lines.push('绰号模式:');
-        for (const p of style.epithetPatterns) {
-            lines.push(`  ${p.pattern}: ${p.examples.join('、')}`);
-            lines.push(`    规则: ${p.rule}`);
-        }
-        lines.push('');
-    }
-
-    lines.push('组合规则:');
-    for (const r of (style.combinationRules || [])) {
-        lines.push(`  - ${r}`);
-    }
-    lines.push('');
-
-    lines.push('禁止模式:');
-    for (const f of (style.forbiddenPatterns || [])) {
-        lines.push(`  - ${f}`);
-    }
-    lines.push('');
-
-    lines.push('示例:');
-    for (const e of (style.exampleNames || [])) {
-        const extra = e.绰号 ? ` 绰号:${e.绰号}` : e.真名 ? ` 真名:${e.真名}` : e.谐音 ? ` 谐音:${e.谐音}` : e.元素 ? ` 元素:${e.元素}` : e.表面 ? ` 表面:${e.表面}→暗藏:${e.暗藏}` : '';
-        lines.push(`  ${e.name}${extra} — ${e.解析}`);
-    }
-
-    lines.push('');
-    lines.push(`强度: ${level} (${(style.intensity || {})[level] || ''})`);
-    lines.push(`适用题材: ${(style.applicableGenres || []).join('、')}`);
-
-    return lines.join('\n');
+    const samples = _generateSamples(style, 3);
+    const intensityNote = intensity === 'high' ? '严格遵循' : intensity === 'low' ? '参考' : '建议遵循';
+    return `【命名风格·${style.label}】${intensityNote}\n姓氏池：${style.surnamePool.join('、')}\n男性名池：${style.maleGivenPool.join('、')}\n女性名池：${style.femaleGivenPool.join('、')}\n示例：${samples.join('、')}`;
 }
 
-function buildReviewBlock(namingStyleId, intensity) {
-    const style = get(namingStyleId);
+function _generateSamples(style, count = 3) {
+    const samples = [];
+    for (let i = 0; i < count; i++) {
+        const isMale = i % 2 === 0;
+        const surname = style.surnamePool[Math.floor(Math.random() * style.surnamePool.length)];
+        const givenPool = isMale ? style.maleGivenPool : style.femaleGivenPool;
+        const given = givenPool[Math.floor(Math.random() * givenPool.length)];
+        samples.push(surname + given);
+    }
+    return samples;
+}
+
+function validateName(name, styleId) {
+    const style = get(styleId);
+    if (!style) return { valid: true, warnings: [] };
+    const warnings = [];
+    const AI高频名 = ['林晓', '苏雨', '陈默', '顾言', '叶凡', '苏瑶', '林夕', '李默', '王浩', '张伟'];
+    if (AI高频名.includes(name)) warnings.push(`"${name}"是AI高频名，建议更换`);
+    const 烂梗名 = ['龙傲天', '叶辰', '柳如烟', '萧炎', '唐三', '林动', '石昊'];
+    if (烂梗名.includes(name)) warnings.push(`"${name}"是网文烂梗名，必须更换`);
+    return { valid: warnings.length === 0, warnings };
+}
+
+function generateName(styleId, gender = 'male') {
+    const style = get(styleId);
+    if (!style) return '未名';
+    const surname = style.surnamePool[Math.floor(Math.random() * style.surnamePool.length)];
+    const givenPool = gender === 'female' ? style.femaleGivenPool : style.maleGivenPool;
+    const given = givenPool[Math.floor(Math.random() * givenPool.length)];
+    return surname + given;
+}
+
+async function buildCombinedPromptBlock(projectId) {
+    const store = require('../store');
+    const project = await store.getItem('projects', projectId);
+    if (!project) return '';
+    const genreId = project.genre || '';
+    const styleId = inferFromGenre(genreId);
+    const style = get(styleId);
     if (!style) return '';
-
-    const lines = [];
-    lines.push(`【命名规范审核·${style.label}】`);
-    lines.push(`检查新角色的命名是否符合"${style.label}"规范:`);
-    lines.push(`1. 姓氏是否从姓氏池中选取或符合风格`);
-    lines.push(`2. 名字是否符合命名模式（${(style.givenNamePatterns || []).map(p => p.pattern).join('/')}）`);
-    lines.push(`3. 名字是否违反禁止模式`);
-    lines.push(`4. 姓名组合是否符合组合规则`);
-    if (style.forbiddenPatterns && style.forbiddenPatterns.length > 0) {
-        lines.push(`5. 绝对禁止: ${style.forbiddenPatterns.join('; ')}`);
-    }
-    lines.push(`如果命名不符合规范，在审核中指出并建议替代名。`);
-
-    return lines.join('\n');
+    const block = buildPromptBlock(styleId, 'high');
+    const warnings = _buildAINameWarnings();
+    return block + (warnings ? '\n' + warnings : '');
 }
 
-function buildCombinedPromptBlock(projectId) {
+async function buildCombinedReviewBlock(projectId) {
     const store = require('../store');
-    const project = store.getItem('projects', projectId);
+    const project = await store.getItem('projects', projectId);
     if (!project) return '';
-
-    const materials = store.listItems('materials').filter(m => m.projectId === projectId && !m.archived);
-    const charactersWithStyle = materials.filter(m => m.type === 'character' && m.namingStyle);
-
-    const projectNamingStyle = project.styleProfile?.namingStyle;
-    const projectNamingIntensity = project.styleProfile?.namingStyleIntensity || 'medium';
-
-    if (charactersWithStyle.length === 0) {
-        if (projectNamingStyle) {
-            return buildPromptBlock(projectNamingStyle, projectNamingIntensity);
-        }
-        const genre = project.genre || project.styleProfile?.genre || '';
-        const autoStyle = inferFromGenre(genre);
-        if (autoStyle) {
-            return buildPromptBlock(autoStyle.id, 'medium');
-        }
-        return '';
-    }
-
-    const blocks = [];
-    if (projectNamingStyle) {
-        const block = buildPromptBlock(projectNamingStyle, projectNamingIntensity);
-        if (block) blocks.push(`项目级命名规范:\n${block}`);
-    }
-    for (const ch of charactersWithStyle) {
-        const block = buildPromptBlock(ch.namingStyle, ch.namingStyleIntensity || 'medium');
-        if (block) blocks.push(`角色"${ch.name}"的命名规范:\n${block}`);
-    }
-
-    return blocks.length > 0 ? blocks.join('\n\n---\n\n') : '';
+    const genreId = project.genre || '';
+    const styleId = inferFromGenre(genreId);
+    const style = get(styleId);
+    if (!style) return '';
+    return `【命名审核·${style.label}】检查角色名是否符合${style.label}风格，排除AI高频名和烂梗名`;
 }
 
-function buildCombinedReviewBlock(projectId) {
-    const store = require('../store');
-    const project = store.getItem('projects', projectId);
-    if (!project) return '';
-
-    const materials = store.listItems('materials').filter(m => m.projectId === projectId && !m.archived);
-    const charactersWithStyle = materials.filter(m => m.type === 'character' && m.namingStyle);
-
-    const projectNamingStyle = project.styleProfile?.namingStyle;
-    const projectNamingIntensity = project.styleProfile?.namingStyleIntensity || 'medium';
-
-    if (charactersWithStyle.length === 0) {
-        if (projectNamingStyle) {
-            return buildReviewBlock(projectNamingStyle, projectNamingIntensity);
-        }
-        const genre = project.genre || project.styleProfile?.genre || '';
-        const autoStyle = inferFromGenre(genre);
-        if (autoStyle) {
-            return buildReviewBlock(autoStyle.id, 'medium');
-        }
-        return '';
-    }
-
-    const blocks = [];
-    if (projectNamingStyle) {
-        const block = buildReviewBlock(projectNamingStyle, projectNamingIntensity);
-        if (block) blocks.push(block);
-    }
-    for (const ch of charactersWithStyle) {
-        const block = buildReviewBlock(ch.namingStyle, ch.namingStyleIntensity || 'medium');
-        if (block) blocks.push(block);
-    }
-
-    return blocks.length > 0 ? blocks.join('\n\n') : '';
+function _buildAINameWarnings() {
+    const aiNames = ['林晓', '苏雨', '陈默', '顾言', '叶凡', '苏瑶', '林夕', '李默', '王浩', '张伟'];
+    const memeNames = ['龙傲天', '叶辰', '柳如烟', '萧炎', '唐三', '林动', '石昊'];
+    return `【禁止使用的AI高频名】${aiNames.join('、')}\n【禁止使用的烂梗名】${memeNames.join('、')}`;
 }
 
-function inferFromGenre(genre) {
-    if (!genre) return null;
-    const genreMap = {
-        '高武': 'poetic-imagery',
-        '玄幻': 'net-abstract',
-        '仙侠': 'myth-reincarnate',
-        '武侠': 'jianghu-epithet',
-        '都市': 'minimalist-cool',
-        '赛博': 'cyber-codename',
-        '末世': 'cyber-codename',
-        '废土': 'cyber-codename',
-        '喜剧': 'pun-homophone',
-        '反套路': 'pun-homophone',
-        '暗黑': 'dark-abyss',
-        '恐怖': 'dark-abyss',
-        '规则怪谈': 'dark-abyss',
-        '二次元': 'japanese-anime',
-        '轻小说': 'japanese-anime',
-        '权谋': 'double-entendre',
-        '宫斗': 'double-entendre',
-        '农村': 'earthy-grounded',
-        '年代': 'earthy-grounded',
-        '异能': 'element-fusion',
-        '魔法': 'element-fusion'
-    };
-    for (const [key, styleId] of Object.entries(genreMap)) {
-        if (genre.includes(key)) return get(styleId);
-    }
-    return null;
-}
+function list() { return getAllStyles(); }
 
-function reload() { load(); return styles.size; }
+/**
+ * reload - 命名风格为代码内常量，无需从外部文件重载。
+ * 提供 no-op 实现以保持与其他 registry 的 API 一致性（flavorRegistryRoutes /reload 调用）。
+ */
+function reload() { /* no-op: naming styles are code constants */ }
 
-module.exports = { list, get, buildPromptBlock, buildReviewBlock, buildCombinedPromptBlock, buildCombinedReviewBlock, inferFromGenre, reload };
+module.exports = { NAMING_STYLES, getAllStyles, get, list, buildPromptBlock, buildCombinedPromptBlock, buildCombinedReviewBlock, inferFromGenre, validateName, generateName, reload };

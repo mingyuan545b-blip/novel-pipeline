@@ -1,5 +1,9 @@
+const logger = require('../shared/logger');
 const express = require('express');
 const { PromptOptimizer, PROBLEM_PATTERNS, OPTIMIZER_LIMITS } = require('../services/promptOptimizer');
+const { ERROR_CODES } = require('../shared/errorCodes');
+
+const { VALIDATION_ERROR, INTERNAL_ERROR } = ERROR_CODES;
 
 const router = express.Router();
 
@@ -10,59 +14,59 @@ router.get('/patterns/:projectId', (req, res) => {
         const result = optimizer.detectProblemPatterns(lastN);
         res.json(result);
     } catch (err) {
-        console.error('[OPTIMIZER] detect error:', err);
-        res.status(500).json({ error: err.message });
+        logger.error('optimizer', '[OPTIMIZER] detect error:', err);
+        return res.apiError(INTERNAL_ERROR.statusCode, err.message, INTERNAL_ERROR.code);
     }
 });
 
-router.get('/report/:projectId', (req, res) => {
+router.get('/report/:projectId', async (req, res) => {
     try {
         const optimizer = new PromptOptimizer(req.params.projectId);
         const lastN = parseInt(req.query.lastNChapters) || 10;
-        const result = optimizer.getFullReport(lastN);
+        const result = await optimizer.getFullReport(lastN);
         res.json(result);
     } catch (err) {
-        console.error('[OPTIMIZER] report error:', err);
-        res.status(500).json({ error: err.message });
+        logger.error('optimizer', '[OPTIMIZER] report error:', err);
+        return res.apiError(INTERNAL_ERROR.statusCode, err.message, INTERNAL_ERROR.code);
     }
 });
 
-router.get('/suggestion/:projectId/:patternId', (req, res) => {
+router.get('/suggestion/:projectId/:patternId', async (req, res) => {
     try {
         const optimizer = new PromptOptimizer(req.params.projectId);
-        const result = optimizer.generateSuggestion(req.params.patternId);
-        if (result.error) return res.status(400).json(result);
+        const result = await optimizer.generateSuggestion(req.params.patternId);
+        if (result.error) return res.apiError(VALIDATION_ERROR.statusCode, result.error, VALIDATION_ERROR.code, result);
         res.json(result);
     } catch (err) {
-        console.error('[OPTIMIZER] suggestion error:', err);
-        res.status(500).json({ error: err.message });
+        logger.error('optimizer', '[OPTIMIZER] suggestion error:', err);
+        return res.apiError(INTERNAL_ERROR.statusCode, err.message, INTERNAL_ERROR.code);
     }
 });
 
-router.post('/apply/:projectId/:patternId', (req, res) => {
+router.post('/apply/:projectId/:patternId', async (req, res) => {
     try {
         const optimizer = new PromptOptimizer(req.params.projectId);
         const { suggestionIndex, customModification } = req.body || {};
-        const result = optimizer.applyOptimization(req.params.patternId, suggestionIndex || 0, customModification);
-        if (!result.success) return res.status(400).json(result);
-        console.log(`[OPTIMIZER] Applied optimization: pattern=${req.params.patternId}, tokenDelta=${result.tokenDelta}, health=${result.healthScoreAfter}`);
+        const result = await optimizer.applyOptimization(req.params.patternId, suggestionIndex || 0, customModification);
+        if (!result.success) return res.apiError(VALIDATION_ERROR.statusCode, result.error || '操作失败', VALIDATION_ERROR.code, result);
+        logger.info('optimizer', `[OPTIMIZER] Applied optimization: pattern=${req.params.patternId}, tokenDelta=${result.tokenDelta}, health=${result.healthScoreAfter}`);
         res.json(result);
     } catch (err) {
-        console.error('[OPTIMIZER] apply error:', err);
-        res.status(500).json({ error: err.message });
+        logger.error('optimizer', '[OPTIMIZER] apply error:', err);
+        return res.apiError(INTERNAL_ERROR.statusCode, err.message, INTERNAL_ERROR.code);
     }
 });
 
-router.post('/rollback/:projectId/:snapshotId', (req, res) => {
+router.post('/rollback/:projectId/:snapshotId', async (req, res) => {
     try {
         const optimizer = new PromptOptimizer(req.params.projectId);
-        const result = optimizer.rollback(req.params.snapshotId);
-        if (!result.success) return res.status(400).json(result);
-        console.log(`[OPTIMIZER] Rolled back snapshot: ${req.params.snapshotId}, field=${result.field}`);
+        const result = await optimizer.rollback(req.params.snapshotId);
+        if (!result.success) return res.apiError(VALIDATION_ERROR.statusCode, result.error || '操作失败', VALIDATION_ERROR.code, result);
+        logger.info('optimizer', `[OPTIMIZER] Rolled back snapshot: ${req.params.snapshotId}, field=${result.field}`);
         res.json(result);
     } catch (err) {
-        console.error('[OPTIMIZER] rollback error:', err);
-        res.status(500).json({ error: err.message });
+        logger.error('optimizer', '[OPTIMIZER] rollback error:', err);
+        return res.apiError(INTERNAL_ERROR.statusCode, err.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -72,8 +76,8 @@ router.get('/history/:projectId', (req, res) => {
         const result = optimizer.getOptimizationHistory();
         res.json(result);
     } catch (err) {
-        console.error('[OPTIMIZER] history error:', err);
-        res.status(500).json({ error: err.message });
+        logger.error('optimizer', '[OPTIMIZER] history error:', err);
+        return res.apiError(INTERNAL_ERROR.statusCode, err.message, INTERNAL_ERROR.code);
     }
 });
 

@@ -1,14 +1,14 @@
 const VALID_TRANSITIONS = {
     'outlined': ['written', 'failed-skipped'],
     'written': ['first-reviewing', 'failed-skipped'],
-    'first-reviewing': ['second-reviewing', 'written', 'timeout-skipped', 'permanently-skipped'],
-    'second-reviewing': ['final-editing', 'written', 'timeout-skipped', 'permanently-skipped'],
-    'final-editing': ['approved', 'written', 'timeout-skipped', 'permanently-skipped'],
+    'first-reviewing': ['second-reviewing', 'written', 'timeout-skipped', 'cooldown-waiting'],
+    'second-reviewing': ['final-editing', 'written', 'timeout-skipped', 'cooldown-waiting'],
+    'final-editing': ['approved', 'written', 'timeout-skipped', 'cooldown-waiting'],
     'approved': ['material-updated', 'outlined'],
     'material-updated': ['outlined'],
     'failed-skipped': ['outlined'],
     'timeout-skipped': ['outlined'],
-    'permanently-skipped': ['outlined']
+    'cooldown-waiting': ['outlined']
 };
 
 const STATE_LABELS = {
@@ -21,12 +21,12 @@ const STATE_LABELS = {
     'material-updated': '素材已更新',
     'failed-skipped': '失败跳过',
     'timeout-skipped': '超时跳过',
-    'permanently-skipped': '永久跳过'
+    'cooldown-waiting': '冷却等待'
 };
 
 const PIPELINE_STATES = ['first-reviewing', 'second-reviewing', 'final-editing'];
-const TERMINAL_STATES = ['approved', 'material-updated', 'failed-skipped', 'timeout-skipped', 'permanently-skipped'];
-const RESETTABLE_STATES = ['failed-skipped', 'timeout-skipped', 'permanently-skipped'];
+const TERMINAL_STATES = ['approved', 'material-updated', 'failed-skipped', 'timeout-skipped', 'cooldown-waiting'];
+const RESETTABLE_STATES = ['failed-skipped', 'timeout-skipped', 'cooldown-waiting'];
 
 function isValidTransition(from, to) {
     if (from === to) return true;
@@ -56,7 +56,7 @@ function getNextState(currentState, event) {
         'material-update': { from: 'approved', to: 'material-updated' },
         'timeout': { from: PIPELINE_STATES, to: 'timeout-skipped' },
         'fail-skip': { from: ['outlined', 'written'], to: 'failed-skipped' },
-        'permanent-skip': { from: PIPELINE_STATES, to: 'permanently-skipped' },
+        'cooldown-wait': { from: PIPELINE_STATES, to: 'cooldown-waiting' },
         'reset': { from: [...TERMINAL_STATES, ...RESETTABLE_STATES, 'material-updated'], to: 'outlined' }
     };
     const mapping = EVENT_MAP[event];

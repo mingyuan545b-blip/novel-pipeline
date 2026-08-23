@@ -4,6 +4,9 @@ const store = require('../store');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { ERROR_CODES } = require('../shared/errorCodes');
+
+const { NOT_FOUND, INTERNAL_ERROR } = ERROR_CODES;
 
 const PROFILES_DIR = path.join(store.DATA_DIR, 'worldview-profiles');
 
@@ -22,18 +25,18 @@ router.get('/', (req, res) => {
         }).filter(Boolean);
         res.json(profiles);
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
 router.get('/:id', (req, res) => {
     try {
         const filePath = path.join(PROFILES_DIR, `${req.params.id}.json`);
-        if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Profile not found' });
+        if (!fs.existsSync(filePath)) return res.apiError(NOT_FOUND.statusCode, 'Profile not found', NOT_FOUND.code);
         const data = JSON.parse(fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, ''));
         res.json(data);
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
@@ -53,42 +56,42 @@ router.post('/', (req, res) => {
         fs.writeFileSync(path.join(PROFILES_DIR, `${id}.json`), JSON.stringify(profile, null, 2), 'utf-8');
         res.json({ success: true, profile });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
 router.put('/:id', (req, res) => {
     try {
         const filePath = path.join(PROFILES_DIR, `${req.params.id}.json`);
-        if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Profile not found' });
+        if (!fs.existsSync(filePath)) return res.apiError(NOT_FOUND.statusCode, 'Profile not found', NOT_FOUND.code);
         const existing = JSON.parse(fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, ''));
         const updated = { ...existing, ...req.body, id: existing.id, updatedAt: new Date().toISOString() };
         fs.writeFileSync(filePath, JSON.stringify(updated, null, 2), 'utf-8');
         res.json({ success: true, profile: updated });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
 router.delete('/:id', (req, res) => {
     try {
         const filePath = path.join(PROFILES_DIR, `${req.params.id}.json`);
-        if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Profile not found' });
+        if (!fs.existsSync(filePath)) return res.apiError(NOT_FOUND.statusCode, 'Profile not found', NOT_FOUND.code);
         fs.unlinkSync(filePath);
         res.json({ success: true });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.post('/:id/apply/:projectId', (req, res) => {
+router.post('/:id/apply/:projectId', async (req, res) => {
     try {
         const profilePath = path.join(PROFILES_DIR, `${req.params.id}.json`);
-        if (!fs.existsSync(profilePath)) return res.status(404).json({ error: 'Profile not found' });
+        if (!fs.existsSync(profilePath)) return res.apiError(NOT_FOUND.statusCode, 'Profile not found', NOT_FOUND.code);
 
         const profile = JSON.parse(fs.readFileSync(profilePath, 'utf-8').replace(/^\uFEFF/, ''));
-        const project = store.getItem('projects', req.params.projectId);
-        if (!project) return res.status(404).json({ error: 'Project not found' });
+        const project = await store.getItem('projects', req.params.projectId);
+        if (!project) return res.apiError(NOT_FOUND.statusCode, 'Project not found', NOT_FOUND.code);
 
         if (profile.constraints?.length) {
             project.constraints = profile.constraints;
@@ -103,17 +106,17 @@ router.post('/:id/apply/:projectId', (req, res) => {
         project.worldviewProfileId = profile.id;
         project.worldviewProfileName = profile.name;
         project.updatedAt = new Date().toISOString();
-        store.setItem('projects', req.params.projectId, project);
+        await store.setItem('projects', req.params.projectId, project);
 
         if (profile.materialTemplates?.length) {
-            const existingMats = store.queryItems('materials', { projectId: req.params.projectId });
+            const existingMats = await store.queryItems('materials', { projectId: req.params.projectId });
             for (const m of existingMats) {
-                store.deleteItem('materials', m.id);
+                await store.deleteItem('materials', m.id);
             }
 
             for (const tmpl of profile.materialTemplates) {
                 const matId = uuidv4();
-                store.setItem('materials', matId, {
+                await store.setItem('materials', matId, {
                     id: matId,
                     projectId: req.params.projectId,
                     type: tmpl.type || 'worldview',
@@ -139,17 +142,17 @@ router.post('/:id/apply/:projectId', (req, res) => {
             }
         });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.post('/save-from-project/:projectId', (req, res) => {
+router.post('/save-from-project/:projectId', async (req, res) => {
     try {
-        const project = store.getItem('projects', req.params.projectId);
-        if (!project) return res.status(404).json({ error: 'Project not found' });
+        const project = await store.getItem('projects', req.params.projectId);
+        if (!project) return res.apiError(NOT_FOUND.statusCode, 'Project not found', NOT_FOUND.code);
 
         const { name, description } = req.body;
-        const materials = store.queryItems('materials', { projectId: req.params.projectId });
+        const materials = await store.queryItems('materials', { projectId: req.params.projectId });
 
         const materialTemplates = materials.map(m => ({
             type: m.type,
@@ -170,7 +173,7 @@ router.post('/save-from-project/:projectId', (req, res) => {
         fs.writeFileSync(path.join(PROFILES_DIR, `${id}.json`), JSON.stringify(profile, null, 2), 'utf-8');
         res.json({ success: true, profile: { id: profile.id, name: profile.name, materialCount: materialTemplates.length } });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 

@@ -1,5 +1,10 @@
 const store = require('../store');
 const { v4: uuidv4 } = require('uuid');
+const { getSnapshotHistory } = require('./stateSnapshotQueries');
+const { computeDiff } = require('./stateSnapshotDiff');
+
+const queries = require('./stateSnapshotQueries');
+const diffModule = require('./stateSnapshotDiff');
 
 class StateSnapshotService {
     async createSnapshot(projectId, chapterNumber, chapterContent, materialUpdates) {
@@ -24,207 +29,63 @@ class StateSnapshotService {
             const prevState = prevSnapshot?.characterStates?.[c.id] || {};
             const updates = materialUpdates?.characterUpdates?.find(u => u.id === c.id);
             characterStates[c.id] = {
-                id: c.id,
-                name: c.name,
+                id: c.id, name: c.name,
                 content: c.currentContent || c.initialContent,
                 location: updates?.location || prevState.location || '未知',
-                status: updates?.status || prevState.status || '活跃',
                 powerLevel: updates?.powerLevel || prevState.powerLevel || '未知',
-                emotionalState: updates?.emotionalState || prevState.emotionalState || '平静',
-                lastAppearanceChapter: this._detectAppearance(chapterContent, c.name)
-                    ? chapterNumber
-                    : (prevState.lastAppearanceChapter || 0),
-                active: updates?.active !== undefined ? updates.active : (prevState.active !== false),
-                changesFromPrev: updates ? Object.keys(updates) : []
+                status: updates?.status || prevState.status || '正常',
+                equipment: equipment.filter(e => e.characterId === c.id || e.parentFaction === c.parentFaction).map(e => e.name),
+                growthHistory: growthHistories.find(g => g.characterId === c.id)?.currentContent || '',
+                appearedInChapter: this._detectAppearance(chapterContent, c.name),
+                changesFromPrev: updates?.changes || []
             };
         }
 
         const relationshipStates = {};
         for (const r of relationships) {
             const prevState = prevSnapshot?.relationshipStates?.[r.id] || {};
-            const updates = materialUpdates?.relationshipUpdates?.find(u => u.id === r.id);
             relationshipStates[r.id] = {
-                id: r.id,
-                name: r.name,
-                content: r.currentContent || r.initialContent,
-                type: updates?.type || prevState.type || r.tags?.[0] || '未知',
-                strength: updates?.strength || prevState.strength || 50,
-                lastChangeChapter: updates ? chapterNumber : (prevState.lastChangeChapter || 0),
-                changeDescription: updates?.description || prevState.changeDescription || ''
+                id: r.id, name: r.name,
+                type: r.relationshipType || r.type || '未知',
+                strength: r.strength || prevState.strength || '中等',
+                appearedInChapter: this._detectAppearance(chapterContent, r.name)
             };
         }
 
         const equipmentStates = {};
         for (const e of equipment) {
-            const prevState = prevSnapshot?.equipmentStates?.[e.id] || {};
-            const updates = materialUpdates?.equipmentUpdates?.find(u => u.id === e.id);
-            equipmentStates[e.id] = {
-                id: e.id,
-                name: e.name,
-                content: e.currentContent || e.initialContent,
-                owner: updates?.owner || prevState.owner || '未知',
-                status: updates?.status || prevState.status || '完好',
-                lastChangeChapter: updates ? chapterNumber : (prevState.lastChangeChapter || 0)
-            };
-        }
-
-        const growthMilestones = {};
-        for (const g of growthHistories) {
-            const prevMilestones = prevSnapshot?.growthMilestones?.[g.id] || [];
-            const updates = materialUpdates?.growthUpdates?.find(u => u.id === g.id);
-            const newMilestone = updates ? {
-                chapter: chapterNumber,
-                description: updates.milestone || '',
-                timestamp: new Date().toISOString()
-            } : null;
-            growthMilestones[g.id] = newMilestone
-                ? [...prevMilestones, newMilestone]
-                : prevMilestones;
+            equipmentStates[e.id] = { id: e.id, name: e.name, type: e.equipmentType || e.type || '未知' };
         }
 
         const foreshadowingStates = {};
         for (const f of foreshadowings) {
             const prevState = prevSnapshot?.foreshadowingStates?.[f.id] || {};
-            const updates = materialUpdates?.foreshadowingUpdates?.find(u => u.id === f.id);
             foreshadowingStates[f.id] = {
-                id: f.id,
-                name: f.name,
-                content: f.currentContent || f.initialContent,
-                status: updates?.status || prevState.status || 'planted',
-                plantedChapter: updates?.plantedChapter || prevState.plantedChapter || chapterNumber,
-                harvestedChapter: updates?.harvestedChapter || prevState.harvestedChapter || null,
-                urgency: this._calcUrgency(
-                    updates?.plantedChapter || prevState.plantedChapter || chapterNumber,
-                    chapterNumber,
-                    updates?.status || prevState.status
-                )
+                id: f.id, name: f.name,
+                status: f.status || prevState.status || 'planted',
+                plantedChapter: f.plantedChapter || prevState.plantedChapter || chapterNumber,
+                urgency: this._calcUrgency(f.plantedChapter || prevState.plantedChapter || chapterNumber, chapterNumber, f.status || prevState.status)
             };
         }
 
-        const timelineEvents = [];
-        const quests = await store.queryItems('quests', q => q.projectId === projectId);
-        const activeQuests = quests.filter(q => q.status === 'active');
-        if (materialUpdates?.timelineEvents) {
-            timelineEvents.push(...materialUpdates.timelineEvents);
-        }
+        const worldviewStates = {};
+        for (const w of worldviews) worldviewStates[w.id] = { id: w.id, name: w.name, content: w.currentContent || '' };
+        const powerSystemStates = {};
+        for (const p of powerSystems) powerSystemStates[p.id] = { id: p.id, name: p.name, content: p.currentContent || '' };
+
+        const currentStates = { characterStates, relationshipStates, equipmentStates, foreshadowingStates };
+        const diff = computeDiff(prevSnapshot, currentStates);
 
         const snapshot = {
-            id: uuidv4(),
-            projectId,
-            chapterNumber,
+            id: uuidv4(), projectId, chapterNumber,
             timestamp: new Date().toISOString(),
-            characterStates,
-            relationshipStates,
-            equipmentStates,
-            growthMilestones,
-            foreshadowingStates,
-            activeQuests: activeQuests.map(q => ({ id: q.id, name: q.name, status: q.status, progress: q.progress })),
-            timelineEvents,
-            worldviewSnapshot: worldviews.map(w => ({ id: w.id, name: w.name, content: w.currentContent || w.initialContent })),
-            powerSystemSnapshot: powerSystems.map(p => ({ id: p.id, name: p.name, content: p.currentContent || p.initialContent })),
-            diffFromPrev: this._computeDiff(prevSnapshot, { characterStates, relationshipStates, equipmentStates, foreshadowingStates })
+            characterStates, relationshipStates, equipmentStates,
+            foreshadowingStates, worldviewStates, powerSystemStates,
+            diff, materialCount: activeMaterials.length
         };
 
         await store.setItem('state-snapshots', snapshot.id, snapshot);
         return snapshot;
-    }
-
-    async getSnapshot(projectId, chapterNumber) {
-        const snapshots = await store.queryItems('state-snapshots', s => s.projectId === projectId);
-        if (chapterNumber) {
-            return snapshots
-                .filter(s => s.chapterNumber === chapterNumber)
-                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-        }
-        return snapshots.sort((a, b) => b.chapterNumber - a.chapterNumber)[0];
-    }
-
-    async getSnapshotHistory(projectId) {
-        const snapshots = await store.queryItems('state-snapshots', s => s.projectId === projectId);
-        return snapshots.sort((a, b) => a.chapterNumber - b.chapterNumber);
-    }
-
-    async getCharacterTimeline(projectId, characterId) {
-        const snapshots = await this.getSnapshotHistory(projectId);
-        return snapshots.map(s => ({
-            chapterNumber: s.chapterNumber,
-            timestamp: s.timestamp,
-            state: s.characterStates?.[characterId] || null
-        })).filter(e => e.state !== null);
-    }
-
-    async getRelationshipTimeline(projectId, relationshipId) {
-        const snapshots = await this.getSnapshotHistory(projectId);
-        return snapshots.map(s => ({
-            chapterNumber: s.chapterNumber,
-            timestamp: s.timestamp,
-            state: s.relationshipStates?.[relationshipId] || null
-        })).filter(e => e.state !== null);
-    }
-
-    async getPowerProgression(projectId, characterId) {
-        const timeline = await this.getCharacterTimeline(projectId, characterId);
-        return timeline
-            .filter(t => t.state.powerLevel && t.state.powerLevel !== '未知')
-            .map(t => ({
-                chapterNumber: t.chapterNumber,
-                powerLevel: t.state.powerLevel,
-                changesFromPrev: t.state.changesFromPrev || []
-            }));
-    }
-
-    async getForeshadowingTracker(projectId) {
-        const snapshots = await this.getSnapshotHistory(projectId);
-        if (!snapshots.length) return [];
-
-        const latest = snapshots[snapshots.length - 1];
-        const allForeshadowings = Object.values(latest.foreshadowingStates || {});
-
-        return allForeshadowings.map(f => {
-            const history = snapshots
-                .filter(s => s.foreshadowingStates?.[f.id])
-                .map(s => ({
-                    chapterNumber: s.chapterNumber,
-                    status: s.foreshadowingStates[f.id].status,
-                    urgency: s.foreshadowingStates[f.id].urgency
-                }));
-            return { ...f, history };
-        });
-    }
-
-    async restoreSnapshot(projectId, chapterNumber) {
-        const snapshot = await this.getSnapshot(projectId, chapterNumber);
-        if (!snapshot) throw new Error(`找不到第${chapterNumber}章的快照`);
-
-        const materials = await store.queryItems('materials', m => m.projectId === projectId);
-
-        for (const [id, state] of Object.entries(snapshot.characterStates || {})) {
-            const mat = materials.find(m => m.id === id);
-            if (mat) {
-                await store.setItem('materials', id, {
-                    ...mat,
-                    currentContent: state.content,
-                    restoredFromSnapshot: chapterNumber
-                });
-            }
-        }
-
-        return { restored: true, chapterNumber, affectedMaterials: Object.keys(snapshot.characterStates || {}).length };
-    }
-
-    async getDiff(projectId, chapterA, chapterB) {
-        const snapA = await this.getSnapshot(projectId, chapterA);
-        const snapB = await this.getSnapshot(projectId, chapterB);
-        if (!snapA || !snapB) throw new Error('找不到指定章节的快照');
-
-        return {
-            chapterA,
-            chapterB,
-            characterChanges: this._diffStates(snapA.characterStates, snapB.characterStates),
-            relationshipChanges: this._diffStates(snapA.relationshipStates, snapB.relationshipStates),
-            equipmentChanges: this._diffStates(snapA.equipmentStates, snapB.equipmentStates),
-            foreshadowingChanges: this._diffStates(snapA.foreshadowingStates, snapB.foreshadowingStates)
-        };
     }
 
     _detectAppearance(content, name) {
@@ -241,74 +102,14 @@ class StateSnapshotService {
         return 20;
     }
 
-    _computeDiff(prevSnapshot, currentStates) {
-        if (!prevSnapshot) return { isNew: true, changes: [] };
-        const changes = [];
-
-        for (const [id, state] of Object.entries(currentStates.characterStates || {})) {
-            const prev = prevSnapshot.characterStates?.[id];
-            if (!prev) {
-                changes.push({ type: 'character', id, name: state.name, change: '新增角色' });
-            } else {
-                if (prev.location !== state.location) {
-                    changes.push({ type: 'character', id, name: state.name, field: 'location', from: prev.location, to: state.location });
-                }
-                if (prev.powerLevel !== state.powerLevel) {
-                    changes.push({ type: 'character', id, name: state.name, field: 'powerLevel', from: prev.powerLevel, to: state.powerLevel });
-                }
-                if (prev.status !== state.status) {
-                    changes.push({ type: 'character', id, name: state.name, field: 'status', from: prev.status, to: state.status });
-                }
-            }
-        }
-
-        for (const [id, state] of Object.entries(currentStates.relationshipStates || {})) {
-            const prev = prevSnapshot.relationshipStates?.[id];
-            if (!prev) {
-                changes.push({ type: 'relationship', id, name: state.name, change: '新增关系' });
-            } else if (prev.strength !== state.strength || prev.type !== state.type) {
-                changes.push({ type: 'relationship', id, name: state.name, field: 'strength/type', from: `${prev.type}(${prev.strength})`, to: `${state.type}(${state.strength})` });
-            }
-        }
-
-        for (const [id, state] of Object.entries(currentStates.foreshadowingStates || {})) {
-            const prev = prevSnapshot.foreshadowingStates?.[id];
-            if (!prev) {
-                changes.push({ type: 'foreshadowing', id, name: state.name, change: '埋下伏笔' });
-            } else if (prev.status !== state.status) {
-                changes.push({ type: 'foreshadowing', id, name: state.name, field: 'status', from: prev.status, to: state.status });
-            }
-        }
-
-        return { isNew: false, changes };
-    }
-
-    _diffStates(statesA, statesB) {
-        const changes = [];
-        const allIds = new Set([...Object.keys(statesA || {}), ...Object.keys(statesB || {})]);
-
-        for (const id of allIds) {
-            const a = statesA?.[id];
-            const b = statesB?.[id];
-            if (!a && b) {
-                changes.push({ id, name: b.name, change: '新增', details: b });
-            } else if (a && !b) {
-                changes.push({ id, name: a.name, change: '移除', details: a });
-            } else if (a && b) {
-                const fields = {};
-                for (const key of Object.keys(a)) {
-                    if (key !== 'id' && a[key] !== b[key] && typeof a[key] !== 'object') {
-                        fields[key] = { from: a[key], to: b[key] };
-                    }
-                }
-                if (Object.keys(fields).length > 0) {
-                    changes.push({ id, name: a.name || b.name, change: '变更', fields });
-                }
-            }
-        }
-
-        return changes;
-    }
+    async getSnapshot(projectId, chapterNumber) { return queries.getSnapshot(projectId, chapterNumber); }
+    async getSnapshotHistory(projectId) { return queries.getSnapshotHistory(projectId); }
+    async getCharacterTimeline(projectId, characterId) { return queries.getCharacterTimeline(projectId, characterId); }
+    async getRelationshipTimeline(projectId, relationshipId) { return queries.getRelationshipTimeline(projectId, relationshipId); }
+    async getPowerProgression(projectId, characterId) { return queries.getPowerProgression(projectId, characterId); }
+    async getForeshadowingTracker(projectId) { return queries.getForeshadowingTracker(projectId); }
+    async restoreSnapshot(projectId, chapterNumber) { return diffModule.restoreSnapshot(projectId, chapterNumber); }
+    async getDiff(projectId, chapterA, chapterB) { return diffModule.getDiff(projectId, chapterA, chapterB); }
 }
 
 module.exports = new StateSnapshotService();
