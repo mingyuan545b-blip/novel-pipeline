@@ -1,0 +1,51 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+client/dist/
+client/dist_backup/
+.next/
+
+# 运行时产物
+*.log
+*.pid
+.server.pid
+output/
+backups/
+coverage/
+client/coverage/
+server/test-reports/
+test-screenshots/
+
+# 工具缓存/索引
+.codegraph/
+.gitnexus/
+
+# 密钥与环境（仅保留example）
+.env
+.env.local
+client/.env
+client/.env.local
+!.env.example
+
+# 数据库文件与运行时数据
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/.jsonstore.pid
+data/license.json
+
+# 临时/调试文件
+*.tmp.*
+.tmp-*
+tmp_*
+scripts/tmp_*
+scripts/_tmp_*
+page_screenshot.png
+client-eslint.json
+client/eslint-result.json
+v8-engine.html
+
+# 系统
+.DS_Store
