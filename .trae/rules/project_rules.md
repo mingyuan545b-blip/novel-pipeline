@@ -9,9 +9,9 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Frontend (React + Vite)                    │
+│                    Frontend (React 19 + Vite 8)               │
 │  Dashboard | Pipeline | Materials | Chapters | Agents | ... │
-│  Store: Zustand | API: Axios | Themes: 7 skins              │
+│  Store: React Query + Zustand 双写 | API: Axios | Themes: 7 skins │
 └──────────────────────────┬──────────────────────────────────┘
                            │ HTTP (Vite proxy -> :3001/api)
 ┌──────────────────────────▼──────────────────────────────────┐
@@ -36,9 +36,10 @@
 │  │  | infinite-dungeon                                    │  │
 │  │  -> detectors / interceptors / reviewRules / presets   │  │
 │  ├────────────────────────────────────────────────────────┤  │
-│  │ LLM Layer (8 providers)                                │  │
-│  │  aliyunCoding(qwen3.6-plus) | minimax | deepseek      │  │
-│  │  | siliconflow | lmstudio | openai | zhipu | moonshot  │  │
+│  │ LLM Layer (9 providers)                                │  │
+│  │  aliyunCoding(qwen3.6-plus, 默认) | deepseek           │  │
+│  │  | siliconflow | zhipu | moonshot | custom             │  │
+│  │  (minimax/lmstudio/openai 已弃用，自动迁移到aliyunCoding) │  │
 │  │  resolveStepConfig -> per-agent model assignment       │  │
 │  ├────────────────────────────────────────────────────────┤  │
 │  │ Context Management                                     │  │
@@ -46,20 +47,37 @@
 │  │  | RuleStack | BeatAllocator | ChapterIntent           │  │
 │  └────────────────────────────────────────────────────────┘  │
 ├──────────────────────────────────────────────────────────────┤
-│  Store (JSON File)                                           │
+│  Store (三后端架构: PostgreSQL > SQLite > JSON文件)           │
 │  data/projects/ | data/materials/ | data/chapters/ | ...    │
 │  data/dialects/ | data/speech-styles/                       │
+│  pgSchema.js: 11表(PostgreSQL) | database.js: SQLite         │
+│  jsonStore.js: JSON文件(默认fallback)                         │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 ### 启动命令
 ```bash
-# 后端
-cd novel-pipeline && node server/index.js    # 端口 3001
+# 后端（默认JSON文件存储）—— 启动前自动清理旧进程
+cd novel-pipeline && npm start                # 端口 3001（自动杀旧进程+PID管理）
+npm stop                                      # 停止服务器（PID文件+端口清理双保险）
+npm restart                                   # 重启服务器
+npm run server:status                         # 查看服务器状态（PID/端口/运行状态）
+
+# 后端（使用PostgreSQL）
+USE_PG=true DATABASE_URL=postgresql://postgres@localhost:5432/novel_pipeline npm start
+
+# 后端（使用SQLite）
+USE_SQLITE=true npm start
 
 # 前端（开发模式）
 cd novel-pipeline/client && npm run dev       # 端口 5173，代理到 3001
+
+# 数据迁移（JSON/SQLite → PostgreSQL）
+node scripts/migrate-to-pg.js
 ```
+
+> ⚠️ **服务器进程管理铁律**：修改服务器代码后直接 `npm start` 即可，脚本会自动杀掉占用端口的旧进程。
+> 禁止依赖手动 taskkill/StopCommand 杀进程（不可靠）。详见 scripts/killPort.js + scripts/serverStart.js。
 
 ---
 
@@ -74,7 +92,7 @@ cd novel-pipeline/client && npm run dev       # 端口 5173，代理到 3001
 | `second-review` | 复审 | 二次校验，纠正初审误判（含方言/风格误判纠正） | Markdown+JSON | 8192 |
 | `final-editor` | 定稿人 | 最高裁定，最终润色定稿 | 纯文本正文 | 32768 |
 | `material-manager` | 素材管理员 | 从正文提取/更新素材，解析方言/风格标签 | JSON | 8192 |
-| `fast-review` | 快审 | 爽点密度/节奏审核（爽文模式） | Markdown+JSON | 8192 |
+| `fast-review` | 快审 | 轻量级快速审核（通过reviewOverride路由替代初审+复审） | Markdown+JSON | 8192 |
 | `reviser` | 返修员 | 根据审核反馈精准修改正文 | 修改后完整正文 | 32768 |
 | `intent-planner` | 意图规划 | 规划章节意图(goal/mustKeep/mustAvoid) | 结构化JSON | 8192 |
 
@@ -84,19 +102,23 @@ Foundation Prompt → Agent Template → Style Profile注入 → Constraint Inje
 → Genre Rules注入 → 方言/风格注入 → Deduplicate → Prompt Auditor审计 → Context Budget分配
 ```
 
-核心文件：`server/services/_agentPromptsLegacy.js`
+核心文件：
+- 新版：`server/services/prompts/` 目录（promptBuilder.js + constraintInjector.js + flavorInjector.js + styleInjector.js + genreInjector.js）
+- 旧版（兼容）：`server/services/_agentPromptsLegacy.js`
 
 ---
 
 ## 三、Pipeline 流程
 
-### 三种模式
+### 统一长篇模式（novel）
 
-| 模式 | 步骤序列 | 最大轮次 | 最低字数 |
-|---|---|---|---|
-| `novel`(默认) | writer→first-review→second-review→final-editor→material-manager | 7 | 2200 |
-| `shuangwen` | writer→fast-review→final-editor→material-manager | 3 | 1200 |
-| `tomato-short` | writer→fast-review→final-editor→material-manager | 3 | 1850 |
+| 模式 | 步骤序列 | 最大轮次 | 最低字数(REJECT) | 目标字数(TARGET) | 上限(MAX) |
+|---|---|---|---|---|---|
+| `novel`(统一长篇模式) | writer→first-review→second-review→final-editor | 7 | 1800 | 2200-2800 | 3500 |
+
+> 说明：原 shuangwen/tomato-short 模式已移除，所有项目统一使用 novel 长篇模式。字数阈值由 `server/config/wordConfigSchema.js` + `project.wordConfig` 动态管理。
+
+> 注：material-manager 不是pipeline步骤，是审核通过后独立运行的素材提取步骤
 
 ### 执行流程
 ```
@@ -225,19 +247,20 @@ POST /api/flavors/reload                                热重载方言/风格�
 
 ## 五、数据规范
 
-### 素材类型（28种）
+### 素材类型（33种）
 
 | 分类 | 类型 |
 |---|---|
 | 世界观 | worldview, scene, phenomenon, institution, organization, faction, geography, technology, power-system |
 | 角色 | character, character-psychology, character-combat, character-personality, character-relationship, character-dialogue, character-behavior |
 | 逻辑 | foreshadowing, writing-technique, logic |
-| 特殊 | sub-plane, equipment, relationship, mechanism, material, index, narrative-bridge, catchphrase, famous-scene, growth-history, location, other |
+| 特殊 | sub-plane, equipment, relationship, mechanism, material, index, catchphrase, famous-scene, growth-history, location, narrative-bridge, other, craft |
 
-### 新增类型必须三处同步
-1. `server/routes/materials.js` → `MATERIAL_TYPES`
+### 新增类型必须四处同步
+1. `server/config/materialTypes.js` → `VALID_MATERIAL_TYPES` + `MATERIAL_TYPE_LABELS` + `MATERIAL_TYPE_COLORS` + `DOMAIN_CATEGORIES`
 2. `client/src/pages/MaterialsPage.jsx` → `MATERIAL_TYPE_LABELS` + `MATERIAL_TYPE_COLORS` + `DOMAIN_CATEGORIES`
 3. `server/services/materialValidator.js` → `VALID_MATERIAL_TYPES` + `HIERARCHY_RULES`
+4. `server/config/materialTypes.js` → 导出模块
 
 ### 角色位面归属（双字段设计）
 
@@ -342,10 +365,26 @@ module.exports = {
 
 ## 七、LLM 配置
 
-核心文件：`server/services/llmConfig.js`
+核心文件：`server/config/providerRegistry.js`、`server/services/llmConfig.js`
+
+### 9个LLM提供商（aliyunCoding为默认，其余已弃用）
+
+> 说明：minimax/lmstudio/openai 已弃用，详见 `server/config/providerRegistry.js` 的 `DEPRECATED_PROVIDERS`，自动迁移到 aliyunCoding。
+
+| Provider ID | 名称 | 默认模型 | API Key环境变量 | 状态 |
+|---|---|---|---|---|
+| `aliyunCoding` | 阿里云百炼(Coding Plan) | qwen3.6-plus | ALIYUN_CODING_API_KEY | ✅ 默认 |
+| `deepseek` | DeepSeek | deepseek-chat | DEEPSEEK_API_KEY | 可用 |
+| `siliconflow` | 硅基流动 | deepseek-ai/DeepSeek-V3 | SILICONFLOW_API_KEY | 可用 |
+| `zhipu` | 智谱AI | glm-4-plus | ZHIPU_API_KEY | 可用 |
+| `moonshot` | 月之暗面 | moonshot-v1-128k | MOONSHOT_API_KEY | 可用 |
+| `custom` | 自定义 | - | - | 可用 |
+| `minimax` | MiniMax | MiniMax-M2.7 | MINIMAX_API_KEY | ❌ 已弃用 |
+| `openai` | OpenAI | gpt-4o | OPENAI_API_KEY | ❌ 已弃用 |
+| `lmstudio` | LM Studio (本地) | default | LMSTUDIO_API_KEY | ❌ 已弃用 |
 
 ### 默认分配
-所有agent默认使用 aliyunCoding (qwen3.6-plus)
+所有agent默认使用 aliyunCoding (qwen3.6-plus)，详见 `DEFAULT_STEP_ASSIGNMENTS`
 
 ### 配置解析优先级
 1. 项目级 per-step 配置 → `project.agentModelConfig[step].keyId`
@@ -366,8 +405,67 @@ project.agentModelConfig = { writer: { provider: 'aliyunCoding', model: 'qwen3.6
 
 ## 八、Store 数据结构
 
-### 存储方案
-JSON文件持久化，每条记录一个文件
+### 三后端架构（自动降级）
+
+```
+┌─────────────────────────────────────────────┐
+│              store.js (统一入口)               │
+│  listItems/getItem/setItem/deleteItem/...    │
+└──────────────────┬──────────────────────────┘
+                   │ 环境变量决定使用哪个后端
+    ┌──────────────┼──────────────┐
+    │              │              │
+┌───▼────┐  ┌─────▼──────┐  ┌───▼──────┐
+│PostgreSQL│  │   SQLite   │  │ JSON文件  │
+│(优先)   │  │  (备选)     │  │(默认fallback│
+│USE_PG   │  │USE_SQLITE  │  │           │
+│ = true  │  │  = true    │  │           │
+└────────┘  └────────────┘  └───────────┘
+```
+
+### 1. PostgreSQL后端（USE_PG=true）
+
+核心文件：`server/db/pgPool.js` + `server/db/database-pg.js` + `server/db/pgSchema.js`
+
+连接字符串：`DATABASE_URL` 环境变量，默认 `postgresql://postgres@localhost:5432/novel_pipeline`
+
+连接池配置：max: 10, idleTimeout: 30s, connectionTimeout: 5s
+
+#### 11张表结构
+
+| 表名 | 主键 | 核心字段 | 用途 |
+|---|---|---|---|
+| `materials` | id TEXT | projectId, type, name, parentPlane, parentFaction, dialectRegion, speechStyle, archived, isLocked, version, data | 素材数据 |
+| `chapters` | id TEXT | projectId, chapterNumber, status, title, wordCount, round, data | 章节数据 |
+| `projects` | id TEXT | mode, targetChapterCount, targetWordCount, data | 项目数据 |
+| `kv_store` | type+id | data | 通用键值存储 |
+| `api_keys` | id TEXT | apiKey, groupId, model, provider, baseURL, name, _encrypted, data | API密钥 |
+| `agent_bindings` | id TEXT | agentType, keyId, data | Agent绑定 |
+| `reviews` | id TEXT | chapterId, projectId, reviewType, passed, data | 审核数据 |
+| `pipeline_logs` | id TEXT | projectId, chapterId, step, status, round, data | Pipeline日志 |
+| `infinite_pipeline_state` | id TEXT | projectId(UNIQUE), running, phase, data | 无限Pipeline状态 |
+| `quests` | id TEXT | projectId, parentId, status, priority, data | 任务数据 |
+| `timelines` | id TEXT | projectId, eventType, importance, isKeyEvent, data | 时间线数据 |
+
+#### 关键索引
+- materials: projectId / type+archived / parentPlane+parentFaction / dialectRegion / speechStyle / isLocked / version
+- chapters: projectId+chapterNumber / status / wordCount
+- reviews: chapterId / projectId / reviewType
+- pipeline_logs: projectId / chapterId
+- infinite_pipeline_state: projectId
+- quests: projectId / parentId / status
+- timelines: projectId / eventType
+
+### 2. SQLite后端（USE_SQLITE=true）
+
+核心文件：`server/db/database.js` + `server/db/store.js`
+数据库路径：`data/novel-pipeline.db`
+降级条件：数据库为空时自动降级到JSON文件
+
+### 3. JSON文件后端（默认fallback）
+
+核心文件：`server/db/jsonStore.js`
+存储方案：JSON文件持久化，每条记录一个文件
 
 | 类型 | 目录 | 大小限制 |
 |---|---|---|
@@ -380,7 +478,7 @@ JSON文件持久化，每条记录一个文件
 | dialects | data/dialects/ | - |
 | speech-styles | data/speech-styles/ | - |
 
-### 关键API
+### 关键API（统一接口，不依赖后端类型）
 ```javascript
 store.listItems(type)              // 列出所有
 store.getItem(type, id)            // 获取单条
@@ -511,6 +609,14 @@ store.isFoundationMaterial(mat)    // 判断是否基底素材（动态推断，
 - 修复：改为`[^|｜\]]+?` + `.trim()`
 - 文件：server/services/pipeline/steps/materialManager.js
 
+**坑21：服务器旧进程杀不掉导致新代码不生效（反复犯5次以上）**
+- 问题：修改服务器代码后，旧进程未被杀掉，新代码不生效，测试持续报旧错误
+- 根因：依赖手动 taskkill/StopCommand 杀进程，两者都不可靠（taskkill超时、StopCommand杀不掉子进程）
+- 修复：创建 scripts/killPort.js（netstat查找PID + taskkill/process.kill双方案 + 轮询等待）+ scripts/serverStart.js（启动前自动清理端口 + PID文件管理 + stop/restart/status命令）
+- 验证：连续两次 `npm start`，PID自动从55164切换到50156，旧进程被自动杀掉
+- 文件：scripts/killPort.js, scripts/serverStart.js, package.json
+- ⚠️ **铁律21**：禁止再依赖手动杀进程，直接 `npm start` 即可
+
 ### 🟡 P2 - 配置级问题
 
 **坑5：项目API不保存styleProfile**
@@ -608,11 +714,22 @@ foundation.forEach(m => console.log(m.type, m.name));
 | 文件 | 功能 |
 |---|---|
 | server/index.js | Express入口，路由挂载 |
-| server/store.js | JSON文件存储，含isFoundationMaterial |
-| server/services/_pipelineLegacy.js | Pipeline主引擎 |
-| server/services/_agentPromptsLegacy.js | Agent提示词构建（含方言/风格注入） |
+| server/store.js | 统一入口，三后端自动降级（PG > SQLite > JSON） |
+| server/db/pgPool.js | PostgreSQL连接池管理 |
+| server/db/database-pg.js | PostgreSQL后端实现 |
+| server/db/pgSchema.js | PostgreSQL建表SQL（11张表） |
+| server/db/store-pg.js | PostgreSQL存储层 |
+| server/db/database.js | SQLite后端实现 |
+| server/db/store.js | SQLite存储层 |
+| server/db/jsonStore.js | JSON文件存储层（默认fallback） |
+| server/core/pipeline/orchestrator.js | Pipeline编排器（新架构） |
+| server/services/pipeline/fullPipeline.js | Pipeline主引擎（旧架构） |
+| server/config/providerRegistry.js | LLM提供商注册中心（9个） |
+| server/config/materialTypes.js | 素材类型配置（33种） |
+| server/services/contentUtils.js | 内容工具+模式配置 |
+| server/services/pipelineConfig.js | Pipeline模式配置（轮次/字数） |
 | server/services/genreConfig.js | 题材插件注册中心 |
-| server/services/llmConfig.js | LLM配置中心 |
+| server/services/llmConfig.js | LLM配置中心（代理到providerRegistry） |
 | server/services/dialectRegistry.js | 方言注册服务（加载/查询/Prompt构建） |
 | server/services/speechStyleRegistry.js | 说话风格注册服务（含组合Prompt构建） |
 | server/services/materialValidator.js | 素材验证+层级校验 |
@@ -620,15 +737,26 @@ foundation.forEach(m => console.log(m.type, m.name));
 | server/services/promptAuditor.js | 提示词审计 |
 | server/services/contextBudget.js | 上下文预算 |
 | server/services/reviewCircuitBreaker.js | 审核熔断器 |
+| server/services/reviewOverride.js | 审核覆盖逻辑（独立模块） |
 | server/routes/flavors.js | 方言/风格API路由 |
 
 ### Pipeline引擎
 | 文件 | 功能 |
 |---|---|
-| server/services/pipeline/fullPipeline.js | 主Pipeline引擎（含审核覆盖逻辑） |
+| server/core/pipeline/orchestrator.js | Pipeline编排器（新架构核心） |
+| server/services/pipeline/fullPipeline.js | 主Pipeline引擎（旧架构） |
 | server/services/pipeline/infinitePipeline.js | 无限Pipeline引擎 |
 | server/services/pipeline/volumeHelpers.js | 卷/位面可见性管理 |
+| server/services/pipeline/reviewOverride.js | 审核覆盖逻辑（独立模块） |
+| server/services/pipeline/constants.js | Pipeline常量 |
+| server/services/pipeline/steps/writer.js | Writer步骤 |
+| server/services/pipeline/steps/review.js | 审核步骤 |
+| server/services/pipeline/steps/reviser.js | 返修步骤 |
+| server/services/pipeline/steps/finalEditor.js | 定稿步骤 |
+| server/services/pipeline/steps/fastReview.js | 快审步骤 |
 | server/services/pipeline/steps/materialManager.js | 素材管理器（含方言/风格标签解析） |
+| server/services/pipeline/steps/firstReview.js | 初审步骤 |
+| server/services/pipeline/steps/secondReview.js | 复审步骤 |
 
 ### 题材插件
 | 文件 | 题材 |
@@ -644,8 +772,25 @@ foundation.forEach(m => console.log(m.type, m.name));
 |---|---|
 | data/dialects/*.json (21个) | 方言数据（每个方言一个文件） |
 | data/speech-styles/*.json (14个) | 说话风格数据（每个风格一个文件） |
-| data/subplanes/*.json | 次位面数据（每个位面一个文件） |
-| data/subplanes/mainworld.json | 主世界势力数据 |
+| data/subplanes/*.json | 次位面数据（当前1个文件：volume-order-witty-strategy.json） |
+| data/projects/*.json | 项目数据（含意图/风格配置/章节大纲） |
+| data/materials/*.json | 素材数据（角色/势力/世界观/伏笔等） |
+| data/chapters/*.json | 章节数据（含正文/审核输出/素材更新记录） |
+| data/reviews/*.json | 审核报告数据 |
+| data/timelines/*.json | 时间线数据 |
+| data/infinite-pipeline-state/*.json | 无限Pipeline状态数据 |
+| data/material-index/ | 素材索引（discoveries/lifecycle/planes/types） |
+| data/memory-layers/ | 记忆分层（active/archive/compressed/core/recent） |
+| data/character-archetypes/*.json (30个) | 角色原型数据 |
+| data/naming-styles/*.json (12个) | 命名风格数据 |
+| data/genre-profiles/*.json (10个) | 题材配置数据 |
+| data/worldview-templates/*.json (5个) | 世界观模板数据 |
+| data/humor-devices/*.json (2个) | 幽默手法数据 |
+| data/meme-lexicon/*.json (3个) | 网络用语词典 |
+| data/circuit-breakers/*.json | 审核熔断器状态 |
+| data/map-nodes/*.json | 地图节点数据 |
+| data/quests/*.json | 任务数据 |
+| data/version-snapshots/*.json | 版本快照 |
 | scripts/load-subplanes.js | 通用加载器 |
 
 ### 前端核心
@@ -672,7 +817,7 @@ foundation.forEach(m => console.log(m.type, m.name));
 
 1. **数据与代码分离** - 数据放JSON，代码读JSON，禁止硬编码
 2. **层级归属必须显式** - parentPlane/parentFaction必须填写
-3. **新增类型三处同步** - materials.js + MaterialsPage.jsx + materialValidator.js
+3. **新增类型四处同步** - materialTypes.js + MaterialsPage.jsx + materialValidator.js + 导出模块
 4. **法律风险规避** - IP角色禁止直呼其名
 5. **道具≠掠夺** - 能力=系统任务掠夺，道具=探索/交易
 6. **弱化通过修为压制** - 严禁残废化/时间限制描述
@@ -684,7 +829,13 @@ foundation.forEach(m => console.log(m.type, m.name));
 12. **禁止空catch** - `catch(_){}` 必须至少有 `console.warn`，不允许吞掉错误
 13. **禁止重复代码超3次** - 同一段逻辑出现3次以上必须提取为函数
 14. **存储层写操作必须加锁** - jsonStore已有acquireLock/releaseLock，新增写操作必须使用
-15. **SQL必须参数化** - 禁止字符串拼接SQL，必须使用 `?` 占位符
+15. **SQL必须参数化** - 禁止字符串拼接SQL，必须使用 `?` 占位符（自动转换为PostgreSQL `$N`）
+16. **认证 token 自动刷新机制** - 401/403 时自动清除旧 token 并重新获取，禁止依赖手动刷新页面
+17. **async 函数必须 await** - 调用 async 函数时必须有 await，否则返回 Promise 而非结果值，导致 `.filter()/.map()` 等数组方法报错
+18. **数组操作必须防御性检查** - 对可能非数组的值调用 `.filter()/.map()/.find()` 前，必须用 `Array.isArray()` 检查
+19. **所有问题根源解决** - 发现的任何问题必须从机制层面彻底修复，不能头痛医头脚痛医脚，不能依赖手动操作
+20. **服务器重启 token 自动续期** - 服务器重启后旧 token 失效，客户端必须能自动获取新 token，不能出现 403 错误
+21. **服务器进程管理自动化** - 修改服务器代码后直接 `npm start`，脚本自动清理旧进程（killPort.js + serverStart.js）。禁止依赖手动 taskkill/StopCommand 杀进程（已验证不可靠：taskkill超时、StopCommand杀不掉）。杀进程方案优先级：taskkill /F /T → process.kill(pid, 'SIGKILL') → 轮询等待端口释放
 
 ---
 
@@ -719,7 +870,7 @@ foundation.forEach(m => console.log(m.type, m.name));
 
 - 审核覆盖逻辑（字数幻觉/方言误判/风格误判/幽默误判/不覆盖场景）
 - 基底素材保护（各类型判定规则/显式标记优先/null处理）
-- 素材类型三处同步（28+类型/无重复/关键类型存在）
+- 素材类型四处同步（33类型/无重复/关键类型存在）
 - 素材层级校验（character/faction必填字段）
 - 素材验证（无效类型拒绝/类型推断建议）
 
@@ -738,14 +889,449 @@ foundation.forEach(m => console.log(m.type, m.name));
 | # | 问题 | 位置 | 状态 |
 |---|---|---|---|
 | P0-1 | API输入验证缺失 | server/routes/*.js | ✅已修(4个核心路由接入validators) |
-| P0-2 | materialManager代码膨胀(1037行) | server/services/pipeline/steps/materialManager.js | ❌待修 |
+| P0-2 | materialManager代码膨胀(1037行) | server/services/pipeline/steps/materialManager.js | ✅已修(拆分为146行主文件+20个子模块，全部≤200行) |
 | P0-3 | intensityMap重复6次 | materialManager.js | ✅已修(提取parseFlavorTag+INTENSITY_MAP) |
 | P0-4 | 审核覆盖正则脆弱 | fullPipeline.js shouldOverrideReviewRejection | ✅已修(提取为reviewOverride.js独立模块) |
 | P0-5 | InfinitePipeline内存泄漏风险 | infinitePipeline.js INFINITE_PIPELINE_STATE | ✅已修(日志限制200+启动前清理+延迟10s+心跳warn) |
 | P0-6 | 前端PipelinePage轮询泄漏风险 | client/src/pages/PipelinePage.jsx | ✅已修(buttonPollRefs+卸载cleanup) |
-| P0-7 | 前端状态管理缺数据层 | client/src/store/useAppStore.js | ⏳延后(需React Query,风险高) |
+| P0-7 | 前端状态管理缺数据层 | client/src/store/useAppStore.js | ✅已修(React Query+Axios双写模式,116个Hooks) |
 | P0-8 | 错误处理不一致(空catch) | 全系统 | ✅已修(119处空catch→console.warn) |
 | P0-9 | API响应格式不统一 | server/routes/*.js | ✅已修(创建responseFormatter.js) |
 | P0-10 | 缺少速率限制 | server/index.js | ✅已修(全局200/min+Pipeline10/min) |
+| P0-11 | PostgreSQL隐藏Bug(15个) | server/db/ 全文件 | ✅已修(两轮审查修复15个Bug，详见下方) |
 
 **修复P0问题时，必须同时更新此表的状态列。**
+
+**修复P0-11后更新**：✅ P0-11 PostgreSQL 15个Bug已全部修复（2026-05-24），两轮审查覆盖7个文件，修复包括：healthCheck逻辑错误/quests+timelines处理函数缺失/_txDepth并发安全/initPgPool并发保护/safeParse计数器重置/projects字段遗漏/删除操作缺表/内存泄漏修复/唯一索引添加/closePgPool状态重置/store.js竞态修复
+
+---
+
+## 十五、前端架构说明（2026-05-24 更新）
+
+### 15.1 技术栈
+
+```
+React 19 + Vite 8 + Zustand 5 + @tanstack/react-query 5
+Axios（HTTP客户端） | React Router 7
+react-markdown + remark-gfm（Markdown渲染）
+```
+
+### 15.2 前端目录结构
+
+```
+client/src/
+├── App.jsx                          # 路由入口（154行），React Query迁移完成
+├── main.jsx                         # React挂载入口（50行），QueryClientProvider已挂载
+│
+├── hooks/                           # Hooks层（12个旧版hooks）
+│   ├── queries/                     # ⭐ React Query Hooks（10个文件，1090行，116个Hooks）
+│   │   ├── index.js                 # 统一导出入口（10行）
+│   │   ├── useProjects.js           # 项目查询（141行）：15个Hooks，CRUD+cleanup+remediate+constraints
+│   │   ├── useMaterials.js          # 素材查询（56行）：5个Hooks，列表/详情/CRUD
+│   │   ├── useChapters.js           # 章节查询（78行）：8个Hooks，列表/详情/CRUD/排序/下载/重置
+│   │   ├── usePipeline.js           # Pipeline查询/操作（430行）：50个Hooks
+│   │   ├── useChapterAudit.js       # 章节审计查询（99行）：10个Hooks，audit/repair/batchRepair/retry/rollback
+│   │   ├── useReviews.js            # 审核查询（34行）：3个Hooks
+│   │   ├── useAgents.js             # Agent查询（73行）：7个Hooks，列表/详情/模板/约束/风格
+│   │   ├── useFlavors.js            # 方言/风格查询（106行）：11个Hooks，方言/风格/题材配置/预览/重载
+│   │   └── useSettings.js           # 设置查询（73行）：7个Hooks，设置/约束/模板/prompt管理
+│   │
+│   └── （旧版hooks，逐步废弃中）
+│       ├── useProjects.js           # 旧版项目hook（159行）
+│       ├── useMaterials.js          # 旧版素材hook（108行）
+│       ├── useChapters.js           # 旧版章节hook（118行）
+│       └── ...
+│
+├── pages/                           # 页面组件（18+37子模块，~17000行）
+│   ├── PipelinePage.jsx             # Pipeline控制台（2627行），React Query迁移完成 ✅
+│   ├── MaterialsPage.jsx            # 素材库（1571行），React Query迁移完成 ✅
+│   ├── Dashboard.jsx                # 仪表盘（1240行），React Query迁移完成 ✅
+│   ├── KnowledgePage.jsx            # 知识库（1177行）
+│   ├── PublishPage.jsx              # 发布页（1101行）
+│   ├── WorkshopPage.jsx             # 工作台（804行）
+│   ├── ComicConfigPage.jsx          # 漫画配置（604行）
+│   ├── MapPage.jsx                  # 地图（569行）
+│   ├── ComicStoryboardPage.jsx      # 漫画分镜（687行）
+│   ├── AgentsPage.jsx               # Agent管理（462行），React Query迁移完成 ✅
+│   ├── SettingsPage.jsx             # 设置（456行），React Query迁移完成 ✅
+│   ├── StyleTemplatesPage.jsx       # 风格模板（385行）
+│   ├── ChaptersPage.jsx             # 章节管理（351行），React Query迁移完成 ✅
+│   ├── LibraryPage.jsx              # 书库（369行）
+│   ├── TimelinePage.jsx             # 时间线（343行）
+│   ├── ComicExportPage.jsx          # 漫画导出（253行）
+│   ├── GuidePage.jsx                # 引导页（280行）
+│   ├── ComicRenderPage.jsx          # 漫画渲染（174行）
+│   └── ComicWorkflowsPage.jsx       # 漫画工作流（230行）
+│   │
+│   ├── pipeline/                    # Pipeline子模块（14个文件，2781行）
+│   │   ├── ChapterAuditPanel.jsx    # 章节审核面板（599行）
+│   │   ├── PipelineToolsPanel.jsx   # 工具面板（354行）
+│   │   ├── OutputViewer.jsx         # 输出查看器（340行）
+│   │   ├── pipelineConstants.js     # Pipeline常量（182行）
+│   │   ├── useInfinitePipeline.js   # 无限Pipeline逻辑（176行）
+│   │   ├── AgentConfigPanel.jsx     # Agent配置面板（171行）
+│   │   ├── PipelineLogViewer.jsx    # 日志查看器（193行）
+│   │   ├── InjectionMapPanel.jsx    # 注入映射面板（147行）
+│   │   ├── PipelineSettingsPanel.jsx# 设置面板（151行）
+│   │   ├── ChapterListPanel.jsx     # 章节列表面板（97行）
+│   │   ├── InfinitePipelineBar.jsx  # 无限Pipeline栏（29行）
+│   │   ├── ReviewResultPanel.jsx    # 审核结果面板（61行）
+│   │   └── SafeMarkdown.jsx         # 安全Markdown渲染（12行）
+│   │
+│   ├── materials/                   # 素材子模块（7个文件，1175行）
+│   │   ├── useMaterials.js          # 素材逻辑（222行）
+│   │   ├── MaterialEditor.jsx       # 素材编辑器（268行）
+│   │   ├── MaterialTreePanel.jsx    # 素材树面板（209行）
+│   │   ├── QuestPanel.jsx           # 任务面板（204行）
+│   │   ├── materialConstants.js     # 素材常量（128行）
+│   │   ├── TimelinePanel.jsx        # 时间线面板（102行）
+│   │   └── CreateMaterialForm.jsx   # 创建素材表单（42行）
+│   │
+│   ├── knowledge/                   # 知识库子模块（8个文件，1022行）
+│   │   ├── GraphPanel.jsx           # 图谱面板（293行）
+│   │   ├── PowerTracker.jsx         # 力量追踪（186行）
+│   │   ├── ConsistencyPanel.jsx     # 一致性面板（115行）
+│   │   ├── ForeshadowPanel.jsx      # 伏笔面板（110行）
+│   │   ├── MemoryPanel.jsx          # 记忆面板（85行）
+│   │   ├── SnapshotPanel.jsx        # 快照面板（83行）
+│   │   ├── OverviewPanel.jsx        # 概览面板（53行）
+│   │   └── knowledgeConstants.js    # 知识库常量（17行）
+│   │
+│   ├── publish/                     # 发布子模块（4个文件，935行）
+│   │   ├── usePublish.js            # 发布逻辑（390行）
+│   │   ├── PublishConfigPanel.jsx   # 发布配置面板（266行）
+│   │   ├── InteractionPanel.jsx     # 交互面板（168行）
+│   │   └── PublishQueuePanel.jsx    # 发布队列表（111行）
+│   │
+│   └── dashboard/                   # 仪表盘子模块（4个文件，650行）
+│       ├── useDashboard.js          # Dashboard逻辑（561行）
+│       ├── ProjectCard.jsx          # 项目卡片（51行）
+│       ├── OutlineGenerator.jsx     # 大纲生成器（25行）
+│       └── MaterialGenerator.jsx    # 素材生成器（17行）
+│
+├── services/                        # 服务层（3个文件，724行）
+│   ├── api.js                       # Axios API封装（461行），所有API端点集中管理
+│   ├── queryClient.js               # React Query客户端（13行），全局配置staleTime:30s
+│   └── wsClient.js                  # WebSocket客户端（250行）
+│
+├── store/                           # Zustand状态（3个文件，200行）
+│   ├── useAppStore.js               # 全局状态（116行），项目/章节/素材/主题
+│   ├── useUIStore.js                # UI状态（54行），模态框/侧边栏
+│   └── usePipelineStore.js          # Pipeline状态（30行）
+│
+├── components/                      # 通用组件（5个文件，1061行）
+│   ├── CreateProjectModal.jsx       # 创建项目弹窗（701行）
+│   ├── Sidebar.jsx                  # 侧边导航（183行）
+│   ├── ErrorBoundary.jsx            # 错误边界（70行）
+│   ├── VirtualList.jsx              # 虚拟列表（59行）
+│   └── Header.jsx                   # 顶栏（48行）
+│
+├── shared/                          # 共享工具（3个文件，278行）
+│   ├── utils.js                     # 通用工具（122行）
+│   ├── dateUtils.js                 # 日期工具（80行）
+│   └── hooks.js                     # 通用hooks（76行）
+│
+└── styles/                          # 样式（12个文件，3667行）
+    ├── layout.css                   # 布局（714行）
+    ├── components.css               # 组件（616行）
+    ├── animations.css               # 动画（227行）
+    ├── skin-mario.css               # Mario皮肤（382行）
+    ├── skin-aurora.css              # Aurora皮肤（358行）
+    ├── skin-ripple.css              # Ripple皮肤（284行）
+    ├── timeline.css                 # 时间线（295行）
+    ├── skin-glass.css               # Glass皮肤（212行）
+    ├── skin-liquid.css              # Liquid皮肤（210行）
+    ├── skin-soft.css                # Soft皮肤（191行）
+    └── variables.css                # CSS变量（28行）
+```
+
+### 15.3 React Query Hooks 清单
+
+#### useProjects.js（15个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useProjects()` | query | 获取项目列表 |
+| `useProject(id)` | query | 获取单个项目详情 |
+| `useCreateProject()` | mutation | 创建项目 |
+| `useUpdateProject(id)` | mutation | 更新项目 |
+| `useDeleteProject()` | mutation | 删除项目 |
+| `useProjectConstraints()` | query | 获取项目约束预设 |
+| `useProjectRemediationStatus(id)` | query | 获取整改状态 |
+| `useProjectCleanupStats(id)` | query | 获取清理统计 |
+| `useProjectAgentModelConfig(id)` | query | 获取Agent模型配置 |
+| `useSaveAgentModelConfig(id)` | mutation | 保存Agent模型配置 |
+| `useResetChapters(id)` | mutation | 重置所有章节 |
+| `useProjectCleanup(id)` | mutation | 清理项目 |
+| `useProjectStyleGuidance(id)` | query | 获取风格指导 |
+| `useProjectRemediate(id)` | mutation | 整改分发 |
+| `useDeleteProjectRemediation(id)` | mutation | 删除整改 |
+
+#### useMaterials.js（5个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useMaterials(projectId, filters)` | query | 获取素材列表（支持过滤） |
+| `useMaterial(id)` | query | 获取单个素材详情 |
+| `useCreateMaterial()` | mutation | 创建素材 |
+| `useUpdateMaterial(id, projectId)` | mutation | 更新素材 |
+| `useDeleteMaterial()` | mutation | 删除素材 |
+
+> 注：`useToggleMaterialLock()` 在 usePipeline.js 中
+
+#### useChapters.js（8个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useChapters(projectId)` | query | 获取章节列表 |
+| `useChapter(id)` | query | 获取单个章节详情 |
+| `useUpdateChapter()` | mutation | 更新章节 |
+| `useDeleteChapter()` | mutation | 删除章节 |
+| `useResetChapter()` | mutation | 重置章节 |
+| `useDownloadChaptersTxt()` | mutation | 下载全本TXT |
+| `useDownloadChapterTxt()` | mutation | 下载单章TXT |
+| `useUpdateChapterOrder()` | mutation | 章节排序 |
+
+#### usePipeline.js（50个Hooks）
+| 分类 | Hook名 | 功能 |
+|---|---|---|
+| **状态** | `usePipelineStatus(projectId, {refetchInterval})` | 无限流水线状态（支持轮询） |
+| | `usePipelineAgents()` | 获取Agent列表 |
+| **操作** | `useStartPipeline()` | 启动无限流水线 |
+| | `useStopPipeline()` | 停止无限流水线 |
+| | `useResetPipeline()` | 重置无限流水线 |
+| **章节操作** | `useRunStep()` | 运行单步 |
+| | `useRunFullPipeline()` | 运行完整Pipeline |
+| | `useRunPipeline()` | 运行Pipeline（旧版） |
+| | `useRunSingleChapter()` | 运行单章 |
+| | `useRetryChapter()` | 重试章节 |
+| | `useBatchRetryChapters()` | 批量重试章节 |
+| | `useTaskStatusPoll(taskId, {refetchInterval, enabled})` | 任务状态轮询 |
+| | `useResetChapterContent()` | 重置章节内容 |
+| | `useResetChaptersBulk()` | 批量重置章节 |
+| | `useSupplementOutlines()` | 补充大纲 |
+| | `useClearChaptersAfter()` | 清除后续章节 |
+| **素材操作** | `useRerunMaterialManager()` | 补跑素材管理 |
+| | `useToggleMaterialLock()` | 切换素材锁定 |
+| | `useSetVolumeSubplane()` | 设置卷次位面 |
+| | `useGenerateSubplaneMaterials()` | 生成次位面素材 |
+| **图片** | `useGenerateImages()` | 生成配图 |
+| | `useChapterImages(projectId, chapterId)` | 获取章节图片 |
+| **数据查询** | `usePipelineOutputPaths(projectId)` | 输出路径 |
+| | `usePipelineContextBudget(projectId)` | 上下文容量 |
+| | `usePipelineInjectionMap(projectId)` | 注入映射 |
+| | `usePipelineHookBudget(projectId)` | 伏笔预算 |
+| | `usePipelineRuleStack(projectId)` | 规则栈 |
+| | `usePipelineChapterIntent(projectId)` | 章节意图 |
+| | `usePipelinePromptAudit(projectId)` | 提示词审计 |
+| | `useGetLatestPromptAudit()` | 最新提示词审计 |
+| | `usePipelineOptimizer(projectId)` | 优化器报告 |
+| | `useChapterAuditData(projectId)` | 章节审计数据 |
+| | `useGetContextTrace(projectId, chapterNumber)` | 上下文追踪 |
+| **Agent配置** | `usePipelineAgentModelConfig(projectId)` | Agent模型配置 |
+| | `useSaveAgentModelConfig(projectId)` | 保存Agent模型配置 |
+| | `useGetAgentModelConfig(projectId)` | 获取Agent模型配置（通过projects API） |
+| | `useSaveAgentModelConfigFromProjects(projectId)` | 保存配置（通过projects API） |
+| | `useTestAgentConnection()` | 测试Agent连接 |
+| **优化器** | `usePipelineApplyOptimizer()` | 应用优化 |
+| | `useRunOptimizerReport()` | 运行优化器报告 |
+| | `useApplyOptimizerPattern()` | 应用优化模式 |
+| | `useOptimizerSuggestion(projectId, patternId)` | 获取优化建议 |
+| **审计返修** | `useRepairModels()` | 获取返修模型列表 |
+| | `useRepairChapter()` | 返修章节 |
+| | `useBatchRepairChapters()` | 批量返修 |
+| | `useTestAgentModel()` | 测试Agent模型 |
+| **Hook预算** | `useSyncHookBudget(projectId)` | 同步伏笔预算 |
+| | `useRegisterHook(projectId)` | 注册伏笔 |
+| **规则栈** | `useExtractRuleStack(projectId)` | 提取规则栈 |
+| **其他** | `useSaveProjectTargets(projectId)` | 保存项目目标 |
+
+#### useChapterAudit.js（10个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useChapterAuditModels()` | query | 获取可用返修模型列表 |
+| `useChapterAuditRun(projectId)` | mutation | 执行全量章节审计 |
+| `useChapterAuditRepair(projectId, chapterId)` | mutation | 单次返修 |
+| `useChapterAuditRepairRetry(projectId, chapterId)` | mutation | 返修重试 |
+| `useChapterAuditRepairRetryStatus(taskId, {refetchInterval, enabled})` | query | 返修重试状态轮询 |
+| `useChapterAuditRepairRetryCancel()` | mutation | 取消返修重试 |
+| `useChapterAuditBatchRepair(projectId)` | mutation | 批量返修 |
+| `useChapterAuditBatchRepairStatus(taskId, {refetchInterval, enabled})` | query | 批量返修状态轮询 |
+| `useChapterAuditReview(projectId, chapterId)` | mutation | 单独审核 |
+| `useChapterAuditRollback(projectId)` | mutation | 章节回滚 |
+
+#### useReviews.js（3个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useReviews(projectId)` | query | 获取审核列表 |
+| `useReview(id)` | query | 获取单个审核详情 |
+| `useReviewsByChapter(chapterId)` | query | 按章节获取审核列表 |
+
+#### useAgents.js（7个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useAgentsList(mode)` | query | 获取Agent列表（按模式过滤） |
+| `useAgentDetail(type, mode, projectId)` | query | 获取Agent详情 |
+| `useUpdateAgentPrompt()` | mutation | 更新Agent提示词 |
+| `useAgentTemplates()` | query | 获取Agent模板列表 |
+| `useUpdateAgentTemplate(id)` | mutation | 更新Agent模板 |
+| `useAgentConstraints()` | query | 获取约束预设列表 |
+| `useAgentProfiles()` | query | 获取风格配置列表 |
+
+#### useFlavors.js（11个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useDialects()` | query | 获取方言列表 |
+| `useDialect(region)` | query | 获取单个方言详情 |
+| `useSpeechStyles()` | query | 获取说话风格列表 |
+| `useNamingStyles()` | query | 获取命名风格列表 |
+| `useSystemPersonas()` | query | 获取系统角色模板列表 |
+| `useGenreProfiles()` | query | 获取题材配置列表 |
+| `useWorldviewTemplates()` | query | 获取世界观模板列表 |
+| `useInferNamingStyle(genre)` | query | 推断命名风格 |
+| `useResolveGenreProfile(genre)` | query | 解析题材配置 |
+| `useCombinedFlavorPreview()` | mutation | 组合风味预览 |
+| `useReloadFlavors()` | mutation | 重载方言/风格数据 |
+
+#### useSettings.js（7个Hooks）
+| Hook名 | 类型 | 功能 |
+|---|---|---|
+| `useSettings()` | query | 获取系统设置 |
+| `useUpdateSettings()` | mutation | 更新系统设置 |
+| `useConstraintPresets()` | query | 获取约束预设列表 |
+| `useStyleTemplates()` | query | 获取风格模板列表 |
+| `useGeneratePrompt()` | mutation | 生成提示词 |
+| `useSavePrompt()` | mutation | 保存提示词 |
+| `useDeletePrompt()` | mutation | 删除提示词 |
+
+### 15.4 React Query 缓存策略
+
+```javascript
+// queryClient.js 全局配置
+staleTime: 30_000        // 30秒内不自动重新请求
+gcTime: 5 * 60 * 1000    // 5分钟后清理未使用的缓存
+retry: 1                 // 失败重试1次
+refetchOnWindowFocus: false  // 窗口聚焦不自动刷新
+
+// 各模块典型配置
+列表数据: staleTime: 60s      // 项目/章节/素材列表
+详情数据: staleTime: 30s      // 单个项目/章节详情
+低频数据: staleTime: 5min     // 方言/风格/模板
+轮询数据: refetchInterval: 3s~5s  // Pipeline状态/任务进度
+```
+
+### 15.5 Mutation invalidation 规则
+
+| Mutation | Invalidate Query Keys |
+|---|---|
+| `useCreateProject` | `['projects']` |
+| `useUpdateProject(id)` | `['projects', 'detail', id]` + `['projects']` |
+| `useDeleteProject(id)` | `['projects']` |
+| `useCreateMaterial` | `['materials', 'list', projectId]` |
+| `useUpdateMaterial(id, projectId)` | `['materials', 'detail', id]` + `['materials', 'list', projectId]` |
+| `useUpdateChapter` | `['chapters', 'detail', id]` + `['chapters', 'list', projectId]` |
+| `useStartPipeline` | `['pipeline', 'status', projectId]` |
+| `useRunStep` | `['chapters', 'list', projectId]` + `['pipeline', 'output-paths', projectId]` |
+| `useChapterAuditRepair` | `['chapter-audit', 'audit', projectId]` + `['chapters', 'list', projectId]` |
+
+### 15.6 Zustand vs React Query 职责分工
+
+| 数据类型 | 管理方式 | 说明 |
+|---|---|---|
+| **服务端数据** | React Query | 项目/章节/素材/审核/Pipeline状态等 |
+| **UI状态** | Zustand | theme/modals/sidebar/membership/bgImage等 |
+| **实时反馈** | Zustand | addPipelineLog/setPipelineState（运行日志面板） |
+| **双写兼容** | React Query → Zustand | 数据获取后同步到Zustand，兼容未改造的旧组件 |
+
+### 15.7 页面改造状态（2026-05-24 验证更新）
+
+| 页面 | React Query迁移 | useEffect剩余 | 剩余API调用 | 备注 |
+|---|---|---|---|---|
+| PipelinePage | ✅ 97% | 14处 | pipelineApi.getPipelineLogs(1处) | 核心数据获取已迁移，剩余useEffect为UI逻辑 |
+| ChaptersPage | ✅ 100% | 0处 | chaptersApi.downloadNovel(1处) | 数据获取全部完成，下载功能保留axios |
+| AgentsPage | ✅ 100% | 0处 | 无 | 全部完成 |
+| SettingsPage | ✅ 部分 | 2处 | settingsApi.getKeys(1处) | settings部分已改，API Keys保留 |
+| MaterialsPage | ✅ 部分 | 4处 | questApi(18处) | 风味/素材数据已改，quest/timeline保留 |
+| Dashboard | ✅ 部分 | 2处 | franchise(10+处) | 项目/风味数据已改，franchise保留 |
+
+### 15.8 构建与验证
+
+```bash
+# 前端开发模式
+cd novel-pipeline/client && npm run dev      # 端口 5173
+
+# 前端生产构建
+cd novel-pipeline/client && npm run build    # 输出 dist/
+
+# 验证
+npm run build                                # 必须通过
+```
+
+### 15.9 前端开发规范
+
+1. **新页面/新组件优先使用React Query Hooks**，不要直接调用API
+2. **mutation后使用invalidateQueries**刷新缓存，不要手动setState
+3. **轮询使用refetchInterval**，不要使用setInterval
+4. **双写兼容期**：React Query获取数据后通过`useAppStore.getState().setXxx(data)`同步到Zustand
+5. **queryKey命名规范**：`[模块, 'list'|'detail'|子模块, ...参数]`
+6. **Hook文件命名**：`useXxx.js`，放在`hooks/queries/`目录下
+7. **统一导出**：所有Hooks通过`hooks/queries/index.js`统一导出
+
+## DataContext统一数据入口规则
+
+### 强制规则
+1. **所有Agent必须通过DataContext读取数据**，禁止直接调用store.getItem/queryItems
+2. DataContext是唯一数据入口：`const ctx = await getDataContext(projectId);`
+3. 新增数据访问需求时，必须先在DataContext中添加委托方法
+4. DataContext有缓存机制，同一projectId只创建一个实例
+
+### 违规示例
+```javascript
+// ❌ 违规：Agent直接读store
+const project = await store.getItem('projects', projectId);
+const chapters = store.queryItems('chapters', { projectId });
+
+// ✅ 正确：通过DataContext
+const ctx = await getDataContext(projectId);
+const project = await ctx.getProject();
+const chapters = await ctx.getChapters();
+```
+
+### DataContext委托方法分类
+- **项目数据**：getProject(), getStyleProfile(), getGenre(), getGenreId(), getGenreSchema(), getStyleTemplate(), getMode(), getWordConfig()
+- **章节数据**：getChapter(id), getChapters(filter), getPreviousChapter(ch), getSkippedChapters(ch)
+- **素材数据**：getMaterials(filter), getActiveMaterials(type), getForeshadowingMaterials(), getCharacterMaterials(), getNarrativeBridgeMaterials(), getCoreSettingMaterials()
+- **实体数据**：getEntitiesForWriter(ch, budget), getEntitiesForReviewer(ch), getEntitiesForIntentPlanner(ch), getEntityByName(type, name), getEntityRelations(), getRelationTypes()
+- **题材数据**：getAgentMaterialAccess(agent), getMaterialFocus(), getReviewRules()
+- **时间轴**：getTimelineEventsForChapter(ch), getTimelineEventsForRange(from, to), getRecentTimelineEvents(ch, lookback), getTimelineCausalChain(eventId), getTimelineSummary(ch, lookback, budget), detectTimelineConflicts(ch)
+- **战力守卫**：checkPowerConsistency(ch), getPowerCurve(entityId), getPowerCheckHint(ch)
+- **伏笔守卫**：getOverdueForeshadows(ch), getForeshadowResolveStats(), getForeshadowHint(ch), getForeshadowCheckHint(ch)
+- **角色弧线守卫**：checkCharacterArcs(ch), getCharacterActivityStats(ch), getCharacterArcCheckHint(ch), getCharacterActivityHint(ch)
+- **长线审计**：runFullAudit(ch), shouldRunAudit(ch), getAuditHistory(limit)
+- **素材长线管理**：getMaterialActivityAnalysis(ch), archiveStaleMaterials(ch), detectDuplicateMaterials(), calculateTokenBudget(ch), getMaterialHealthReport(ch)
+
+## 守卫服务开发规则
+
+### 新增守卫服务检查清单
+- [ ] 创建服务文件：server/services/xxxGuard.js
+- [ ] 实现标准接口：checkXxx / generateXxxHint / generateXxxCheckHint
+- [ ] 阈值提取为CONFIG常量，禁止硬编码
+- [ ] 集成到DataContext：import + 委托方法
+- [ ] writer集成：调用ctx.getXxxHint()注入提示
+- [ ] review集成：调用ctx.getXxxCheckHint()注入检查结果
+- [ ] API路由：knowledge.js添加路由
+- [ ] 前端API：api.js添加方法
+- [ ] 验收脚本：verify-tX.js
+
+### 守卫服务与题材插件
+- 守卫服务是通用逻辑，不依赖特定题材
+- 题材特定阈值从genreSchema读取，不硬编码
+- 例：PowerGuard战力突变阈值从genreSchema.powerChangeThreshold读取
+
+## 知识库表开发规则
+
+### 新增知识库表检查清单
+- [ ] DDL写在knowledgeSchema.js，不写在pgSchema.js
+- [ ] store-pg.js的knowledge表handler条件同步更新
+- [ ] database-pg.js的DEDICATED_TABLES同步添加
+- [ ] 知识库表统一使用JSONB（而非TEXT+safeParse）
+- [ ] 每张知识库表必须有projectId索引
+- [ ] DATABASE_SCHEMA.md同步更新文档
+

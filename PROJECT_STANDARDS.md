@@ -1,7 +1,7 @@
 # Novel-Pipeline 项目规范与交付标准
 
 > 本文档为所有接手AI的开发规范和交付标准，任何修改必须遵循以下原则。
-> 最后更新：2026-05-07（50+轮迭代后的完整版本）
+> 最后更新：2026-06-03（守卫服务+DataContext规范更新）
 
 ---
 
@@ -55,6 +55,14 @@
 - 两套系统的硬性拦截等级必须对齐（什么该hardBlock，什么该warning）
 - **血泪教训**：审计系统有MAX_CHAPTER_WORDS硬拦截，但流水线first-review/second-review/polisher/final-editor都没有，导致4800字膨胀
 
+### 9. DataContext统一数据入口（强制）
+- **所有Agent必须通过DataContext读取数据**，禁止直接调用store.getItem/queryItems
+- DataContext是唯一数据入口，内部委托各服务层（entityCenter/timelineService/powerGuard等）
+- 新增数据访问需求时，必须先在DataContext中添加委托方法，再在Agent中调用
+- DataContext有缓存机制，同一projectId只创建一个实例，避免重复IO
+- **违反此规则的代码不得合并**：任何`store.getItem('projects', projectId)`在Agent代码中出现都是违规
+- **正确做法**：`const ctx = await getDataContext(projectId); const project = await ctx.getProject();`
+
 ---
 
 ## 二、Agent输出格式规范（基座协议）
@@ -90,25 +98,26 @@
 
 ## 三、Pipeline流程规范
 
-### Novel模式（完整审核链）
+### 长篇模式（统一模式，完整审核链）
 ```
 意图规划 → 执笔人(writer) → [字数检查] → 初审(first-review) → 复审(second-review) → 定稿人(final-editor) → 润色师 → 素材管理
                 ↓失败          ↓失败+硬性检测     ↓失败+硬性检测      ↓字数检查
             字数不足→重写   返修员←──┘        返修员←──┘       截断超限
 ```
 
-### Shuangwen/Tomato-short模式（快审链）
-```
-意图规划 → 执笔人(writer) → 快审(fast-review) → 定稿人(final-editor) → 润色师 → 素材管理
-```
+> 说明：系统已统一为长篇模式（novel），爽文(shuangwen)和番茄短篇(tomato-short)模式已移除。
 
-### 字数阈值（由contentUtils.js MODE_CONFIGS统一管理）
+### 字数阈值（由 server/config/wordConfigSchema.js + project.wordConfig 动态管理）
 
-| 模式 | REJECT_MIN | TARGET_MIN | TARGET_MAX | MAX_CHAPTER | MAX_ROUNDS |
-|------|-----------|-----------|-----------|-------------|------------|
-| novel | 1800 | 2200 | 2800 | **3500** | 5 |
-| shuangwen | 1200 | 1800 | 2500 | **2800** | 3 |
-| tomato-short | 1850 | 1900 | 2100 | **2150** | 3 |
+| 字段 | 默认值 | 说明 |
+|------|--------|------|
+| rejectMin | 1800 | 拒绝下限（兼容字段，新数据用 minWords） |
+| targetMin | 2200 | 目标字数下限 |
+| targetMax | 2800 | 目标字数上限 |
+| maxWords | 3500 | 章节最大字数（系统上限 MAX_WORD_COUNT） |
+| MAX_RETRIES | 3 | 最大重试次数（来自 PIPELINE.MAX_CHAPTER_RETRIES） |
+
+> 配置层级：systemConfigDefs.js（系统默认）→ project.wordConfig（项目覆盖）→ 题材插件（题材特定）
 
 ### 字数拦截关卡（6道防线）
 
@@ -127,25 +136,29 @@
 ### 审核不通过时的重写逻辑
 1. 字数不足 → 用writer全文重写
 2. 字数足够但审核不通过 → 用reviser局部修改
-3. 定稿人检测到节奏问题 → 路由到adjuster（已移除，直接用reviser）
-4. 多位审核者拒绝 → 汇总所有反馈，标注"多位审核者意见汇总"
-5. 达到MAX_ROUNDS仍未通过 → 章节状态重置为outlined
+3. 多位审核者拒绝 → 汇总所有反馈，标注"多位审核者意见汇总"
+4. 达到MAX_ROUNDS仍未通过 → 章节状态重置为outlined
 
 ---
 
 ## 四、LLM路由规范
 
-### 默认路由（LLM_PROVIDER=lmstudio时）
-- **LM Studio**：writer, reader（创作类步骤）
-- **MiniMax API**：intent-planner, reviser, first-review, second-review, final-editor, material-manager, polisher, fast-review（审核/规划类步骤）
+### 默认路由（统一aliyunCoding）
+- **所有Agent**：aliyunCoding（qwen3.6-plus）— 由 `server/config/providerDefs.js` 的 `DEFAULT_STEP_ASSIGNMENTS` 统一分配
+- 覆盖Agent：writer, reader, reviser, intent-planner, material-manager, polisher, first-review, second-review, fast-review, final-editor
 
-### 原因
-- 审核类步骤需要严格JSON输出格式，MiniMax API指令遵循度更高
-- 创作类步骤可以用本地模型，降低API成本
+### 配置层级
+1. **项目级**：`project.agentModelConfig[step]`（项目设置中按Agent配置provider/model/keyId）
+2. **步骤覆盖**：`project.agentStepOverrides`（按provider扩展步骤分配）
+3. **全局默认**：`LLM_PROVIDER`/`LLM_API_KEY`/`LLM_MODEL` 环境变量
+4. **系统兜底**：aliyunCoding（qwen3.6-plus）
+
+### 已弃用Provider（自动迁移到aliyunCoding）
+- minimax / lmstudio / openai — 详见 `server/config/providerRegistry.js` 的 `DEPRECATED_PROVIDERS`
 
 ### 返修系统LLM路由
-- **返修(repair)**：默认使用MiniMax（可在前端选择provider/model）
-- **返修审核(review)**：默认使用MiniMax
+- **返修(repair)**：与正常流水线相同路由（可在前端选择provider/model）
+- **返修审核(review)**：与正常流水线相同路由
 - **后续流水线**：与正常流水线相同路由
 
 ---
@@ -222,9 +235,11 @@
 ### 3. 返修内容清洗流程
 ```
 LLM输出 → cleanChapterContent → deduplicateContent → cleanFinalContent
-        → validateTomatoMetrics(番茄模式) → ensureCliffhanger(爽文/番茄模式)
+        → validateTomatoMetrics(pipelineConfig) → ensureCliffhanger
         → 字数检查(4重) → _runHardBlockChecks → 保存
 ```
+
+> 说明：`validateTomatoMetrics` 和 `ensureCliffhanger` 仍保留为通用清洗函数，参数已改为 `pipelineConfig`，不再绑定特定模式。
 
 ### 4. 返修重试机制（repairWithRetry）
 - 支持一直重试直到通过（maxRetries默认10）
@@ -283,6 +298,9 @@ LLM输出 → cleanChapterContent → deduplicateContent → cleanFinalContent
 - [ ] 是否举一反三检查了同类Agent？
 - [ ] **新增检测是否同时集成到pipeline.js和chapterAuditor.js？**
 - [ ] **字数检查是否覆盖所有输出点（writer/reviser/polisher/final-editor）？**
+- [ ] **是否通过DataContext读取数据？（禁止Agent直接调用store）**
+- [ ] **新守卫服务是否集成到DataContext？**
+- [ ] **知识库表DDL是否同步到knowledgeSchema.js？**
 
 ### 流水线测试必检项
 - [ ] 章节最终状态是否为 `approved`？
@@ -479,7 +497,7 @@ parsed.passed || parsed.approved  →  '✅ 通过' : '❌ 未通过'
 | 20 | **字数膨胀到4800** | **pipeline.js** | **6道防线：first-review/second-review MAX硬拦截 + final-editor/polisher截断** |
 | 21 | **敏感词仅warning不拦截** | **pipeline.js** | **scanSensitiveWords升级为critical hardBlock** |
 | 22 | **审计系统缺跨章重复检测** | **chapterAuditor.js** | **_runHardBlockChecks添加detectCrossChapterRepetition** |
-| 23 | **返修缺番茄/爽文模式支持** | **chapterAuditor.js** | **repairChapter添加validateTomatoMetrics+ensureCliffhanger** |
+| 23 | **返修缺清洗函数支持** | **chapterAuditor.js** | **repairChapter添加validateTomatoMetrics+ensureCliffhanger** |
 | 24 | **返修审核缺技法提示** | **chapterAuditor.js** | **reviewChapter添加_buildTechniqueHints** |
 | 25 | **wordCount计算不统一** | **pipeline.js** | **全部统一为.replace(/\s/g,'').length** |
 | 26 | 执行日志重启丢失 | pipeline.js | 持久化到store('pipeline-logs') |
@@ -667,8 +685,8 @@ parsed.passed || parsed.approved  →  '✅ 通过' : '❌ 未通过'
       → repairChapter(chapterId, instructions, llm)
         → LLM返修
         → cleanChapterContent → deduplicateContent → cleanFinalContent
-        → validateTomatoMetrics(番茄模式) ✅新增
-        → ensureCliffhanger(爽文/番茄模式) ✅新增
+        → validateTomatoMetrics(pipelineConfig) ✅新增
+        → ensureCliffhanger ✅新增
         → 字数4重检查(相对90%-110% + 绝对REJECT_MIN + 绝对MAX_CHAPTER)
         → _runHardBlockChecks(8项检测，含跨章重复) ✅增强
         → auditChapter(12项检测)
@@ -716,7 +734,7 @@ parsed.passed || parsed.approved  →  '✅ 通过' : '❌ 未通过'
 
 1. **单章流水线运行时前端无法实时获取步骤日志** — 需要SSE或WebSocket推送
 2. **定稿人拒绝3轮后直接失败** — 应考虑更灵活的策略
-3. **润色师依赖MiniMax API** — 本地模型不支持
+3. **润色师依赖aliyunCoding API** — 本地模型不支持
 4. **cleanChapterContent可能误删正文** — 正则匹配过于宽泛
 5. **三幕结构节点（每15章）** — 已在style-profile中配置，但尚未在pipeline中强制执行
 6. **模板导入后约束验证** — 需要更完善的冲突检测
@@ -735,4 +753,74 @@ parsed.passed || parsed.approved  →  '✅ 通过' : '❌ 未通过'
 6. **监控执行**：执行日志面板 + Agent输出详情
 7. **审计章节**：审计面板 → 全量扫描 → 定点返修
 8. **发布章节**：发布页面 → 选择平台 → 配置作品ID → 发布
-9. **遇到问题**：先查本文档的踩坑记录，再查HANDOVER.md的操作手册
+9. **遇到问题**：先查本文档的踩坑记录，再查 [docs/INDEX.md](docs/INDEX.md) 的SOP索引
+
+---
+
+## 二十六、守卫服务开发规范
+
+### 1. 守卫服务标准接口
+
+每个守卫服务必须提供以下三类方法：
+
+| 方法类型 | 命名规范 | 说明 | 调用方 |
+|---------|---------|------|--------|
+| 检查方法 | `checkXxx(projectId, chapterNumber)` | 执行检查，返回问题列表 | review步骤 |
+| 提示方法 | `generateXxxHint(projectId, chapterNumber)` | 生成writer注入文本 | writer步骤 |
+| 审计方法 | `generateXxxCheckHint(projectId, chapterNumber)` | 生成review注入文本 | review步骤 |
+
+### 2. 守卫服务集成流程
+
+新增守卫服务时，必须按以下步骤集成：
+
+1. **创建服务文件**：`server/services/xxxGuard.js`
+2. **实现标准接口**：checkXxx / generateXxxHint / generateXxxCheckHint
+3. **集成到DataContext**：在dataContext.js中import并添加委托方法
+4. **writer集成**：在writer.js中调用ctx.getXxxHint()注入提示
+5. **review集成**：在review.js中调用ctx.getXxxCheckHint()注入检查结果
+6. **API路由**：在knowledge.js中添加GET/POST路由
+7. **前端API**：在api.js中添加对应方法
+8. **验收脚本**：创建verify-tX.js验收脚本
+
+### 3. 守卫服务配置常量
+
+每个守卫服务的阈值必须提取为CONFIG常量，禁止硬编码：
+
+```javascript
+// 正确
+const FORESHADOW_CONFIG = {
+    OVERDUE_ADVANCE_CHAPTERS: 10,
+    OVERDUE_RESOLVE_CHAPTERS: 30,
+    IMPORTANT_OVERDUE_CHAPTERS: 5,
+    TARGET_RESOLVE_RATE: 0.7
+};
+
+// 错误
+if (chaptersSinceAdvance > 10) { ... }
+```
+
+### 4. 守卫服务与题材插件的关系
+
+- 守卫服务是**通用逻辑**，不依赖特定题材
+- 题材特定阈值通过genre插件的entitySchema或constraints定义
+- 守卫服务从genreSchema读取阈值，不从代码中硬编码
+- 例如：PowerGuard的战力突变阈值，修仙题材50%，都市题材30%，从genreSchema.powerChangeThreshold读取
+
+### 5. 知识库表开发规范
+
+- 新增知识库表DDL必须写在`server/db/knowledgeSchema.js`中，不写在pgSchema.js
+- store-pg.js的knowledge表handler条件必须同步更新
+- database-pg.js的DEDICATED_TABLES必须同步添加新表名
+- 知识库表统一使用JSONB（而非TEXT+safeParse），因为知识库数据结构更灵活
+- 每张知识库表必须有projectId索引
+
+### 6. 已有守卫服务清单
+
+| 服务 | 文件 | 集成状态 |
+|------|------|---------|
+| TimelineService | timelineService.js | writer+review+materialUpdateProcessor |
+| PowerGuard | powerGuard.js | review |
+| ForeshadowGuard | foreshadowGuard.js | writer+review |
+| CharacterArcGuard | characterArcGuard.js | writer+review |
+| ConsistencyAuditService | consistencyAuditService.js | review（每10章自动触发） |
+| MaterialLifecycleService | materialLifecycleService.js | API+前端 |
