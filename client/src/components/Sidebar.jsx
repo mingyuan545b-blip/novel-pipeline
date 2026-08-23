@@ -2,28 +2,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import { settingsApi, comicApi } from '../services/api';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 
 const NOVEL_NAV = [
     { path: '/', icon: '◈', label: '仪表盘' },
     { path: '/pipeline', icon: '⟐', label: '流水线' },
     { path: '/workshop', icon: '⬡', label: '创作工坊' },
     { path: '/materials', icon: '⬡', label: '素材库' },
+    { path: '/entity-center', icon: '⬡', label: '实体中心' },
     { path: '/library', icon: '📚', label: '藏经阁' },
-    { path: '/timeline', icon: '⟁', label: '时间轴' },
     { path: '/knowledge', icon: '⬢', label: '知识库' },
-    { path: '/map', icon: '🗺', label: '世界地图' },
+    { path: '/context-map', icon: '🗺', label: '上下文电路图' },
     { path: '/style-templates', icon: '🎨', label: '风格模板' },
-    { path: '/chapters', icon: '▦', label: '章节管理' },
-    { path: '/publish', icon: '▲', label: '发布中心' }
-];
-
-const SHUANGWEN_NAV = [
-    { path: '/', icon: '◈', label: '仪表盘' },
-    { path: '/pipeline', icon: '⟐', label: '流水线' },
-    { path: '/workshop', icon: '⬡', label: '创作工坊' },
-    { path: '/materials', icon: '⬡', label: '素材库' },
-    { path: '/library', icon: '📚', label: '藏经阁' },
     { path: '/chapters', icon: '▦', label: '章节管理' },
     { path: '/publish', icon: '▲', label: '发布中心' }
 ];
@@ -37,7 +26,10 @@ const COMIC_NAV = [
 ];
 
 const SYSTEM_NAV = [
+    { path: '/metrics', icon: '📊', label: '系统监控' },
+    { path: '/debug-logs', icon: '🔍', label: '调试日志' },
     { path: '/agents', icon: '⧫', label: 'Agent配置' },
+    { path: '/genre-debug', icon: '🔬', label: '题材调试' },
     { path: '/settings', icon: '⚙', label: '系统设置' },
     { path: '/guide', icon: '◈', label: '操作指南' }
 ];
@@ -45,7 +37,7 @@ const SYSTEM_NAV = [
 export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { settings, currentProject, activeModule, setActiveModule } = useAppStore();
+    const { currentProject, activeModule, setActiveModule } = useAppStore();
     const [apiStatus, setApiStatus] = useState('unknown');
     const [comfyuiStatus, setComfyuiStatus] = useState('unknown');
 
@@ -55,13 +47,8 @@ export default function Sidebar() {
                 const res = await settingsApi.get();
                 const data = res.data || res;
                 setApiStatus(data.hasKey ? 'online' : 'offline');
-            } catch (e) {
-                try {
-                    const res = await axios.get('/api/settings', { timeout: 5000 });
-                    setApiStatus(res.data?.hasKey ? 'online' : 'offline');
-                } catch {
-                    setApiStatus('offline');
-                }
+            } catch {
+                setApiStatus('offline');
             }
         };
         const checkComfyUI = async () => {
@@ -81,45 +68,29 @@ export default function Sidebar() {
     useEffect(() => {
         if (location.pathname.startsWith('/comic')) {
             setActiveModule('comic');
-        } else if (currentProject?.mode === 'shuangwen') {
-            setActiveModule('shuangwen');
-        } else if (currentProject?.mode === 'tomato-short') {
-            setActiveModule('tomato-short');
-        } else if (currentProject?.mode === 'novel' || (currentProject && !currentProject.mode)) {
+        } else {
             setActiveModule('novel');
         }
-    }, [currentProject?.mode]);
+    }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const currentNav = activeModule === 'comic' ? COMIC_NAV : activeModule === 'shuangwen' || activeModule === 'tomato-short' ? SHUANGWEN_NAV : NOVEL_NAV;
+    const currentNav = activeModule === 'comic' ? COMIC_NAV : NOVEL_NAV;
 
     return (
         <aside className="app-sidebar">
-            <div className="sidebar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <div className="sidebar-logo" onClick={() => navigate('/')} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && navigate('/')} style={{ cursor: 'pointer' }} aria-label="返回首页">
                 <div className="sidebar-logo-icon">⬡</div>
                 <div>
                     <div className="sidebar-logo-text">NOVEL PIPELINE</div>
-                    <div className="sidebar-logo-sub">AI 爽文 · 长篇 · 漫剧 生产流水线</div>
+                    <div className="sidebar-logo-sub">AI 长篇 · 漫剧 生产流水线</div>
                 </div>
             </div>
 
             <div className="sidebar-module-switch">
                 <button
-                    className={`module-switch-btn ${activeModule === 'shuangwen' ? 'module-switch-active' : ''}`}
-                    onClick={() => { setActiveModule('shuangwen'); navigate('/'); }}
-                >
-                    <span className="module-switch-icon">⚡</span>
-                    爽文
-                </button>
-                <button
-                    className={`module-switch-btn ${activeModule === 'tomato-short' ? 'module-switch-active' : ''}`}
-                    onClick={() => { setActiveModule('tomato-short'); navigate('/'); }}
-                >
-                    <span className="module-switch-icon">🍅</span>
-                    番茄
-                </button>
-                <button
                     className={`module-switch-btn ${activeModule === 'novel' ? 'module-switch-active' : ''}`}
                     onClick={() => { setActiveModule('novel'); navigate('/'); }}
+                    aria-label="切换到长篇模式"
+                    aria-pressed={activeModule === 'novel'}
                 >
                     <span className="module-switch-icon">✎</span>
                     长篇
@@ -127,6 +98,8 @@ export default function Sidebar() {
                 <button
                     className={`module-switch-btn ${activeModule === 'comic' ? 'module-switch-active' : ''}`}
                     onClick={() => { setActiveModule('comic'); navigate('/comic/config'); }}
+                    aria-label="切换到漫剧模式"
+                    aria-pressed={activeModule === 'comic'}
                 >
                     <span className="module-switch-icon">◈</span>
                     漫剧
@@ -135,15 +108,19 @@ export default function Sidebar() {
 
             <nav className="sidebar-nav">
                 <div className="sidebar-section-label">
-                    {activeModule === 'comic' ? '◈ 漫剧' : activeModule === 'shuangwen' ? '⚡ 爽文' : activeModule === 'tomato-short' ? '🍅 番茄爽文' : '✎ 长篇小说'}
+                    {activeModule === 'comic' ? '◈ 漫剧' : '✎ 长篇小说'}
                 </div>
                 {currentNav.map(item => (
                     <div
                         key={item.path}
                         className={`sidebar-link ${location.pathname === item.path ? 'sidebar-link-active' : ''}`}
                         onClick={() => navigate(item.path)}
+                        role="link"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && navigate(item.path)}
+                        aria-current={location.pathname === item.path ? 'page' : undefined}
                     >
-                        <span className="sidebar-link-icon">{item.icon}</span>
+                        <span className="sidebar-link-icon" aria-hidden="true">{item.icon}</span>
                         <span>{item.label}</span>
                     </div>
                 ))}
@@ -154,8 +131,12 @@ export default function Sidebar() {
                         key={item.path}
                         className={`sidebar-link ${location.pathname === item.path ? 'sidebar-link-active' : ''}`}
                         onClick={() => navigate(item.path)}
+                        role="link"
+                        tabIndex={0}
+                        onKeyDown={(e) => e.key === 'Enter' && navigate(item.path)}
+                        aria-current={location.pathname === item.path ? 'page' : undefined}
                     >
-                        <span className="sidebar-link-icon">{item.icon}</span>
+                        <span className="sidebar-link-icon" aria-hidden="true">{item.icon}</span>
                         <span>{item.label}</span>
                     </div>
                 ))}

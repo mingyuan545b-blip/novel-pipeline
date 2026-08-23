@@ -1,0 +1,191 @@
+/* ── Page layout ── */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.tabBar {
+  margin-bottom: 20px;
+}
+
+.filterBar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterCount {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.materialsGrid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 16px;
+}
+
+.detailScroll {
+  max-height: calc(100vh - 280px);
+  overflow: auto;
+}
+
+/* ── Modal common ── */
+.modalMedium {
+  max-width: 650px;
+}
+
+.modalLarge {
+  max-width: 900px;
+  max-height: 85vh;
+  overflow: auto;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* ── Text colors ── */
+.textCyan { color: var(--neon-cyan); }
+.textOrange { color: var(--neon-orange); }
+.textPurple { color: var(--neon-purple); }
+
+/* ── Timeline form ── */
+.keyEventLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.keyEventActive {
+  color: var(--neon-red);
+  font-weight: 600;
+}
+
+.keyEventInactive {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* ── Prompt panel ── */
+.promptDesc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.promptSection {
+  margin-bottom: 20px;
+}
+
+.promptSectionTitle {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.promptCharList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.promptCharCard {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(0, 200, 255, 0.1);
+}
+
+.promptCharHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.promptCharName {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.promptTag {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.promptTagDialect {
+  background: rgba(0, 255, 150, 0.1);
+  color: var(--neon-green);
+  border: 1px solid rgba(0, 255, 150, 0.2);
+}
+
+.promptTagStyle {
+  background: rgba(255, 100, 255, 0.1);
+  color: var(--neon-pink);
+  border: 1px solid rgba(255, 100, 255, 0.2);
+}
+
+.promptCombined {
+  font-size: 11px;
+  color: var(--neon-purple);
+}
+
+.promptSubBlock { margin-bottom: 4px; }
+.promptSubLabel { font-size: 11px; margin-bottom: 2px; }
+.promptSubLabelDialect { color: var(--neon-green); }
+.promptSubLabelStyle { color: var(--neon-pink); }
+
+.promptSubContent {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.promptSubContentDialect { background: rgba(0, 255, 150, 0.03); }
+.promptSubContentStyle { background: rgba(255, 100, 255, 0.03); }
+
+.promptCodeBlock {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px;
+  border-radius: 8px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.promptCodeBlockWriter { border: 1px solid rgba(255, 200, 0, 0.15); }
+.promptCodeBlockReviewer { border: 1px solid rgba(128, 0, 255, 0.15); max-height: 200px; }
+.promptEmpty { text-align: center; padding: 40px; color: var(--text-muted); }

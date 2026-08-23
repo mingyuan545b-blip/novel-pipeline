@@ -1,0 +1,30 @@
+.settings-card { margin-bottom: 20px; }
+.settings-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.field-group { display: flex; gap: 8px; align-items: center; }
+.field-label { margin: 0; }
+.field-label-orange { margin: 0; color: #F39C12; }
+.input-sm { width: 60px; }
+.input-md { width: 80px; }
+.input-lg { width: 100px; }
+.save-btn { font-size: 12px; border-color: #F39C12; color: #F39C12; }
+.hint { color: #555; font-size: 11px; }
+.progress-hint { font-size: 12px; color: var(--text-muted); }
+.budget-panel { margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; }
+.budget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.budget-title { font-weight: 700; color: var(--neon-blue); }
+.budget-close { font-size: 10px; }
+.budget-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-bottom: 8px; }
+.budget-card { padding: 6px 10px; border-radius: 6px; }
+.budget-card-green { background: rgba(0,255,100,0.08); border: 1px solid rgba(0,255,100,0.2); }
+.budget-card-orange { background: rgba(255,165,0,0.08); border: 1px solid rgba(255,165,0,0.2); }
+.budget-card-blue { background: rgba(0,150,255,0.08); border: 1px solid rgba(0,150,255,0.2); }
+.budget-card-purple { background: rgba(150,0,255,0.08); border: 1px solid rgba(150,0,255,0.2); }
+.budget-value { font-weight: 700; }
+.budget-value-lg { font-size: 20px; }
+.budget-value-md { font-size: 14px; }
+.budget-value-green { color: var(--neon-green); }
+.budget-value-orange { color: var(--neon-orange); }
+.budget-value-blue { color: var(--neon-blue); }
+.budget-value-purple { color: var(--neon-purple); }
+.budget-label { color: var(--text-muted); }
+.budget-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: var(--text-secondary); }

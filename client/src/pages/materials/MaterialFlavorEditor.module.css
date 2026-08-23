@@ -1,0 +1,159 @@
+/* MaterialFlavorEditor - 说话风味编辑器样式 */
+
+/* ── 主容器 ── */
+.flavorContainer {
+    background: rgba(0, 200, 255, 0.05);
+    border: 1px solid rgba(0, 200, 255, 0.15);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.sectionTitle {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.sectionTitleCyan { color: var(--neon-cyan); }
+.sectionTitleOrange { color: var(--neon-orange); }
+.sectionTitlePurple { color: var(--neon-purple); }
+
+/* ── 网格布局 ── */
+.grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.grid1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+/* ── 表单元素 ── */
+.formGroupNoMargin {
+    margin: 0;
+}
+
+.labelSmall {
+    font-size: 11px;
+}
+
+/* ── 组合提示 ── */
+.comboHint {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--neon-purple);
+    background: rgba(128, 0, 255, 0.08);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* ── 预览区域 ── */
+.previewWrapper {
+    margin-top: 8px;
+}
+
+.previewButton {
+    font-size: 11px;
+}
+
+.previewBox {
+    margin-top: 8px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.previewItem {
+    margin-bottom: 6px;
+}
+
+.previewLabelCyan {
+    color: var(--neon-cyan);
+}
+
+.previewLabelOrange {
+    color: var(--neon-orange);
+}
+
+.previewExample {
+    color: var(--text-secondary);
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.previewCombined {
+    color: var(--neon-purple);
+    font-size: 11px;
+}
+
+/* ── 命名规范 ── */
+.namingContainer {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 200, 0, 0.05);
+    border: 1px solid rgba(255, 200, 0, 0.15);
+    border-radius: 6px;
+}
+
+.namingPreviewButton {
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+.namingPreviewBox {
+    margin-top: 6px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow: auto;
+    color: var(--text-secondary);
+}
+
+/* ── 人设模板 ── */
+.archetypeContainer {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(128, 0, 255, 0.05);
+    border: 1px solid rgba(128, 0, 255, 0.15);
+    border-radius: 6px;
+}
+
+.archetypeInfo {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.archetypeDesc {
+    color: var(--neon-purple);
+    margin-bottom: 4px;
+}
+
+.archetypeDetail {
+    margin-top: 2px;
+}
+
+.archetypePreviewButton {
+    font-size: 10px;
+    margin-top: 6px;
+}
+
+.archetypePreviewBox {
+    margin-top: 6px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    font-size: 10px;
+    white-space: pre-wrap;
+    max-height: 250px;
+    overflow: auto;
+    color: var(--text-secondary);
+}

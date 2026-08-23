@@ -1,0 +1,83 @@
+/* ===== SnapshotPanel ===== */
+.snapshot-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.snapshot-title { margin: 0 0 12px; font-size: 14px; }
+.snapshot-desc { font-size: 12px; color: var(--text-secondary); margin: 0 0 12px; }
+.snapshot-list { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow: auto; }
+.snapshot-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--bg-secondary); border-radius: 4px; }
+.snapshot-item-left { display: flex; gap: 8px; align-items: center; }
+.snapshot-item-chapter { font-weight: 600; font-size: 13px; }
+.snapshot-item-counts { font-size: 11px; color: var(--text-secondary); }
+.snapshot-item-time { font-size: 10px; color: var(--text-secondary); }
+.snapshot-diff-input-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+
+.snapshot-diff-input {
+    padding: 6px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    width: 80px;
+    font-size: 13px;
+}
+
+.snapshot-diff-vs { color: var(--text-secondary); }
+
+.snapshot-diff-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    background: var(--accent-color);
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.snapshot-diff-btn:disabled { opacity: 0.5; }
+.snapshot-dim-title { font-size: 13px; margin: 0 0 6px; color: var(--accent-color); }
+.snapshot-dim-item { padding: 6px; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 4px; font-size: 12px; }
+.snapshot-dim-field { font-size: 11px; color: var(--text-secondary); margin-left: 12px; }
+.snapshot-dim-from { color: #ff4757; }
+.snapshot-dim-to { color: #2ed573; }
+.snapshot-empty { color: var(--text-secondary); font-size: 12px; }
+
+/* ===== Timeline ===== */
+.timeline-line {
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+    border-radius: 1px;
+}
+
+.timeline-chapter-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--neon-blue);
+    margin-bottom: 8px;
+    padding-left: 8px;
+    border-left: 3px solid var(--neon-blue);
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -18px;
+    top: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+    box-shadow: 0 0 6px rgba(0, 240, 255, 0.25);
+}
+
+.timeline-storyline-badge {
+    font-size: 11px;
+}

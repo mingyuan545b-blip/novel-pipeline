@@ -1,0 +1,35 @@
+.panel { padding: 12px; }
+.loading, .empty { color: var(--text-muted); text-align: center; }
+.loading { padding: 20px; }
+.empty { padding: 40px; }
+.error { color: #ff6b6b; padding: 12px; }
+
+.section { margin-bottom: 16px; }
+.sectionTitle { font-weight: 700; margin-bottom: 8px; }
+.sectionTitleActive { color: #ff6b6b; }
+.sectionTitleResolved { color: #2ed573; }
+
+.constraintCard {
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+}
+.constraintCardActive {
+    background: rgba(255,107,107,0.08);
+    border: 1px solid rgba(255,107,107,0.2);
+}
+.constraintCardResolved {
+    background: rgba(46,213,115,0.05);
+    border: 1px solid rgba(46,213,115,0.15);
+    opacity: 0.7;
+}
+
+.cardHeader { display: flex; justify-content: space-between; align-items: center; }
+.metaOrange { color: #ffa502; font-size: 12px; }
+.metaGreen { color: #2ed573; font-size: 12px; }
+.resolveBtn { font-size: 10px; }
+
+.constraintText { color: #ffffff; font-size: 13px; margin-top: 4px; }
+.constraintDesc { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+.constraintMeta { color: var(--text-muted); font-size: 10px; margin-top: 2px; }
+.constraintResolvedText { color: var(--text-muted); font-size: 12px; margin-top: 2px; text-decoration: line-through; }

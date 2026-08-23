@@ -1,0 +1,33 @@
+.initErrorBanner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #ef4444;
+    color: #fff;
+    padding: 8px 16px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.closeButton {
+    margin-left: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.retryButton {
+    margin-left: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 2px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+}

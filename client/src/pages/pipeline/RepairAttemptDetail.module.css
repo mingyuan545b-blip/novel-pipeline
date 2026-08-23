@@ -1,0 +1,47 @@
+.sectionBox { margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border-radius: 4px; }
+.issueBox { margin-top: 3px; padding: 4px; background: rgba(0,0,0,0.3); border-radius: 3px; }
+.suggestionBox { margin-top: 2px; padding: 3px; background: rgba(0,100,255,0.1); border-radius: 3px; border-left: 3px solid #54a0ff; }
+
+.instructionBox { margin-top: 4px; padding: 4px; background: rgba(0,100,255,0.1); border-radius: 4px; border: 1px solid rgba(0,100,255,0.2); }
+.instructionLabel { color: #54a0ff; font-size: 9px; font-weight: 600; }
+.instructionText { color: #c8c8c8; font-size: 9px; margin-top: 2px; white-space: pre-wrap; }
+
+.reviewBox { margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border-radius: 4px; }
+.reviewBoxPassed { border: 1px solid rgba(0,255,0,0.2); }
+.reviewBoxFailed { border: 1px solid rgba(255,80,80,0.2); }
+
+.passLabel { color: #2ed573; font-size: 9px; font-weight: 600; }
+.failLabel { color: #ff6b6b; font-size: 9px; font-weight: 600; }
+.summaryText { color: #ddd; font-size: 9px; margin-top: 2px; line-height: 1.5; }
+.issueList { margin-top: 4px; }
+.issueListTitle { color: #ff6b6b; font-size: 9px; font-weight: 600; }
+
+.sevCritical { color: #ff4757; }
+.sevHigh { color: #ffa502; }
+.sevNormal { color: #747d8c; }
+.issueTitle { font-size: 8px; font-weight: 600; }
+.issueLocation { color: #54a0ff; font-size: 8px; margin-top: 1px; }
+.issueOriginal { color: #ffa502; font-size: 8px; margin-top: 1px; }
+.issueViolation { color: #ff6b6b; font-size: 8px; margin-top: 1px; }
+.issueFix { color: #2ed573; font-size: 8px; margin-top: 1px; }
+.issueTarget { color: #2ed573; font-size: 8px; margin-top: 1px; }
+.issueDesc { color: #ddd; font-size: 9px; margin-top: 2px; line-height: 1.4; }
+.codeInline { background: rgba(255,255,255,0.06); padding: 0 3px; border-radius: 2px; }
+.codeInlineGreen { background: rgba(46,213,115,0.08); padding: 0 3px; border-radius: 2px; color: #2ed573; }
+
+.suggestionTitle { color: #54a0ff; font-size: 8px; font-weight: 600; }
+.suggestionDesc { color: #c8c8c8; font-size: 9px; margin-top: 1px; }
+
+.rawContent { color: #ddd; font-size: 9px; margin-top: 2px; max-height: 200px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
+
+.diffBox { margin-top: 4px; padding: 4px; background: rgba(0,0,0,0.3); border-radius: 4px; border: 1px solid rgba(100,100,100,0.3); }
+.diffTitle { color: #ddd; font-size: 9px; font-weight: 600; }
+.diffList { max-height: 300px; overflow-y: auto; margin-top: 2px; }
+.diffItem { margin-top: 3px; padding: 3px; background: rgba(0,0,0,0.2); border-radius: 3px; font-size: 9px; }
+.diffBefore { color: #ff6b6b; font-size: 8px; }
+.diffAfter { color: #2ed573; font-size: 8px; }
+.diffMore { color: #d5d5d5; font-size: 8px; margin-top: 2px; }
+
+.btnRow { margin-top: 6px; display: flex; gap: 4px; margin-bottom: 4px; }
+.btnSm { font-size: 8px; flex: 1; }
+.btnCompare { font-size: 8px; flex: 1; background: #54a0ff33; border-color: #54a0ff; }

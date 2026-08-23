@@ -1,65 +1,45 @@
 import { Component } from 'react';
-
-const IGNORED_ERRORS = ['removeChild', 'insertBefore', 'not a child of this node'];
-
-function isIgnoredError(error) {
-    const msg = error?.message || String(error);
-    return IGNORED_ERRORS.some(k => msg.includes(k));
-}
+import logger from '../shared/logger';
+import styles from './ErrorBoundary.module.css';
 
 export default class ErrorBoundary extends Component {
     constructor(props) {
         super(props);
-        this.state = { hasError: false, error: null };
+        this.state = { hasError: false, error: null, errorInfo: null };
     }
 
     static getDerivedStateFromError(error) {
-        if (isIgnoredError(error)) {
-            return { hasError: false, error: null };
-        }
-        return { hasError: true, error: error.message || String(error) };
+        return { hasError: true, error };
     }
 
     componentDidCatch(error, errorInfo) {
-        if (isIgnoredError(error)) {
-            return;
-        }
-        console.error('[ErrorBoundary]', error, errorInfo);
+        this.setState({ errorInfo });
+        logger.error('ErrorBoundary', 'Uncaught error:', error.message, errorInfo?.componentStack);
     }
 
     render() {
         if (this.state.hasError) {
+            const msg = this.state.error?.message || String(this.state.error);
+            const isRenderError = msg.includes('Objects are not valid as a React child')
+                || msg.includes('Cannot read properties')
+                || msg.includes('is not defined');
+
             return (
-                <div style={{
-                    padding: 40,
-                    textAlign: 'center',
-                    color: '#ff0044',
-                    background: '#0a0a0f',
-                    minHeight: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontFamily: 'sans-serif'
-                }}>
-                    <h1 style={{ fontSize: 24, marginBottom: 16 }}>页面出现错误</h1>
-                    <p style={{ color: '#8888aa', marginBottom: 20, maxWidth: 600 }}>
-                        {this.state.error}
-                    </p>
+                <div className={styles.errorContainer}>
+                    <div className={styles.errorTitle}>⚠️ 渲染错误</div>
+                    <div className={styles.errorMessage}>
+                        {isRenderError ? '数据格式不匹配，可能是后端返回了对象而非字符串' : msg}
+                    </div>
+                    <details className={styles.errorDetails}>
+                        <summary>详细信息</summary>
+                        <pre>{this.state.errorInfo?.componentStack || msg}</pre>
+                    </details>
                     <button
-                        onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
-                        style={{
-                            padding: '10px 24px',
-                            background: 'linear-gradient(135deg, #00f0ff, #ff00ff)',
-                            border: 'none',
-                            borderRadius: 8,
-                            color: '#000',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            fontSize: 14
-                        }}
+                        className={styles.retryButton}
+                        onClick={() => this.setState({ hasError: false, error: null, errorInfo: null })}
+                        aria-label="重试加载"
                     >
-                        重新加载页面
+                        重试
                     </button>
                 </div>
             );

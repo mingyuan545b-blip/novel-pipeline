@@ -1,0 +1,34 @@
+.panel {
+  margin-top: 6px;
+  padding: 8px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 4px;
+  border: 1px solid rgba(100,200,255,0.3);
+}
+.hint { font-size: 10px; color: #c8c8c8; margin-bottom: 4px; }
+.textarea {
+  width: 100%;
+  height: 60px;
+  font-size: 10px;
+  background: #1a1a2e;
+  color: #eee;
+  border: 1px solid #666;
+  border-radius: 4px;
+  padding: 4px;
+  resize: vertical;
+}
+.optionsRow { display: flex; gap: 6px; margin-top: 4px; align-items: center; flex-wrap: wrap; }
+.select {
+  font-size: 9px;
+  background: #1a1a2e;
+  color: #eee;
+  border: 1px solid #666;
+  border-radius: 3px;
+  padding: 2px 4px;
+}
+.checkboxLabel { font-size: 9px; color: #c8c8c8; display: flex; align-items: center; gap: 3px; }
+.checkbox { width: 12px; height: 12px; }
+.actionRow { display: flex; gap: 6px; margin-top: 6px; }
+.btnRetry { font-size: 9px; background: #2ed57333; border-color: #2ed573; }
+.btnOnce { font-size: 9px; }
+.btnCancel { font-size: 9px; }

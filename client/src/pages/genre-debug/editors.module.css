@@ -1,0 +1,68 @@
+/* ── Constraint tab ── */
+.constraintRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.constraintFields { flex: 1; }
+
+.constraintIdRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.constraintFieldRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.constraintLabel {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    width: 36px;
+}
+
+.constraintLabelTop { padding-top: 4px; }
+.tagRequired { font-size: 10px; color: var(--neon-green); font-weight: 600; }
+.tagIncompatible { font-size: 10px; color: var(--neon-red); font-weight: 600; }
+
+/* ── Foundation tab ── */
+.foundationItem {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    border-left: 3px solid var(--neon-blue);
+    padding: 10px;
+}
+
+.foundationIndex {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    padding-top: 4px;
+}
+
+/* ── Style tab ── */
+.styleFieldCard { border-left: 3px solid var(--neon-orange); }
+
+.styleFieldHeader {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.styleFieldIcon { font-size: 14px; }
+.styleFieldName { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.styleFieldKey { font-size: 10px; color: var(--text-muted); }
+.styleFieldDesc { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; }
+.styleTextarea { width: 100%; box-sizing: border-box; padding: 6px 8px; }
+.pacingSection { margin-top: 16px; }
+.pacingTitle { font-size: 13px; font-weight: 600; color: var(--neon-cyan); margin-bottom: 10px; }

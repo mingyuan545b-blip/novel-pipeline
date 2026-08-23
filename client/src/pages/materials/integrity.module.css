@@ -1,0 +1,144 @@
+/* ── Integrity panel ── */
+.integrityStats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.integrityStatCard {
+  border-radius: 8px;
+  padding: 8px 16px;
+  text-align: center;
+}
+
+.integrityStatLabel { font-size: 11px; color: var(--text-muted); }
+.integrityStatValue { font-size: 20px; font-weight: 700; }
+
+.statHealthy { background: rgba(0, 255, 150, 0.1); border: 1px solid rgba(0, 255, 150, 0.3); }
+.statCritical { background: rgba(255, 80, 80, 0.08); border: 1px solid rgba(255, 80, 80, 0.2); }
+.statWarning { background: rgba(255, 200, 0, 0.08); border: 1px solid rgba(255, 200, 0, 0.2); }
+.statInfo { background: rgba(0, 200, 255, 0.08); border: 1px solid rgba(0, 200, 255, 0.2); }
+
+.statValueHealthy { color: var(--neon-green); }
+.statValueCritical { color: var(--neon-pink); }
+.statValueWarning { color: var(--neon-orange); }
+.statValueInfo { color: var(--neon-cyan); }
+
+.integrityStatsBlock {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.integrityStatsTitle {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--neon-cyan);
+}
+
+.integrityStatsRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.integrityStatsTypes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.integrityTypeTag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 200, 255, 0.08);
+  color: var(--neon-cyan);
+}
+
+.issuesTitle {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--neon-orange);
+}
+
+.issuesList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.issueCard {
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.issueCritical { background: rgba(255, 80, 80, 0.08); border: 1px solid rgba(255, 80, 80, 0.2); }
+.issueWarning { background: rgba(255, 200, 0, 0.06); border: 1px solid rgba(255, 200, 0, 0.15); }
+.issueInfo { background: rgba(0, 200, 255, 0.05); border: 1px solid rgba(0, 200, 255, 0.1); }
+
+.issueRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.issueIcon { font-size: 12px; }
+.issueMessage { font-size: 12px; color: var(--text-primary); flex: 1; }
+.issueFix { font-size: 11px; color: var(--text-muted); margin-top: 4px; padding-left: 22px; }
+
+.fixActions {
+  display: flex;
+  gap: 8px;
+}
+
+.fixBtnDanger {
+  background: rgba(255, 80, 80, 0.2);
+  border-color: rgba(255, 80, 80, 0.4);
+}
+
+.fixResult {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 200, 255, 0.15);
+}
+
+.fixResultTitle {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.fixResultDryRun { color: var(--neon-cyan); }
+.fixResultApplied { color: var(--neon-green); }
+
+.fixResultSummary {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.fixItem {
+  font-size: 11px;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fixItemError { color: var(--neon-pink); }
+.fixItemSuccess { color: var(--text-secondary); }
+
+.allHealthy {
+  text-align: center;
+  padding: 40px;
+  color: var(--neon-green);
+}

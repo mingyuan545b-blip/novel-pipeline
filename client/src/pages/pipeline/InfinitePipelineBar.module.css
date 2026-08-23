@@ -1,0 +1,11 @@
+.pipeline-bar { margin-bottom: 20px; border-color: var(--neon-green); background: rgba(0, 255, 100, 0.05); }
+.bar-row { display: flex; justify-content: space-between; align-items: center; }
+.status-info { display: flex; align-items: center; }
+.loading-spinner { margin-right: 8px; }
+.status-text { color: var(--neon-green); font-weight: 700; }
+.phase-tag { margin-left: 12px; color: var(--neon-yellow); font-weight: 600; }
+.batch-progress { margin-left: 8px; color: var(--text-secondary); }
+.current-chapter { margin-left: 12px; color: var(--text-secondary); }
+.completed-count { margin-left: 12px; color: var(--neon-blue); }
+.stop-btn { background: var(--neon-red); color: #fff; }
+.log-area { margin-top: 8px; max-height: 100px; overflow: auto; font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); }

@@ -1,0 +1,96 @@
+/* ── Agent tab ── */
+.agentCard {
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.agentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.agentInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.agentIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.agentName { font-size: 14px; font-weight: 600; }
+.agentMeta { font-size: 11px; color: var(--text-muted); }
+.agentArrow { font-size: 14px; color: var(--text-muted); transition: transform 0.2s; }
+.agentArrowExpanded { transform: rotate(90deg); }
+.agentNeeds { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+.agentExpandArea {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.promptHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.promptTitle { font-size: 12px; font-weight: 600; color: var(--neon-purple); }
+.promptLength { font-size: 11px; color: var(--text-muted); }
+
+.promptPre {
+    margin: 0;
+    padding: 8px;
+    background: var(--bg-input);
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.promptExpandBtn { font-size: 10px; margin-top: 4px; cursor: pointer; text-align: center; }
+
+/* ── Prompt section ── */
+.promptSectionHeader {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.promptSectionArrow { transition: transform 0.15s; display: inline-block; }
+.promptSectionArrowExpanded { transform: rotate(90deg); }
+.promptSectionLength { font-weight: 400; color: var(--text-muted); }
+
+.promptSectionPre {
+    margin: 0;
+    padding: 8px;
+    background: var(--bg-input);
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    overflow: auto;
+}
+
+.promptSectionPreExpanded { max-height: none; overflow: visible; }
+.promptSectionPreCollapsed { max-height: 120px; }
+.promptExpandAll { font-size: 10px; margin-top: 4px; cursor: pointer; text-align: center; }

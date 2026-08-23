@@ -1,0 +1,197 @@
+/* CrossWorldTraceTab 样式 — 跨世界物品溯源面板 */
+
+/* ── 容器 ── */
+.cwt-container { display: flex; flex-direction: column; gap: 14px; }
+.cwt-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+.cwt-header-title { color: var(--neon-blue); font-weight: 700; font-size: 16px; }
+.cwt-header-sub { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 8px; }
+.cwt-header-btns { display: flex; gap: 8px; align-items: center; }
+
+.cwt-guide {
+    background: rgba(0, 200, 255, 0.04);
+    border-left: 3px solid var(--neon-blue);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ── 输入控件 ── */
+.cwt-select, .cwt-input {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+    padding: 5px 10px;
+    outline: none;
+}
+.cwt-select:focus, .cwt-input:focus { border-color: var(--neon-blue); }
+.cwt-select { min-width: 110px; }
+
+/* ── 添加表单 ── */
+.cwt-add-form {
+    border: 1px solid rgba(0, 200, 255, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    background: rgba(0, 200, 255, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.cwt-add-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.cwt-add-row .cwt-input { flex: 1; min-width: 120px; }
+.cwt-add-btns { display: flex; gap: 8px; }
+
+/* ── 溯源卡片列表 ── */
+.cwt-trace-list { display: flex; flex-direction: column; gap: 10px; }
+.cwt-trace-card {
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--neon-cyan);
+    overflow: hidden;
+}
+.cwt-trace-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.cwt-trace-header:hover { background: rgba(255, 255, 255, 0.03); }
+.cwt-trace-icon { font-size: 20px; flex-shrink: 0; }
+.cwt-trace-info { flex: 1; min-width: 0; }
+.cwt-trace-name { color: var(--text-primary); font-weight: 600; font-size: 14px; }
+.cwt-trace-sub { display: flex; gap: 10px; margin-top: 3px; align-items: center; flex-wrap: wrap; }
+.cwt-badge-type {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(0, 200, 255, 0.1);
+    color: var(--neon-cyan);
+}
+.cwt-holder { color: var(--text-muted); font-size: 12px; }
+
+.cwt-trace-origin {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+.cwt-origin-label { color: var(--text-muted); }
+.cwt-origin-world { color: var(--neon-orange); font-weight: 500; }
+.cwt-origin-chapter { color: var(--text-muted); }
+.cwt-origin-method {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(162, 155, 254, 0.12);
+    color: #a29bfe;
+}
+.cwt-expand-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    flex-shrink: 0;
+}
+
+/* ── 展开内容 ── */
+.cwt-trace-body {
+    padding: 12px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.18);
+}
+.cwt-current {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+.cwt-current-world { color: var(--neon-cyan); font-weight: 500; }
+
+.cwt-trace-log-title {
+    color: var(--neon-blue);
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+/* ── 时间线 ── */
+.cwt-timeline { display: flex; flex-direction: column; gap: 6px; }
+.cwt-timeline-item {
+    display: flex;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid var(--text-muted);
+}
+.cwt-timeline-item.cwt-action-green { border-left-color: #00ff96; }
+.cwt-timeline-item.cwt-action-blue { border-left-color: var(--neon-blue); }
+.cwt-timeline-item.cwt-action-purple { border-left-color: #a29bfe; }
+.cwt-timeline-item.cwt-action-red { border-left-color: #ff5050; }
+.cwt-timeline-item.cwt-action-orange { border-left-color: var(--neon-orange); }
+.cwt-timeline-item.cwt-action-gray { border-left-color: var(--text-muted); }
+
+.cwt-timeline-dot {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 20px;
+    text-align: center;
+}
+.cwt-timeline-content { flex: 1; min-width: 0; }
+.cwt-timeline-action { color: var(--text-primary); font-weight: 500; font-size: 13px; }
+.cwt-timeline-detail {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 2px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.cwt-timeline-ch { color: var(--text-muted); }
+.cwt-timeline-note {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 3px;
+    font-style: italic;
+}
+.cwt-empty-log { color: var(--text-muted); font-size: 12px; padding: 6px 0; }
+
+.cwt-trace-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* ── 状态 ── */
+.cwt-loading { color: var(--text-muted); text-align: center; padding: 24px; }
+.cwt-error {
+    color: #ff5050;
+    text-align: center;
+    padding: 16px;
+    background: rgba(255, 80, 80, 0.06);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+.cwt-empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.8;
+}

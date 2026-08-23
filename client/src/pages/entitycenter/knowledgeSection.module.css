@@ -1,0 +1,8 @@
+.ks-loading { color: var(--text-secondary); font-size: 13px; padding: 8px 0; }
+.ks-card { border-left: 3px solid var(--neon-cyan); }
+.ks-title { font-size: 13px; color: var(--neon-cyan); margin-bottom: 8px; }
+.ks-row { font-size: 12px; padding: 4px 8px; border-radius: 4px; background: var(--bg-secondary); }
+.ks-fact { font-weight: 600; flex: 1; }
+.ks-confidence { font-weight: 600; }
+.ks-source { color: var(--text-secondary); }
+.ks-chapter { color: var(--text-secondary); }

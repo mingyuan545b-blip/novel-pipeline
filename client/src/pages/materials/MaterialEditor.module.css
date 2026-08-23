@@ -1,0 +1,249 @@
+/* MaterialEditor - 素材编辑器样式 */
+
+/* ── 空状态 ── */
+.emptyState {
+    padding: 60px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.emptyIcon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.emptyText {
+    font-size: 14px;
+}
+
+/* ── 卡片头部 ── */
+.cardArchived {
+    border-left: 3px solid var(--archived-color, var(--neon-red));
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.titleMain {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.metaInfo {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.archiveStatus {
+    color: var(--archived-color, var(--neon-red));
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 4px;
+}
+
+.btnPurple { color: var(--neon-purple); }
+.btnOrange { color: var(--neon-orange); }
+.btnGreen { color: var(--neon-green); }
+
+/* ── 归档原因 ── */
+.archiveReason {
+    padding: 6px 10px;
+    background: rgba(255, 0, 68, 0.05);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--neon-orange);
+}
+
+.archiveTime {
+    margin-left: 8px;
+    color: var(--text-muted);
+}
+
+/* ── 编辑表单 ── */
+.editActions {
+    display: flex;
+    gap: 8px;
+}
+
+/* ── 标签栏 ── */
+.tagBar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.tag {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid;
+}
+
+.tagCyan {
+    background: rgba(0, 200, 255, 0.1);
+    color: var(--neon-cyan);
+    border-color: rgba(0, 200, 255, 0.2);
+}
+
+.tagOrange {
+    background: rgba(255, 200, 0, 0.1);
+    color: var(--neon-orange);
+    border-color: rgba(255, 200, 0, 0.2);
+}
+
+.tagGreen {
+    background: rgba(0, 255, 150, 0.1);
+    color: var(--neon-green);
+    border-color: rgba(0, 255, 150, 0.2);
+}
+
+.tagPink {
+    background: rgba(255, 100, 255, 0.1);
+    color: var(--neon-pink);
+    border-color: rgba(255, 100, 255, 0.2);
+}
+
+.tagPurple {
+    background: rgba(128, 0, 255, 0.1);
+    color: var(--neon-purple);
+    border-color: rgba(128, 0, 255, 0.2);
+}
+
+/* ── 初始内容 ── */
+.initialContentDetails {
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.initialContentSummary {
+    color: var(--neon-blue);
+    cursor: pointer;
+}
+
+.initialContentBox {
+    padding: 8px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    margin-top: 4px;
+    color: var(--text-muted);
+    max-height: 150px;
+    overflow: auto;
+}
+
+/* ── 标签列表 ── */
+.tagList {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+/* ── 内容显示 ── */
+.contentEmpty {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.contentPlain {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    max-height: 400px;
+    overflow: auto;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.fieldList {
+    max-height: 500px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fieldCard {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    padding: 6px 10px;
+    border-left: 3px solid var(--field-color, var(--border-color));
+}
+
+.fieldLabel {
+    font-size: 11px;
+    color: var(--field-color, var(--text-muted));
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.fieldValue {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+/* ── 变更日志 ── */
+.changeLog {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(126, 87, 194, 0.06);
+    border-radius: 6px;
+    border-left: 3px solid var(--neon-purple);
+    max-height: 200px;
+    overflow: auto;
+}
+
+.changeLogTitle {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--neon-purple);
+    margin-bottom: 6px;
+}
+
+.changeLogItem {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.changeLogItemLast {
+    border-bottom: none;
+}
+
+.changeLogItemHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.changeLogTime {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.changeLogChapterBtn {
+    font-size: 10px;
+    padding: 1px 6px;
+    color: var(--neon-blue);
+}
+
+.changeLogContent {
+    color: var(--text-secondary);
+    margin-top: 2px;
+}

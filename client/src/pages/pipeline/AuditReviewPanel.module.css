@@ -1,0 +1,223 @@
+.retryProgress {
+    margin-bottom: 8px;
+    padding: 10px;
+    background: rgba(0, 100, 255, 0.08);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 100, 255, 0.3);
+    font-size: 11px;
+}
+
+.progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progressTitle {
+    color: #54a0ff;
+    font-weight: 600;
+}
+
+.cancelBtn {
+    font-size: 9px;
+    color: #ff6b6b;
+    background: rgba(255, 80, 80, 0.2);
+    border: 1px solid rgba(255, 80, 80, 0.5);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.phaseLabel {
+    color: #c8c8c8;
+    margin-top: 4px;
+    font-size: 10px;
+}
+
+.attemptList {
+    margin-top: 4px;
+}
+
+.attemptItem {
+    font-size: 9px;
+    margin-top: 2px;
+}
+.attemptPassed { color: #2ed573; }
+.attemptFailed { color: #ffa502; }
+.attemptIssueCount { color: #ff6b6b; margin-left: 4px; }
+
+.repairResult {
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.resultHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
+.resultTitle {
+    font-weight: 600;
+}
+
+.closeBtn {
+    font-size: 9px;
+    color: #d5d5d5;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.errorMsg {
+    color: #ff4757;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.resultStats {
+    color: #c8c8c8;
+    margin-top: 4px;
+}
+
+.modelInfo {
+    color: #54a0ff;
+    margin-top: 2px;
+    font-size: 10px;
+}
+
+.remainingViolations {
+    color: #ffa502;
+    margin-top: 2px;
+}
+
+.attemptHistory {
+    margin-top: 8px;
+}
+
+.attemptHistoryTitle {
+    color: #ddd;
+    font-weight: 600;
+    font-size: 10px;
+    margin-bottom: 4px;
+}
+
+.attemptCard {
+    margin-top: 4px;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.attemptCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.attemptLabel {
+    font-weight: 600;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.attemptModel {
+    color: #54a0ff;
+    font-size: 9px;
+}
+
+.attemptDetail {
+    color: #c8c8c8;
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+.attemptReview {
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+.attemptRemaining {
+    color: #ffa502;
+    font-size: 9px;
+    margin-top: 2px;
+}
+
+.actionBar {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.compareBar {
+    margin-top: 6px;
+    display: flex;
+    gap: 4px;
+}
+
+.pipelineResult {
+    margin-top: 6px;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.pipelineTitle {
+    font-weight: 600;
+    font-size: 10px;
+}
+
+.pipelineSteps {
+    color: #d5d5d5;
+    margin-top: 2px;
+    font-size: 9px;
+}
+
+.pipelineFinal {
+    color: #c8c8c8;
+    margin-top: 2px;
+    font-size: 9px;
+}
+
+.pipelineError {
+    margin-top: 4px;
+    color: #ff6b6b;
+    font-size: 9px;
+}
+
+.maxRetriesWarning {
+    margin-top: 4px;
+    color: #ffa502;
+    font-size: 9px;
+}
+
+/* RepairResultCard dynamic colors */
+.resultBgFail { background: rgba(255,0,68,0.08); border: 1px solid rgba(255,0,68,0.3); }
+.resultBgPass { background: rgba(0,255,0,0.1); border: 1px solid rgba(0,255,0,0.3); }
+.resultBgPartial { background: rgba(255,165,0,0.08); border: 1px solid rgba(255,165,0,0.3); }
+.resultTitleFail { color: #ff4757; }
+.resultTitlePass { color: #2ed573; }
+.resultTitlePartial { color: #ffa502; }
+.attemptCardPass { border: 1px solid rgba(0,255,0,0.15); }
+.attemptCardFail { border: 1px solid rgba(255,165,0,0.15); }
+.attemptLabelPass { color: #2ed573; }
+.attemptLabelFail { color: #ffa502; }
+.attemptReviewPass { color: #2ed573; }
+.attemptReviewFail { color: #ff6b6b; }
+.remainingTag { margin-right: 4px; }
+.pipelineResultOk { border: 1px solid rgba(0,255,0,0.2); }
+.pipelineResultFail { border: 1px solid rgba(255,80,80,0.2); }
+.pipelineTitleOk { color: #2ed573; }
+.pipelineTitleFail { color: #ff6b6b; }
+.pipelineStepTag { margin-right: 6px; }
+.btnSm { font-size: 8px; }
+.btnRetryAuto { font-size: 8px; background: #2ed57333; border-color: #2ed573; }
+.btnRetryManual { font-size: 8px; background: #ffa50233; border-color: #ffa502; }
+.btnPipeline { font-size: 8px; background: #54a0ff33; border-color: #54a0ff; }
+.btnReview { font-size: 8px; }
+.btnRollback { font-size: 8px; background: #ff6b6b33; border-color: #ff6b6b; }
+.btnCompare { font-size: 8px; flex: 1; }
+.btnCompareBlue { font-size: 8px; flex: 1; background: #54a0ff33; border-color: #54a0ff; }

@@ -1,0 +1,156 @@
+/* ── Preview results ── */
+.errorCard {
+  border-color: var(--neon-red);
+}
+
+.errorTitle {
+  color: var(--neon-red);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.errorDetail {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.resultBlock {
+  margin-bottom: 16px;
+}
+
+.sectionTitleBlue {
+  color: var(--neon-blue);
+  margin-bottom: 8px;
+}
+
+.sectionTitleGreen {
+  color: var(--neon-green);
+  margin-bottom: 8px;
+}
+
+.sectionTitlePink {
+  color: var(--neon-pink);
+  margin-bottom: 12px;
+}
+
+.subTitleBlue {
+  font-weight: 600;
+  color: var(--neon-blue);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.subTitleGreen {
+  font-weight: 600;
+  color: var(--neon-green);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.subTitleOrange {
+  font-weight: 600;
+  color: var(--neon-orange);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.listItem {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 2px 0;
+}
+
+.rawOutput {
+  white-space: pre-wrap;
+  font-size: 12px;
+  color: var(--text-muted);
+  max-height: 300px;
+  overflow: auto;
+}
+
+.styleSummary {
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* ── Technique / Element items ── */
+.techniqueItem {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(0, 240, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--neon-blue);
+}
+
+.techniqueName {
+  font-weight: 700;
+  color: var(--neon-blue);
+  font-size: 13px;
+}
+
+.techniqueDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.techniqueExample {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.elementItem {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(0, 255, 100, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid var(--neon-green);
+}
+
+.elementName {
+  font-weight: 700;
+  color: var(--neon-green);
+  font-size: 13px;
+}
+
+.elementDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.elementReusability {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--neon-orange);
+}
+
+/* ── Fusion core ── */
+.fusionCore {
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: rgba(255, 0, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid var(--neon-pink);
+}
+
+.fusionCoreTitle {
+  font-weight: 700;
+  color: var(--neon-pink);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.fusionCoreDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}

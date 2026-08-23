@@ -1,0 +1,178 @@
+/* ── Layout ── */
+.tabsBar {
+  margin-bottom: 24px;
+}
+
+.cardSpacing {
+  margin-bottom: 20px;
+}
+
+.sectionSpacing {
+  margin-top: 20px;
+}
+
+.resultSection {
+  margin-top: 20px;
+}
+
+/* ── Text styles ── */
+.description {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.monoText {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.monoTextSm {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.charCount {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.infoText {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.detailText {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.filePath {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.codeBlock {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* ── Alert boxes ── */
+.warningBox {
+  padding: 16px;
+  background: rgba(255, 0, 68, 0.1);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  color: var(--neon-red);
+}
+
+.tipBox {
+  padding: 10px;
+  background: rgba(0, 240, 255, 0.05);
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.errorList {
+  padding: 8px 12px;
+  background: rgba(255, 0, 68, 0.1);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.errorItem {
+  font-size: 12px;
+  color: var(--neon-red);
+  line-height: 1.8;
+}
+
+.warnList {
+  padding: 8px 12px;
+  background: rgba(255, 165, 0, 0.1);
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.warnItem {
+  font-size: 12px;
+  color: var(--neon-orange);
+  line-height: 1.8;
+}
+
+/* ── Form controls ── */
+.fileInput {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.fileSelected {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--neon-green);
+}
+
+.checkboxRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.chapterCountGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.narrowInput {
+  width: 60px;
+}
+
+.noMargin {
+  margin: 0;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Fusion novel entries ── */
+.novelEntry {
+  margin-bottom: 12px;
+}
+
+.novelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.novelLabel {
+  font-size: 13px;
+  color: var(--neon-blue);
+  font-weight: 600;
+}
+
+/* ── Error text ── */
+.errorText {
+  color: var(--neon-red);
+  font-size: 13px;
+}

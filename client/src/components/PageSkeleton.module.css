@@ -1,0 +1,29 @@
+.container {
+    padding: 24px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.header {
+    height: 32px;
+    width: 40%;
+    background: var(--skeleton-bg, rgba(255, 255, 255, 0.06));
+    border-radius: 6px;
+    margin-bottom: 24px;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.row {
+    height: 16px;
+    background: var(--skeleton-bg, rgba(255, 255, 255, 0.06));
+    border-radius: 4px;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

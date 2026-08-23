@@ -1,0 +1,62 @@
+/* ===== GraphPanel ===== */
+.graph-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.graph-stats-badge {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.graph-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 16px;
+}
+
+.graph-svg-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.graph-svg { background: rgba(0, 0, 0, 0.2); }
+
+.graph-sidebar { display: flex; flex-direction: column; gap: 12px; }
+
+.graph-legend-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.graph-legend-title { font-size: 13px; margin-bottom: 8px; }
+.graph-legend-list { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.graph-legend-item { display: flex; align-items: center; gap: 6px; }
+.graph-legend-dot { width: 12px; height: 12px; flex-shrink: 0; }
+.graph-legend-line { width: 20px; height: 2px; flex-shrink: 0; }
+.graph-legend-divider { border-top: 1px solid var(--border-color); margin: 4px 0; }
+
+.graph-node-detail {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.graph-node-detail-name { font-size: 13px; margin-bottom: 8px; }
+.graph-node-detail-meta { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
+.graph-node-detail-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+.graph-node-rel-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.graph-node-rel-item { padding: 4px 8px; margin-bottom: 4px; border-radius: 4px; font-size: 11px; }
+.graph-node-rel-name { font-weight: 600; }
+.graph-node-rel-detail { color: var(--text-muted); margin-top: 2px; line-height: 1.4; }

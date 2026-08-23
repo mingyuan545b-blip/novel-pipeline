@@ -1,0 +1,37 @@
+.panel { margin-top: 8px; padding: 12px; border-radius: 8px; }
+.panelPass { background: rgba(46,213,115,0.05); border: 1px solid rgba(46,213,115,0.2); }
+.panelFail { background: rgba(255,0,68,0.05); border: 1px solid rgba(255,0,68,0.2); }
+
+.resultRow { display: flex; gap: 12px; }
+.resultBadge { flex: 0 0 auto; padding: 10px 14px; border-radius: 8; min-width: 120px; }
+.badgePass { background: rgba(46,213,115,0.1); border-left: 4px solid var(--neon-green); }
+.badgeFail { background: rgba(255,0,68,0.1); border-left: 4px solid var(--neon-red); }
+.badgeEmoji { font-size: 20px; margin-bottom: 2px; }
+.badgeText { font-size: 14px; font-weight: 700; }
+.textPass { color: var(--neon-green); }
+.textFail { color: var(--neon-red); }
+.badgeModel { font-size: 10px; color: var(--neon-blue); margin-top: 4px; }
+.badgeWordCount { font-size: 10px; color: #d5d5d5; margin-top: 2px; }
+.resultContent { flex: 1; }
+.summaryBox { padding: 8px 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 12px; line-height: 1.6; }
+
+.issuesSection { margin-bottom: 8px; }
+.issuesTitle { font-size: 12px; font-weight: 600; color: var(--neon-red); margin-bottom: 4px; }
+.issueCard { padding: 6px 10px; margin-bottom: 3px; font-size: 11px; line-height: 1.5; background: var(--bg-secondary); border-radius: 0 6px 6px 0; }
+.issueSev { font-weight: 600; font-size: 9px; margin-right: 6px; }
+.issueTitle { color: #eee; font-weight: 600; }
+.issueLocation { color: #54a0ff; margin-top: 2px; font-size: 10px; }
+.issueOriginal { color: #ffa502; margin-top: 2px; font-size: 10px; }
+.issueViolation { color: #ff6b6b; margin-top: 2px; font-size: 10px; }
+.issueFix { color: #2ed573; margin-top: 2px; font-size: 10px; }
+.issueTarget { color: #2ed573; margin-top: 2px; font-size: 10px; }
+.issueDesc { color: #ddd; margin-top: 3px; }
+.issuePerspective { color: #747d8c; font-size: 9px; margin-left: 6px; }
+.codeInline { background: rgba(255,255,255,0.08); padding: 1px 4px; border-radius: 3px; }
+.codeInlineGreen { background: rgba(46,213,115,0.1); padding: 1px 4px; border-radius: 3px; color: #2ed573; }
+
+.suggestionsBox { padding: 8px 10px; background: rgba(0,210,211,0.06); border-radius: 8px; border: 1px solid rgba(0,210,211,0.15); }
+.suggestionsTitle { font-size: 12px; font-weight: 600; color: var(--neon-blue); margin-bottom: 4px; }
+.suggestionCard { padding: 6px 10px; border-left: 3px solid var(--neon-blue); margin-bottom: 3px; font-size: 11px; line-height: 1.5; background: var(--bg-secondary); border-radius: 0 6px 6px 0; }
+.suggestionTitle { color: var(--neon-blue); font-weight: 600; }
+.suggestionDesc { color: #ddd; margin-top: 2px; }

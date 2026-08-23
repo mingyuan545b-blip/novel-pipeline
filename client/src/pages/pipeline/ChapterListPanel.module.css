@@ -1,0 +1,11 @@
+.header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.title { margin: 0; }
+.countInfo { font-size: 11px; color: var(--text-muted); }
+.clearBtn { background: rgba(255,50,50,0.3); border-color: #ff3232; }
+.filterRow { display: flex; gap: 4px; margin-bottom: 8px; }
+.filterBtn { font-size: 11px; flex: 1; }
+.collapseBtn { font-size: 10px; width: 100%; margin-bottom: 6px; opacity: 0.7; }
+.chapterGrid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.emptyHint { color: var(--text-muted); font-size: 14px; }
+.badge { margin-left: 6px; }
+.collapseInfo { font-size: 11px; color: var(--text-muted); padding: 4px 8px; }

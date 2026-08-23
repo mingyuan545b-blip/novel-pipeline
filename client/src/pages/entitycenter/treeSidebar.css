@@ -1,0 +1,144 @@
+/* 思维导图式层级侧边栏 */
+.ec-tree-sidebar {
+    width: 248px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 10px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    max-height: calc(100vh - 220px);
+    overflow-y: auto;
+}
+
+.ec-tree-group {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: background 0.2s;
+}
+
+.ec-tree-group-active {
+    background: rgba(0, 200, 255, 0.04);
+}
+
+.ec-tree-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 11px 12px;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+}
+
+.ec-tree-group-header:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.ec-tree-group-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.ec-tree-group-label {
+    flex: 1;
+}
+
+.ec-tree-arrow {
+    font-size: 10px;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.ec-tree-arrow-open {
+    transform: rotate(90deg);
+}
+
+.ec-tree-children {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 4px 0;
+}
+
+.ec-tree-children li {
+    margin: 0;
+}
+
+.ec-tree-leaf {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 12px 9px 28px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    border-left: 3px solid transparent;
+}
+
+.ec-tree-leaf:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+}
+
+.ec-tree-leaf-active {
+    background: rgba(0, 200, 255, 0.1);
+    color: var(--neon-cyan);
+    border-left-color: var(--neon-cyan);
+    font-weight: 600;
+}
+
+.ec-tree-leaf-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+.ec-tree-leaf-label {
+    flex: 1;
+}
+
+/* 主布局：侧边栏 + 内容区 */
+.ec-mindmap-layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.ec-mindmap-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 响应式：窄屏时侧边栏折叠为顶部横向 */
+@media (max-width: 900px) {
+    .ec-mindmap-layout {
+        flex-direction: column;
+    }
+    .ec-tree-sidebar {
+        width: 100%;
+        max-height: none;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .ec-tree-group {
+        min-width: 140px;
+    }
+    .ec-tree-children {
+        position: relative;
+    }
+}

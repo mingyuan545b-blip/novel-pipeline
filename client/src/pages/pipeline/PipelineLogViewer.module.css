@@ -1,0 +1,185 @@
+.logViewer {
+    margin-bottom: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.chapterInfo h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--neon-blue);
+}
+
+.chapterStats {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.maxRoundsLabel {
+    margin: 0;
+}
+
+.maxRoundsInput {
+    width: 60px;
+}
+
+.imageGenLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.imageGenLabelActive {
+    color: var(--neon-blue);
+}
+
+.imageGenLabelInactive {
+    color: var(--text-muted);
+}
+
+.aspectSelect {
+    width: 90px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.logSection {
+    max-height: 400px;
+    overflow: auto;
+}
+
+.logEmpty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 40px;
+}
+
+.logRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12px;
+}
+
+.logRowStatus {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.logContent {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.logStep {
+    font-weight: 600;
+    min-width: 60px;
+    white-space: nowrap;
+}
+
+.logChapter {
+    background: rgba(0, 210, 211, 0.15);
+    color: #00d2d3;
+    font-size: 10px;
+}
+
+.logRound {
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.logMsg {
+    color: var(--text-muted);
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.logTime {
+    color: var(--text-muted);
+    font-size: 11px;
+    white-space: nowrap;
+    margin-left: 8px;
+}
+
+.reviewRow {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12px;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reviewMeta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reviewType {
+    font-weight: 600;
+    color: var(--neon-purple);
+}
+
+.reviewCreatedAt {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.reviewSummary {
+    color: var(--text-secondary);
+    margin-top: 4px;
+    line-height: 1.5;
+}
+
+.issueList {
+    margin-top: 4px;
+}
+
+.issueItem {
+    font-size: 11px;
+    line-height: 1.4;
+    padding-left: 8px;
+    margin-bottom: 2px;
+}
+
+.suggestionItem {
+    color: var(--neon-blue);
+    font-size: 11px;
+    line-height: 1.4;
+    padding-left: 8px;
+    border-left: 2px solid var(--neon-blue);
+    margin-bottom: 2px;
+}
+
+/* PipelineLogList dynamic colors */
+.logStepDefault { color: var(--neon-purple); }
+.logError { color: var(--neon-red); }
+.reviewMetaMuted { color: var(--text-muted); font-size: 11px; }
+.reviewTimeMuted { color: var(--text-muted); font-size: 11px; }
+.issueCritical { color: var(--neon-red); border-left: 2px solid var(--neon-red); }
+.issueHigh { color: var(--neon-orange); border-left: 2px solid var(--neon-orange); }
+.issueMedium { color: var(--text-muted); border-left: 2px solid var(--text-muted); }

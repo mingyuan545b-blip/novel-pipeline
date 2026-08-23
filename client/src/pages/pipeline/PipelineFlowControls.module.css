@@ -1,0 +1,10 @@
+.card { margin-bottom: 20px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.chapterTitle { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
+.chapterMeta { font-size: 12px; color: var(--text-muted); }
+.controlsRow { display: flex; gap: 8px; align-items: center; }
+.maxRoundsLabel { margin: 0; }
+.maxRoundsInput { width: 60px; }
+.stepRow { display: flex; align-items: center; }
+.nodeIcon { color: var(--neon-blue); }
+.execBtn { margin-top: 6px; font-size: 10px; }

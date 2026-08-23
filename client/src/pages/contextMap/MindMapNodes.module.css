@@ -1,0 +1,82 @@
+/* 思维导图节点样式 — 高对比度配色 */
+
+/* 根节点 */
+.rootNode {
+    position: absolute; z-index: 10;
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f2847 100%);
+    border: 2px solid #00d4ff; border-radius: 12px;
+    padding: 14px 24px; cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+    min-width: 160px; text-align: center;
+}
+.rootNode:hover { box-shadow: 0 0 30px rgba(0, 212, 255, 0.4); border-color: #38bdf8; }
+.rootLabel { font-size: 16px; font-weight: 700; color: #00d4ff; }
+
+/* 分组节点 */
+.groupNode {
+    position: absolute; z-index: 10; background: #111827;
+    border: 2px solid #334155; border-radius: 10px;
+    padding: 10px 16px; cursor: pointer; min-width: 130px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.groupNode:hover { border-color: #60a5fa; box-shadow: 0 0 12px rgba(96, 165, 250, 0.2); }
+.groupNodeHealthy { border-color: #22c55e; }
+.groupNodeWarning { border-color: #f59e0b; }
+.groupNodeError { border-color: #ef4444; }
+.groupNodeEmpty { border-color: #334155; }
+.groupNodeSelected { box-shadow: 0 0 16px rgba(96, 165, 250, 0.3); }
+.groupHeader { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+.groupIcon { font-size: 20px; }
+.groupLabel { font-size: 14px; font-weight: 700; color: #f0f4f8; }
+.groupDesc { font-size: 10px; color: #7a8ba8; margin-bottom: 4px; line-height: 1.3; }
+.groupMeta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #94a3b8; }
+.groupCount { background: #1e293b; padding: 1px 6px; border-radius: 4px; color: #cbd5e1; }
+.groupDepth { font-weight: 700; padding: 1px 6px; border-radius: 4px; cursor: pointer; }
+
+/* 深度标签 */
+.depthL0 { background: #1e293b; color: #64748b; }
+.depthL1 { background: #1e293b; color: #94a3b8; }
+.depthL2 { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.depthL3 { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+.depthL4 { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+
+/* 状态灯 */
+.statusLight { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+.statusLightHealthy { background: #22c55e; box-shadow: 0 0 8px #22c55e, 0 0 16px rgba(34, 197, 94, 0.3); animation: glowGreen 2s ease-in-out infinite; }
+.statusLightWarning { background: #f59e0b; box-shadow: 0 0 8px #f59e0b, 0 0 16px rgba(245, 158, 11, 0.3); animation: glowYellow 1.5s ease-in-out infinite; }
+.statusLightError { background: #ef4444; box-shadow: 0 0 8px #ef4444, 0 0 16px rgba(239, 68, 68, 0.4); animation: glowRed 1s ease-in-out infinite; }
+.statusLightEmpty { background: #475569; box-shadow: none; }
+@keyframes glowGreen { 0%, 100% { box-shadow: 0 0 6px #22c55e; } 50% { box-shadow: 0 0 14px #22c55e, 0 0 24px rgba(34, 197, 94, 0.3); } }
+@keyframes glowYellow { 0%, 100% { box-shadow: 0 0 6px #f59e0b; } 50% { box-shadow: 0 0 14px #f59e0b, 0 0 24px rgba(245, 158, 11, 0.3); } }
+@keyframes glowRed { 0%, 100% { box-shadow: 0 0 6px #ef4444; } 50% { box-shadow: 0 0 18px #ef4444, 0 0 30px rgba(239, 68, 68, 0.4); } }
+
+/* 叶子节点 */
+.leafNode { position: absolute; z-index: 10; background: #0f172a; border: 1px solid #1e293b; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 12px; transition: border-color 0.15s, background 0.15s; white-space: nowrap; }
+.leafNode:hover { background: #1e293b; border-color: #60a5fa; }
+.leafNodeSelected { border-color: #3b82f6; background: #1e293b; box-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
+.leafContent { display: flex; align-items: center; gap: 6px; }
+.leafIcon { font-size: 14px; }
+.leafName { color: #e2e8f0; font-weight: 500; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+.leafDepth { font-size: 10px; font-weight: 700; padding: 0 4px; border-radius: 3px; }
+.leafOverride { font-size: 9px; color: #60a5fa; background: rgba(59, 130, 246, 0.15); padding: 0 4px; border-radius: 3px; }
+
+/* 折叠/展开 */
+.expandHint { font-size: 10px; color: #64748b; }
+.expandHintExpanded { color: #60a5fa; }
+
+/* 分组标签 */
+.groupTag { font-size: 10px; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+.tagWorldview { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+.tagCharacter { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+.tagBindable { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.tagForeshadowing { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+.tagKnowledge { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+
+/* 内嵌深度选择器 */
+.inlineDepth { margin-top: 6px; position: relative; }
+.inlineDepthTrigger { font-size: 11px; color: #60a5fa; cursor: pointer; padding: 2px 6px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); }
+.inlineDepthTrigger:hover { background: rgba(59, 130, 246, 0.2); }
+.inlineDepthMenu { position: absolute; top: 100%; left: 0; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 4px; display: flex; gap: 2px; z-index: 30; margin-top: 2px; }
+.inlineDepthBtn { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer; border: 1px solid #334155; background: #0f172a; color: #94a3b8; transition: all 0.1s; }
+.inlineDepthBtn:hover { background: #334155; color: #e2e8f0; }
+.inlineDepthBtnActive { border-color: #3b82f6; color: #60a5fa; background: rgba(59, 130, 246, 0.15); }

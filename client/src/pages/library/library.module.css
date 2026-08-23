@@ -1,0 +1,36 @@
+.page-container { padding: 24px; max-width: 1400px; margin: 0 auto; }
+.tree-panel { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 12px; max-height: calc(100vh - 180px); overflow: auto; }
+.detail-panel { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; align-self: start; }
+.detail-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+.detail-body { padding: 20px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.stat-item { padding: 10px; background: var(--bg-secondary); border-radius: 8px; }
+.stat-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
+.stat-value { font-size: 14px; font-weight: 600; }
+.search-input { padding: 7px 12px 7px 30px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); width: 220px; font-size: 13px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; }
+.mode-select { padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 13px; }
+.toolbar-btn { padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-secondary); cursor: pointer; font-size: 12px; }
+.disabled-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: rgba(255,71,87,0.15); color: #ff4757; }
+.toggle-btn { padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); }
+.toggle-btn-enable { background: rgba(46,213,115,0.1); color: #2ed573; }
+.toggle-btn-disable { background: rgba(255,71,87,0.1); color: #ff4757; }
+.reset-btn { padding: 4px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); }
+.edit-inline-input { flex: 1; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 13px; }
+.save-btn { padding: 6px 12px; border-radius: 6px; border: none; background: var(--accent-primary); color: #fff; cursor: pointer; font-size: 12px; }
+.cancel-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-secondary); cursor: pointer; font-size: 12px; }
+.tag-chip { padding: 3px 10px; border-radius: 12px; font-size: 12px; }
+.warn-banner { padding: 8px 16px; background: rgba(255,165,2,0.1); border: 1px solid rgba(255,165,2,0.3); border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #ffa502; }
+.empty-detail { padding: 60px 20px; text-align: center; color: var(--text-secondary); }
+.tab-active { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--accent-primary); background: var(--accent-primary); color: #fff; cursor: pointer; font-size: 12px; }
+.tab-inactive { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-secondary); cursor: pointer; font-size: 12px; }
+.fb-panel { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border-color); padding: 16px; margin-top: 16px; }
+.fb-title { margin: 0; font-size: 14px; font-weight: 600; }
+.fb-meta { font-size: 11px; color: var(--text-secondary); }
+.fb-section-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+.fb-empty { padding: 24px; text-align: center; color: var(--text-secondary); font-size: 13px; }
+.fb-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.fb-label { font-size: 11px; width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+.fb-bar-track { flex: 1; height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; }
+.fb-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+.fb-rate { font-size: 11px; font-weight: 600; width: 40px; text-align: right; flex-shrink: 0; }

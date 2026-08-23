@@ -1,0 +1,161 @@
+/* 调试日志页面样式 */
+/* 与 metrics.module.css 保持风格一致：使用 CSS 变量适配主题 */
+
+.debugPage { padding: 20px; max-width: 1400px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; }
+
+.debugHeader { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.debugHeader h2 { margin: 0; font-size: 20px; flex-shrink: 0; }
+.debugHeaderMeta { color: var(--text-secondary, #888); font-size: 13px; }
+.debugHeaderActions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+
+.manualInput { padding: 6px 12px; border: 1px solid var(--border-color, #444); border-radius: 6px; background: var(--card-bg, #1a1a2e); color: var(--text-primary, #e0e0e0); font-size: 13px; width: 260px; }
+.manualInput:focus { outline: none; border-color: var(--accent-color, #6c63ff); }
+
+.searchBtn, .clearBtn, .refreshBtn { padding: 6px 14px; border: 1px solid var(--border-color, #444); border-radius: 6px; background: var(--card-bg, #1a1a2e); color: var(--text-primary, #e0e0e0); cursor: pointer; font-size: 13px; }
+.searchBtn:hover, .refreshBtn:hover { background: var(--btn-hover-bg, #2a2a4e); border-color: var(--accent-color, #6c63ff); }
+.clearBtn:hover { background: rgba(239, 68, 68, 0.15); border-color: var(--error-color, #ef4444); color: var(--error-color, #ef4444); }
+.clearBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.debugBody { display: grid; grid-template-columns: 360px 1fr; gap: 16px; flex: 1; min-height: 0; overflow: hidden; }
+
+/* TraceId 列表面板 */
+.traceListPanel { background: var(--card-bg, #1a1a2e); border: 1px solid var(--border-color, #333); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+.traceListHeader { padding: 12px 16px; border-bottom: 1px solid var(--border-color, #333); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.traceListHeader h3 { margin: 0; font-size: 14px; color: var(--text-secondary, #aaa); text-transform: uppercase; letter-spacing: 0.5px; }
+.traceListActions { display: flex; gap: 6px; align-items: center; }
+.levelSelect { padding: 4px 8px; border: 1px solid var(--border-color, #444); border-radius: 4px; background: var(--card-bg, #1a1a2e); color: var(--text-primary, #e0e0e0); font-size: 12px; }
+
+.traceListLoading, .traceListEmpty { padding: 24px; text-align: center; color: var(--text-secondary, #888); font-size: 13px; }
+
+.archiveToggle { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-secondary, #aaa); cursor: pointer; }
+.archiveToggle input { cursor: pointer; }
+.archivedBadge { background: rgba(86,156,214,0.2); color: #569cd6; font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+
+.traceList { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+.traceItem { padding: 10px 16px; border-bottom: 1px solid var(--border-color, #222); cursor: pointer; transition: background 0.15s; }
+.traceItem:hover { background: var(--row-hover-bg, rgba(108,99,255,0.05)); }
+.traceItemActive { background: rgba(108,99,255,0.15); border-left: 3px solid var(--accent-color, #6c63ff); }
+
+.traceItemHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.traceIdValue { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: var(--accent-color, #6c63ff); }
+.errorBadge { background: var(--error-color, #ef4444); color: #fff; font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+
+.traceItemMeta { display: flex; gap: 8px; font-size: 11px; color: var(--text-secondary, #888); }
+.levelCountError { color: var(--error-color, #ef4444); font-weight: 600; }
+.levelCountWarn { color: #f59e0b; font-weight: 600; }
+
+/* 日志详情面板 */
+.logListPanel { background: var(--card-bg, #1a1a2e); border: 1px solid var(--border-color, #333); border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+.logListHeader { padding: 12px 16px; border-bottom: 1px solid var(--border-color, #333); display: flex; align-items: center; gap: 16px; flex-shrink: 0; flex-wrap: wrap; }
+.logListHeader h3 { margin: 0; font-size: 14px; color: var(--text-secondary, #aaa); text-transform: uppercase; letter-spacing: 0.5px; }
+.logListMeta { display: flex; gap: 12px; font-size: 12px; color: var(--text-secondary, #888); align-items: center; }
+.logListTraceId { font-family: 'Consolas', 'Monaco', monospace; color: var(--accent-color, #6c63ff); }
+
+.logListLoading, .logListError, .logListEmpty { padding: 40px; text-align: center; color: var(--text-secondary, #888); font-size: 14px; }
+.logListError { color: var(--error-color, #ef4444); }
+
+.logList { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 12px; }
+.logItem { border-bottom: 1px solid var(--border-color, #222); }
+.logItemHeader { display: flex; gap: 8px; padding: 6px 16px; align-items: baseline; cursor: default; }
+.logItemHeader[role="button"] { cursor: pointer; }
+.logItemHeader[role="button"]:hover { background: var(--row-hover-bg, rgba(108,99,255,0.05)); }
+
+.logTime { color: var(--text-secondary, #888); flex-shrink: 0; }
+.logLevel { font-weight: 700; flex-shrink: 0; min-width: 50px; }
+.logModule { color: #c586c0; flex-shrink: 0; }
+.logMessage { color: var(--text-primary, #ddd); flex: 1; word-break: break-word; }
+.expandHint { color: var(--text-secondary, #888); flex-shrink: 0; }
+
+.levelDebug .logLevel { color: #569cd6; }
+.levelInfo .logLevel { color: #4ec9b0; }
+.levelWarn .logLevel { color: #f59e0b; }
+.levelError .logLevel { color: var(--error-color, #ef4444); }
+.levelError { background: rgba(239, 68, 68, 0.05); }
+
+.logContext { margin: 0; padding: 8px 16px 12px 40px; font-size: 11px; color: var(--text-secondary, #aaa); background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-color, #222); white-space: pre-wrap; word-break: break-word; overflow-x: auto; }
+
+/* 标签页栏 */
+.tabBar { display: flex; gap: 4px; border-bottom: 1px solid var(--border-color, #333); margin-bottom: 16px; flex-shrink: 0; }
+.tabBtn { padding: 10px 20px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-secondary, #888); cursor: pointer; font-size: 14px; transition: all 0.15s; position: relative; }
+.tabBtn:hover { color: var(--text-primary, #ddd); }
+.tabBtnActive { color: var(--accent-color, #6c63ff); border-bottom-color: var(--accent-color, #6c63ff); }
+.tabAlertDot { display: inline-block; width: 8px; height: 8px; background: var(--error-color, #ef4444); border-radius: 50%; margin-left: 6px; vertical-align: middle; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.tabContent { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.alertCountBadge { color: var(--error-color, #ef4444); font-weight: 600; background: rgba(239,68,68,0.1); padding: 2px 8px; border-radius: 4px; }
+
+/* 聚合视图 */
+.aggPanel { background: var(--card-bg, #1a1a2e); border: 1px solid var(--border-color, #333); border-radius: 10px; padding: 16px; flex: 1; overflow: auto; }
+.aggHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.aggHeader h3 { margin: 0; font-size: 14px; color: var(--text-secondary, #aaa); text-transform: uppercase; letter-spacing: 0.5px; }
+.aggEmpty { padding: 40px; text-align: center; color: var(--text-secondary, #888); font-size: 14px; }
+
+.aggTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.aggTable th { padding: 8px 12px; text-align: left; border-bottom: 2px solid var(--border-color, #333); color: var(--text-secondary, #888); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+.aggRow { border-bottom: 1px solid var(--border-color, #222); transition: background 0.15s; }
+.aggRow:hover { background: var(--row-hover-bg, rgba(108,99,255,0.05)); }
+.aggKeyCell { font-family: 'Consolas', 'Monaco', monospace; color: var(--accent-color, #6c63ff); }
+.aggCountCell { text-align: center; color: var(--text-primary, #ddd); }
+.aggWindowCount { background: rgba(245,158,11,0.15); color: #f59e0b; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.aggTimeCell { color: var(--text-secondary, #888); font-size: 12px; }
+.aggMsgCell { color: var(--text-primary, #ddd); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aggJumpBtn { padding: 4px 10px; border: 1px solid var(--border-color, #444); border-radius: 4px; background: var(--card-bg, #1a1a2e); color: var(--accent-color, #6c63ff); cursor: pointer; font-size: 12px; }
+.aggJumpBtn:hover { background: var(--btn-hover-bg, #2a2a4e); }
+
+/* 告警视图 */
+.alertPanel { background: var(--card-bg, #1a1a2e); border: 1px solid var(--border-color, #333); border-radius: 10px; padding: 16px; flex: 1; overflow: auto; }
+.alertHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.alertHeader h3 { margin: 0; font-size: 14px; color: var(--text-secondary, #aaa); text-transform: uppercase; letter-spacing: 0.5px; }
+.alertEmpty { padding: 40px; text-align: center; color: var(--text-secondary, #888); font-size: 14px; }
+
+.alertRulesSection { margin-bottom: 16px; padding: 8px 12px; background: rgba(0,0,0,0.2); border-radius: 6px; font-size: 12px; color: var(--text-secondary, #888); }
+.alertRulesSection summary { cursor: pointer; padding: 4px 0; }
+.alertRulesList { list-style: none; padding: 8px 0 0 0; margin: 0; }
+.alertRulesList li { padding: 4px 0; display: flex; gap: 8px; align-items: center; }
+
+.alertList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.alertItem { padding: 12px 16px; border-left: 4px solid var(--text-secondary, #555); background: rgba(0,0,0,0.2); border-radius: 6px; }
+.alertItem.severityCritical { border-left-color: var(--error-color, #ef4444); background: rgba(239,68,68,0.08); }
+.alertItem.severityWarning { border-left-color: #f59e0b; background: rgba(245,158,11,0.08); }
+.alertItem.severityInfo { border-left-color: #569cd6; }
+.alertItem.alertAck { opacity: 0.6; }
+
+.alertItemHeader { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.alertSeverity { font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 3px; text-transform: uppercase; }
+.severityCritical .alertSeverity { color: var(--error-color, #ef4444); background: rgba(239,68,68,0.2); }
+.severityWarning .alertSeverity { color: #f59e0b; background: rgba(245,158,11,0.2); }
+.severityInfo .alertSeverity { color: #569cd6; background: rgba(86,156,214,0.2); }
+.alertRuleName { color: var(--text-primary, #ddd); font-size: 14px; }
+.alertAckBadge { font-size: 11px; padding: 1px 6px; background: rgba(108,99,255,0.2); color: var(--accent-color, #6c63ff); border-radius: 3px; }
+
+.alertItemMeta { display: flex; gap: 16px; font-size: 12px; color: var(--text-secondary, #888); margin-bottom: 6px; flex-wrap: wrap; }
+.alertSampleMsg { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: var(--text-secondary, #aaa); padding: 6px 10px; background: rgba(0,0,0,0.3); border-radius: 4px; margin-bottom: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alertItemActions { display: flex; gap: 8px; }
+.alertAckBtn { padding: 4px 12px; border: 1px solid var(--border-color, #444); border-radius: 4px; background: transparent; color: var(--text-primary, #ddd); cursor: pointer; font-size: 12px; }
+.alertAckBtn:hover { background: var(--btn-hover-bg, #2a2a4e); border-color: var(--accent-color, #6c63ff); }
+
+@media (max-width: 900px) {
+    .debugBody { grid-template-columns: 1fr; grid-template-rows: 300px 1fr; }
+    .manualInput { width: 180px; }
+    .aggTable { font-size: 11px; }
+    .aggMsgCell { max-width: 150px; }
+}
+
+/* 错误追踪视图（方向 F） */
+.errorCodeBadge { background: rgba(239,68,68,0.2); color: var(--error-color, #ef4444); font-size: 10px; padding: 1px 6px; border-radius: 3px; font-weight: 600; font-family: 'Consolas', 'Monaco', monospace; flex-shrink: 0; }
+.errorDetail { margin: 0; padding: 8px 16px 12px 40px; font-size: 11px; color: var(--text-secondary, #aaa); background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-color, #222); white-space: pre-wrap; word-break: break-word; overflow-x: auto; }
+.errorDetailLabel { color: var(--accent-color, #6c63ff); font-weight: 600; margin-top: 6px; margin-bottom: 2px; }
+.errorDetailActions { margin-top: 8px; }
+.errorListMeta { font-size: 12px; color: var(--text-secondary, #888); margin: 8px 0; }
+
+/* 错误聚合统计卡片 */
+.errorStatsCard { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color, #333); border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
+.errorStatsHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.errorStatsHeader h4 { margin: 0; font-size: 13px; color: var(--text-secondary, #aaa); text-transform: uppercase; letter-spacing: 0.5px; }
+.errorStatsTotal { font-size: 12px; color: var(--error-color, #ef4444); font-weight: 600; }
+.errorStatsSection { margin-top: 8px; }
+.errorStatsSectionTitle { font-size: 11px; color: var(--text-secondary, #888); margin-bottom: 4px; text-transform: uppercase; }
+.errorStatsChips { display: flex; flex-wrap: wrap; gap: 6px; }
+.errorStatsChip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: rgba(108,99,255,0.1); border: 1px solid var(--border-color, #333); border-radius: 12px; font-size: 11px; color: var(--text-primary, #ddd); font-family: 'Consolas', 'Monaco', monospace; }
+.errorStatsChipCount { background: rgba(239,68,68,0.2); color: var(--error-color, #ef4444); padding: 1px 6px; border-radius: 8px; font-weight: 600; }

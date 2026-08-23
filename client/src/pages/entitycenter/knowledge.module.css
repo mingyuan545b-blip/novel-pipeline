@@ -1,0 +1,12 @@
+.fact-card { border-left: 3px solid var(--neon-cyan); }
+.fact-title { font-size: 14px; }
+.fact-count { color: var(--text-secondary); font-size: 12px; }
+.fact-row { padding: 6px 10px; border-radius: 6px; background: var(--bg-secondary); }
+.fact-name { font-weight: 600; }
+.fact-chapter { color: var(--text-secondary); font-size: 12px; }
+.fact-notes { color: var(--text-secondary); font-size: 12px; flex: 1; }
+.fact-delete { padding: 2px 8px; font-size: 12px; color: #ff6b9d; }
+.confidence-badge { font-size: 12px; font-weight: 600; }
+.source-badge { color: var(--text-secondary); font-size: 12px; }
+.form-card { border: 1px solid var(--neon-cyan); }
+.empty-hint { color: var(--text-secondary); }

@@ -1,0 +1,41 @@
+/* ===== Publish Page: 面板组件样式 ===== */
+
+/* 更新对话框 */
+.update-dialog-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.update-dialog { background: var(--bg-secondary); border: 1px solid var(--neon-cyan); border-radius: 8px; padding: 24px; min-width: 440px; max-width: 520px; }
+.update-dialog-title { color: var(--neon-cyan); margin-bottom: 16px; font-size: 16px; }
+.update-dialog-hint { color: #aaa; font-size: 13px; margin-bottom: 6px; }
+.update-range-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.update-range-input { width: 100px; font-size: 14px; text-align: center; }
+.update-range-sep { color: #666; font-size: 14px; }
+.update-range-hint { color: #555; font-size: 12px; white-space: nowrap; }
+
+/* 平台管理 */
+.account-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.account-info-row { display: flex; align-items: center; gap: 8px; }
+.account-color-dot { width: 12px; height: 12px; border-radius: 50%; }
+.account-actions { display: flex; gap: 4px; }
+.account-detail { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+.account-config-row { margin-top: 8px; }
+.platform-card-center { text-align: center; padding: 16px; }
+.platform-color-dot { width: 24px; height: 24px; border-radius: 50%; margin: 0 auto 8px; }
+.platform-features { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+
+/* 互动面板 */
+.interaction-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.interaction-stat-value { font-size: 20px; font-weight: 700; }
+.interaction-card { margin-bottom: 12px; }
+.interaction-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.interaction-meta { display: flex; gap: 8px; align-items: center; }
+.interaction-content { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 8px; }
+.interaction-reply { padding: 8px 12px; background: rgba(0, 255, 100, 0.05); border-radius: 6px; font-size: 12px; color: var(--neon-green); }
+
+/* 回复输入 */
+.reply-row { display: flex; gap: 8px; align-items: center; }
+
+/* 队列面板 */
+.queue-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.queue-config-row { display: flex; gap: 8px; align-items: center; }
+.queue-interval-row { display: flex; gap: 4px; align-items: center; }
+.format-section { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.format-account-row { display: flex; gap: 4px; align-items: center; }

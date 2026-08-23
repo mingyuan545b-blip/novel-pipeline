@@ -1,0 +1,33 @@
+.configCard { margin-bottom: 24px; }
+.configGrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.fullWidth { width: 100%; box-sizing: border-box; }
+.selectFullWidth { width: 100%; padding: 8px 12px; box-sizing: border-box; }
+.subtitleRow { margin-top: 8px; }
+.subtitleLabel {
+    display: flex; align-items: center; gap: 6px;
+    cursor: pointer; font-size: 13px; color: var(--text-secondary);
+}
+.subtitleCheckbox { accent-color: var(--neon-blue); }
+.sceneCard { margin-bottom: 12px; }
+.sceneHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.sceneTitle { font-weight: 600; color: var(--neon-blue); }
+.deleteSceneBtn { font-size: 10px; color: var(--neon-red); padding: 2px 8px; }
+.sceneGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sceneFormGroup { margin: 0; }
+.sceneSubGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.voiceSelect { width: 100%; padding: 6px 8px; box-sizing: border-box; font-size: 12px; }
+.ttsPreviewBtn { margin-top: 8px; font-size: 11px; padding: 4px 12px; }
+.actionBar { display: flex; gap: 8px; margin-bottom: 24px; }
+.resultCard { margin-bottom: 24px; }
+.resultSuccess { border-color: var(--neon-green); }
+.resultError { border-color: var(--neon-red); }
+.resultTitleSuccess { color: var(--neon-green); font-weight: 600; margin-bottom: 8px; }
+.resultTitleError { color: var(--neon-red); font-weight: 600; margin-bottom: 8px; }
+.resultDetails { font-size: 12px; color: var(--text-secondary); line-height: 1.8; }
+.mono { font-family: monospace; }
+.resultErrorText { font-size: 12px; color: var(--neon-red); }
+.emptyEpisodes { font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px; }
+.episodeItem { padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+.episodeName { font-weight: 600; color: var(--neon-blue); font-size: 13px; }
+.episodeMeta { font-size: 11px; color: var(--text-muted); }
+.episodeVideo { margin-right: 12px; font-family: monospace; }

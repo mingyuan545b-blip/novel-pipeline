@@ -1,0 +1,57 @@
+/* ── Constraint modules tab ── */
+.moduleCard { cursor: pointer; }
+
+.moduleHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.moduleInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.moduleRight {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.moduleAgentRow {
+    background: var(--card-bg);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.moduleAgentName {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 80px;
+}
+
+.moduleAgentCount { font-size: 10px; color: var(--text-muted); }
+.moduleExpandArea { margin-top: 8px; }
+.moduleId { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+
+.modulePre {
+    background: var(--bg-input);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    border: 1px solid var(--border-color);
+    max-height: 300px;
+    overflow: auto;
+}

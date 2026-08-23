@@ -1,0 +1,33 @@
+.panel { margin-top: 12px; padding: 14px; background: transparent; border-radius: 8px; border: 1px solid rgba(255,100,100,0.3); font-size: 13px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.title { font-weight: 700; color: #ff6b6b; font-size: 14px; }
+.auditBtn { font-size: 10px; }
+
+.statsGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+.statCard { padding: 8px 10px; border-radius: 6px; }
+.statValue { font-weight: 700; font-size: 22px; }
+.statLabel { color: #ffffff; font-size: 11px; margin-top: 2px; }
+
+.statHealth { background: rgba(50,255,100,0.1); border: 1px solid rgba(50,255,100,0.3); }
+.statHealth .statValue { color: #2ed573; }
+.statDup { background: rgba(255,50,50,0.12); border: 1px solid rgba(255,50,50,0.3); }
+.statDup .statValue { color: #ff6b6b; }
+.statInflate { background: rgba(255,165,0,0.12); border: 1px solid rgba(255,165,0,0.3); }
+.statInflate .statValue { color: #ffa502; }
+.statAgents { background: rgba(50,150,255,0.12); border: 1px solid rgba(50,150,255,0.3); }
+.statAgents .statValue { color: #54a0ff; }
+
+.summary { font-size: 12px; color: #ffffff; margin-bottom: 8px; padding: 6px 10px; background: rgba(0,0,0,0.3); border-radius: 4px; }
+
+.agentCard { margin-bottom: 8px; padding: 6px 10px; background: rgba(0,0,0,0.2); border-radius: 6px; }
+.agentHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.agentName { font-weight: 700; font-size: 12px; }
+.agentStats { color: #ffffff; font-size: 11px; }
+.issueLine { font-size: 11px; color: #ffffff; margin-bottom: 2px; }
+.issueLabel { font-weight: 600; }
+
+.placeholder { color: #ffffff; font-size: 12px; }
+
+.scoreGood { color: #2ed573; }
+.scoreWarn { color: #ffa502; }
+.scoreBad { color: #ff6b6b; }

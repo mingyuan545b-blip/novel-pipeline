@@ -1,0 +1,80 @@
+.ruleStackPanel {
+    padding: 14px;
+    background: transparent;
+    border-radius: 8px;
+    border: 1px solid rgba(162, 155, 254, 0.3);
+    font-size: 13px;
+}
+
+.panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.panelTitle {
+    font-weight: 700;
+    color: #a29bfe;
+    font-size: 14px;
+}
+
+.layerGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.layerCard {
+    padding: 6px 8px;
+    background: transparent;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.layerCount {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.layerName {
+    color: #ffffff;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.priorityHint {
+    font-size: 11px;
+    color: #ffffff;
+    margin-bottom: 6px;
+    padding: 4px 8px;
+    background: transparent;
+    border-radius: 4px;
+}
+
+.rulesList {
+    max-height: 100px;
+    overflow: auto;
+    font-size: 11px;
+    border-top: 1px solid rgba(162, 155, 254, 0.2);
+    padding-top: 6px;
+}
+
+.ruleRow {
+    margin-bottom: 3px;
+    display: flex;
+    gap: 6px;
+}
+
+.ruleContent {
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.emptyHint {
+    color: #ffffff;
+    font-size: 12px;
+}

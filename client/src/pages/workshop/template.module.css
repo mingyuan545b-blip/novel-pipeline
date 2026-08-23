@@ -1,0 +1,72 @@
+/* ── Template validation ── */
+.validationHeader {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.summaryItem {
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.summaryKey {
+  color: var(--text-muted);
+}
+
+.summaryValue {
+  float: right;
+  color: var(--neon-blue);
+  font-weight: 600;
+}
+
+.importActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.importResultBox {
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.importResultSuccess {
+  composes: importResultBox;
+  background: rgba(0, 255, 100, 0.1);
+}
+
+.importResultError {
+  composes: importResultBox;
+  background: rgba(255, 0, 68, 0.1);
+}
+
+.successTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--neon-green);
+  margin-bottom: 8px;
+}
+
+.badgeRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.skippedInfo {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}

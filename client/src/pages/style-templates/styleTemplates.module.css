@@ -1,0 +1,14 @@
+.page-container { padding: 24px; max-width: 1200px; margin: 0 auto; }
+.progress-bar { padding: 10px 14px; background: rgba(0,240,255,0.05); border-radius: 6px; margin-bottom: 16px; font-size: 13px; color: var(--neon-blue); display: flex; align-items: center; gap: 8px; }
+.current-style-card { margin-bottom: 20px; padding: 16px; border-left: 4px solid var(--neon-blue); }
+.template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+.example-block { font-size: 12px; color: var(--text-muted); font-style: italic; padding: 8px 10px; background: rgba(0,240,255,0.03); border-radius: 4px; margin-bottom: 8px; border-left: 2px solid var(--neon-blue); }
+.forbidden-tag { background: rgba(255,60,60,0.1) !important; color: var(--neon-red) !important; cursor: pointer; }
+.source-badge { background: rgba(255,255,255,0.05) !important; color: var(--text-muted) !important; font-size: 10px !important; }
+.modal-wide { max-width: 700px !important; max-height: 85vh !important; overflow: auto; }
+.analyze-modal { max-width: 650px !important; }
+.analyze-info { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; padding: 8px 12px; background: rgba(0,240,255,0.03); border-radius: 6px; border-left: 2px solid var(--neon-blue); }
+.rules-title { font-size: 14px; font-weight: 600; margin: 16px 0 8px; color: var(--neon-blue); }
+.char-count-warn { font-size: 11px; margin-top: 4px; color: var(--neon-red); }
+.char-count-ok { font-size: 11px; margin-top: 4px; color: var(--text-muted); }
+.card-actions { display: flex; gap: 6px; border-top: 1px solid var(--border-color); padding-top: 10px; }

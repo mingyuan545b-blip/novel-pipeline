@@ -1,8 +1,12 @@
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import useAppStore from './store/useAppStore';
-import { useEffect, useState } from 'react';
-import { projectsApi, settingsApi, pipelineApi, licenseApi, versionApi } from './services/api';
+import useAppInit from './hooks/useAppInit';
+import useServerVersionGuard from './hooks/useServerVersionGuard';
+import { useEffect } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
+import OfflineBanner from './components/OfflineBanner';
+import NotificationContainer from './components/NotificationContainer';
+import appStyles from './App.module.css';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
@@ -21,15 +25,19 @@ import ComicRenderPage from './pages/ComicRenderPage';
 import ComicExportPage from './pages/ComicExportPage';
 import StyleTemplatesPage from './pages/StyleTemplatesPage';
 import KnowledgePage from './pages/KnowledgePage';
-import TimelinePage from './pages/TimelinePage';
 import LibraryPage from './pages/LibraryPage';
-import MapPage from './pages/MapPage';
+import CharacterStatePage from './pages/CharacterStatePage';
+import EntityCenterPage from './pages/EntityCenterPage';
+import GenreDebugPage from './pages/GenreDebugPage';
+import MetricsPage from './pages/metrics/MetricsPage';
+import ContextMapPage from './pages/contextMap/ContextMapPage';
+import DebugLogsPage from './pages/debug/DebugLogsPage';
 
 function App() {
     const location = useLocation();
-    const { setProjects, setSettings, setAgents, setActivePage, theme, bgImage, bgOpacity, bgBlur, setMembership, setUpdateInfo, membership } = useAppStore();
-    const [forceUpdateModal, setForceUpdateModal] = useState(false);
-    const [initError, setInitError] = useState(null);
+    const { setActivePage, theme, bgImage, bgOpacity, bgBlur } = useAppStore();
+    const { initError, clearInitError, retryInit } = useAppInit();
+    useServerVersionGuard();
 
     useEffect(() => {
         setActivePage(location.pathname);
@@ -40,8 +48,7 @@ function App() {
     }, [theme]);
 
     useEffect(() => {
-        const bgImageValue = bgImage ? `url(${bgImage})` : 'none';
-        document.documentElement.style.setProperty('--app-bg-image', bgImageValue);
+        document.documentElement.style.setProperty('--app-bg-image', bgImage ? `url(${bgImage})` : 'none');
     }, [bgImage]);
 
     useEffect(() => {
@@ -52,45 +59,17 @@ function App() {
         document.documentElement.style.setProperty('--app-bg-blur', `${bgBlur}px`);
     }, [bgBlur]);
 
-    useEffect(() => {
-        const initData = async () => {
-            try {
-                const [projectsRes, settingsRes, agentsRes, licenseRes] = await Promise.all([
-                    projectsApi.list().catch(() => ({ data: [] })),
-                    settingsApi.get().catch(() => ({ data: { hasKey: false } })),
-                    pipelineApi.getAgents().catch(() => ({ data: [] })),
-                    licenseApi.getStatus().catch(() => ({ data: { level: 'free', licensed: false } }))
-                ]);
-                setProjects(projectsRes.data || []);
-                setSettings(settingsRes.data || { hasKey: false });
-                setAgents(agentsRes.data || []);
-                setMembership(licenseRes.data || { level: 'free', licensed: false });
-            } catch (e) {
-                console.error('Init data error:', e);
-                setInitError('数据加载失败，请检查服务器是否正常运行');
-            }
-        };
-        initData();
-
-        const checkUpdate = async () => {
-            try {
-                const versionRes = await versionApi.getInfo().catch(() => null);
-                if (versionRes?.data) {
-                    setUpdateInfo(versionRes.data);
-                }
-            } catch {}
-        };
-        checkUpdate();
-    }, [setProjects, setSettings, setAgents, setMembership, setUpdateInfo]);
-
     return (
         <ErrorBoundary>
+            <OfflineBanner />
+            <NotificationContainer />
             <div className="app-layout" data-theme={theme}>
                 <div className="app-bg-layer"></div>
                 {initError && (
-                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: '#ef4444', color: '#fff', padding: '8px 16px', textAlign: 'center', fontSize: '14px' }}>
+                    <div className={appStyles.initErrorBanner}>
                         {initError}
-                        <button onClick={() => setInitError(null)} style={{ marginLeft: '12px', background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fff', cursor: 'pointer', padding: '2px 8px', borderRadius: '4px' }}>关闭</button>
+                        <button onClick={retryInit} className={appStyles.retryButton}>重试</button>
+                        <button onClick={clearInitError} className={appStyles.closeButton}>关闭</button>
                     </div>
                 )}
                 <Sidebar />
@@ -98,25 +77,33 @@ function App() {
                     <Header />
                     <div className="app-content">
                         <Routes>
-                            <Route path="/" element={<Dashboard />} />
-                            <Route path="/pipeline" element={<PipelinePage />} />
-                            <Route path="/materials" element={<MaterialsPage />} />
-                            <Route path="/chapters" element={<ChaptersPage />} />
-                            <Route path="/agents" element={<AgentsPage />} />
-                            <Route path="/settings" element={<SettingsPage />} />
+                            <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+                            <Route path="/pipeline" element={<ErrorBoundary><PipelinePage /></ErrorBoundary>} />
+                            <Route path="/materials" element={<ErrorBoundary><MaterialsPage /></ErrorBoundary>} />
+                            <Route path="/chapters" element={<ErrorBoundary><ChaptersPage /></ErrorBoundary>} />
+                            <Route path="/agents" element={<ErrorBoundary><AgentsPage /></ErrorBoundary>} />
+                            <Route path="/settings" element={<ErrorBoundary><SettingsPage /></ErrorBoundary>} />
                             <Route path="/guide" element={<GuidePage />} />
                             <Route path="/workshop" element={<WorkshopPage />} />
-                            <Route path="/publish" element={<PublishPage />} />
+                            <Route path="/publish" element={<ErrorBoundary><PublishPage /></ErrorBoundary>} />
                             <Route path="/comic/config" element={<ComicConfigPage />} />
                             <Route path="/comic/workflows" element={<ComicWorkflowsPage />} />
                             <Route path="/comic/storyboard" element={<ComicStoryboardPage />} />
                             <Route path="/comic/render" element={<ComicRenderPage />} />
                             <Route path="/comic/export" element={<ComicExportPage />} />
                             <Route path="/style-templates" element={<StyleTemplatesPage />} />
-                            <Route path="/knowledge" element={<KnowledgePage />} />
+                            <Route path="/knowledge" element={<ErrorBoundary><KnowledgePage /></ErrorBoundary>} />
                             <Route path="/library" element={<LibraryPage />} />
-                            <Route path="/timeline" element={<TimelinePage />} />
-                            <Route path="/map" element={<MapPage />} />
+                            <Route path="/map" element={<Navigate to="/context-map" replace />} />
+                            <Route path="/character-states" element={<Navigate to="/entity-center?tab=state-tracking" replace />} />
+                            <Route path="/entity-center" element={<EntityCenterPage />} />
+                            <Route path="/genre-debug" element={<ErrorBoundary><GenreDebugPage /></ErrorBoundary>} />
+                            <Route path="/metrics" element={<ErrorBoundary><MetricsPage /></ErrorBoundary>} />
+                            <Route path="/context-map" element={<ErrorBoundary><ContextMapPage /></ErrorBoundary>} />
+                            <Route path="/debug-logs" element={<ErrorBoundary><DebugLogsPage /></ErrorBoundary>} />
+                            {/* 陷阱#21：必须有通配符路由，否则用户访问 /projects 等未定义路径时
+                                 Dashboard 不渲染，项目数据不显示，用户以为"前端没数据" */}
+                            <Route path="*" element={<Navigate to="/" replace />} />
                         </Routes>
                     </div>
                 </div>

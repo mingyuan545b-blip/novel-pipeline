@@ -1,0 +1,9 @@
+.header-row { display: flex; justify-content: space-between; align-items: center; }
+.version-group { display: flex; gap: 4px; align-items: center; }
+.version-label { font-size: 11px; color: var(--text-muted); }
+.version-btn { font-size: 10px; }
+.version-btn-old { font-size: 10px; opacity: 0.7; }
+.content-card { max-height: 400px; overflow: auto; }
+.version-banner { padding: 6px 10px; background: rgba(255,165,2,0.1); border-bottom: 1px solid var(--border-color); font-size: 11px; color: #ffa502; display: flex; justify-content: space-between; align-items: center; }
+.content-text { white-space: pre-wrap; font-size: 14px; line-height: 1.8; }
+.empty-content { color: var(--text-muted); text-align: center; padding: 40px; }

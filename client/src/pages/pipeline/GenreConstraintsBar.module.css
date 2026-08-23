@@ -1,0 +1,12 @@
+.constraints-bar { margin-bottom: 20px; border-left: 3px solid var(--neon-purple); }
+.bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.bar-title-group { display: flex; align-items: center; gap: 8px; }
+.bar-title { font-weight: 700; color: var(--neon-purple); font-size: 13px; }
+.bar-badge { font-size: 10px; background: rgba(160,100,255,0.15); color: var(--neon-purple); }
+.bar-count { font-size: 11px; color: var(--text-muted); }
+.bar-link { font-size: 11px; color: var(--neon-cyan); text-decoration: none; }
+.tag-list { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 10px; cursor: help; }
+.tag-required { background: rgba(0,255,100,0.08); border: 1px solid rgba(0,255,100,0.3); color: var(--neon-green); }
+.tag-optional { background: rgba(160,100,255,0.08); border: 1px solid rgba(160,100,255,0.2); color: var(--neon-purple); }
+.title-rule { margin-top: 8px; padding: 6px 10px; background: rgba(255,165,0,0.06); border-radius: 4px; border-left: 2px solid var(--neon-orange); font-size: 11px; color: var(--text-secondary); line-height: 1.5; }

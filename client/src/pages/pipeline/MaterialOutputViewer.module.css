@@ -1,0 +1,22 @@
+.section { margin-bottom: 10px; }
+.sectionTitle { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.sectionTitleGreen { color: var(--neon-green); }
+.sectionTitleBlue { color: var(--neon-blue); }
+.sectionTitleOrange { color: var(--neon-orange); }
+.sectionTitlePurple { color: var(--neon-purple); }
+
+.itemCard { padding: 6px 10px; border-left: 3px solid var(--neon-green); margin-bottom: 4px; font-size: 12px; line-height: 1.5; background: var(--bg-secondary); border-radius: 0 6px 6px 0; }
+.itemCardBlue { border-left-color: var(--neon-blue); }
+.itemCardOrange { border-left-color: var(--neon-orange); }
+
+.typeTag { color: var(--neon-purple); font-weight: 600; margin-right: 6px; }
+.itemName { font-weight: 600; }
+.itemReason { color: var(--text-muted); margin-left: 8px; }
+.itemContent { margin-top: 4px; font-size: 11px; color: var(--text-secondary); padding: 4px 8px; background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+.archiveLogBox { margin-bottom: 10px; padding: 10px 12px; background: rgba(255,165,0,0.06); border-radius: 8px; border: 1px solid rgba(255,165,0,0.15); }
+.archiveLogItem { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+
+.rawFallback { padding: 12px; }
+.summaryBox { padding: 8px 12px; background: var(--bg-secondary); border-radius: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 10px; }
+.mainContent { padding: 12px; }

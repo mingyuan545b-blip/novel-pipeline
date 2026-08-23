@@ -1,0 +1,90 @@
+/* ===== PowerPanel ===== */
+.power-system-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.power-system-title { margin: 0 0 12px; font-size: 14px; }
+.power-system-list { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.power-system-item {
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    border-left: 3px solid var(--neon-purple);
+    flex: 1 1 300px;
+    max-width: 500px;
+}
+
+.power-system-item-name { font-weight: 600; font-size: 13px; color: var(--neon-purple); }
+.power-system-item-desc { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+.power-compare-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.power-compare-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.power-compare-title { margin: 0; font-size: 14px; }
+.power-compare-modes { display: flex; gap: 6px; }
+.power-char-list { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.power-chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.power-chart-title { margin: 0 0 16px; font-size: 14px; }
+.power-chart-svg { background: rgba(0, 0, 0, 0.15); border-radius: 6px; }
+.power-chart-legend { display: flex; gap: 16px; margin-top: 8px; font-size: 11px; }
+.power-chart-legend-item { display: flex; align-items: center; gap: 4px; }
+.power-chart-legend-dot { width: 12px; height: 12px; border-radius: 2px; }
+
+.power-timeline-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.power-timeline-title { margin: 0 0 12px; font-size: 14px; }
+.power-timeline-list { display: flex; flex-direction: column; gap: 4px; }
+
+.power-timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+}
+
+.power-timeline-chapter { font-size: 11px; color: var(--text-secondary); min-width: 60px; }
+
+.power-timeline-bar-bg {
+    flex: 1;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    position: relative;
+}
+
+.power-timeline-bar-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border-radius: 2px;
+    background: var(--neon-blue);
+}
+
+.power-timeline-level { font-size: 12px; font-weight: 600; color: var(--neon-blue); }

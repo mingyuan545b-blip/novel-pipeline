@@ -1,4 +1,3 @@
-const e = window.Error;
 const origConsoleError = console.error;
 
 console.error = function (...args) {
@@ -32,14 +31,20 @@ window.addEventListener('unhandledrejection', function (event) {
 
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './services/queryClient';
 import './styles/variables.css';
 import './styles/components.css';
 import './styles/layout.css';
 import './styles/animations.css';
+import './styles/publish.css';
+import './styles/publish-panels.css';
 import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>,
+    <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </QueryClientProvider>,
 );

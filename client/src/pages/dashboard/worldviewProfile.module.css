@@ -1,0 +1,15 @@
+.profileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #333);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    background: var(--card-bg, rgba(0,0,0,0.2));
+}
+.profileInfo { flex: 1; min-width: 0; }
+.profileName { font-weight: 600; font-size: 14px; }
+.profileDesc { font-size: 12px; color: var(--text-muted, #888); margin-top: 2px; }
+.profileMeta { font-size: 11px; color: var(--text-muted, #666); margin-top: 4px; }
+.profileActions { display: flex; gap: 6px; flex-shrink: 0; margin-left: 12px; }

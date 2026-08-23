@@ -1,0 +1,131 @@
+/* ── Common shared elements ── */
+.loadingCenter {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.errorCenter {
+    text-align: center;
+    padding: 40px;
+    color: var(--neon-red);
+    font-size: 12px;
+}
+
+.warningBanner {
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.bannerRed {
+    background: rgba(255, 0, 60, 0.06);
+    border: 1px solid rgba(255, 0, 60, 0.2);
+    color: var(--neon-red);
+}
+
+.bannerBlue {
+    background: rgba(0, 150, 255, 0.06);
+    border: 1px solid rgba(0, 150, 255, 0.2);
+    color: var(--neon-blue);
+}
+
+.bannerOrange {
+    background: rgba(255, 165, 0, 0.06);
+    border: 1px solid rgba(255, 165, 0, 0.2);
+    color: var(--neon-orange);
+}
+
+.bannerCyan {
+    background: rgba(0, 240, 255, 0.06);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    color: var(--neon-cyan);
+}
+
+.listHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.listTitle {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btnAdd {
+    padding: 4px 12px;
+    border: 1px solid var(--neon-cyan);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--neon-cyan);
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.cardItem {
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.inputField {
+    font-size: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 8px;
+    color: var(--text-secondary);
+    resize: vertical;
+    outline: none;
+    line-height: 1.5;
+    font-family: inherit;
+}
+
+.inputFieldPrimary {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.inputId {
+    font-size: 10px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 2px 6px;
+    color: var(--text-muted);
+    width: 160px;
+    font-family: monospace;
+}
+
+.btnRemove {
+    padding: 4px 8px;
+    border: 1px solid rgba(255, 0, 60, 0.3);
+    border-radius: 4px;
+    background: rgba(255, 0, 60, 0.06);
+    color: var(--neon-red);
+    cursor: pointer;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.preBlock {
+    background: var(--bg-input);
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+    border: 1px solid var(--border-color);
+}
+
+.hidden { display: none; }

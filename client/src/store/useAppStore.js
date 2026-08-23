@@ -1,11 +1,32 @@
+/**
+ * Zustand 全局状态 Store
+ *
+ * 架构说明：
+ * - React Query 接管服务端数据（项目/章节/素材/Pipeline状态等）
+ * - Zustand 保留 UI 状态（theme/modals/sidebar/membership/bgImage）
+ * - 双写兼容期：React Query 获取数据后通过 getState().setXxx(data) 同步到 Zustand
+ *
+ * 存储的状态：
+ * - currentProject: 当前选中的项目对象
+ * - projects: 项目列表（双写，React Query 为主）
+ * - chapters: 章节列表（双写，React Query 为主）
+ * - materials: 素材列表（双写，React Query 为主）
+ * - theme: 主题皮肤（aurora/glass/liquid/mario/ripple）
+ * - bgImage/bgOpacity/bgBlur: 背景图片配置（localStorage 持久化）
+ * - membership: 会员状态
+ *
+ * 文件位置：client/src/store/useAppStore.js
+ * 依赖：zustand
+ */
 import { create } from 'zustand';
 
 const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('app-theme') || 'aurora' : 'aurora';
 const savedBgImage = typeof localStorage !== 'undefined' ? localStorage.getItem('app-bg-image') || '' : '';
 const savedBgOpacity = typeof localStorage !== 'undefined' ? parseFloat(localStorage.getItem('app-bg-opacity') || '1') : 1;
 const savedBgBlur = typeof localStorage !== 'undefined' ? parseInt(localStorage.getItem('app-bg-blur') || '0') : 0;
+const _savedProjectId = typeof localStorage !== 'undefined' ? localStorage.getItem('app-current-project-id') || '' : '';
 
-const useAppStore = create((set, get) => ({
+const useAppStore = create((set, _get) => ({
     currentProject: null,
     projects: [],
     chapters: [],
@@ -44,7 +65,14 @@ const useAppStore = create((set, get) => ({
     membership: { level: 'free', licensed: false },
     updateInfo: null,
 
-    setCurrentProject: (project) => set({ currentProject: project }),
+    setCurrentProject: (project) => {
+        if (project?.id) {
+            localStorage.setItem('app-current-project-id', project.id);
+        } else {
+            localStorage.removeItem('app-current-project-id');
+        }
+        set({ currentProject: project });
+    },
     setProjects: (projects) => set({ projects }),
     setChapters: (chapters) => set({ chapters }),
     setMaterials: (materials) => set({ materials }),

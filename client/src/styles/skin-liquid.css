@@ -14,6 +14,7 @@
     --neon-orange: #ffb464;
     --neon-red: #ff6464;
     --neon-yellow: #ffe464;
+    --neon-cyan: #64e0d0;
     --gradient-primary: linear-gradient(135deg, #64b4ff, #b478ff, #ff7eb3);
     --gradient-secondary: linear-gradient(135deg, #b478ff, #64b4ff);
     --gradient-accent: linear-gradient(135deg, #ff7eb3, #ff6464);

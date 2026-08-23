@@ -1,0 +1,10 @@
+.output-section { margin-top: 20px; }
+.empty-output { color: var(--text-muted); text-align: center; padding: 40px; }
+.markdown-wrap { padding: 12px; font-size: 14px; line-height: 1.8; }
+.output-card { max-height: 500px; overflow: auto; }
+.version-banner { padding: 6px 10px; background: rgba(255,165,2,0.1); border-bottom: 1px solid var(--border-color); font-size: 11px; color: #ffa502; }
+.tab-active-color { /* applied via inline style for dynamic color */ }
+.tab-indicator { margin-left: 6px; font-size: 10px; opacity: 0.7; }
+.agent-name { font-weight: 600; }
+.agent-path { font-size: 11px; font-family: var(--font-mono); color: var(--text-muted); }
+.agent-name-default { color: var(--neon-purple); }

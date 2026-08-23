@@ -1,0 +1,16 @@
+.intent-panel { margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; }
+.intent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.intent-title { font-weight: 700; color: var(--neon-green); }
+.intent-close { font-size: 10px; }
+.intent-body { font-size: 11px; }
+.intent-field { margin-bottom: 6px; }
+.intent-field-label { font-weight: 600; }
+.color-blue { color: var(--neon-blue); }
+.color-green { color: var(--neon-green); }
+.color-red { color: var(--neon-red); }
+.color-gold { color: #ffd700; }
+.color-orange { color: var(--neon-orange); }
+.color-purple { color: var(--neon-purple); }
+.color-cyan { color: #00d2d3; }
+.color-pink { color: #ff6b6b; }
+.color-lavender { color: #a29bfe; }

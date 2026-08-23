@@ -1,0 +1,280 @@
+/* WorldScopeTab 样式 — 与chronicle.css风格统一 */
+
+/* ── 引导卡片 ── */
+.ws-guide-card {
+    border-left: 3px solid var(--neon-blue);
+    text-align: center;
+    padding: 24px;
+}
+.ws-guide-icon { font-size: 28px; margin-bottom: 8px; }
+.ws-guide-title { color: var(--text-primary); font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+.ws-guide-desc { color: var(--text-muted); font-size: 12px; margin-bottom: 16px; line-height: 1.6; }
+.ws-guide-btns { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.ws-guide-btn { font-size: 11px; padding: 4px 12px; }
+.ws-guide-btn-active { opacity: 1; }
+.ws-guide-btn-inactive { opacity: 0.7; }
+.ws-guide-current { color: var(--text-muted); font-size: 10px; margin-top: 8px; }
+
+/* ── 容器 ── */
+.ws-container { display: flex; flex-direction: column; gap: 14px; }
+.ws-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.ws-header-title { color: var(--neon-blue); font-weight: 700; font-size: 16px; }
+.ws-header-sub { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 8px; }
+.ws-header-btns { display: flex; gap: 6px; align-items: center; }
+.ws-header-btn { font-size: 12px; padding: 4px 10px; }
+
+/* ── 世界卡片网格 ── */
+.ws-worlds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.ws-world-card {
+    border-radius: 8px;
+    padding: 14px;
+    background: var(--bg-secondary);
+    border-left: 3px solid var(--neon-blue);
+}
+.ws-world-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.ws-world-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.ws-world-name { font-weight: 600; font-size: 15px; }
+.ws-badge-default {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0, 200, 255, 0.1);
+    color: var(--neon-cyan);
+    flex-shrink: 0;
+}
+.ws-world-stats { display: flex; gap: 12px; margin-bottom: 10px; }
+.ws-stat-resident { color: var(--neon-cyan); font-size: 12px; }
+.ws-stat-visitor { color: var(--neon-orange); font-size: 12px; }
+
+/* ── 实体列表 ── */
+.ws-entity-list { display: flex; flex-direction: column; gap: 5px; }
+.ws-entity-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 13px;
+}
+.ws-entity-icon { font-size: 13px; flex-shrink: 0; }
+.ws-entity-name { color: var(--text-primary); font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-entity-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+.ws-badge-resident { background: rgba(0, 200, 255, 0.1); color: var(--neon-cyan); }
+.ws-badge-visitor { background: rgba(255, 159, 67, 0.1); color: var(--neon-orange); }
+
+/* ── 添加世界 ── */
+.ws-add-world {
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: border-color 0.15s, color 0.15s;
+}
+.ws-add-world:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+.ws-add-form {
+    border: 1px solid rgba(0, 200, 255, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    background: rgba(0, 200, 255, 0.03);
+}
+.ws-add-form-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.ws-add-input {
+    flex: 1;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 12px;
+    padding: 4px 8px;
+    outline: none;
+}
+.ws-add-input:focus { border-color: var(--neon-blue); }
+.ws-add-color { width: 40px; padding: 2px; flex: none; }
+.ws-add-form-btns { display: flex; gap: 6px; }
+
+/* ── 穿越事件时间线 ── */
+.ws-section { margin-top: 12px; }
+.ws-section-title { color: var(--neon-blue); font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+.ws-title-danger { color: #ff5050; }
+.ws-timeline { display: flex; flex-direction: column; gap: 4px; }
+.ws-timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+.ws-timeline-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--neon-blue);
+    flex-shrink: 0;
+    box-shadow: 0 0 4px rgba(0, 200, 255, 0.4);
+}
+.ws-timeline-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    flex-wrap: wrap;
+}
+.ws-timeline-char { color: var(--text-primary); font-weight: 500; }
+.ws-timeline-arrow { color: var(--neon-blue); }
+.ws-timeline-to { color: var(--neon-orange); font-weight: 500; }
+.ws-timeline-from { color: var(--text-muted); font-size: 11px; }
+.ws-timeline-ch { color: var(--text-muted); font-size: 10px; margin-left: auto; }
+
+/* ── 串台警告 ── */
+.ws-violations { display: flex; flex-direction: column; gap: 4px; }
+.ws-violation-item {
+    background: rgba(255, 80, 80, 0.06);
+    border-left: 2px solid #ff5050;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.ws-violation-entity { color: var(--text-primary); font-weight: 500; }
+.ws-violation-arrow { color: var(--neon-cyan); font-size: 11px; }
+.ws-violation-appear { color: #ff5050; font-size: 11px; }
+.ws-violation-desc { color: var(--text-muted); font-size: 11px; }
+
+/* ── 通用 ── */
+.ws-loading { color: var(--text-muted); text-align: center; padding: 20px; }
+.ws-error {
+    color: #ff5050;
+    text-align: center;
+    padding: 16px;
+    background: rgba(255, 80, 80, 0.06);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+/* ── 世界属性区域(武力体系/文化/科技/规则等) ── */
+.ws-world-attrs {
+    margin: 8px 0 10px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
+    border-left: 2px solid rgba(0, 200, 255, 0.35);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.ws-world-attr-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+.ws-world-attr-label {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    width: 64px;
+    font-weight: 500;
+}
+.ws-world-attr-value {
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+/* ── 武力体系标签(多选) ── */
+.ws-power-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+.ws-power-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    background: rgba(0, 200, 255, 0.12);
+    color: var(--neon-cyan);
+    border: 1px solid rgba(0, 200, 255, 0.25);
+    white-space: nowrap;
+}
+
+/* ── 世界类型徽章(副本/秘境/梦境等) ── */
+.ws-badge-type {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(162, 155, 254, 0.12);
+    color: #a29bfe;
+    border: 1px solid rgba(162, 155, 254, 0.25);
+    flex-shrink: 0;
+}
+
+/* ── 势力面板(按世界分组展示) ── */
+.ws-factions-section { margin-top: 14px; }
+.ws-factions-group {
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 6px;
+}
+.ws-factions-group-title {
+    color: var(--neon-cyan);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ws-faction-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    margin: 3px 0;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    font-size: 13px;
+    flex-wrap: wrap;
+}
+.ws-faction-name { color: var(--text-primary); font-weight: 500; }
+.ws-faction-type {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    background: rgba(0, 200, 255, 0.1);
+    color: var(--neon-cyan);
+}
+.ws-faction-status {
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 3px;
+}
+.ws-faction-status-active { background: rgba(0, 200, 255, 0.12); color: var(--neon-cyan); }
+.ws-faction-status-declining { background: rgba(255, 159, 67, 0.12); color: var(--neon-orange); }
+.ws-faction-status-destroyed { background: rgba(255, 80, 80, 0.12); color: #ff5050; }
+.ws-faction-status-hidden { background: rgba(162, 155, 254, 0.12); color: #a29bfe; }
+.ws-faction-status-emerging { background: rgba(0, 255, 150, 0.12); color: #00ff96; }
+.ws-faction-leader { color: var(--text-muted); font-size: 12px; }
+.ws-faction-desc { color: var(--text-muted); font-size: 12px; flex-basis: 100%; margin-top: 3px; }

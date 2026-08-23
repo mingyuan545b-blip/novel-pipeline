@@ -1,0 +1,58 @@
+/* 角色详情重构样式 */
+
+/* 通用分区标题 */
+.ec-section-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; margin: 0 0 10px 0; }
+.ec-count-badge { font-size: 11px; font-weight: 400; color: var(--text-muted, #888); font-variant-numeric: tabular-nums; }
+
+/* 角色头部 */
+.ec-char-header { display: flex; align-items: center; gap: 14px; padding: 16px; background: linear-gradient(135deg, rgba(0,200,255,0.04), rgba(162,155,254,0.04)); border-radius: 12px; border-left: 3px solid var(--neon-cyan); }
+.ec-char-header-info { flex: 1; min-width: 0; }
+.ec-char-name { font-size: 18px; font-weight: 700; margin: 0 0 6px 0; color: var(--text-primary, #e0e0e0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ec-char-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.ec-char-time { display: flex; gap: 12px; margin-top: 2px; }
+
+/* 人设特征 */
+.ec-traits-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.ec-trait-tag { display: flex; flex-direction: column; background: var(--bg-secondary, rgba(255,255,255,0.05)); border-radius: 8px; padding: 8px 12px; min-width: 120px; border-left: 2px solid var(--tag-accent, var(--neon-cyan)); }
+.ec-trait-label { font-size: 10px; color: var(--text-muted, #888); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+.ec-trait-value { font-size: 13px; color: var(--text-primary, #e0e0e0); font-weight: 500; line-height: 1.4; }
+
+/* 角色档案 */
+.ec-profile-section { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.ec-profile-item { display: flex; gap: 8px; font-size: 12px; line-height: 1.5; }
+.ec-profile-label { color: var(--text-muted, #888); min-width: 48px; flex-shrink: 0; }
+.ec-profile-value { color: var(--text-secondary, #aaa); }
+
+/* 金句库 */
+.ec-quote-section { margin-top: 10px; padding: 8px 10px; background: var(--bg-secondary, rgba(255,255,255,0.03)); border-radius: 6px; border-left: 2px solid var(--neon-cyan); }
+.ec-quote-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.ec-quote-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.ec-quote-item { font-size: 12px; line-height: 1.5; color: var(--text-secondary, #aaa); }
+.ec-quote-scene { color: var(--neon-cyan); font-weight: 500; margin-right: 4px; }
+.ec-quote-text { color: var(--text-primary, #e0e0e0); }
+
+/* 素材原文折叠 */
+.ec-source-details { margin-top: 8px; }
+.ec-source-summary { cursor: pointer; font-size: 11px; color: var(--neon-cyan); padding: 4px 0; user-select: none; }
+.ec-source-summary:hover { color: var(--neon-blue); }
+.ec-source-content { font-size: 12px; color: var(--text-secondary, #aaa); white-space: pre-wrap; line-height: 1.6; max-height: 300px; overflow-y: auto; padding: 8px; background: var(--bg-secondary, rgba(255,255,255,0.03)); border-radius: 6px; margin-top: 6px; }
+
+/* 行为约束来源提示 */
+.ec-behavior-source-hint { font-size: 10px; color: var(--text-muted, #888); padding: 4px 8px; background: rgba(0, 255, 150, 0.04); border-radius: 4px; margin-bottom: 8px; line-height: 1.5; }
+
+/* 题材状态 */
+.ec-state-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.ec-state-tag { display: flex; flex-direction: column; background: var(--bg-secondary, rgba(255,255,255,0.05)); border-radius: 8px; padding: 8px 12px; min-width: 100px; border-left: 2px solid var(--neon-cyan); }
+.ec-state-label { font-size: 10px; color: var(--text-muted, #888); margin-bottom: 3px; }
+.ec-state-value { font-size: 13px; color: var(--neon-cyan); font-weight: 500; }
+
+/* 约束配置面板统计 */
+.ec-constraints-summary { display: flex; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+.ec-constraint-stat { display: flex; flex-direction: column; align-items: center; padding: 8px 16px; background: var(--bg-secondary, rgba(255,255,255,0.05)); border-radius: 8px; min-width: 80px; }
+.ec-constraint-stat-value { font-size: 14px; font-weight: 600; color: var(--neon-cyan); }
+.ec-constraint-stat-label { font-size: 10px; color: var(--text-muted, #888); margin-top: 2px; }
+.ec-constraint-section-title { font-size: 12px; font-weight: 600; color: var(--text-primary, #e0e0e0); margin-bottom: 4px; }
+.ec-constraint-review-focus { font-size: 12px; color: var(--text-secondary, #aaa); padding: 6px 10px; background: rgba(0, 255, 150, 0.04); border-radius: 4px; line-height: 1.5; }
+
+/* 绿色badge */
+.ec-badge-green { background: rgba(0, 255, 150, 0.1); color: var(--neon-green); border: 1px solid rgba(0, 255, 150, 0.3); }
