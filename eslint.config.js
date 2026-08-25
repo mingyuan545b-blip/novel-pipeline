@@ -115,7 +115,7 @@ module.exports = [
         }
     },
     {
-        files: ['server/scripts/**/*.js', 'server/__tests__/**/*.js', 'tests/**/*.js'],
+        files: ['server/scripts/**/*.js', 'server/__tests__/**/*.js', 'server/tests/**/*.js', 'tests/**/*.js'],
         rules: {
             'max-lines': 'off',
             'max-lines-per-function': 'off',
