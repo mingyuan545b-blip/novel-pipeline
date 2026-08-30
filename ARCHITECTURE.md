@@ -28,15 +28,27 @@ Novel-Pipeline 是一个AI驱动的长篇小说自动化创作系统，目标支
 
 **后端.env关键变量**：
 ```
-LLM_PROVIDER=aliyunCoding          # 默认LLM供应商
+LLM_PROVIDER=lmstudio              # 全局回退供应商（步骤级路由见下方说明）
 ALIYUN_CODING_API_KEY=sk-xxx       # 阿里云API密钥
 ALIYUN_CODING_MODEL=qwen3.6-plus   # 阿里云模型
 DEEPSEEK_API_KEY=sk-xxx            # DeepSeek API密钥
 DEEPSEEK_BASE_URL=https://xxx/v1   # DeepSeek API地址
 DEEPSEEK_MODEL=deepseek-v4-pro     # DeepSeek模型
+LMSTUDIO_API_KEY=lm-studio         # LM Studio本地：占位密钥（必须非空）
+LMSTUDIO_BASE_URL=http://192.168.1.102:1234/v1  # 本地推理服务地址（/v1结尾）
+LMSTUDIO_MODEL=qwen3.8-27b         # LM Studio中加载的模型ID
 REQUEST_SECRET=novel-pipeline-2024-secure  # 认证密钥
 PORT=3001                          # 后端端口
 ```
+
+**LLM步骤路由规则**（`server/config/providerDefs.js` 的 `DEFAULT_STEP_ASSIGNMENTS`）：
+1. 项目级 `agentModelConfig`（每步指定 keyId/provider）优先
+2. 步骤分配表按键顺序匹配：`lmstudio` 在前 → 配置了 `LMSTUDIO_API_KEY` 时全部11个步骤走本地模型；未配置自动回落 `aliyunCoding` 云端
+3. 都没有才用 `LLM_PROVIDER` 全局回退
+
+**本地思考模型治理**：llama.cpp系服务（LM Studio）不认API层 `enable_thinking` 参数，
+思考会吃光 `max_tokens` 导致正文为空。对策：provider声明 `noThinkMarker`（lmstudio为 ` /no_think`），
+`llmRequestBuilder.buildRequestPayload` 统一在末条user消息追加。详见陷阱#94。
 
 **前端.env关键变量**：
 ```

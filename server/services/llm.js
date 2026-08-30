@@ -8,6 +8,7 @@ const { normalizeMessageContent } = require('./llmResponseParser');
 const { waitForRetry } = require('./llmRetryUtils');
 const { buildRequestPayload, buildRequestHeaders, classifyAndHandleError } = require('./llmRequestBuilder');
 const llmMetrics = require('./llmMetrics');
+const { LLM_DEFAULTS } = require('../config/systemConfig');
 
 function getProviders() {
     return providerRegistry.getProviderList();
@@ -46,7 +47,9 @@ async function chat(messages, options = {}) {
         if (externalSignal.aborted) throw new Error('LLM request aborted before start');
         externalSignal.addEventListener('abort', () => abortController.abort(), { once: true });
     }
-    const timeoutId = setTimeout(() => abortController.abort(), options.timeout || 600000);
+    // 超时优先级：调用方显式指定 > 供应商级覆盖（本地慢速模型放宽）> 全局默认
+    const providerTimeout = providerRegistry.PROVIDERS?.[config.provider]?.requestTimeoutMs;
+    const timeoutId = setTimeout(() => abortController.abort(), options.timeout || providerTimeout || LLM_DEFAULTS?.REQUEST_TIMEOUT_MS || 600000);
     if (externalSignal?.aborted) { clearTimeout(timeoutId); throw new Error('LLM request aborted before start'); }
 
     const payload = buildRequestPayload(config, messages, options);

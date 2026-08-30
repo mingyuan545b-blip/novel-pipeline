@@ -92,7 +92,9 @@ const DEBUG_FALLBACK = {
 const LLM_DEFAULTS = {
     DEFAULT_TEMPERATURE: 0.7, MAX_TOKENS_CHAPTER: 8192, MAX_TOKENS_OUTLINE: 4096,
     MAX_TOKENS_REVIEW: 4096, WORKSHOP_RETRY_DELAY_MS: 5000,
-    RATE_LIMIT_RPS: 5, RATE_LIMIT_BURST: 10, ENABLE_THINKING: false
+    RATE_LIMIT_RPS: 5, RATE_LIMIT_BURST: 10, ENABLE_THINKING: false,
+    // 单次请求默认超时（云端供应商）；本地慢速模型在providerDefs按供应商覆盖
+    REQUEST_TIMEOUT_MS: 600000
 };
 
 const PROVIDER_DEFAULTS = {
@@ -157,6 +159,7 @@ const CONTEXT_BUDGET_MODELS = {
     'qwen-max': { maxContext: 32768, reservedOutput: 4096, safeInput: 28672 },
     'deepseek-chat': { maxContext: 65536, reservedOutput: 4096, safeInput: 61440 },
     'deepseek-reasoner': { maxContext: 65536, reservedOutput: 8192, safeInput: 57344 },
+    'qwen3.8-27b': { maxContext: 262144, reservedOutput: 16384, safeInput: 245760 },
     'glm-4': { maxContext: 131072, reservedOutput: 4096, safeInput: 126976 },
     'default': { maxContext: 32768, reservedOutput: 4096, safeInput: 28672 }
 };

@@ -33,7 +33,8 @@ jest.mock('../../server/config/providerRegistry', () => ({
 }));
 jest.mock('../../server/config/modelResolver', () => ({ DEFAULT_MODEL: 'default-model' }));
 jest.mock('../../server/config/systemConfig', () => ({
-    PROVIDER_DEFAULTS: { DEFAULT_PROVIDER: 'aliyunCoding', ALIYUN_CODING_BASE_URL: 'https://a.test', SILICONFLOW_BASE_URL: 'https://s.test', DEEPSEEK_BASE_URL: 'https://d.test' }
+    PROVIDER_DEFAULTS: { DEFAULT_PROVIDER: 'aliyunCoding', ALIYUN_CODING_BASE_URL: 'https://a.test', SILICONFLOW_BASE_URL: 'https://s.test', DEEPSEEK_BASE_URL: 'https://d.test' },
+    LLM_DEFAULTS: { REQUEST_TIMEOUT_MS: 600000 }
 }));
 
 const axios = require('axios');

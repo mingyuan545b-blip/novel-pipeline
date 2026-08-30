@@ -44,7 +44,7 @@ describe('llmConfig + providerRegistry (S3)', () => {
         mockStore.clear();
         // 清理 env
         for (const k of Object.keys(process.env)) {
-            if (k.startsWith('LLM_') || k.startsWith('ALIYUN_') || k.startsWith('DEEPSEEK_') || k.startsWith('SILICONFLOW_') || k.startsWith('ZHIPU_') || k.startsWith('MOONSHOT_') || k === 'ENCRYPTION_SECRET') {
+            if (k.startsWith('LLM_') || k.startsWith('ALIYUN_') || k.startsWith('DEEPSEEK_') || k.startsWith('SILICONFLOW_') || k.startsWith('ZHIPU_') || k.startsWith('MOONSHOT_') || k.startsWith('LMSTUDIO_') || k === 'ENCRYPTION_SECRET') {
                 delete process.env[k];
             }
         }
@@ -94,13 +94,24 @@ describe('llmConfig + providerRegistry (S3)', () => {
     });
 
     describe('PROVIDERS 常量', () => {
-        test('包含 aliyunCoding/deepseek/siliconflow/zhipu/moonshot/custom', () => {
+        test('包含 aliyunCoding/deepseek/siliconflow/zhipu/moonshot/lmstudio/custom', () => {
             expect(PROVIDERS.aliyunCoding).toBeDefined();
             expect(PROVIDERS.deepseek).toBeDefined();
             expect(PROVIDERS.siliconflow).toBeDefined();
             expect(PROVIDERS.zhipu).toBeDefined();
             expect(PROVIDERS.moonshot).toBeDefined();
+            expect(PROVIDERS.lmstudio).toBeDefined();
             expect(PROVIDERS.custom).toBeDefined();
+        });
+
+        test('lmstudio 声明 noThinkMarker/noThinkSystemDirective/requestTimeoutMs 与环境变量三件套（本地思考模型治理）', () => {
+            expect(PROVIDERS.lmstudio.noThinkMarker).toBe(' /no_think');
+            expect(PROVIDERS.lmstudio.noThinkSystemDirective).toContain('禁止输出任何思考过程');
+            expect(PROVIDERS.lmstudio.requestTimeoutMs).toBe(1800000);
+            expect(PROVIDERS.lmstudio.envKey).toBe('LMSTUDIO_API_KEY');
+            expect(PROVIDERS.lmstudio.envModel).toBe('LMSTUDIO_MODEL');
+            expect(PROVIDERS.lmstudio.envBaseURL).toBe('LMSTUDIO_BASE_URL');
+            expect(PROVIDERS.lmstudio.aliases).toContain('lm-studio');
         });
 
         test('aliyunCoding 有 aliases', () => {
@@ -271,6 +282,23 @@ describe('llmConfig + providerRegistry (S3)', () => {
             const cfg = await providerRegistry.resolveStepConfig('writer', null);
             expect(cfg.provider).toBe('aliyunCoding');
             expect(cfg.apiKey).toBe('aliyun-env-key');
+        });
+
+        test('DEFAULT_STEP_ASSIGNMENTS 路径：LMSTUDIO key 存在时优先本地（顺序在云端前）', async () => {
+            process.env.LMSTUDIO_API_KEY = 'lm-studio';
+            process.env.LMSTUDIO_BASE_URL = 'http://127.0.0.1:1234/v1';
+            process.env.LMSTUDIO_MODEL = 'qwen3.8-27b';
+            process.env.ALIYUN_CODING_API_KEY = 'aliyun-env-key';
+            const cfg = await providerRegistry.resolveStepConfig('writer', null);
+            expect(cfg.provider).toBe('lmstudio');
+            expect(cfg.baseURL).toBe('http://127.0.0.1:1234/v1');
+            expect(cfg.model).toBe('qwen3.8-27b');
+        });
+
+        test('DEFAULT_STEP_ASSIGNMENTS 路径：LMSTUDIO key 缺失时回落云端', async () => {
+            process.env.ALIYUN_CODING_API_KEY = 'aliyun-env-key';
+            const cfg = await providerRegistry.resolveStepConfig('first-review', null);
+            expect(cfg.provider).toBe('aliyunCoding');
         });
 
         test('LLM_PROVIDER 全局回退路径', async () => {

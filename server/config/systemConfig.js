@@ -12,6 +12,7 @@ function getAgentConfig(agentType) {
 
 function resolveModelBudget(model) {
     const ml = model ? model.toLowerCase() : '';
+    if (ml.includes('qwen3.8')) return 262144;
     if (ml.includes('qwen3-30b-a3b')) return 512000;
     if (ml.includes('qwen3.6-35b-a3b') || ml.includes('qwen3.6-35b')) return 256000;
     if (ml.includes('qwen3.6-plus')) return 800000;

@@ -1,18 +1,32 @@
 # SESSION-STATE — 跨窗口接手状态卡
 
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
+> 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-08-23
+> 最后更新：2026-08-27
 
 ---
 
 ## 一、当前结论（重要）
 
-1. **项目骨架健康，不需要大重构**：3496/3496 单测通过、213/213套件、eslint 0错误、前端6秒构建。问题都是"漂移型"（测试/文档与代码失同步、仓库卫生），做纠偏即可。
-2. **文档记录不完全可信**：此前由降智模型编写，陷阱清单等需以代码和测试实测为准（本会话已发现并修复9处记录与代码矛盾）。
-3. **铁律系统已重建**（2026-08-23）：规则唯一定义源 `scripts/lib/ironLawRules.js`；场景化 block/warn/skip 处置；`node scripts/audit-iron-law.js --self-check` 做互斥自检。改规则必须先过自检。
+1. **项目骨架健康（2026-08-27复验）**：单测 205套件/3444用例全绿、铁律自检无互斥、硬编码0、级联0、服务3001健康、PG正常（7项目/82章）。问题都是"漂移型"，做纠偏即可。
+2. **LM Studio本地模型已接入（2026-08-27）**：`qwen3.8-27b`（256K上下文，unsloth Q8_K_XL）@ `http://192.168.1.102:1234/v1` 全流程可用。路由：配置了 `LMSTUDIO_API_KEY` 时11个步骤全部走本地，删key自动回落阿里云。**本地模型是思考模型且API层关不掉思考**，靠 `noThinkMarker`（` /no_think`）在请求构建层统一治理（陷阱#94）。生成速度约6 tok/s，单章预计20-40分钟，属硬件现状。
+3. **uncensored-MTP变体加载崩溃**：`qwen3.8-27b-uncensored-hauhaucs-aggressive-mtp` 在LM Studio加载即崩（exitCode=0xC0000409），疑似显存同驻冲突或MTP构建问题；当前验证与生产均用标准版。
+4. **文档记录不完全可信**：此前由降智模型编写，陷阱清单等需以代码和测试实测为准。
+5. **文档体系已治理（2026-08-27）**：新增防失忆协议 `docs/sop/10-上下文交接规范.md`（三层记忆架构：交接卡/工作日志/长期知识）；CLAUDE.md与AGENTS.md接手指引已对齐；任务级工作日志在 `docs/worklog/`。
+6. **铁律系统**（2026-08-23）：规则唯一定义源 `scripts/lib/ironLawRules.js`；场景化 block/warn/skip 处置；`node scripts/audit-iron-law.js --self-check` 做互斥自检。改规则必须先过自检。
 
-## 二、本会话已完成（git log 2026-08-23，全部过五关pre-commit门禁）
+## 二、已完成（全部过五关pre-commit门禁）
+
+### 2026-08-27（本会话）
+
+| 提交 | 内容 |
+|---|---|
+| （本次） | 文档治理：sop/10防失忆规范+INDEX+AGENTS/CLAUDE对齐+ARCHITECTURE环境节+陷阱#94 |
+| （本次） | LM Studio接入：providerDefs新增lmstudio+步骤分配本地优先、llmRequestBuilder注入/no_think、context budget补qwen3.8-27b(262144)、.env切换、单测+8全绿 |
+| （本次） | 真实小说端到端验证：项目"守灵人"3章完整流水线（详见 docs/worklog/2026-08-27-lmstudio接入与文档治理.md） |
+
+### 2026-08-23
 
 | 提交 | 内容 |
 |---|---|
@@ -20,6 +34,8 @@
 | fe5b3e4~20a0266 | 悬空重构代码分4组落库（文档/后端/前端/基建） |
 | 3d4ec9d | 铁律系统重建：共享规则+场景分支+互斥自检+钩子统一(.githooks) |
 | 2abb66f | 4个超200行文件拆分（零行为变更）+ 过期题材测试修复 |
+| baf3b66 | 2个超100行函数拆分（orchestratorStepLoop/agentPromptAssembler）+ eslint测试目录豁免修复 |
+| 05ff55b | SESSION-STATE交接卡机制建立 |
 | 66fef17 | modelBakeoff.js 模型对比评测脚本 |
 | b86d84b | UI大面积加载失败修复：全局限流200→1200/分（123处429根因）+ settings页8处裸fetch改鉴权api（401根因） |
 | 5f6af62 | 桌面启动/停止按钮（launcher/，桌面有副本） |
@@ -28,18 +44,21 @@
 
 - 后端3001：`npm start`（scripts/serverStart.js），PostgreSQL(USE_PG=true)，健康
 - 前端5173：`cd client && npm run dev`，Vite+React19
+- **LLM：lmstudio/qwen3.8-27b（.env的LMSTUDIO_*）**；阿里云key保留作回落（删LMSTUDIO_API_KEY即回云端）
+- 端到端验证项目：`守灵人_本地模型验证`（projectId见工作日志恢复锚点），验证 `node scripts/verifyNewProject.js <projectId>`
 - 桌面按钮：`小说流水线-启动.bat` / `小说流水线-停止.bat`（一键起停+开浏览器）
 - UI巡检：`node scripts/uiBugCheck.js`（Playwright，22页，报告在output/ui-bugcheck/）
 - 已知非bug：/comic/config 报 503 "ComfyUI not running" = 外部服务未装的预期提示
+- 已知未修：health-check 2项失败（CORS配置、jsonStore写后验证）= 下方P1，非新问题
 
 ## 四、待办（按优先级）
 
 ### 🔴 需用户本人操作
 - [ ] **轮换5个进过git历史的密钥**：阿里云key、DeepSeek key、REQUEST_SECRET、ENCRYPTION_SECRET、DB密码（历史提交7a79780之前含明文，未来push远端前建议 git filter-repo 清理）
+- [ ] LM Studio中试加载uncensored-MTP版（先卸载标准版腾显存，崩溃码0xC0000409待复现定位）；或接受标准版
 - [ ] 决定 modelBakeoff 候选模型名单并授权消耗少量API额度
 
 ### 🟠 P1 质量与CI
-- [ ] 2个超100行函数拆分：orchestratorStepLoop.js executeStepLoop(106行)、agentPromptAssembler.js assembleAgentPrompt(115行) —— CI `--max-warnings=0` 因此红
 - [ ] 5文件覆盖率阈值：genreConfig/healthCheckers/healthMonitor/materials路由/initializeRoutes
 - [ ] 健康检查2硬失败：CORS配置、jsonStore写后验证（原子写）
 - [ ] 53个核心路由缺输入验证（express-validator已是依赖）
@@ -65,6 +84,7 @@ npm run ci:check           # CI全量
 node scripts/audit-iron-law.js --self-check   # 铁律互斥自检（改规则前后必跑）
 node scripts/audit-iron-law.js --pre-deliver  # 交付前扫描(含新文件)
 node scripts/uiBugCheck.js                    # 前端22页巡检
+node scripts/tmp_verify_lmstudio.js           # LM Studio路由+连通验证（不回显密钥）
 node scripts/modelBakeoff.js --models A,B --dry-run  # 模型对比(先dry-run)
 npm start / npm stop       # 后端起停
 ```
@@ -74,3 +94,4 @@ npm start / npm stop       # 后端起停
 - 删除文件/改全局配置/改安装前先征得确认；只读检查可直接做
 - 用户已授权按本文件计划推进修复，但破坏性git操作（history rewrite）仍需单独确认
 - 回答用中文；改动后跑对应测试验证再提交；提交走pre-commit五关门禁
+- **长任务必须建工作日志**（docs/worklog/），上下文压缩前先落盘（见 sop/10）
