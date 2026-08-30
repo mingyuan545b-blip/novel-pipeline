@@ -109,8 +109,10 @@ const AGENT_DEFAULTS = {
     'outline-generator': { maxTokens: 4096, defaultTemperature: 0.7 },
     'writer': { maxTokens: 32768, defaultTemperature: 0.8 },
     'first-review': { maxTokens: 8192, defaultTemperature: 0.3 },
-    'fast-review': { maxTokens: 2048, defaultTemperature: 0.3 },
-    'second-review': { maxTokens: 4096, defaultTemperature: 0.3 },
+    // 审核步预算为上限请求值；本地思考模型会用部分预算做reasoning（陷阱#94），
+    // 上调防止思考吃光预算导致正文为空（云端模型按实际生成量计费，不受影响）
+    'fast-review': { maxTokens: 4096, defaultTemperature: 0.3 },
+    'second-review': { maxTokens: 8192, defaultTemperature: 0.3 },
     'final-editor': { maxTokens: 8192, defaultTemperature: 0.5 },
     'polisher': { maxTokens: 8192, defaultTemperature: 0.6 },
     'material-manager': { maxTokens: 4096, defaultTemperature: 0.3 },

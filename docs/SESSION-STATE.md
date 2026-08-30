@@ -22,9 +22,8 @@
 
 | 提交 | 内容 |
 |---|---|
-| （本次） | 文档治理：sop/10防失忆规范+INDEX+AGENTS/CLAUDE对齐+ARCHITECTURE环境节+陷阱#94 |
-| （本次） | LM Studio接入：providerDefs新增lmstudio+步骤分配本地优先、llmRequestBuilder注入/no_think、context budget补qwen3.8-27b(262144)、.env切换、单测+8全绿 |
-| （本次） | 真实小说端到端验证：项目"守灵人"3章完整流水线（详见 docs/worklog/2026-08-27-lmstudio接入与文档治理.md） |
+| b8f008a | LM Studio接入+思考治理+文档治理（19文件）：lmstudio provider本地优先、/no_think+系统级输出纪律双保险、消除writer模板与output-novel模块矛盾输出指令（思考爆炸根因）、超时配置化(供应商级30min)、错误捕获增强、context budget补256K、sop/10防失忆规范、AGENTS/CLAUDE对齐、worklog机制、单测+13全绿(3444) |
+| （进行中） | 真实小说端到端验证：项目"守灵人"(f91ea3b0)。run1/run2已证伪旧代码(600s超时、思考8184tokens吃光预算)，run3跑修复后代码（进度详见 docs/worklog/2026-08-27-lmstudio接入与文档治理.md） |
 
 ### 2026-08-23
 
