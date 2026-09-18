@@ -63,4 +63,13 @@ function mergeMaterialContent(existingContent, incomingContent) {
     return result;
 }
 
-module.exports = { mergeMaterialContent, parseSections };
+/**
+ * 以"更丰富的基线"合并：initialContent 是人设基座，currentContent 是章节演进的累积。
+ * 取更长的作为基线，避免任一方被短内容冲掉（陷阱清单 P0：素材深度字段被覆盖）。
+ */
+function mergeWithBaseline(initialContent, currentContent, incoming) {
+    const base = (initialContent || '').length > (currentContent || '').length ? initialContent : currentContent;
+    return mergeMaterialContent(base, incoming);
+}
+
+module.exports = { mergeMaterialContent, mergeWithBaseline, parseSections };

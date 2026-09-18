@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const { mergeWithBaseline } = require('./materialContentMerger');
 const logger = require('../../../shared/logger');
 const store = require('../../../store');
 const { validateNewMaterial } = require('../../genreConfig');

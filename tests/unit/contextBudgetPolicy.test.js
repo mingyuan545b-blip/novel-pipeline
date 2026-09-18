@@ -281,3 +281,21 @@ describe('素材内容合并（防人设被章节状态冲掉）', () => {
         expect(mergeMaterialContent('纯文本没有人设标签', '【当前状态】x')).toBeNull();
     });
 });
+
+describe('素材内容合并：以更丰富基线为底（防深度流失）', () => {
+    const { mergeWithBaseline } = require('../../server/services/pipeline/steps/materialContentMerger');
+    const init = '【身份】收殓师\n【性格】' + '沉稳'.repeat(50);
+    const cur = '【基本信息】男\n【当前状态】在洞穴';
+    test('initialContent 更长时以它为基座，人设不丢', () => {
+        const merged = mergeWithBaseline(init, cur, '【当前状态】在窑厂');
+        expect(merged.length).toBeGreaterThan(init.length);
+        expect(merged).toContain('沉稳');
+        expect(merged).toContain('在窑厂');
+        expect(merged).not.toContain('在洞穴');
+    });
+    test('currentContent 更长时以它为基座', () => {
+        const merged = mergeWithBaseline('【身份】短', cur, '【当前状态】在窑厂');
+        expect(merged).toContain('基本信息');
+        expect(merged).toContain('在窑厂');
+    });
+});
