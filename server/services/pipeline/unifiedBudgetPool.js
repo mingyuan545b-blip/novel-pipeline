@@ -1,25 +1,16 @@
 /**
- * unifiedBudgetPool.js — 统一预算管理器
- * 合并了budgetManager(动态预算+降级)和agentBudgetManager(素材分类+分配)
+ * unifiedBudgetPool.js — 统一预算管理器（预算池分配 + Agent素材分类）
+ *
+ * 2026-09-18 拆分：预算评估/降级决策移至 contextBudgetPlanner.js，
+ * 本文件保留：统一预算池分区、素材分类与槽位分配、user content 组装。
+ * 对外导出保持向后兼容（calculateBudget 等由 planner 转发）。
  */
-const { DEPTH_LEVELS } = require('./contextDepthConstants');
-const { getScenePriorityBoost } = require('./contextDecisionRules');
+'use strict';
+
 const { ContextBudget, estimateTokens, truncateToTokens } = require('../contextBudget');
+const { calculateBudget, MODEL_BUDGETS, MODEL_BUDGET_OVERRIDES, DEGRADATION_THRESHOLDS } = require('./contextBudgetPlanner');
+const { DEPTH_LEVELS } = require('./contextDepthConstants');
 const logger = require('../../shared/logger');
-
-/* ===== 模型Token预算配置 ===== */
-const MODEL_BUDGETS = {
-    'qwen3.6-plus': { maxInput: 30000, safeLimit: 24000, reserveRatio: 0.15 },
-    'qwen-turbo':   { maxInput: 8000,  safeLimit: 6000,  reserveRatio: 0.20 },
-    default:        { maxInput: 30000, safeLimit: 24000, reserveRatio: 0.15 },
-};
-
-const DEGRADATION_THRESHOLDS = {
-    green:  { ratio: 0.6,  label: '充裕', action: 'none' },
-    yellow: { ratio: 0.8,  label: '紧张', action: 'reduce-optional' },
-    orange: { ratio: 0.95, label: '危急', action: 'reduce-required' },
-    red:    { ratio: 1.0,  label: '超限', action: 'force-minimal' },
-};
 
 const BUDGET_ZONES = {
     memory:      { label: '记忆上下文', ratio: 0.25, minTokens: 1000 },
@@ -33,58 +24,13 @@ const BUDGET_ZONES = {
 const WORLDVIEW_TYPES = new Set(['worldview','power-system','relationship','scene','phenomenon','institution','organization','faction','geography','technology']);
 const CHARACTER_TYPES = new Set(['character','character-psychology','character-combat','character-personality','character-relationship','character-dialogue','character-behavior','foreshadowing']);
 
-/* ===== 动态预算计算(原budgetManager) ===== */
-function calculateBudget(params) {
-    const { model, resolvedNeeds, sceneTypes, totalBudget } = params;
-    const config = MODEL_BUDGETS[model] || MODEL_BUDGETS.default;
-    const availableBudget = Math.round(config.safeLimit * (1 - config.reserveRatio));
-    const prioritized = _prioritizeNeeds(resolvedNeeds, sceneTypes);
-    const allocations = {};
-    let remaining = Math.min(totalBudget, availableBudget);
-    for (const need of prioritized) {
-        const estimated = _estimateTokenCost(need);
-        const allocated = Math.min(estimated, remaining);
-        allocations[need.type] = { tokens: allocated, depth: need.resolvedDepth, priority: need.priority };
-        remaining -= allocated;
-    }
-    const totalAllocated = availableBudget - remaining;
-    const status = _assessStatus(totalAllocated, availableBudget);
-    const degradationPlan = status.action !== 'none' ? _buildDegradationPlan(prioritized, status) : null;
-    return { allocations, totalAllocated, remaining, status, degradationPlan };
-}
-
-function _prioritizeNeeds(needs, sceneTypes) {
-    return needs.map(need => {
-        const requiredBoost = need.required ? 100 : 0;
-        const sceneBoost = getScenePriorityBoost(sceneTypes || [], need.type) * 10;
-        return { ...need, priority: requiredBoost + sceneBoost };
-    }).sort((a, b) => b.priority - a.priority);
-}
-
+/* ===== 统一预算池分配 ===== */
+/** 估算单个素材需求的 token 占用（供统一预算池的 zone.used 统计使用） */
 function _estimateTokenCost(need) {
     const depthConfig = DEPTH_LEVELS[need.resolvedDepth] || DEPTH_LEVELS.L2;
     return Math.round((depthConfig.tokenBudget || 330) * (need.maxItems || 5) * 1.2);
 }
 
-function _assessStatus(used, total) {
-    const ratio = used / total;
-    for (const [level, config] of Object.entries(DEGRADATION_THRESHOLDS)) {
-        if (ratio <= config.ratio) return { level, ...config, ratio };
-    }
-    return { level: 'red', ...DEGRADATION_THRESHOLDS.red, ratio };
-}
-
-function _buildDegradationPlan(needs, status) {
-    const plan = { action: status.action, steps: [] };
-    const targetDepth = status.action === 'force-minimal' ? 'L0' : null;
-    for (const need of needs) {
-        const to = targetDepth || `L${Math.max(0, parseInt((need.resolvedDepth || 'L2').replace('L', ''), 10) - 1)}`;
-        plan.steps.push({ type: need.type, action: status.action, from: need.resolvedDepth, to });
-    }
-    return plan;
-}
-
-/* ===== 统一预算池分配 ===== */
 function allocateUnifiedBudget(params) {
     const { model, totalBudget, memorySize = 0, materialNeeds = [], constraints = [] } = params;
     const zones = {};
@@ -180,7 +126,7 @@ function getMaterialAccessConfig(genre, agentType) {
 }
 
 module.exports = {
-    calculateBudget, MODEL_BUDGETS, DEGRADATION_THRESHOLDS,
+    calculateBudget, MODEL_BUDGETS, MODEL_BUDGET_OVERRIDES, DEGRADATION_THRESHOLDS,
     allocateUnifiedBudget, BUDGET_ZONES,
     classifyMaterials, allocateMaterialsToBudget, buildUserContent, truncateUserContent, getMaterialAccessConfig,
 };

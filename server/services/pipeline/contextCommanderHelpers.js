@@ -5,6 +5,7 @@
 'use strict';
 
 const logger = require('../../shared/logger');
+const { BUDGET_POLICY } = require('../../config/budgetPolicy');
 
 /** 空结果构造器 */
 function emptyResult(agentType) {
@@ -22,15 +23,22 @@ function extractKnownCharNames(materials) {
     return materials.filter(m => m.type === 'character').map(m => m.name).filter(Boolean);
 }
 
-/** 应用降级计划到needs */
+/** 应用降级计划到needs
+ *  step.action='drop' → 整类不注入（只组合本章必要素材）
+ *  其余 → 降低深度（to 已由预算层保证不低于下限）
+ */
 function applyDegradation(needs, plan) {
     for (const step of plan.steps) {
         const need = needs.find(n => n.type === step.type);
-        if (need && step.to) {
-            need.resolvedDepth = step.to;
-            need.degraded = true;
-            need.degradationAction = step.action;
+        if (!need) continue;
+        need.degraded = true;
+        need.degradationAction = step.action;
+        if (step.action === 'drop' || !step.to) {
+            need.dropped = true;
+            need.dropReason = step.action;
+            continue;
         }
+        need.resolvedDepth = step.to;
     }
 }
 
@@ -41,11 +49,15 @@ function depthToNum(depth) {
     return match ? parseInt(match[1], 10) : 2;
 }
 
-/** 应用深度提升 */
+/** 应用深度提升（自动决策的深度上限见 budgetPolicy.maxAutoDepth，用户 override 不受此限） */
 function applyDepthBoost(baseDepth, boost) {
-    if (boost === 0) return baseDepth;
+    const ceiling = depthToNum(BUDGET_POLICY.maxAutoDepth);
+    if (boost === 0) {
+        const cur = depthToNum(baseDepth);
+        return cur > ceiling ? `L${ceiling}` : baseDepth;
+    }
     const num = depthToNum(baseDepth);
-    const adjusted = Math.max(0, Math.min(4, num + boost));
+    const adjusted = Math.max(0, Math.min(ceiling, num + boost));
     return `L${adjusted}`;
 }
 
@@ -56,7 +68,7 @@ function resolveBudget(baseBudget, phase) {
     return baseBudget;
 }
 
-/** 构建决策日志条目 */
+/** 构建决策日志条目（含相关性/降级结果，供上下文装配图展示"为什么加载/为什么没加载"） */
 function logEntry(need, resolved, phase) {
     return {
         type: need.type,
@@ -65,6 +77,9 @@ function logEntry(need, resolved, phase) {
         depthAdjustment: resolved.depthAdjustment,
         sceneBoost: resolved.sceneBoost,
         reason: resolved.adjustmentReason,
+        relevanceReason: resolved.relevanceReason || null,
+        dropped: Boolean(resolved.dropped),
+        dropReason: resolved.dropReason || null,
         phase,
     };
 }

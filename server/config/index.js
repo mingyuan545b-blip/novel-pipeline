@@ -6,10 +6,14 @@
 const systemConfig = require('./systemConfig');
 const { resolveConfig } = require('./unifiedConfig');
 const { NOVEL_DEFAULTS, getDefaultsForGenre } = require('./genreDefaults');
+const { BUDGET_POLICY, ITEM_COUNT_BY_DEPTH, DEGRADATION_ACTIONS } = require('./budgetPolicy');
 
 module.exports = {
     ...systemConfig,
     resolveConfig,
     NOVEL_DEFAULTS,
-    getDefaultsForGenre
+    getDefaultsForGenre,
+    BUDGET_POLICY,
+    ITEM_COUNT_BY_DEPTH,
+    DEGRADATION_ACTIONS
 };

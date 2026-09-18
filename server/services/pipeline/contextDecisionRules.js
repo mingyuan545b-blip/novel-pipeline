@@ -11,14 +11,33 @@ const CHAPTER_PHASES = {
     resolution:  { range: [81, 99], label: '收尾期' },
 };
 
-/** 场景类型关键词映射 */
+/** 场景类型关键词映射（收录常见同义/变体，提高召回；命中1个即算该场景） */
 const SCENE_KEYWORDS = {
-    combat:      ['战斗', '交手', '对决', '厮杀', '围攻', '破阵', '反击', '出手', '杀招'],
-    social:      ['宴会', '聚会', '谈判', '结盟', '拜访', '茶话', '交流', '对话'],
-    exploration: ['探索', '发现', '遗迹', '秘境', '寻宝', '深入', '迷宫', '禁地'],
-    revelation:  ['真相', '揭秘', '身世', '阴谋', '背叛', '伏笔', '反转', '揭露'],
-    training:    ['修炼', '突破', '悟道', '闭关', '炼丹', '炼器', '参悟', '进阶'],
-    emotional:   ['告白', '离别', '重逢', '牺牲', '守护', '思念', '回忆', '承诺'],
+    combat: [
+        '战斗', '交手', '对决', '厮杀', '围攻', '破阵', '反击', '出手', '杀招',
+        '激战', '大战', '决战', '血战', '搏杀', '击杀', '突袭', '追杀', '伏击',
+        '开战', '迎战', '迎敌', '动手', '打斗', '交锋', '拼杀', '死战', '斗法',
+    ],
+    social: [
+        '宴会', '聚会', '谈判', '结盟', '拜访', '茶话', '交流', '对话',
+        '议事', '会面', '酒宴', '会谈', '商讨', '宴请', '结交', '觐见',
+    ],
+    exploration: [
+        '探索', '发现', '遗迹', '秘境', '寻宝', '深入', '迷宫', '禁地',
+        '探查', '勘察', '古墓', '洞窟', '密道', '寻路', '跋涉', '探险',
+    ],
+    revelation: [
+        '真相', '揭秘', '身世', '阴谋', '背叛', '伏笔', '反转', '揭露',
+        '隐情', '谜团', '线索', '幕后', '真相大白', '识破', '察觉异常',
+    ],
+    training: [
+        '修炼', '突破', '悟道', '闭关', '炼丹', '炼器', '参悟', '进阶',
+        '练功', '修行', '打坐', '淬体', '感悟', '功法大成', '苦修', '研习',
+    ],
+    emotional: [
+        '告白', '离别', '重逢', '牺牲', '守护', '思念', '回忆', '承诺',
+        '告别', '情愫', '深情', '求婚', '心动', '不舍', '牵挂', '愧疚',
+    ],
 };
 
 /** 章节位置对素材深度的调整规则 */
@@ -49,14 +68,17 @@ const PHASE_DEPTH_ADJUSTMENTS = {
     },
 };
 
-/** 场景类型对素材的优先级调整 */
+/** 场景类型对素材的优先级调整
+ *  双重作用：①预算内优先级提升 ②相关性门控的"场景命中"依据（见 contextRelevance.js）
+ *  因此这里列出的类型在其场景章节中不会被丢弃。
+ */
 const SCENE_PRIORITY_BOOSTS = {
-    combat:      { 'power-system': 2, equipment: 2, character: 1 },
-    social:      { character: 2, faction: 1, 'famous-scene': 1 },
-    exploration: { geography: 2, 'sub-plane': 2, faction: 1 },
-    revelation:  { foreshadowing: 2, character: 1 },
-    training:    { 'power-system': 2, equipment: 1, character: 1 },
-    emotional:   { character: 2, foreshadowing: 1 },
+    combat:      { 'power-system': 2, equipment: 2, 'character-combat': 2, character: 1, location: 1 },
+    social:      { character: 2, faction: 1, 'famous-scene': 1, institution: 1, 'knowledge-access': 1 },
+    exploration: { geography: 2, 'sub-plane': 2, faction: 1, location: 1, 'knowledge-access': 1 },
+    revelation:  { foreshadowing: 2, character: 1, 'knowledge-access': 1, institution: 1 },
+    training:    { 'power-system': 2, equipment: 1, character: 1, 'growth-history': 1, 'knowledge-access': 1 },
+    emotional:   { character: 2, foreshadowing: 1, 'growth-history': 1, 'famous-scene': 1 },
 };
 
 /** 预算分配比例（按素材类型） */

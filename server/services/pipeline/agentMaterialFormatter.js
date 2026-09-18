@@ -37,7 +37,12 @@ function formatEntityByDepth(entity, depth) {
     const roleLabels = { protagonist: '主角', 'key-supporting': '关键配角', supporting: '配角', background: '背景' };
     const roleTag = roleLabels[entity.roleLevel] || entity.roleLevel || '';
 
-    if (d === 'L0') return `${name} | ${roleTag}${entity.position ? '·' + entity.position : ''}`;
+    if (d === 'L0') {
+        // L0=索引（≤60字），至少保留"身份 + 一句话锚点"，避免退化成"名字|定位"空壳
+        const head = `${name} | ${roleTag}${entity.position ? '·' + entity.position : ''}`;
+        const anchor = String(entity.briefText || '').replace(/\s+/g, ' ').trim().substring(0, 30);
+        return (anchor ? `${head} — ${anchor}` : head).substring(0, 60);
+    }
     if (d === 'L1') {
         const parts = [`【${name}】${roleTag}`];
         if (entity.position) parts.push(`身份: ${entity.position}`);

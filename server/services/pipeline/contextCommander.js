@@ -10,6 +10,7 @@ const {
     resolveChapterPhase, detectSceneTypes,
     getDepthAdjustment, getScenePriorityBoost, allocateBudget,
 } = require('./contextDecisionRules');
+const { assessRelevance, collectOutlineMentionedTypes } = require('./contextRelevance');
 const { getOverridesMap } = require('./contextOverrideStore');
 const { resolveServantLoads } = require('./servantDecisionEngine');
 const { resolveTimelineContext } = require('./timelineContextResolver');
@@ -47,25 +48,37 @@ async function resolveContext(agentType, params) {
 
     const resolvedNeeds = [];
     const decisionLog = [];
+    const outlineTypes = collectOutlineMentionedTypes(materials, outlineText);
 
     for (const need of baseDecl.materialNeeds) {
         const resolved = _resolveNeed(need, phase, sceneTypes, outlineText, materials, overrides);
         // 应用意图深度覆盖
         applyIntentDepthOverride(resolved, intentResult);
+        // 相关性门控：只保留本章真正需要的素材类型（required/一致性/场景/意图/大纲点名）
+        const rel = assessRelevance(resolved, {
+            sceneBoost: resolved.sceneBoost, intentResult, outlineTypes,
+        });
+        if (rel.relevant) {
+            resolved.relevanceReason = rel.reason;
+        } else {
+            resolved.dropped = true;
+            resolved.dropReason = 'not-relevant';
+        }
         resolvedNeeds.push(resolved);
         decisionLog.push(_logEntry(need, resolved, phase));
     }
 
     const totalBudget = _resolveBudget(baseDecl.totalBudget, phase, sceneTypes);
-    const budgetAllocation = allocateBudget(totalBudget, resolvedNeeds.map(n => n.type));
+    const activeNeeds = resolvedNeeds.filter(n => !n.dropped);
+    const budgetAllocation = allocateBudget(totalBudget, activeNeeds.map(n => n.type));
 
-    for (const need of resolvedNeeds) {
+    for (const need of activeNeeds) {
         need.budget = budgetAllocation[need.type] || need.budget;
     }
 
     const budgetAssessment = calculateBudget({
         model: project?.model || DEFAULT_MODEL,
-        resolvedNeeds, sceneTypes, totalBudget,
+        resolvedNeeds: activeNeeds, sceneTypes, totalBudget,
     });
 
     if (budgetAssessment.degradationPlan) {

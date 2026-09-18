@@ -14,5 +14,7 @@ module.exports = {
     ULTRA_LONG_CONTEXT_MODELS: constants.ULTRA_LONG_CONTEXT_MODELS,
     SAFETY_MARGIN: constants.SAFETY_MARGIN,
     MODEL_RATIOS: constants.MODEL_RATIOS,
-    DEFAULT_RATIOS: constants.DEFAULT_RATIOS
+    DEFAULT_RATIOS: constants.DEFAULT_RATIOS,
+    resolveModelBudget: constants.resolveModelBudget,
+    resolveModelCategory: constants.resolveModelCategory
 };

@@ -21,16 +21,31 @@ async function scheduleMaterials(agentType, params) {
     const activeMats = (materials || []).filter(m => m.projectId === projectId && !m.archived);
     const intentResult = context.intentResult;
     const loadedMaterials = {};
+    const droppedTypes = [];
     let totalLoaded = 0;
+    let actualChars = 0;
 
     for (const need of context.materialNeeds) {
+        // 预算降级判定为"整类不需要"：本章不注入该类，避免无谓token
+        if (need.dropped) {
+            loadedMaterials[need.type] = [];
+            droppedTypes.push(need.type);
+            continue;
+        }
         const result = await _loadByNeed(need, activeMats, outlineText, ctx, chapter, projectId, agentType, intentResult);
         loadedMaterials[need.type] = result.items;
         totalLoaded += result.items.length;
+        actualChars += result.items.reduce((sum, it) => sum + (it.content?.length || 0), 0);
     }
 
     const constraints = await _loadConstraints(agentType, projectId, ctx, project, genre);
-    const stats = { agentType, loaded: totalLoaded, budget: context.totalBudget, contextMeta: context.meta };
+    const stats = {
+        agentType, loaded: totalLoaded, budget: context.totalBudget,
+        actualChars, droppedTypes,
+        plannedChars: context.budgetAssessment?.plannedChars ?? null,
+        budgetStatus: context.budgetAssessment?.status?.level ?? null,
+        contextMeta: context.meta,
+    };
 
     return { materials: loadedMaterials, constraints, conflicts: constraints.conflicts, stats };
 }
