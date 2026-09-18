@@ -1,13 +1,15 @@
 const store = require("../../../store");
 const { v4: uuidv4 } = require('uuid');
-const { getVolumeOrder } = require("../volumeHelpers");
 const { getHookBudgetForProject } = require("../../hookBudget");
 const materialIndex = require("../../materialIndex");
 const { broadcastToProject } = require("../../websocket");
 const { LLM_DEFAULTS } = require("../../../config/systemConfig");
 const { MAX_CHAPTER_RETRIES, COOLDOWN_STEPS } = require("./chapterScheduler");
 const pipelineRegistry = require("../../pipelineRegistry");
+const { STATUS_VALUES } = require("../../chapterStatus");
 const logger = require("../../../shared/logger");
+const { wordCountDetail, reviewFailDetail, stepDetail, intentPlannerDetail } = require('./chapterLogDetails');
+const { tryUnlockSubplane } = require('./subplaneUnlock');
 
 let _runFullPipelineRef = null;
 let _runPipelineStepRef = null;
@@ -42,25 +44,23 @@ async function executeChapter(projectId, ch, state, addLog, maxRounds, waitWithS
                 }
                 const structuredData = { step, round, passed, roleName, chapterNumber: chapterNumber || ch.chapterNumber };
                 if (step === 'intent-planner') {
-                    const detailParts = [];
-                    if (feedback?.mustKeep?.length) detailParts.push(`✅保持: ${feedback.mustKeep.join(' | ')}`);
-                    if (feedback?.mustAvoid?.length) detailParts.push(`🚫避免: ${feedback.mustAvoid.join(' | ')}`);
-                    if (feedback?.conflictDesign) detailParts.push(`⚔️冲突: ${feedback.conflictDesign}`);
-                    if (feedback?.chapterEndHook) detailParts.push(`🪝钩子: ${feedback.chapterEndHook}`);
-                    if (feedback?.hookAdvance?.length) detailParts.push(`📌推进: ${feedback.hookAdvance.join(' | ')}`);
-                    if (feedback?.hookResolve?.length) detailParts.push(`🔓回收: ${feedback.hookResolve.join(' | ')}`);
-                    const detailStr = detailParts.length > 0 ? ` | ${detailParts.join(' → ')}` : '';
-                    addLog(`  [意图规划] 🎯 ${feedback?.summary || ''}${detailStr}`, { ...structuredData, feedback: { summary: feedback?.summary } });
+                    const detail = intentPlannerDetail(feedback);
+                    addLog(`  [意图规划] 🎯 ${feedback?.summary || ''}${detail ? ' | ' + detail : ''}`,
+                        { ...structuredData, detail, feedback: { summary: feedback?.summary } });
                     return;
                 }
                 const status = passed ? '✅通过' : '❌未通过';
+                const summary = feedback?.summary || '';
                 let msg = `  [R${round} ${roleName}] ${status}`;
-                if (feedback) {
-                    const summary = feedback.summary || '';
-                    if (summary) msg += ` → ${summary.substring(0, 80)}`;
-                    if (feedback._autoCorrected) msg += ' [自动修正]';
-                }
-                addLog(msg, { ...structuredData, feedback: feedback ? { summary: feedback.summary?.substring(0, 200) } : undefined });
+                if (summary) msg += ` → ${summary.substring(0, 80)}`;
+                if (feedback?._autoCorrected) msg += ' [自动修正]';
+                addLog(msg, {
+                    ...structuredData,
+                    roleName,
+                    // detail：给前端"执行日志"直接展示的细节（结论+前两条问题）
+                    detail: stepDetail(feedback),
+                    feedback: feedback ? { summary: feedback.summary?.substring(0, 200), issues: feedback.issues?.slice(0, 3) } : undefined,
+                });
             }
         });
 
@@ -134,24 +134,28 @@ async function handleFailure(projectId, ch, result, state, addLog) {
             if (uc._wordCountRetry >= 5) {
                 uc._pipelineRetries = (uc._pipelineRetries || 0) + 1;
                 uc._wordCountRetry = 0;
-                uc.status = 'outlined';
+                uc.status = STATUS_VALUES.OUTLINED;
                 delete uc.skipUntil;
-                addLog(`━━━ 第${chNum}章 字数连续5次不达标 ❌(重试${uc._pipelineRetries}/${MAX_CHAPTER_RETRIES})，重置重试 ━━━`);
+                addLog(`━━━ 第${chNum}章 字数连续5次不达标 ❌(重试${uc._pipelineRetries}/${MAX_CHAPTER_RETRIES})，重置重试 ━━━`,
+                    { chapterNumber: chNum, step: 'word-count-fail', passed: false, detail: wordCountDetail(uc, result) });
             } else {
-                uc.status = 'outlined';
+                uc.status = STATUS_VALUES.OUTLINED;
                 delete uc.skipUntil;
-                addLog(`━━━ 第${chNum}章 字数不达标 ❌(第${uc._wordCountRetry}次)，直接重试 ━━━`);
+                addLog(`━━━ 第${chNum}章 字数不达标 ❌(第${uc._wordCountRetry}次)，直接重试 ━━━`,
+                    { chapterNumber: chNum, step: 'word-count-fail', passed: false, detail: wordCountDetail(uc, result) });
             }
         } else {
             uc._pipelineRetries = (uc._pipelineRetries || 0) + 1;
             if (uc._pipelineRetries <= 3) {
-                uc.status = 'outlined';
+                uc.status = STATUS_VALUES.OUTLINED;
                 delete uc.skipUntil;
-                addLog(`━━━ 第${chNum}章 审核未通过 ❌(${result.rounds}轮| 重试${uc._pipelineRetries}/${MAX_CHAPTER_RETRIES})，立即重试 ━━━`);
+                addLog(`━━━ 第${chNum}章 审核未通过 ❌(${result.rounds}轮| 重试${uc._pipelineRetries}/${MAX_CHAPTER_RETRIES})，立即重试 ━━━`,
+                    { chapterNumber: chNum, step: 'review-fail', passed: false, detail: reviewFailDetail(result) });
             } else {
                 uc.status = 'failed-skipped';
                 uc.skipUntil = Date.now() + LLM_DEFAULTS.overloadCooldownMs;
-                addLog(`━━━ 第${chNum}章 审核未通过 ❌(${result.rounds}轮| 重试${uc._pipelineRetries}/${MAX_CHAPTER_RETRIES})，冷却${LLM_DEFAULTS.overloadCooldownMs/1000}秒 ━━━`);
+                addLog(`━━━ 第${chNum}章 审核未通过 ❌(${result.rounds}轮| 重试${uc._pipelineRetries}/${MAX_CHAPTER_RETRIES})，冷却${LLM_DEFAULTS.overloadCooldownMs/1000}秒 ━━━`,
+                    { chapterNumber: chNum, step: 'review-fail', passed: false, detail: reviewFailDetail(result) });
             }
         }
         uc.updatedAt = new Date().toISOString();
@@ -172,27 +176,6 @@ async function handleFailure(projectId, ch, result, state, addLog) {
         }
     }
     return { success: false, stopped: false };
-}
-
-async function tryUnlockSubplane(projectId, totalCompleted, addLog) {
-    try {
-        let volumeOrderConfig = null;
-        try { volumeOrderConfig = await getVolumeOrder(projectId); } catch (_) { /* silent */ }
-        if (!volumeOrderConfig?.volumeOrder) {
-            const lockedPlanes = (await store.queryItems('materials', { projectId })).filter(m => m.type === 'sub-plane' && m.isLocked);
-            if (lockedPlanes.length > 0 && totalCompleted > 0 && totalCompleted % 30 === 0) {
-                const idx = Math.floor(Math.random() * lockedPlanes.length);
-                const planeToUnlock = lockedPlanes[idx];
-                planeToUnlock.isLocked = false;
-                planeToUnlock.unlockChapter = totalCompleted;
-                planeToUnlock.updatedAt = new Date().toISOString();
-                await store.setItem('materials', planeToUnlock.id, planeToUnlock);
-                addLog(`🔓 小世界解封：${planeToUnlock.name}（第${totalCompleted}章完成触发）`);
-            }
-        }
-    } catch (unlockErr) {
-        logger.warn('infinitePipeline', 'Sub-plane unlock check failed', { unlockErrMessage: unlockErr.message });
-    }
 }
 
 module.exports = { executeChapter, setRunFullPipelineRef, setRunPipelineStepRef };

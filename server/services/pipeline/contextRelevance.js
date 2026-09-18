@@ -19,6 +19,25 @@ const RELEVANCE_REASONS = Object.freeze({
     OUTLINE: 'outline-mention',
 });
 
+/** 依据/丢弃原因的中文标签（前端展示与日志共用，单一数据源） */
+const RELEVANCE_REASON_LABELS = Object.freeze({
+    [RELEVANCE_REASONS.REQUIRED]: 'Agent必需',
+    [RELEVANCE_REASONS.CONSISTENCY]: '一致性关键',
+    [RELEVANCE_REASONS.SCENE]: '场景命中',
+    [RELEVANCE_REASONS.INTENT]: '意图命中',
+    [RELEVANCE_REASONS.OUTLINE]: '大纲点名',
+    'not-relevant': '与本章无关',
+    'genre-excluded': '题材未声明',
+    'drop': '预算裁剪',
+    'not-in-genre': '题材未声明',
+});
+
+/** 取中文依据标签（未知原因原样返回，便于发现新原因未登记） */
+function reasonLabel(reason) {
+    if (!reason) return '';
+    return RELEVANCE_REASON_LABELS[reason] || reason;
+}
+
 /** 一致性关键类型（任何题材都不得排除） */
 const NEVER_DROP_TYPES = BUDGET_POLICY.neverDropTypes;
 
@@ -78,4 +97,5 @@ function assessRelevance(need, ctx) {
 module.exports = {
     assessRelevance, collectOutlineMentionedTypes, intentTouchesType,
     genreAccessForAgent, NEVER_DROP_TYPES, RELEVANCE_REASONS,
+    RELEVANCE_REASON_LABELS, reasonLabel,
 };

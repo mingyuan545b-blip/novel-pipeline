@@ -96,6 +96,8 @@ function buildSourceFlow(context, scheduled) {
         { key: 'knowledge-base', label: '知识库', wired: hasKnowledge, detail: hasKnowledge ? '已请求知识访问' : '本章未请求' },
         { key: 'intent', label: '章节意图', wired: Boolean(context.intentResult?.intent), detail: context.intentResult?.intent ? '意图已接入决策' : '无意图（未规划或读取失败）' },
         { key: 'constraints', label: '约束规则', wired: Boolean(scheduled?.constraints?.text), detail: `${scheduled?.constraints?.text?.length || 0}字` },
+        { key: 'relations', label: '人物关系', wired: (context.materialNeeds || []).some(n => n.type === 'relationship' && !n.dropped), detail: ((context.materialNeeds || []).some(n => n.type === 'relationship' && !n.dropped)) ? '已请求关系表' : '本章未请求' },
+        { key: 'memory', label: '记忆(事实+叙事)', wired: true, detail: '由提示词装配注入（memory-pyramid + 卷摘要）' },
         { key: 'budget', label: '预算规划', wired: Boolean(context.budgetAssessment), detail: `${context.budgetAssessment?.status?.label || '-'} (${context.budgetAssessment?.status?.level || '-'})` },
     ];
 }

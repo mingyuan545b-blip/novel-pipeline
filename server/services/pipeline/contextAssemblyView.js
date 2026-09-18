@@ -13,10 +13,18 @@
 const { buildContextAssemblyMap } = require('./contextAssemblyMapBuilder');
 const { getContextTraceForProject } = require('../contextTrace');
 const { TYPE_STATUS } = require('./contextAssemblyRecorder');
+const { reasonLabel } = require('./contextRelevance');
+const { MATERIAL_TYPE_LABELS, MATERIAL_TYPE_ICONS } = require('../../config/materialTypes');
 const { ASSEMBLY_TRACE_POLICY } = require('../../config/assemblyTracePolicy');
 const logger = require('../../shared/logger');
 
 /** 装配状态 → 前端展示用严重度 */
+const DROPPED_LABELS = Object.freeze({
+    'not-relevant': '与本章无关',
+    'genre-excluded': '题材未声明',
+    'drop': '预算裁剪',
+});
+
 const STATUS_SEVERITY = Object.freeze({
     [TYPE_STATUS.INJECTED]: 'ok',
     [TYPE_STATUS.DROPPED]: 'info',
@@ -45,9 +53,23 @@ async function buildAssemblyView(projectId, chapterNumber, agentFilter) {
     };
 }
 
+function _statusLabel(t) {
+    if (t.status === TYPE_STATUS.INJECTED) return '已注入';
+    if (t.status === TYPE_STATUS.DROPPED) return DROPPED_LABELS[t.dropReason] || '本章不需要';
+    if (t.status === TYPE_STATUS.EMPTY) return '无数据';
+    if (t.status === TYPE_STATUS.MISSING) return '链路丢失';
+    return t.status;
+}
+
 function _normalizeAssembly(assembly) {
     const types = (assembly.types || []).map(t => ({
         ...t,
+        typeLabel: MATERIAL_TYPE_LABELS[t.type] || t.type,
+        typeIcon: MATERIAL_TYPE_ICONS[t.type] || '📄',
+        // 依据/丢弃原因统一转中文（前端不再硬编码映射）
+        relevanceLabel: reasonLabel(t.relevanceReason),
+        dropReasonLabel: reasonLabel(t.dropReason),
+        statusLabel: _statusLabel(t),
         severity: STATUS_SEVERITY[t.status] || 'info',
         density: t.actualDepth || '-',
     }));
@@ -95,9 +117,10 @@ function _collectAlerts(agents) {
 }
 
 function _alertMessage(t) {
-    if (t.status === TYPE_STATUS.EMPTY) return `${t.type}：决策需要但素材库无数据（${t.actualDepth || '-'}）`;
-    if (t.status === TYPE_STATUS.MISSING) return `${t.type}：规划未注入也未标记丢弃，疑似链路断裂`;
-    return `${t.type}：${t.status}`;
+    const name = MATERIAL_TYPE_LABELS[t.type] || t.type;
+    if (t.status === TYPE_STATUS.EMPTY) return `${name}：决策需要但素材库无数据（${t.actualDepth || '-'}）`;
+    if (t.status === TYPE_STATUS.MISSING) return `${name}：规划未注入也未标记丢弃，疑似链路断裂`;
+    return `${name}：${t.status}`;
 }
 
 module.exports = { buildAssemblyView, STATUS_SEVERITY };

@@ -72,6 +72,11 @@ export const AGENT_LABELS = {
     'final-editor': '定稿人',
     polisher: '润色师',
     'material-manager': '素材管理',
+    'material-organizer': '素材整理',
+    'material-registrar': '素材登记',
+    'knowledge-extraction': '知识抽取',
+    'consistency-check': '一致性校验',
+    'hook-budget-update': '伏笔预算更新',
     reader: '阅读者',
     'consistency-constraints': '一致性约束',
     'tomato-writer': '番茄执笔',
@@ -111,8 +116,10 @@ export const safeStr = (v) => {
 export const formatTime = (ts) => {
     if (!ts) return '';
     const d = new Date(ts);
+    if (Number.isNaN(d.getTime())) return '';
     const pad = (n) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    // 可读格式：2026-09-18 22:13:05（旧实现无日期分隔符，形如 2026091822:13:05）
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 };
 
 export const getStepStatus = (stepKey, selectedChapter, pipelineState) => {
@@ -160,6 +167,11 @@ export const AGENT_ICONS = {
     'final-editor': '✏️',
     polisher: '💎',
     'material-manager': '📦',
+    'material-organizer': '🗂️',
+    'material-registrar': '📇',
+    'knowledge-extraction': '🧠',
+    'consistency-check': '⚖️',
+    'hook-budget-update': '🪝',
     reader: '📖',
     'consistency-constraints': '🔒',
     'pipeline-start': '🚀',

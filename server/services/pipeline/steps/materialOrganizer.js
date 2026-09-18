@@ -1,4 +1,5 @@
 const logger = require('../../../shared/logger');
+const { warnOnEmptyOrganizingPlan } = require('./materialOrganizerGuards');
 const store = require('../../../store');
 const stateKVIndex = require('../../stateKVIndex');
 const { getCharacterStateSchema } = require('../../../config/characterStateSchemas');
@@ -112,6 +113,10 @@ ${supportingRule}
     - ⚠️配角首次出场时必须记录其"人设基础事实"为certain：配角自己的身份/能力/阵营/所属势力规则是其立身之本，必须为certain，不能是suspect/unknown
     - ⚠️禁止限知偏向：主角和配角的certain事实数量比例不能超过3:1，配角不能是信息盲人
 14. relationshipChanges中isSecret=true的关系会自动同步到限知系统，但knowledgeChanges可以记录更细粒度的认知变化（如推理、误信等）
+14b. ⚠️强制要求：本章只要有≥2名已知角色发生互动（对话/冲突/结盟/并肩），relationshipChanges **不得为空**；
+    每条必须写全 with（对象角色名）/from/to（关系起点与变化后）/reason（本章依据）/isSecret；
+    关系没有变化时也要用 from==to 记录当前关系（用于长篇关系网冷启动）。
+14c. 关系必须基于本章正文事实，禁止编造未出场的角色名。
 15. 🔷配角出场时必须评估：本章是否体现了配角的标志性细节/独立立场/命运弧光推进？如果是，记录到personalityNote中
 16. ⚠️工具人化禁令：配角stateChanges必须是主动行为（自主决策/主动战斗/主动拒绝），不能全是被动行为（被救/被修复/被告知）。如果本章配角只有被动行为，在personalityNote中标注"⚠️工具人化风险"`;
 }
@@ -143,7 +148,7 @@ async function handleMaterialOrganizer(params) {
 
     // 陷阱#90防护：检测空organizingPlan，防止连锁下游问题
     // 不阻断pipeline（某些章节可能确实无角色变化），但记录warning便于排查
-    _warnOnEmptyOrganizingPlan(organizingPlan, chapterNum);
+    warnOnEmptyOrganizingPlan(organizingPlan, chapterNum);
 
     return {
         step: 'material-organizer',
@@ -165,30 +170,6 @@ function parseOrganizerOutput(text) {
             .replace(/,\s*}/g, '}')
             .replace(/,\s*]/g, ']');
         return JSON.parse(cleaned);
-    }
-}
-
-/**
- * 陷阱#90防护：检测空organizingPlan并记录warning
- * 空organizingPlan会导致连锁下游问题：
- *   - material-registrar无操作 → character_states表0条
- *   - knowledgeChanges为空 → 限知数据不生成
- *   - 角色素材无深度字段
- * 不阻断pipeline（某些章节可能确实无角色变化），但记录warning便于排查
- */
-function _warnOnEmptyOrganizingPlan(organizingPlan, chapterNum) {
-    if (!organizingPlan) {
-        logger.error('materialOrganizer', `[trap#90] ch${chapterNum}: organizingPlan为null（JSON解析失败或LLM未输出有效JSON）`);
-        return;
-    }
-    const charCount = Array.isArray(organizingPlan.characters) ? organizingPlan.characters.length : 0;
-    const kcCount = Array.isArray(organizingPlan.knowledgeChanges) ? organizingPlan.knowledgeChanges.length : 0;
-    if (charCount === 0 && kcCount === 0) {
-        logger.warn('materialOrganizer', `[trap#90] ch${chapterNum}: organizingPlan为空（characters=0, knowledgeChanges=0），可能导致下游character_states/knowledge_access无数据`);
-    } else if (charCount === 0) {
-        logger.warn('materialOrganizer', `[trap#90] ch${chapterNum}: characters为空，可能遗漏角色状态更新`);
-    } else if (kcCount === 0) {
-        logger.warn('materialOrganizer', `[trap#90] ch${chapterNum}: knowledgeChanges为空，可能遗漏限知认知变化记录`);
     }
 }
 

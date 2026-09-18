@@ -3,6 +3,29 @@ import { useQueryClient } from '@tanstack/react-query';
 import useAppStore from '../../store/useAppStore';
 import { useRunStep, useRunFullPipeline, useTaskStatusPoll, PIPELINE_KEYS } from '../../hooks/queries';
 
+
+/** 把 full-pipeline 返回的逐轮/逐步骤日志摊平到执行日志（含章号/轮次/细节） */
+function appendRoundLogs(addPipelineLog, result, chapterNumber, selectedChapter) {
+    const log = (result && result.log) || [];
+    if (!Array.isArray(log) || log.length === 0) return;
+    for (const entry of log) {
+        if (!entry || !entry.step) continue;
+        const feedback = entry.feedback || {};
+        const issues = (feedback.issues || []).map((i) => i.desc || i.description).filter(Boolean);
+        const detail = [feedback.summary, ...issues.slice(0, 2)].filter(Boolean).join(' ｜ ');
+        addPipelineLog({
+            step: entry.step,
+            status: entry.passed ? 'done' : 'error',
+            round: entry.round,
+            chapterNumber: entry.chapterNumber || chapterNumber,
+            result: { passed: entry.passed, feedback },
+            detail: detail || undefined,
+            timestamp: entry.timestamp || new Date().toISOString(),
+            _chapterTitle: selectedChapter?.title,
+        });
+    }
+}
+
 const TASK_ID_DISPLAY_LENGTH = 12;
 const POLL_INTERVAL_MS = 3000;
 
@@ -34,7 +57,7 @@ export function useFullPipelineHandler(currentProject, selectedChapter) {
         if (!selectedChapter) { alert('请先选择一个章节'); return; }
         setPipelineState({ running: true, currentStep: 'full', currentRound: 1 });
         clearPipelineLogs();
-        addPipelineLog({ step: 'full-pipeline', status: 'running', message: '正在提交任务...', timestamp: new Date().toISOString() });
+        addPipelineLog({ step: 'full-pipeline', status: 'running', message: `第${selectedChapter.chapterNumber}章 正在提交任务...`, chapterNumber: selectedChapter.chapterNumber, detail: `《${selectedChapter.title || ''}》最多${maxRounds}轮`, timestamp: new Date().toISOString() });
         try {
             const res = await runFullPipelineMut.mutateAsync({
                 projectId: currentProject.id, chapterId: selectedChapter.id, maxRounds,
@@ -77,18 +100,19 @@ export function useFullPipelineHandler(currentProject, selectedChapter) {
     useEffect(() => {
         if (!taskStatusData || !fullPipelinePolling) return;
         if (taskStatusData.status === 'completed') {
-            addPipelineLog({ step: 'full-pipeline', status: 'done', result: taskStatusData.result, timestamp: new Date().toISOString() });
+            appendRoundLogs(addPipelineLog, taskStatusData.result, selectedChapter?.chapterNumber, selectedChapter);
+            addPipelineLog({ step: 'full-pipeline', status: 'done', result: taskStatusData.result, chapterNumber: selectedChapter?.chapterNumber, detail: `第${selectedChapter?.chapterNumber}章 完成（${taskStatusData.result?.rounds || '?'}轮）`, timestamp: new Date().toISOString() });
             setFullPipelinePolling(false);
             setFullPipelineTaskId(null);
             queryClient.invalidateQueries({ queryKey: PIPELINE_KEYS.outputPaths(currentProject?.id) });
         } else if (taskStatusData.status === 'failed') {
             const failMsg = taskStatusData.error || taskStatusData.result?.error || taskStatusData.result?.message || '流水线执行失败';
-            addPipelineLog({ step: 'full-pipeline', status: 'error', error: failMsg, timestamp: new Date().toISOString() });
+            addPipelineLog({ step: 'full-pipeline', status: 'error', error: failMsg, chapterNumber: selectedChapter?.chapterNumber, detail: `第${selectedChapter?.chapterNumber}章 失败：` + failMsg, timestamp: new Date().toISOString() });
             alert('本章流水线执行失败：' + failMsg);
             setFullPipelinePolling(false);
             setFullPipelineTaskId(null);
         } else if (taskStatusData.progress && typeof taskStatusData.progress === 'string') {
-            addPipelineLog({ step: 'full-pipeline', status: 'running', message: taskStatusData.progress, timestamp: new Date().toISOString() });
+            addPipelineLog({ step: 'full-pipeline', status: 'running', message: taskStatusData.progress, chapterNumber: selectedChapter?.chapterNumber, timestamp: new Date().toISOString() });
         }
     }, [taskStatusData, fullPipelinePolling, currentProject?.id, addPipelineLog, queryClient]);
 

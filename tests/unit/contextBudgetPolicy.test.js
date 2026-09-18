@@ -215,3 +215,69 @@ describe('上下文装配记录（持久化与状态判定）', () => {
         expect(getCascadableStoreTypes()).toContain('context-assemblies');
     });
 });
+
+describe('素材归档保护（语义判定，非名字匹配）', () => {
+    const { isProtectedMaterial } = require('../../server/services/pipeline/steps/materialLifecycle');
+    test('主角按 roleLevel 保护（名字不含"主角"也要保护）', () => {
+        expect(isProtectedMaterial({ name: '茅十七', roleLevel: 'protagonist' }, 3)).toBe(true);
+        expect(isProtectedMaterial({ name: '张三', isMainCharacter: true }, 3)).toBe(true);
+        expect(isProtectedMaterial({ name: '某配角', isLocked: true }, 3)).toBe(true);
+    });
+    test('最近N章出现过的素材保护（避免误伤当前剧情线）', () => {
+        expect(isProtectedMaterial({ name: '路人甲', roleLevel: 'npc', lastAppearChapter: 8 }, 10)).toBe(true);
+        expect(isProtectedMaterial({ name: '路人乙', roleLevel: 'npc', lastAppearChapter: 1 }, 10)).toBe(false);
+    });
+    test('旧实现用名字包含"主角"判定 → 会漏保护', () => {
+        const oldLogic = (m) => Boolean(m.name && m.name.includes('主角'));
+        expect(oldLogic({ name: '茅十七', roleLevel: 'protagonist' })).toBe(false);
+        expect(isProtectedMaterial({ name: '茅十七', roleLevel: 'protagonist' }, 3)).toBe(true);
+    });
+});
+
+describe('记忆注入策略（单一数据源）', () => {
+    const { MEMORY_POLICY } = require('../../server/config/memoryPolicy');
+    test('卷摘要并入记忆槽且受上限约束', () => {
+        expect(MEMORY_POLICY.includeVolumeSummary).toBe(true);
+        expect(MEMORY_POLICY.volumeSummaryMaxChars).toBeGreaterThan(0);
+    });
+    test('resolveMemoryPyramid 在无facts项目不抛错', async () => {
+        const { resolveSlotContent } = require('../../server/services/prompts/slotResolvers');
+        const out = await resolveSlotContent({ type: 'memory-pyramid' }, { projectId: 'no-such-project-for-test', chapterNumber: 1 });
+        expect(out === null || typeof out === 'string').toBe(true);
+    });
+});
+
+describe('流水线日志元信息（章号/轮次）', () => {
+    const { tagLogMeta } = require('../../server/core/pipeline/orchestratorHelpers');
+    test('补齐章号，收尾步骤归属到刚结束的轮次', () => {
+        const log = [
+            { step: 'writer', round: 2, passed: true },
+            { step: 'material-manager', passed: true },
+            { step: 'material-organizer', passed: true },
+        ];
+        tagLogMeta(log, 7);
+        expect(log[0].chapterNumber).toBe(7);
+        expect(log[1].round).toBe(2);
+        expect(log[2].round).toBe(2);
+    });
+    test('无轮次信息时默认第1轮', () => {
+        const log = [{ step: 'writer', passed: true }];
+        tagLogMeta(log, 3);
+        expect(log[0].round).toBe(1);
+    });
+});
+
+describe('素材内容合并（防人设被章节状态冲掉）', () => {
+    const { mergeMaterialContent } = require('../../server/services/pipeline/steps/materialContentMerger');
+    const oldContent = '【身份】丧仪司收殓师\n【性格】' + '玩世不恭'.repeat(20) + '\n【当前状态】在义庄';
+    test('人设标签保留更丰富的一版，状态标签用新值', () => {
+        const merged = mergeMaterialContent(oldContent, '【当前状态】在乱葬岗\n【基本信息】受伤');
+        expect(merged).toContain('丧仪司收殓师');
+        expect(merged).toContain('在乱葬岗');
+        expect(merged).not.toContain('在义庄');
+        expect(merged).toContain('【基本信息】');
+    });
+    test('无法分节时返回 null（调用方回退原行为）', () => {
+        expect(mergeMaterialContent('纯文本没有人设标签', '【当前状态】x')).toBeNull();
+    });
+});

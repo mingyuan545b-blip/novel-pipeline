@@ -14,6 +14,7 @@ const { buildMaterialTypeList, buildMaterialSystemPromptWithProject, buildMateri
 const { parseJsonResponse, parseMarkdownOutlines } = require('./outlineResponseParser');
 const { saveMaterial, findExistingCharacterMaterial, updateExistingMaterial, createCharacterRelations, createEquipmentBinds, saveChapterOutlines } = require('./outlineMaterialSaver');
 const { syncCharacterToEntityCenter, initCharacterKVState, autoSetProtagonistName } = require('./outlineEntitySync');
+const { enforceMaterialDepth } = require('./materialDepthEnforcer');
 const { syncFactsFromMaterials } = require('../knowledgeBase');
 const { detectOutlineDrift, formatDriftReport } = require('./outlineDriftGuard');
 const { generateFromTemplate } = require('./outlineTemplateGenerator');
@@ -61,7 +62,13 @@ async function generateInitialMaterials(projectId, userPrompt) {
         await createEquipmentBinds(projectId, materials, created);
         const syncedFacts = await syncFactsFromMaterials(projectId, created);
         logger.info('outlineGen', `generateInitialMaterials: synced ${syncedFacts} facts to knowledge base`);
-        return { created, count: created.length, syncedFacts };
+        // 角色素材深度强制达标（题材要求主角≥600字/配角≥400字，实测常被LLM压到250~350字）
+        const cp = genre?.characterProfile || {};
+        const depthStats = await enforceMaterialDepth(projectId, {
+            apiConfig: await getOutlineApiConfig(),
+            roleWordCounts: { protagonist: cp.protagonistWordCount, supporting: cp.supportingWordCount, npc: cp.npcWordCount },
+        });
+        return { created, count: created.length, syncedFacts, depthStats };
     } catch (e) {
         return { created: [], count: 0, raw: responseText, error: e.message };
     }

@@ -70,21 +70,22 @@ export default function AssemblyPanel({ data }) {
                         <table className={s.typeTable}>
                             <thead>
                                 <tr>
-                                    <th>素材类型</th><th>状态</th><th>层级</th><th>条数</th><th>字符</th><th>约token</th><th>依据</th>
+                                    <th>素材类型</th><th>状态</th><th>层级</th><th>条数</th><th>字符</th><th>约token</th><th>为何加载/未加载</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {agent.types.map(t => {
                                     const meta = STATUS_META[t.status] || STATUS_META.dropped;
+                                    const statusText = t.statusLabel || meta.label;
                                     return (
                                         <tr key={t.type} className={s[`row_${meta.cls}`]}>
-                                            <td className={s.typeName}>{t.type}</td>
-                                            <td><span className={`${s.statusPill} ${s[`pill_${meta.cls}`]}`}>{meta.icon} {meta.label}</span></td>
+                                            <td className={s.typeName}>{t.typeIcon || ''} {t.typeLabel || t.type}</td>
+                                            <td><span className={`${s.statusPill} ${s[`pill_${meta.cls}`]}`}>{meta.icon} {statusText}</span></td>
                                             <td>{t.actualDepth || '-'}{t.degraded ? ' ↓' : ''}</td>
                                             <td>{t.itemCount}</td>
                                             <td>{t.chars}</td>
                                             <td>{t.estTokens}</td>
-                                            <td className={s.reasonCell}>{t.relevanceReason || t.dropReason || '-'}</td>
+                                            <td className={s.reasonCell}>{t.relevanceLabel || t.dropReasonLabel || '-'}</td>
                                         </tr>
                                     );
                                 })}

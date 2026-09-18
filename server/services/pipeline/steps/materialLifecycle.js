@@ -1,6 +1,7 @@
 const store = require('../../../store');
 const { getVolumeOrder } = require('../volumeHelpers');
 const logger = require('../../../shared/logger');
+const { MATERIAL_LIFECYCLE_POLICY } = require('../../../config/materialLifecyclePolicy');
 
 const MATERIAL_LIFECYCLE = {
     permanent: new Set(['worldview', 'power-system', 'sub-plane', 'craft', 'writing-technique']),
@@ -33,10 +34,20 @@ async function getCurrentVolumeSubplaneId(projectId, chapterNum) {
     }
 }
 
+/** 是否受保护（不归档）：锁定/主角定位/关键配角/最近N章出现过 —— 语义判定，禁止用名字字符串判断 */
+function isProtectedMaterial(mat, chapterNum) {
+    const cfg = MATERIAL_LIFECYCLE_POLICY;
+    if (mat.isLocked || mat.isMainCharacter === true) return true;
+    if (mat.roleLevel && cfg.protectedRoleLevels.includes(mat.roleLevel)) return true;
+    const lastSeen = mat.lastAppearChapter;
+    if (typeof lastSeen === 'number' && chapterNum - lastSeen <= cfg.recencyWindowChapters) return true;
+    return false;
+}
+
 function archiveMaterials(materialsToArchive, chapterNum, reason) {
     for (const mat of materialsToArchive) {
-        if (mat.name && (mat.name.includes('主角') || mat.isLocked)) {
-            logger.warn('materialLifecycle', `素材重建保护: "${mat.name}" 是主角/锁定素材，跳过归档`);
+        if (isProtectedMaterial(mat, chapterNum)) {
+            logger.warn('materialLifecycle', `素材归档保护: "${mat.name}"（roleLevel=${mat.roleLevel || '-'} lastAppear=${mat.lastAppearChapter ?? '-'}）跳过归档`);
             continue;
         }
         store.setItem('materials', mat.id, {
@@ -130,6 +141,7 @@ function getDynamicMaxMaterials(chapterNum, options = {}) {
 
 module.exports = {
     getMaterialLifecycle,
+    isProtectedMaterial,
     getCurrentVolumeSubplaneId,
     cleanChapterMaterials,
     getActiveMaterials,

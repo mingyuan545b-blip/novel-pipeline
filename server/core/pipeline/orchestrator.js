@@ -10,7 +10,7 @@ const { summarizeDegradations, drainDegradations } = require('../../services/pip
 const { STATUS_VALUES } = require('../../services/chapterStatus');
 const logger = require('../../shared/logger');
 const { DomainError } = require('../../shared/errors');
-const { checkStopped, getSteps, persistPipelineLog } = require('./orchestratorHelpers');
+const { checkStopped, getSteps, persistPipelineLog, tagLogMeta } = require('./orchestratorHelpers');
 const { runPreflightChecks, handleChapterIntent, syncHooksAndRules } = require('./orchestratorPreflight');
 const { clearRoundOutputs, checkCircuitBreaker } = require('./orchestratorRoundHelpers');
 const { executeStepLoop } = require('./orchestratorStepLoop');
@@ -89,18 +89,19 @@ class PipelineOrchestrator {
                 chapter = await store.getItem('chapters', chapterId) || chapter;
 
                 if (checkStopped(projectId, chapterNumber, abortController)) {
-                    chapter.status = 'outlined'; delete chapter.skipUntil;
+                    chapter.status = STATUS_VALUES.OUTLINED;
+                    delete chapter.skipUntil;
                     chapter.updatedAt = new Date().toISOString();
                     await store.setItem('chapters', chapterId, chapter);
                     await persistPipelineLog(chapterId, projectId, pipelineLog);
-                    return { success: false, rounds: round, log: pipelineLog, message: '流水线已停止' };
+                    return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber), message: '流水线已停止' };
                 }
 
                 await clearRoundOutputs(chapter, chapterId, round, startRound);
 
                 if (round > 1) {
-                    const cbResult = await checkCircuitBreaker(projectId, round, circuitBreaker, pipelineLog, chapterId, projectId);
-                    if (cbResult.tripped) return { success: false, rounds: round, log: pipelineLog, message: '流水线熔断暂停', alertLoopReport: cbResult.alertResult };
+                    const cbResult = await checkCircuitBreaker(projectId, round, circuitBreaker, pipelineLog, chapterId, projectId, startRound);
+                    if (cbResult.tripped) return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber), message: '流水线熔断暂停', alertLoopReport: cbResult.alertResult };
                 }
 
                 const loopResult = await executeStepLoop({
@@ -111,7 +112,7 @@ class PipelineOrchestrator {
                 });
 
                 retryCount = loopResult.retryCount ?? retryCount;
-                if (loopResult.done) return loopResult.result;
+                if (loopResult.done) { if (loopResult.result) tagLogMeta(loopResult.result.log, chapterNumber); return loopResult.result; }
                 if (loopResult.currentFeedback) lastFeedback = loopResult.currentFeedback;
                 if (loopResult.currentMaterialGuidance) materialGuidance = loopResult.currentMaterialGuidance;
             }
@@ -120,7 +121,7 @@ class PipelineOrchestrator {
             const isWordCountFailure = lastLog && lastLog.feedback?.issues?.some(i => i.desc && i.desc.includes('字数') && i.desc.includes('低于最低要求'));
             const failedChapter = await store.getItem('chapters', chapterId);
             if (failedChapter) {
-                failedChapter.status = 'outlined';
+                failedChapter.status = STATUS_VALUES.OUTLINED;
                 delete failedChapter.skipUntil;
                 failedChapter.updatedAt = new Date().toISOString();
                 await store.setItem('chapters', chapterId, failedChapter);
@@ -128,7 +129,7 @@ class PipelineOrchestrator {
 
             await persistPipelineLog(chapterId, projectId, pipelineLog);
             const lastFailedStep = pipelineLog.length > 0 ? pipelineLog[pipelineLog.length - 1].step : 'unknown';
-            return { success: false, rounds: effectiveMaxRounds, log: pipelineLog, message: `Pipeline经${effectiveMaxRounds}轮审核仍未通过（最后失败步骤：${lastFailedStep}）`, lastFeedback, failureType: isWordCountFailure ? 'word-count' : 'review' };
+            return { success: false, rounds: effectiveMaxRounds, log: tagLogMeta(pipelineLog, chapterNumber), message: `Pipeline经${effectiveMaxRounds}轮审核仍未通过（最后失败步骤：${lastFailedStep}）`, lastFeedback, failureType: isWordCountFailure ? 'word-count' : 'review' };
         } finally {
             // 安全网：确保Pipeline日志总是持久化，无论通过哪个路径退出
             if (pipelineLog.length > 0) {

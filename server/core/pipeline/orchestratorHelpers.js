@@ -54,10 +54,33 @@ function generateOverrideOutput(overrideReason, stepName, originalFeedback) {
 async function persistPipelineLog(chapterId, projectId, pipelineLog) {
     try {
         const logId = `${chapterId}_pipeline`;
-        const entries = pipelineLog.map(e => ({ ...e, timestamp: e.timestamp || new Date().toISOString() }));
+        // 单点补全章节号：pipelineLog各来源条目原本只有step+timestamp，前端执行日志无法定位到章
+        // （2026-09-06用户报告）。round由executeStep在入log时打标，此处兜底chapterNumber。
+        let chapterNumber;
+        try { chapterNumber = (await store.getItem('chapters', chapterId))?.chapterNumber; } catch (_) { /* 非阻塞 */ }
+        const entries = pipelineLog.map(e => ({ ...e, timestamp: e.timestamp || new Date().toISOString(), chapterNumber: e.chapterNumber ?? chapterNumber }));
         const trimmed = entries.length > MAX_PIPELINE_LOG_ENTRIES ? entries.slice(-150) : entries;
         await store.setItem('pipeline-logs', logId, { id: logId, chapterId, projectId, entries: trimmed, updatedAt: new Date().toISOString() });
     } catch (err) { logger.warn('pipeline', 'Failed to persist pipeline log', { error: err.message }); }
 }
 
 module.exports = { MAX_PIPELINE_LOG_ENTRIES, checkStopped, getSteps, clearDownstreamOutputs, generateOverrideOutput, persistPipelineLog };
+
+/**
+ * 给流水线日志补齐展示元信息：轮次 + 章号。
+ * 目的：前端"执行日志"要能显示 第X章 / 第N轮 / 细节，而不是只有 R1/R2。
+ * 收尾步骤（material-manager/material-organizer 等）没有轮次 → 归属到刚结束的那一轮。
+ */
+function tagLogMeta(log, chapterNumber) {
+    if (!Array.isArray(log)) return log;
+    let lastRound = 1;
+    for (const entry of log) {
+        if (!entry || typeof entry !== 'object') continue;
+        if (entry.round === undefined) entry.round = lastRound;
+        lastRound = entry.round || lastRound;
+        if (entry.chapterNumber === undefined) entry.chapterNumber = chapterNumber;
+    }
+    return log;
+}
+
+module.exports = { ...module.exports, tagLogMeta };

@@ -72,7 +72,29 @@ async function resolveMemoryPyramid(ctx) {
         const decay = f.decayScore !== undefined ? ` (衰减${(f.decayScore * 100).toFixed(0)}%)` : '';
         lines.push(`- [${label}] ${f.factText}${decay}`);
     }
+    const narrative = await _resolveVolumeSummary(ctx.projectId, chapterNumber);
+    if (narrative) lines.push(narrative);
     return lines.join('\n');
+}
+
+/**
+ * 叙事记忆（卷摘要）：services/memory 算好的 L4 卷回顾此前只被 UI 读取、prompt 无人消费，
+ * 现并入同一记忆槽（事实记忆 + 叙事记忆两种粒度），上限见 config/memoryPolicy。
+ */
+async function _resolveVolumeSummary(projectId, chapterNumber) {
+    const { MEMORY_POLICY } = require('../../config/memoryPolicy');
+    if (!MEMORY_POLICY.includeVolumeSummary) return '';
+    try {
+        const memory = require('../memory');
+        const layers = await memory.getMemoryLayers(projectId);
+        const volumes = (layers && layers.compressed && layers.compressed.volumes) || {};
+        const volume = Math.floor((chapterNumber - 1) / 30) + 1;
+        const summary = volumes[volume] && volumes[volume].summary;
+        if (!summary) return '';
+        return '- [叙事记忆·第' + volume + '卷] ' + String(summary).substring(0, MEMORY_POLICY.volumeSummaryMaxChars);
+    } catch (e) {
+        return '';
+    }
 }
 
 function _appendGenreBase(localProfile, genreBase) {

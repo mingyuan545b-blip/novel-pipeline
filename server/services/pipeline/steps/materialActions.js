@@ -10,6 +10,21 @@ const { extractRoleLevelFromContent, extractGenreStateFromContent } = require('.
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
 const { handleCreateAction } = require('./materialCreateAction');
 
+/**
+ * 计算更新后的 currentContent：
+ *   角色类走"合并模式"（保留人设标签，只覆盖状态类标签），避免章节状态把人设冲掉
+ *   （陷阱清单 P0；配置见 config/materialContentPolicy）
+ * 合并失败时回退为原行为（update.content || existing.currentContent）。
+ */
+function resolveCurrentContent(update, existing) {
+    const { MATERIAL_CONTENT_POLICY } = require('../../../config/materialContentPolicy');
+    if (!update.content) return existing.currentContent;
+    if (!MATERIAL_CONTENT_POLICY.mergeTypes.includes(existing.type)) return update.content;
+    const { mergeMaterialContent } = require('./materialContentMerger');
+    const merged = mergeMaterialContent(existing.currentContent, update.content);
+    return merged || update.content;
+}
+
 async function handleUpdateAction(update, existing, chapter, projectId, styleProfile) {
     if (!existing || !existing.id) return false;
 
@@ -18,7 +33,7 @@ async function handleUpdateAction(update, existing, chapter, projectId, stylePro
 
     const updatedMaterial = {
         ...existing,
-        currentContent: update.content || existing.currentContent,
+        currentContent: resolveCurrentContent(update, existing),
         sourceChapter: chapter.chapterNumber || existing.sourceChapter,
         lastAppearChapter: chapter.chapterNumber || existing.lastAppearChapter,
         version: (existing.version || 1) + 1,

@@ -31,6 +31,7 @@ export default function PipelineLogViewer({
                 pipelineState={pipelineState}
                 pipelineSteps={pipelineSteps}
                 reviewLogs={reviewLogs}
+                selectedChapter={selectedChapter}
             />
         </>
     );

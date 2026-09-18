@@ -58,7 +58,8 @@ jest.mock('../../server/services/pipeline/degradationTracker', () => ({
 jest.mock('../../server/core/pipeline/orchestratorHelpers', () => ({
     checkStopped: jest.fn(),
     getSteps: jest.fn(),
-    persistPipelineLog: jest.fn()
+    persistPipelineLog: jest.fn(),
+    tagLogMeta: (log) => log
 }));
 
 jest.mock('../../server/core/pipeline/orchestratorPreflight', () => ({

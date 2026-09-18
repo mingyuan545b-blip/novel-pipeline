@@ -4,7 +4,19 @@ import s from './PipelineLogViewer.module.css';
 const STATUS_STEPS = ['pipeline-start', 'pipeline-done', 'pipeline-error', 'pipeline-stop', 'cooldown', 'chapter-skip', 'outline-supplement', 'chapter-status'];
 const ISSUE_CLASS = { critical: s.issueCritical, high: s.issueHigh, medium: s.issueMedium };
 
-export default function PipelineLogList({ pipelineState, pipelineSteps, reviewLogs }) {
+const DETAIL_MAX = 120;
+
+/** 去掉消息里的 [R1 执笔] 前缀与装饰线，避免与结构化字段重复 */
+function cleanMsg(msg) {
+    if (!msg) return '';
+    return String(msg)
+        .replace(/\[R\d+\s*[^\]]*\]/g, '')
+        .replace(/[━]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+export default function PipelineLogList({ pipelineState, pipelineSteps, reviewLogs, selectedChapter }) {
     const hasLogs = pipelineState.logs.length > 0 || reviewLogs.length > 0;
 
     return (
@@ -18,7 +30,11 @@ export default function PipelineLogList({ pipelineState, pipelineSteps, reviewLo
                         {pipelineState.logs.map((log, idx) => {
                             const stepInfo = pipelineSteps.find(st => st.key === log.step);
                             const beijingTime = formatTime(log.timestamp || log.time);
-                            const affectedCh = log.affectedChapter || log.result?.affectedChapter || log.chapterNumber;
+                            // 章节号：优先日志自带，其次当前选中章节（避免"只显示R1/R2、看不出第几章"）
+                            const affectedCh = log.affectedChapter || log.chapterNumber
+                                || log.result?.affectedChapter || selectedChapter?.chapterNumber;
+                            const detail = log.detail || log.feedback?.summary || (log.result?.feedback?.summary ?? cleanMsg(log.msg));
+                            const roundNo = log.round || log.result?.round;
                             const icon = stepInfo?.icon || AGENT_ICONS[log.step] || '❓';
                             const label = stepInfo?.label || AGENT_LABELS[log.step] || log.step || '';
                             const isPassed = log.result?.passed ?? log.passed;
@@ -28,15 +44,19 @@ export default function PipelineLogList({ pipelineState, pipelineSteps, reviewLo
                                     <div className={s.logContent}>
                                         <span className={s.logStep} style={{ color: stepInfo?.color || undefined }}>{icon} {label}</span>
                                         {affectedCh && <span className={`${s.logChapter} cyber-badge`}>第${affectedCh}章</span>}
-                                        {log.round && <span className={s.logRound}>R{log.round}</span>}
+                                        {roundNo ? <span className={s.logRound}>第{roundNo}轮</span> : null}
                                         {log.status === 'running' && <span className="cyber-loading"></span>}
-                                        {log.status === 'error' && <span className={s.logError}>错误</span>}
+                                        {log.status === 'error' && <span className={s.logError}>{cleanMsg(log.error) ? '错误：' + cleanMsg(log.error).substring(0, 60) : '错误'}</span>}
                                         {isPassed !== undefined && (
                                             <span className={`cyber-badge ${isPassed ? 'cyber-badge-green' : 'cyber-badge-red'}`}>
                                                 {isPassed ? '通过' : '未通过'}
                                             </span>
                                         )}
-                                        {log.msg && (isStatusMsg || !stepInfo) && <span className={s.logMsg}>{log.msg.replace(/[━]/g, '').trim().substring(0, 60)}</span>}
+                                        {detail
+                                            ? <span className={s.logMsg} title={String(detail)}>{String(detail).substring(0, DETAIL_MAX)}</span>
+                                            : (isStatusMsg && log.msg
+                                                ? <span className={s.logMsg}>{cleanMsg(log.msg).substring(0, DETAIL_MAX)}</span>
+                                                : null)}
                                     </div>
                                     <span className={s.logTime}>{beijingTime}</span>
                                 </div>
