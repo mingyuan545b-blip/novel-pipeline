@@ -7,6 +7,7 @@ const { resolveDepth } = require('./contextDepthConstants');
 const { resolveMaterialIntentPriority } = require('./intentDepthResolver');
 const { _resolveEntityDepth, formatEntityByDepth, formatMaterialByDepth } = require('./agentMaterialFormatter');
 const { recordAssembly } = require('./contextAssemblyRecorder');
+const { loadRelations } = require('./relationMaterialLoader');
 const logger = require('../../shared/logger');
 
 async function scheduleMaterials(agentType, params) {
@@ -54,12 +55,24 @@ async function scheduleMaterials(agentType, params) {
     return scheduled;
 }
 
+/** 意图中提到的角色名集合（用于关系相关性排序） */
+function _intentCharacterNames(_agentType, intentResult) {
+    return (intentResult && intentResult.characterNames) ? intentResult.characterNames : new Set();
+}
+
 async function _loadByNeed(need, activeMats, outlineText, ctx, chapter, projectId, agentType, intentResult) {
     if (need.source === 'entity-center') {
         return _loadFromEntityCenter(need, ctx, chapter, projectId, agentType, outlineText, intentResult);
     }
     if (need.source === 'knowledge-access') {
         return _loadKnowledgeAccess(need, projectId, chapter);
+    }
+    if (need.source === 'relations') {
+        return loadRelations(need, {
+            projectId, chapterNumber: chapter?.chapterNumber || 1,
+            outlineText: outlineText || '',
+            intentNames: _intentCharacterNames(agentType, intentResult),
+        });
     }
     return _loadFromMaterials(need, activeMats, outlineText, intentResult);
 }

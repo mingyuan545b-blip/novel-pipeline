@@ -23,7 +23,7 @@ const SUPPLEMENT_DECLARATIONS = {
         label: '返修',
         materialNeeds: [
             { type: 'character',    detail: 'full',    required: true,  budget: 3000, source: 'entity-center' },
-            { type: 'relationship', detail: 'summary', required: true,  budget: 600,  source: 'materials' },
+            { type: 'relationship', detail: 'summary', required: true,  budget: 600,  source: 'relations' },
             { type: 'worldview',    detail: 'summary', required: false, budget: 600,  source: 'materials' },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 300,  source: 'materials' },
             { type: 'famous-scene', detail: 'brief',   required: false, budget: 150,  source: 'materials', maxItems: 2 },
@@ -52,7 +52,7 @@ const SUPPLEMENT_DECLARATIONS = {
         label: '润色',
         materialNeeds: [
             { type: 'character',    detail: 'summary', required: true,  budget: 1500, source: 'entity-center' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'relations' },
             { type: 'famous-scene', detail: 'brief',   required: false, budget: 150,  source: 'materials', maxItems: 2 },
             { type: 'writing-technique', detail: 'brief', required: false, budget: 300, source: 'materials', maxItems: 2 },
         ],
@@ -73,7 +73,7 @@ const SUPPLEMENT_DECLARATIONS = {
         label: '意图规划',
         materialNeeds: [
             { type: 'character',    detail: 'summary', required: true,  budget: 1500, source: 'entity-center' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'relations' },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 300,  source: 'materials' },
             { type: 'worldview',    detail: 'brief',   required: false, budget: 400,  source: 'materials' },
         ],
@@ -93,7 +93,7 @@ const SUPPLEMENT_DECLARATIONS = {
         label: '定稿',
         materialNeeds: [
             { type: 'character',    detail: 'summary', required: true,  budget: 1500, source: 'entity-center' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'relations' },
             { type: 'famous-scene', detail: 'brief',   required: false, budget: 150,  source: 'materials', maxItems: 2 },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 300,  source: 'materials' },
             { type: 'writing-technique', detail: 'brief', required: false, budget: 300, source: 'materials', maxItems: 2 },
@@ -116,7 +116,7 @@ const SUPPLEMENT_DECLARATIONS = {
         label: '读者',
         materialNeeds: [
             { type: 'character',    detail: 'brief',   required: false, budget: 1000, source: 'materials' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'relations' },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 200,  source: 'materials' },
         ],
         constraintNeeds: {},
@@ -133,7 +133,7 @@ const SUPPLEMENT_DECLARATIONS = {
         label: '素材管理',
         materialNeeds: [
             { type: 'character',    detail: 'index',   required: false, budget: 500,  source: 'materials' },
-            { type: 'relationship', detail: 'index',   required: false, budget: 300,  source: 'materials' },
+            { type: 'relationship', detail: 'index',   required: false, budget: 300,  source: 'relations' },
             { type: 'famous-scene', detail: 'index',   required: false, budget: 200,  source: 'materials' },
             { type: 'catchphrase',  detail: 'index',   required: false, budget: 200,  source: 'materials' },
             { type: 'worldview',    detail: 'index',   required: false, budget: 200,  source: 'materials' },

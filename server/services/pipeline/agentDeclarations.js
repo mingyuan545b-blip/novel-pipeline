@@ -32,7 +32,7 @@ const CORE_DECLARATIONS = {
         label: '执笔',
         materialNeeds: [
             { type: 'character',    detail: 'full',    required: true,  budget: 4000, source: 'entity-center' },
-            { type: 'relationship', detail: 'summary', required: true,  budget: 800,  source: 'materials' },
+            { type: 'relationship', detail: 'summary', required: true,  budget: 800,  source: 'relations' },
             { type: 'worldview',    detail: 'full',    required: true,  budget: 800,  source: 'materials' },
             { type: 'power-system', detail: 'summary', required: false, budget: 400,  source: 'materials' },
             { type: 'equipment',    detail: 'summary', required: false, budget: 300,  source: 'materials', matchOutline: true },
@@ -68,7 +68,7 @@ const CORE_DECLARATIONS = {
         label: '初审',
         materialNeeds: [
             { type: 'character',    detail: 'summary', required: true,  budget: 2000, source: 'entity-center' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'relations' },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 300,  source: 'materials' },
             { type: 'worldview',    detail: 'brief',   required: false, budget: 400,  source: 'materials' },
             { type: 'institution',  detail: 'brief',   required: false, budget: 200,  source: 'materials' },
@@ -93,7 +93,7 @@ const CORE_DECLARATIONS = {
         label: '复审',
         materialNeeds: [
             { type: 'character',    detail: 'summary', required: true,  budget: 1500, source: 'entity-center' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 400,  source: 'relations' },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 300,  source: 'materials' },
             { type: 'worldview',    detail: 'brief',   required: false, budget: 400,  source: 'materials' },
             { type: 'institution',  detail: 'brief',   required: false, budget: 200,  source: 'materials' },
@@ -118,7 +118,7 @@ const CORE_DECLARATIONS = {
         label: '快审',
         materialNeeds: [
             { type: 'character',    detail: 'brief',   required: true,  budget: 1000, source: 'entity-center' },
-            { type: 'relationship', detail: 'brief',   required: false, budget: 300,  source: 'materials' },
+            { type: 'relationship', detail: 'brief',   required: false, budget: 300,  source: 'relations' },
             { type: 'foreshadowing',detail: 'brief',   required: false, budget: 200,  source: 'materials' },
             { type: 'knowledge-access', detail: 'brief', required: false, budget: 300, source: 'knowledge-access' },
         ],

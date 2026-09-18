@@ -7,6 +7,8 @@ const { buildModuleHint } = require('../../../genres/moduleHintBuilder');
 const { buildWriterPovRuleSection } = require('../../povRuleSectionBuilder');
 const { buildWritingGuardSection } = require('../../writingGuardSectionBuilder');
 const { buildWriterStyleRuleSection } = require('../../styleRuleSectionBuilder');
+const { buildExpansionInstruction } = require('../expansionInstructionBuilder');
+const { buildLengthInstruction } = require('./sceneFloorInstruction');
 // 上下文构建函数已拆分到 writerPromptContextBuilders.js（遵循200行单文件硬限制）
 const { _buildNarrativeBridge, _buildTimeline, _buildForeshadow, _buildCharacterActivity, _buildCharacterStateSummary, _buildGuardHints } = require('./writerPromptContextBuilders');
 // 修复数据断链：注入题材writerHints.terminologyDimming到writer prompt（原getGenreWriterInjection是死代码）
@@ -36,8 +38,7 @@ async function buildWriterPrompt(params) {
     agentContext.content = `创作第${chapter.chapterNumber}章正文：
 ${writingGuardSection}
 
-【字数要求 - 必须满足】本章目标字数：${targetMin}-${targetMax}字。硬性最低${rejectMin}字、上限${targetMax + 700}字。低于${rejectMin}字退回重写，超过${targetMax + 700}字退回精简。宁可多写不可少写，但不要超过${targetMax + 700}字。
-结构：场景1(铺垫≥400字)→场景2(核心≥600字)→场景3(推进≥500字)→场景4(钩子≥400字)。每场景含动作+对话+叙事推进，环境最多2句带过。
+${buildLengthInstruction(config.word)}
 防重复：不逐字复制前文，时间推进须有新动作/对话。
 ${(() => { const vars = resolve(genre); return vars.SUPPORTING_WRITER_PRINCIPLES ? '\n' + vars.SUPPORTING_WRITER_PRINCIPLES : ''; })()}
 ${(() => { const inj = getGenreWriterInjection(genre); return inj ? '\n' + inj : ''; })()}
@@ -166,6 +167,11 @@ function _appendRoundContext(chapter, round, config, context, agentContext) {
             agentContext.content += `\n\n【当前正文(参考并扩展)】\n${chapter.content.substring(0, 5000)}\n\n⚠️字数未达标(${currentWc}字，还需${wcTargetMin - currentWc}字)，扩展场景描写。`;
         } else {
             agentContext.content += `\n\n【当前正文(参考)】\n${chapter.content.substring(0, 5000)}`;
+        }
+        // 字数缺口时追加结构化扩写指令（统一构建器，显式数学量——flash/27B级模型对含糊指令不扩足，2026-09-06实测）
+        if (currentWc < wcTargetMin) {
+            const expansion = buildExpansionInstruction(currentWc, config.word, { mode: 'rewrite', attempt: Math.max(0, round - 1) });
+            if (expansion) agentContext.content += '\n\n' + expansion;
         }
     }
     if (context.reviewFeedback) {
