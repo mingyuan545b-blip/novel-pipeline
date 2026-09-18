@@ -85,7 +85,7 @@ export default function AssemblyPanel({ data }) {
                                             <td>{t.itemCount}</td>
                                             <td>{t.chars}</td>
                                             <td>{t.estTokens}</td>
-                                            <td className={s.reasonCell}>{t.relevanceLabel || t.dropReasonLabel || '-'}</td>
+                                            <td className={s.reasonCell}>{t.status === 'dropped' ? (t.dropReasonLabel || t.relevanceLabel || '-') : (t.relevanceLabel || '-')}</td>
                                         </tr>
                                     );
                                 })}

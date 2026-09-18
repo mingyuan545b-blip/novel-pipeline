@@ -9,6 +9,21 @@
 
 ## 一、当前结论（重要）
 
+0c. **（2026-09-18 第二批）装配图中文化 + 执行日志补章号/轮次/细节 + 关系与角色深度修复**
+   - 装配图前端全中文（服务端下发 typeLabel/statusLabel/relevanceLabel，唯一数据源）
+   - 执行日志：`tagLogMeta` 统一补 round/chapterNumber；步骤日志带 detail（结论+问题）；
+     失败日志带"当前字数/最低要求/失败步骤"；时间格式 `2026-09-18 22:13:05`
+   - 人物关系：organizer prompt 强制输出 relationshipChanges（≥2角色互动不得为空）；
+     relationship 纳入 neverDropTypes（题材门禁不得排除）；消费端读 character-relations
+   - 角色素材深度：materialDepthEnforcer 批量补全（复用此前零调用的 materialDepthRepairPrompt）
+   - **素材内容合并（陷阱清单P0 已修）**：materialMarkdownExtractor/materialActions 统一走
+     mergeWithBaseline（initialContent 为基座），章节更新不再冲掉人设；
+     实测 茅十七 1286→1418字（跑完一章后反而增补）
+   - **素材误归档已修**：保护主角从 name.includes('主角') 改为语义判定（roleLevel 等）；
+     `scripts/repairArchivedMaterials.js`（默认干跑，支持 --merge-content）修复历史数据
+   - 分层记忆收敛：注入源=memory-pyramid+卷摘要；L0-L4 仅 UI 诊断
+   - 五章E2E复验：5/5章 material-updated（2628~3726字），31项核验 29 OK/2 WARN/0 FAIL
+
 0b. **（2026-09-18 本会话）上下文地基已修复 + 上下文装配图上线**（5个commit，见下方提交清单）：
    - 修复 calculateBudget 恒判超限 → 不再全量降级L0（人设/伏笔/关系不再退化成索引）
    - 上下文电路图更名为**上下文装配图**（`/context-assembly`，页面+API；逐章显示用了哪些素材、

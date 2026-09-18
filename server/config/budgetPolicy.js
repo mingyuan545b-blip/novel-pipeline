@@ -48,7 +48,7 @@ const BUDGET_POLICY = Object.freeze({
     minDepthByRequirement: Object.freeze({ required: 'L2', optional: 'L0' }),
 
     /** 一致性关键类型：任何 Agent、任何章节都不得丢弃（保逻辑/伏笔不崩） */
-    neverDropTypes: Object.freeze(['foreshadowing', 'character', 'worldview']),
+    neverDropTypes: Object.freeze(['foreshadowing', 'character', 'worldview', 'relationship']),
 
     /** 降级时丢弃非必需类型的顺序 */
     dropOptionalByPriorityAsc: true,
