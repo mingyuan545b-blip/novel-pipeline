@@ -55,6 +55,7 @@ const DATA_STORE_REGISTRY = {
     'state-snapshots':       { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'character-chronicle':   { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'knowledge-access':      { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
+    'context-assemblies':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'technique-feedback':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'world-scope-events':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'timelines':             { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },

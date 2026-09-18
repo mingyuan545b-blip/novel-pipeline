@@ -172,3 +172,46 @@ describe('题材元素组合（genre → 素材类型）', () => {
         expect(set.has('equipment')).toBe(false);
     });
 });
+
+describe('上下文装配记录（持久化与状态判定）', () => {
+    const { buildAssembly, TYPE_STATUS } = require('../../server/services/pipeline/contextAssemblyRecorder');
+    const { ASSEMBLY_STORE, chapterKey, assemblyId } = require('../../server/services/contextTrace');
+
+    const context = {
+        materialNeeds: [
+            { type: 'character', detail: 'full', resolvedDepth: 'L3', required: true, relevanceReason: 'required' },
+            { type: 'catchphrase', detail: 'brief', resolvedDepth: 'L1', dropped: true, dropReason: 'not-relevant' },
+            { type: 'foreshadowing', detail: 'summary', resolvedDepth: 'L2' },
+        ],
+        budgetAssessment: { status: { level: 'green', label: '充裕', action: 'none' }, ratio: 0.5, charBudget: 9000, plannedChars: 4500, tokenCeiling: 76800 },
+        meta: { phase: 'opening', sceneTypes: ['combat'] },
+    };
+    const scheduled = {
+        materials: { character: [{ content: 'x'.repeat(100) }], foreshadowing: [] },
+        constraints: { text: '约束' },
+        stats: { loaded: 1, actualChars: 100 },
+    };
+
+    test('按状态区分 已注入/丢弃/无数据', () => {
+        const a = buildAssembly({ agentType: 'writer', chapterNumber: 3, context, scheduled });
+        const by = {};
+        for (const t of a.types) by[t.type] = t.status;
+        expect(by.character).toBe(TYPE_STATUS.INJECTED);
+        expect(by.catchphrase).toBe(TYPE_STATUS.DROPPED);
+        expect(by.foreshadowing).toBe(TYPE_STATUS.EMPTY);
+        expect(a.summary.injectedTypes).toBe(1);
+        expect(a.summary.droppedTypes).toBe(1);
+        expect(a.summary.emptyTypes).toBe(1);
+    });
+
+    test('装配记录使用独立集合并按章+Agent寻址（避免丢失更新）', () => {
+        expect(ASSEMBLY_STORE).toBe('context-assemblies');
+        expect(chapterKey(7)).toBe('chapter-0007');
+        expect(assemblyId('p1', 7, 'writer')).toBe('p1_chapter-0007_writer');
+    });
+
+    test('context-assemblies 已注册级联删除', () => {
+        const { getCascadableStoreTypes } = require('../../server/config/dataStoreRegistry');
+        expect(getCascadableStoreTypes()).toContain('context-assemblies');
+    });
+});

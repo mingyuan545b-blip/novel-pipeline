@@ -1,6 +1,12 @@
 const store = require('../store');
 const { getDataContext } = require('./dataContext');
 
+
+/** 装配记录存储集合（非专用表，走 kv_store；已在 dataStoreRegistry 注册级联删除） */
+const ASSEMBLY_STORE = 'context-assemblies';
+const chapterKey = (n) => `chapter-${String(n).padStart(4, '0')}`;
+const assemblyId = (projectId, n, agentType) => `${projectId}_${chapterKey(n)}_${agentType}`;
+
 class ContextTrace {
     constructor(projectId) {
         this.projectId = projectId;
@@ -83,51 +89,49 @@ class ContextTrace {
 
     /**
      * 记录一次"上下文装配"实况（每章每Agent一条）
-     * 与 selectedContext（意图规划期的选择）互补：这里是素材真正被装载/丢弃的结果
-     * @param {number} chapterNumber
-     * @param {object} assembly 由 contextAssemblyRecorder 构建
+     *
+     * 存储：独立集合 context-assemblies，键 = `${projectId}_ch${nnn}_${agentType}`
+     * 为什么不用 project.contextTraces（2026-09-18 实测教训）：
+     *   内嵌在 projects 记录里需要"读整个项目→改→整体写回"，与 postApproval 的
+     *   recordChapterTrace 并发时互相覆盖（实测5章只有1章记录存活=丢失更新）。
+     *   独立集合按记录写，天然无丢失更新，也不会让项目记录随章节数线性膨胀。
      */
     async recordAssembly(chapterNumber, assembly) {
-        const traceStore = await this._getTraceStore();
-        const key = `chapter-${String(chapterNumber).padStart(4, '0')}`;
-        if (!traceStore.chapters[key]) {
-            traceStore.chapters[key] = {
-                chapter: chapterNumber,
-                timestamp: new Date().toISOString(),
-                selectedContext: [], selectedSources: [], notes: [],
-            };
-        }
-        const chapter = traceStore.chapters[key];
-        if (!chapter.assemblies) chapter.assemblies = {};
-        chapter.assemblies[assembly.agentType] = {
+        const id = assemblyId(this.projectId, chapterNumber, assembly.agentType);
+        const record = {
             ...assembly,
+            projectId: this.projectId,
+            chapter: chapterNumber,
+            chapterKey: chapterKey(chapterNumber),
             recordedAt: new Date().toISOString(),
         };
-        await this._saveTraceStore(traceStore);
-        return chapter.assemblies[assembly.agentType];
+        await store.setItem(ASSEMBLY_STORE, id, record);
+        return record;
     }
 
     /** 获取某章的全部装配记录 { agentType: assembly } */
     async getChapterAssemblies(chapterNumber) {
+        const rows = await store.queryItems(ASSEMBLY_STORE, { projectId: this.projectId });
+        const hit = rows.filter(r => (r.chapter ?? Number(String(r.chapterKey || '').replace('chapter-', ''))) === chapterNumber);
+        if (hit.length > 0) {
+            const out = {};
+            for (const r of hit) out[r.agentType] = r;
+            return out;
+        }
+        // 向后兼容：读取内嵌在 project.contextTraces 里的旧记录
         const trace = await this.getChapterTrace(chapterNumber);
         return trace?.assemblies || {};
     }
 
-    /** 批量移除章节记录（装配记录滚动淘汰用） */
+    /** 批量移除过老的装配记录（装配图滚动淘汰用） */
     async dropChapters(keys) {
         if (!keys || keys.length === 0) return 0;
-        const traceStore = await this._getTraceStore();
+        const rows = await store.queryItems(ASSEMBLY_STORE, { projectId: this.projectId });
         let removed = 0;
-        for (const key of keys) {
-            if (traceStore.chapters[key]) { delete traceStore.chapters[key]; removed++; }
+        for (const r of rows) {
+            if (keys.includes(r.chapterKey)) { await store.deleteItem(ASSEMBLY_STORE, r.id); removed++; }
         }
-        if (removed > 0) await this._saveTraceStore(traceStore);
         return removed;
-    }
-
-    async getAllTraces() {
-        const traceStore = await this._getTraceStore();
-        return traceStore.chapters;
     }
 
     async formatTraceForPrompt(chapterNumber) {
@@ -177,5 +181,8 @@ function getContextTraceForProject(projectId) {
 
 module.exports = {
     ContextTrace,
-    getContextTraceForProject
+    getContextTraceForProject,
+    ASSEMBLY_STORE,
+    chapterKey,
+    assemblyId,
 };
