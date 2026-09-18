@@ -1,7 +1,7 @@
 /**
- * contextDepthConstants.js — 上下文深度常量（上下文电路图专用）
- * 从depthVersionConstants提取，仅保留上下文决策/电路图/预算管理所需的常量
- * 深度版本生成/存储系统已删除（与上下文电路图重叠）
+ * contextDepthConstants.js — 上下文深度常量（上下文装配图专用）
+ * 从depthVersionConstants提取，仅保留上下文决策/装配图/预算管理所需的常量
+ * 深度版本生成/存储系统已删除（与上下文装配图重叠）
  */
 
 /** 5层深度定义 */
