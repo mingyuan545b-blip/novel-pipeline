@@ -9,6 +9,20 @@
 
 ## 一、当前结论（重要）
 
+0b. **（2026-09-18 本会话）上下文地基已修复 + 上下文装配图上线**（5个commit，见下方提交清单）：
+   - 修复 calculateBudget 恒判超限 → 不再全量降级L0（人设/伏笔/关系不再退化成索引）
+   - 上下文电路图更名为**上下文装配图**（`/context-assembly`，页面+API；逐章显示用了哪些素材、
+     什么层级/信息密度、哪些数据未接入或丢失）
+   - 新增 `scripts/verifyDataFlow.js`（全链路数据流通核查）与
+     `scripts/verifyFiveChapterE2E.js`（五章E2E核验）、`scripts/runFiveChapterE2E.js`
+   - 修复字数系统性不足：writer prompt 场景下限硬编码1950字 vs 硬性最低2500字自相矛盾
+     → 改为按 wordConfig 派生（`config/writerLengthPolicy.js`）
+   - 五章E2E项目 `85c5b21a-2f4e-49ff-aa44-c887be977f1e`（丧仪司_五章验证，原创殡葬题材）
+     5/5章 material-updated（2501~3720字），核验 26 OK/2 WARN/0 FAIL
+   - **待决策**：①人物关系生产端断链（关系表无生产者，消费端已修）②角色素材深度<400字
+     ③分层记忆L0-L4冗余（长期记忆由 memory-pyramid 承担）④licence机器绑定含内存导致换内存即失效
+
+
 0. **⚡进行中任务（2026-09-06中断）**：新项目E2E验证到ch1续跑前一步。**下个窗口第一条命令和全部上下文在 `docs/worklog/2026-09-06-token-plan接入与新项目E2E.md` 的"恢复锚点"节**（含16个未提交文件清单）。16文件改动全部测试绿但**未提交**。
 0a. **LLM已切阿里云Token Plan网关**：`sk-sp-`key + `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1` + qwen3.8-flash（.env已配）。旧coding.dashscope端点已对非Coding Agent返回405。速度：素材24s/大纲13s/单章~2min（本地27B的1/25）。
 0b. **历史悬案破案**：此前"新key两个端点都被拒"= Windows User级环境变量残留旧38字符key遮蔽.env（dotenv默认不override）。已修：server入口dotenv加override:true。**建议用户删User级旧变量+轮换对话中明文出现过的key**。
