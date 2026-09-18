@@ -84,6 +84,19 @@ function extractRouteRegistrations() {
  * 从routeVar名称推断路由文件路径
  * 例如: projectRoutes → server/routes/projects.js 或 server/routes/projects/index.js
  */
+/**
+ * 归一化 require 提示路径为仓库相对路径
+ * routeRegistration.js 位于 server/config/，因此：
+ *   './foo'          → server/foo.js
+ *   '../routes/foo'  → server/routes/foo.js
+ */
+function normalizeRouteFile(hint) {
+    let f = hint.replace(/^\.\//, 'server/');
+    if (f.startsWith('../')) f = 'server/' + f.replace(/^\.\.\//, '');
+    if (!f.endsWith('.js')) f += '.js';
+    return f;
+}
+
 function inferRouteFile(routeVar) {
     // 去除Routes后缀，转kebab-case
     const baseName = routeVar.replace(/Routes$/, '').replace(/([A-Z])/g, '-$1').toLowerCase().replace(/^-/, '');
@@ -150,11 +163,9 @@ function main() {
 
         if (reg.routeVar === 'lazyRoute' && reg.routeFileHint) {
             // lazyRoute('./routes/xxx') → server/routes/xxx.js
-            routeFile = reg.routeFileHint.replace(/^\.\//, 'server/');
-            if (!routeFile.endsWith('.js')) routeFile += '.js';
+            routeFile = normalizeRouteFile(reg.routeFileHint);
         } else if (reg.routeVar === 'require' && reg.routeFileHint) {
-            routeFile = reg.routeFileHint.replace(/^\.\//, 'server/');
-            if (!routeFile.endsWith('.js')) routeFile += '.js';
+            routeFile = normalizeRouteFile(reg.routeFileHint);
         } else if (reg.routeVar) {
             routeFile = inferRouteFile(reg.routeVar);
         }
@@ -197,11 +208,9 @@ function main() {
     for (const reg of registrations) {
         let routeFile = null;
         if (reg.routeVar === 'lazyRoute' && reg.routeFileHint) {
-            routeFile = reg.routeFileHint.replace(/^\.\//, 'server/');
-            if (!routeFile.endsWith('.js')) routeFile += '.js';
+            routeFile = normalizeRouteFile(reg.routeFileHint);
         } else if (reg.routeVar === 'require' && reg.routeFileHint) {
-            routeFile = reg.routeFileHint.replace(/^\.\//, 'server/');
-            if (!routeFile.endsWith('.js')) routeFile += '.js';
+            routeFile = normalizeRouteFile(reg.routeFileHint);
         } else if (reg.routeVar) {
             routeFile = inferRouteFile(reg.routeVar);
         }

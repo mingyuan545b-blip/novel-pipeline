@@ -81,6 +81,50 @@ class ContextTrace {
         return traceStore.chapters[key] || null;
     }
 
+    /**
+     * 记录一次"上下文装配"实况（每章每Agent一条）
+     * 与 selectedContext（意图规划期的选择）互补：这里是素材真正被装载/丢弃的结果
+     * @param {number} chapterNumber
+     * @param {object} assembly 由 contextAssemblyRecorder 构建
+     */
+    async recordAssembly(chapterNumber, assembly) {
+        const traceStore = await this._getTraceStore();
+        const key = `chapter-${String(chapterNumber).padStart(4, '0')}`;
+        if (!traceStore.chapters[key]) {
+            traceStore.chapters[key] = {
+                chapter: chapterNumber,
+                timestamp: new Date().toISOString(),
+                selectedContext: [], selectedSources: [], notes: [],
+            };
+        }
+        const chapter = traceStore.chapters[key];
+        if (!chapter.assemblies) chapter.assemblies = {};
+        chapter.assemblies[assembly.agentType] = {
+            ...assembly,
+            recordedAt: new Date().toISOString(),
+        };
+        await this._saveTraceStore(traceStore);
+        return chapter.assemblies[assembly.agentType];
+    }
+
+    /** 获取某章的全部装配记录 { agentType: assembly } */
+    async getChapterAssemblies(chapterNumber) {
+        const trace = await this.getChapterTrace(chapterNumber);
+        return trace?.assemblies || {};
+    }
+
+    /** 批量移除章节记录（装配记录滚动淘汰用） */
+    async dropChapters(keys) {
+        if (!keys || keys.length === 0) return 0;
+        const traceStore = await this._getTraceStore();
+        let removed = 0;
+        for (const key of keys) {
+            if (traceStore.chapters[key]) { delete traceStore.chapters[key]; removed++; }
+        }
+        if (removed > 0) await this._saveTraceStore(traceStore);
+        return removed;
+    }
+
     async getAllTraces() {
         const traceStore = await this._getTraceStore();
         return traceStore.chapters;

@@ -30,7 +30,7 @@ import CharacterStatePage from './pages/CharacterStatePage';
 import EntityCenterPage from './pages/EntityCenterPage';
 import GenreDebugPage from './pages/GenreDebugPage';
 import MetricsPage from './pages/metrics/MetricsPage';
-import ContextMapPage from './pages/contextMap/ContextMapPage';
+import ContextAssemblyPage from './pages/contextAssembly/ContextAssemblyPage';
 import DebugLogsPage from './pages/debug/DebugLogsPage';
 
 function App() {
@@ -94,12 +94,13 @@ function App() {
                             <Route path="/style-templates" element={<StyleTemplatesPage />} />
                             <Route path="/knowledge" element={<ErrorBoundary><KnowledgePage /></ErrorBoundary>} />
                             <Route path="/library" element={<LibraryPage />} />
-                            <Route path="/map" element={<Navigate to="/context-map" replace />} />
+                            <Route path="/map" element={<Navigate to="/context-assembly" replace />} />
                             <Route path="/character-states" element={<Navigate to="/entity-center?tab=state-tracking" replace />} />
                             <Route path="/entity-center" element={<EntityCenterPage />} />
                             <Route path="/genre-debug" element={<ErrorBoundary><GenreDebugPage /></ErrorBoundary>} />
                             <Route path="/metrics" element={<ErrorBoundary><MetricsPage /></ErrorBoundary>} />
-                            <Route path="/context-map" element={<ErrorBoundary><ContextMapPage /></ErrorBoundary>} />
+                            <Route path="/context-assembly" element={<ErrorBoundary><ContextAssemblyPage /></ErrorBoundary>} />
+                            <Route path="/context-map" element={<Navigate to="/context-assembly" replace />} />
                             <Route path="/debug-logs" element={<ErrorBoundary><DebugLogsPage /></ErrorBoundary>} />
                             {/* 陷阱#21：必须有通配符路由，否则用户访问 /projects 等未定义路径时
                                  Dashboard 不渲染，项目数据不显示，用户以为"前端没数据" */}

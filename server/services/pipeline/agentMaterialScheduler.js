@@ -1,16 +1,17 @@
 /** Agent素材统一调度器 — Context Commander动态决策+大纲意图+世界观分类加载 */
 const { resolveContext } = require('./contextCommander');
-const { detectConflicts, buildResolvedConstraints } = require('./constraintConflictDetector');
-const { _loadEntityRules, _loadGenreRules, _loadGlobalRules, _loadKnowledgeAccess, buildStateJson, getLifecycleStates } = require('./agentMaterialHelpers');
+const { _loadKnowledgeAccess, buildStateJson, getLifecycleStates } = require('./agentMaterialHelpers');
 const { selectItems } = require('./schedulerStrategy');
 const { resolveWorldviewLoadDepth, classifyMaterial } = require('./worldviewClassification');
 const { resolveDepth } = require('./contextDepthConstants');
 const { resolveMaterialIntentPriority } = require('./intentDepthResolver');
 const { _resolveEntityDepth, formatEntityByDepth, formatMaterialByDepth } = require('./agentMaterialFormatter');
+const { recordAssembly } = require('./contextAssemblyRecorder');
 const logger = require('../../shared/logger');
 
 async function scheduleMaterials(agentType, params) {
     const { projectId, chapter, materials, ctx, project, genre } = params;
+    const chapterNumber = chapter?.chapterNumber || chapter?.number || 1;
     const context = await resolveContext(agentType, params);
     if (context.materialNeeds.length === 0) {
         logger.warn('materialScheduler', `No context resolved for agent: ${agentType}`);
@@ -38,7 +39,7 @@ async function scheduleMaterials(agentType, params) {
         actualChars += result.items.reduce((sum, it) => sum + (it.content?.length || 0), 0);
     }
 
-    const constraints = await _loadConstraints(agentType, projectId, ctx, project, genre);
+    const constraints = await _loadConstraints(agentType, projectId);
     const stats = {
         agentType, loaded: totalLoaded, budget: context.totalBudget,
         actualChars, droppedTypes,
@@ -47,7 +48,10 @@ async function scheduleMaterials(agentType, params) {
         contextMeta: context.meta,
     };
 
-    return { materials: loadedMaterials, constraints, conflicts: constraints.conflicts, stats };
+    const scheduled = { materials: loadedMaterials, constraints, conflicts: constraints.conflicts, stats };
+    await recordAssembly({ projectId, agentType, chapterNumber, context, scheduled });
+
+    return scheduled;
 }
 
 async function _loadByNeed(need, activeMats, outlineText, ctx, chapter, projectId, agentType, intentResult) {
@@ -143,19 +147,23 @@ function _sortByIntentPriority(mats, intentResult) {
     });
 }
 
-async function _loadConstraints(agentType, projectId, ctx, project, genre) {
-    const entityRules = await _loadEntityRules(projectId);
-    const genreRules = _loadGenreRules(genre);
-    const globalRules = await _loadGlobalRules(projectId, ctx);
-
-    const { conflicts, resolved, log } = detectConflicts({ projectId, entityRules, genreRules, globalRules });
-    const resolvedText = buildResolvedConstraints({ projectId, entityRules, genreRules, globalRules });
-
-    if (log.length > 0) {
-        for (const entry of log) logger.info('materialScheduler', entry);
+/**
+ * 加载约束（单一数据源：constraintInjector）
+ *
+ * 2026-09-18 修复：原实现从 _loadEntityRules/_loadGenreRules/_loadGlobalRules 三处取规则，
+ * 三者在本项目实测恒为 null（genre.characterProfile.behaviorTemplate 从未被任何题材插件定义），
+ * 导致约束段恒为空、与实际注入到 system prompt 的约束不一致（双轨）。
+ * 现统一委托给真正生效的 constraintInjector.buildConstraintInjection()。
+ */
+async function _loadConstraints(agentType, projectId) {
+    try {
+        const { buildConstraintInjection } = require('../prompts/constraintInjector');
+        const text = await buildConstraintInjection(projectId, agentType);
+        return { text: text || '', conflicts: [], resolved: { source: 'constraint-injector' }, source: 'constraint-injector' };
+    } catch (e) {
+        logger.warn('materialScheduler', `Constraint load failed: ${e.message}`);
+        return { text: '', conflicts: [], resolved: { source: 'none' }, source: 'none' };
     }
-
-    return { text: resolvedText, conflicts, resolved, source: resolved.source };
 }
 
 module.exports = { scheduleMaterials };

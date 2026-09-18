@@ -3,13 +3,17 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-08-27
+> 最后更新：2026-09-06（会话中断交接：详细恢复锚点见 docs/worklog/2026-09-06-token-plan接入与新项目E2E.md）
 
 ---
 
 ## 一、当前结论（重要）
 
-1. **项目骨架健康（2026-08-27复验）**：单测 205套件/3444用例全绿、铁律自检无互斥、硬编码0、级联0、服务3001健康、PG正常（7项目/82章）。问题都是"漂移型"，做纠偏即可。
+0. **⚡进行中任务（2026-09-06中断）**：新项目E2E验证到ch1续跑前一步。**下个窗口第一条命令和全部上下文在 `docs/worklog/2026-09-06-token-plan接入与新项目E2E.md` 的"恢复锚点"节**（含16个未提交文件清单）。16文件改动全部测试绿但**未提交**。
+0a. **LLM已切阿里云Token Plan网关**：`sk-sp-`key + `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1` + qwen3.8-flash（.env已配）。旧coding.dashscope端点已对非Coding Agent返回405。速度：素材24s/大纲13s/单章~2min（本地27B的1/25）。
+0b. **历史悬案破案**：此前"新key两个端点都被拒"= Windows User级环境变量残留旧38字符key遮蔽.env（dotenv默认不override）。已修：server入口dotenv加override:true。**建议用户删User级旧变量+轮换对话中明文出现过的key**。
+0c. **字数退回死循环根因链已修**（与本地RUN3三连败同根因）：①含糊扩写指令→统一构建器expansionInstructionBuilder（显式数学量+清单）②rejectMin==minWords可救区为0→80%抢救区升级reviser ③reviser扩写+0字标passed白烧轮→步内升级重试 ④敏感词反馈不含命中词（与审计系统不对齐）→补齐 ⑤熔断器绝对轮次→相对轮次 ⑥执行日志缺章/轮+5归档步骤英文→persistLog单点补全+前端映射。
+1. **项目骨架健康（2026-08-27复验）**：单测 205套件/3444用例全绿、铁律自检无互斥、硬编码0、级联0、服务3001健康、PG正常（7项目/82章）。问题都是"漂移型"，做纠偏即可。（09-06复验：单测3459全绿）
 2. **LM Studio本地模型已接入（2026-08-27）**：`qwen3.8-27b`（256K上下文，unsloth Q8_K_XL）@ `http://192.168.1.102:1234/v1` 全流程可用。路由：配置了 `LMSTUDIO_API_KEY` 时11个步骤全部走本地，删key自动回落阿里云。**本地模型是思考模型且API层关不掉思考**，靠 `noThinkMarker`（` /no_think`）在请求构建层统一治理（陷阱#94）。生成速度约6 tok/s，单章预计20-40分钟，属硬件现状。
 3. **uncensored-MTP变体加载崩溃**：`qwen3.8-27b-uncensored-hauhaucs-aggressive-mtp` 在LM Studio加载即崩（exitCode=0xC0000409），疑似显存同驻冲突或MTP构建问题；当前验证与生产均用标准版。
 4. **文档记录不完全可信**：此前由降智模型编写，陷阱清单等需以代码和测试实测为准。
@@ -43,8 +47,8 @@
 
 - 后端3001：`npm start`（scripts/serverStart.js），PostgreSQL(USE_PG=true)，健康
 - 前端5173：`cd client && npm run dev`，Vite+React19
-- **LLM：lmstudio/qwen3.8-27b（.env的LMSTUDIO_*）**；阿里云key保留作回落（删LMSTUDIO_API_KEY即回云端）
-- 端到端验证项目：`守灵人_本地模型验证`（projectId见工作日志恢复锚点），验证 `node scripts/verifyNewProject.js <projectId>`
+- **LLM：aliyunCoding/qwen3.8-flash @ token-plan网关（.env的ALIYUN_CODING_BASE_URL）**；LMSTUDIO_*已注释停用（27B太慢，用户已决策弃用为主力）
+- 端到端验证项目：**`仙师好评_云端E2E` f48c77ad-f289-4166-ab64-e1143be0a014**（ch2✅2761字素材已更新；ch1/ch3待续跑，见worklog锚点）；旧项目守灵人f91ea3b0弃用不复跑（用户决策）
 - 桌面按钮：`小说流水线-启动.bat` / `小说流水线-停止.bat`（一键起停+开浏览器）
 - UI巡检：`node scripts/uiBugCheck.js`（Playwright，22页，报告在output/ui-bugcheck/）
 - 已知非bug：/comic/config 报 503 "ComfyUI not running" = 外部服务未装的预期提示
@@ -52,7 +56,12 @@
 
 ## 四、待办（按优先级）
 
+### ⚡ 进行中（下个窗口最优先，锚点见worklog）
+- [ ] 续跑ch1（**不要reset**，2213字在抢救区）→ ch1过后跑ch3 → verifyNewProject全链路 → 前端数据关联检查（项目/章节/素材/实体/知识/上下文装配图/藏经阁/审核各页API+uiBugCheck）→ **16文件改动走五关门禁提交** → 刷新本卡
+- [ ] E2E全绿后：genre标签异常排查（ASSEMBLE日志"万界debug·反套路喜剧"≠项目subGenre high-martial-comedy，疑似detectGenre(styleProfile)反模式，连带worldScope hook报错）；章节reset接口"materialIndex is not a constructor"小bug
+
 ### 🔴 需用户本人操作
+- [ ] **轮换对话中明文出现的token-plan key**（sk-sp-开头，E2E验证完成后）+ 删除Windows User级环境变量残留的旧ALIYUN_CODING_API_KEY（38字符，已被override:true中和但建议清理）
 - [ ] **轮换5个进过git历史的密钥**：阿里云key、DeepSeek key、REQUEST_SECRET、ENCRYPTION_SECRET、DB密码（历史提交7a79780之前含明文，未来push远端前建议 git filter-repo 清理）
 - [ ] LM Studio中试加载uncensored-MTP版（先卸载标准版腾显存，崩溃码0xC0000409待复现定位）；或接受标准版
 - [ ] 决定 modelBakeoff 候选模型名单并授权消耗少量API额度
@@ -86,6 +95,8 @@ node scripts/uiBugCheck.js                    # 前端22页巡检
 node scripts/tmp_verify_lmstudio.js           # LM Studio路由+连通验证（不回显密钥）
 node scripts/modelBakeoff.js --models A,B --dry-run  # 模型对比(先dry-run)
 npm start / npm stop       # 后端起停
+node scripts/tmp_rerun_chapters.js <projectId> 1,3   # 续跑指定章节（不reset，maxRounds=5）
+node scripts/tmp_verify_aliyun.js                    # token-plan网关连通验证（须 env -u ALIYUN_CODING_API_KEY 前缀防旧环境变量遮蔽，或直接跑——override已修）
 ```
 
 ## 六、协作约定（用户已确认）

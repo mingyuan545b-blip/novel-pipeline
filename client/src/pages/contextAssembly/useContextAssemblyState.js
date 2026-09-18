@@ -1,5 +1,6 @@
 /**
- * useContextMapState.js — 上下文地图页面状态管理
+ * useContextAssemblyState.js — 上下文装配图页面状态管理
+ * 展示：本章各Agent实际装载了哪些提示词/资料、什么层级与信息密度、哪些数据未接入或丢失
  * 世界观3层：宏观·底层规则 / 中观·势力与地理 / 微观·细节补充
  * 角色3层：主角·核心设定 / 配角与反派 / 人物关系网
  */
@@ -14,9 +15,10 @@ const DEFAULT_FILTERS = {
     foreshadowing: true, 'knowledge-access': true,
 };
 
-export default function useContextMapState() {
+export default function useContextAssemblyState() {
     const { currentProject } = useAppStore();
     const [mapData, setMapData] = useState(null);
+    const [agentType, setAgentType] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [expandedBranches, setExpandedBranches] = useState(new Set());
@@ -29,14 +31,14 @@ export default function useContextMapState() {
         setLoading(true);
         setError(null);
         try {
-            const res = await pipelineApi.getContextMap(currentProject.id, chapterNumber);
+            const res = await pipelineApi.getContextAssembly(currentProject.id, chapterNumber, agentType);
             setMapData(res.data);
         } catch (e) {
             setError(e.response?.data?.error || e.message);
         } finally {
             setLoading(false);
         }
-    }, [currentProject, chapterNumber]);
+    }, [currentProject, chapterNumber, agentType]);
 
     useEffect(() => {
         if (currentProject) loadMap();
@@ -95,8 +97,8 @@ export default function useContextMapState() {
 
     return {
         currentProject, mapData, loading, error,
-        expandedBranches, selectedNode, chapterNumber, categoryFilters,
+        expandedBranches, selectedNode, chapterNumber, categoryFilters, agentType,
         loadMap, toggleBranch, setSelectedNode, setChapterNumber,
-        toggleCategoryFilter, setBranchDepth, setItemDepth, removeOverride,
+        toggleCategoryFilter, setBranchDepth, setItemDepth, removeOverride, setAgentType,
     };
 }

@@ -1,5 +1,5 @@
 /**
- * contextMapBuilder.js — 上下文地图构建器
+ * contextAssemblyMapBuilder.js — 上下文装配图：素材树构建器
  * 构建项目素材的树状结构，用于思维导图可视化
  * 根=项目, 二级=超级分组, 三级=类别分支, 四级=具体素材
  *
@@ -49,7 +49,7 @@ function assessNodeStatus(items, agentDeclarations, currentDepth) {
     return resolveDepth(currentDepth) === 'L0' ? NODE_STATUS.WARNING : NODE_STATUS.HEALTHY;
 }
 
-async function buildContextMap(projectId, chapterNumber) {
+async function buildContextAssemblyMap(projectId, chapterNumber) {
     const project = await store.getItem('projects', projectId);
     if (!project) return { error: 'Project not found' };
 
@@ -158,4 +158,4 @@ async function _safeGetOverrides(projectId) {
     try { return await contextOverrideStore.getOverrides(projectId); } catch { return []; }
 }
 
-module.exports = { buildContextMap, NODE_STATUS, CATEGORY_BRANCHES, DEPTH_LEVELS };
+module.exports = { buildContextAssemblyMap, NODE_STATUS, CATEGORY_BRANCHES, DEPTH_LEVELS };

@@ -6,7 +6,7 @@ const router = require('express').Router();
 const logger = require('../../shared/logger');
 const { resolveContext } = require('../../services/pipeline/contextCommander');
 const contextOverrideStore = require('../../services/pipeline/contextOverrideStore');
-const { buildContextMap } = require('../../services/pipeline/contextMapBuilder');
+const { buildAssemblyView } = require('../../services/pipeline/contextAssemblyView');
 const store = require('../../store');
 const { ERROR_CODES } = require('../../shared/errorCodes');
 
@@ -68,14 +68,27 @@ router.delete('/context-overrides/:overrideId', async (req, res) => {
     }
 });
 
-/** 获取上下文地图（思维导图数据） */
+/** 获取上下文装配图（素材树 + 本章装配实况 + 数据源流通状态） */
+router.get('/context-assembly/:projectId', async (req, res) => {
+    try {
+        const chapterNumber = parseInt(req.query.chapterNumber) || 1;
+        const agentType = req.query.agentType || null;
+        const view = await buildAssemblyView(req.params.projectId, chapterNumber, agentType);
+        res.json(view);
+    } catch (e) {
+        logger.warn('contextCommanderRoutes', 'buildAssemblyView failed:', e.message);
+        res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
+    }
+});
+
+/** @deprecated 旧名"上下文电路图"接口，保留一个版本兼容旧前端/书签 */
 router.get('/context-map/:projectId', async (req, res) => {
     try {
         const chapterNumber = parseInt(req.query.chapterNumber) || 1;
-        const mapData = await buildContextMap(req.params.projectId, chapterNumber);
-        res.json(mapData);
+        const view = await buildAssemblyView(req.params.projectId, chapterNumber, req.query.agentType || null);
+        res.json({ ...view, deprecated: 'context-map 已更名为 context-assembly' });
     } catch (e) {
-        logger.warn('contextCommanderRoutes', 'buildContextMap failed:', e.message);
+        logger.warn('contextCommanderRoutes', 'legacy context-map failed:', e.message);
         res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });

@@ -1,8 +1,9 @@
 import { useMemo, useCallback } from 'react';
-import useContextMapState from './useContextMapState';
+import useContextAssemblyState from './useContextAssemblyState';
+import AssemblyPanel from './AssemblyPanel';
 import { computeLayout, curvePath } from './mindMapLayout';
 import MapNode from './MapNode';
-import s from './ContextMapPage.module.css';
+import s from './ContextAssemblyPage.module.css';
 
 const STATUS_COLORS = { healthy: '#22c55e', warning: '#f59e0b', error: '#ef4444', empty: '#475569' };
 const LINE_STATUS = { healthy: s.connectionLineHealthy, warning: s.connectionLineWarning, error: s.connectionLineError, empty: s.connectionLineEmpty };
@@ -16,13 +17,14 @@ const GROUP_FILTERS = [
     { key: 'knowledge', label: '📚 知识库', branchKeys: ['knowledge-access'] },
 ];
 
-export default function ContextMapPage() {
-    const state = useContextMapState();
+export default function ContextAssemblyPage() {
+    const state = useContextAssemblyState();
     const {
         currentProject, mapData, loading, error,
         expandedBranches, selectedNode, chapterNumber, categoryFilters,
         loadMap, toggleBranch, setSelectedNode, setChapterNumber,
         toggleCategoryFilter, setBranchDepth, setItemDepth: _setItemDepth, removeOverride: _removeOverride,
+        agentType, setAgentType,
     } = state;
 
     const layout = useMemo(() => {
@@ -48,8 +50,8 @@ export default function ContextMapPage() {
         <div className={s.pageContainer}>
             <div className={s.pageHeader}>
                 <div>
-                    <h1 className={s.pageTitle}>🗺 上下文电路图</h1>
-                    <p className={s.pageSubtitle}>可视化素材加载状态，一眼定位数据缺失和深度问题</p>
+                    <h1 className={s.pageTitle}>🧩 上下文装配图</h1>
+                    <p className={s.pageSubtitle}>每章实际用了哪些素材/提示词、什么层级与信息密度，以及哪些数据未接入或丢失</p>
                 </div>
                 <div className={s.headerControls}>
                     <div className={s.chapterSelector}>
@@ -57,12 +59,19 @@ export default function ContextMapPage() {
                         <input className={s.chapterInput} type="number" value={chapterNumber}
                             onChange={e => setChapterNumber(parseInt(e.target.value) || 1)} min={1} />
                     </div>
+                    <select className={s.chapterInput} value={agentType} onChange={e => setAgentType(e.target.value)}
+                        title="只看某个Agent的装配实况">
+                        <option value="">全部Agent</option>
+                        {(mapData?.supportedAgents || []).map(a => <option key={a} value={a}>{a}</option>)}
+                    </select>
                     <button className={`${s.refreshBtn} ${loading ? s.refreshBtnDisabled : ''}`}
                         onClick={loadMap} disabled={loading}>
                         {loading ? '⏳' : '🔄'} 刷新
                     </button>
                 </div>
             </div>
+
+            <AssemblyPanel data={mapData} />
 
             {summary && <SummaryBar summary={summary} colors={STATUS_COLORS} />}
 

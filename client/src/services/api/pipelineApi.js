@@ -80,7 +80,11 @@ export const pipelineApi = {
     getContextOverrides: (projectId) => api.get(`/pipeline/context-overrides/${projectId}`),
     setContextOverride: (projectId, data) => api.post(`/pipeline/context-overrides/${projectId}`, data),
     deleteContextOverride: (overrideId) => api.delete(`/pipeline/context-overrides/${overrideId}`),
-    getContextMap: (projectId, chapterNumber) => api.get(`/pipeline/context-map/${projectId}`, { params: { chapterNumber: chapterNumber || '' } }),
+    // 上下文装配图：本章各Agent实际装配了哪些素材/层级/信息密度，以及数据源流通状态
+    getContextAssembly: (projectId, chapterNumber, agentType) => api.get(
+        `/pipeline/context-assembly/${projectId}`,
+        { params: { chapterNumber: chapterNumber || '', agentType: agentType || '' } }
+    ),
 };
 
 export const genreDebugApi = {
