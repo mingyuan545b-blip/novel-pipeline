@@ -19,6 +19,20 @@ const RELEVANCE_REASONS = Object.freeze({
     OUTLINE: 'outline-mention',
 });
 
+/** 一致性关键类型（任何题材都不得排除） */
+const NEVER_DROP_TYPES = BUDGET_POLICY.neverDropTypes;
+
+/**
+ * 题材声明的可见素材类型集合（"按题材组合元素"）
+ * @returns {Set<string>|null} null 表示不限制（题材未声明或开关关闭）
+ */
+function genreAccessForAgent(genre, agentType) {
+    if (!BUDGET_POLICY.relevanceGating.respectGenreAccess) return null;
+    const needs = genre?.agentMaterialAccess?.[agentType]?.needs;
+    if (!Array.isArray(needs) || needs.length === 0) return null;
+    return new Set(needs);
+}
+
 /**
  * 收集大纲点名到的素材类型
  * @param {Array} materials 项目素材（含name/type）
@@ -62,5 +76,6 @@ function assessRelevance(need, ctx) {
 }
 
 module.exports = {
-    assessRelevance, collectOutlineMentionedTypes, intentTouchesType, RELEVANCE_REASONS,
+    assessRelevance, collectOutlineMentionedTypes, intentTouchesType,
+    genreAccessForAgent, NEVER_DROP_TYPES, RELEVANCE_REASONS,
 };

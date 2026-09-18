@@ -143,3 +143,32 @@ describe('L0 信息密度', () => {
 function materials_stub() {
     return [{ id: '1', name: '林渊', type: 'character' }];
 }
+
+describe('长篇章阶段划分', () => {
+    const { resolveChapterPhase, PHASE_RATIOS } = require('../../server/services/pipeline/contextDecisionRules');
+    test('短篇仍按绝对章号（兼容旧行为）', () => {
+        expect(resolveChapterPhase(3)).toBe('opening');
+        expect(resolveChapterPhase(80)).toBe('climax');
+    });
+    test('长篇按完成比例划分（旧实现100章后全部回落development）', () => {
+        expect(resolveChapterPhase(100, 2000)).toBe('opening');
+        expect(resolveChapterPhase(1000, 2000)).toBe('development');
+        expect(resolveChapterPhase(1900, 2000)).toBe('climax');
+        expect(resolveChapterPhase(1999, 2000)).toBe('resolution');
+    });
+    test('阈值常量存在', () => {
+        expect(PHASE_RATIOS.longNovelThreshold).toBeGreaterThan(0);
+    });
+});
+
+describe('题材元素组合（genre → 素材类型）', () => {
+    const { genreAccessForAgent } = require('../../server/services/pipeline/contextRelevance');
+    test('题材未声明时不做限制', () => {
+        expect(genreAccessForAgent(null, 'writer')).toBeNull();
+    });
+    test('题材声明的可见类型被解析为集合', () => {
+        const set = genreAccessForAgent({ agentMaterialAccess: { writer: { needs: ['character', 'worldview'] } } }, 'writer');
+        expect(set.has('character')).toBe(true);
+        expect(set.has('equipment')).toBe(false);
+    });
+});

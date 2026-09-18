@@ -60,6 +60,8 @@ const BUDGET_POLICY = Object.freeze({
      */
     relevanceGating: Object.freeze({
         enabled: true,
+        /** 是否遵循题材插件的 agentMaterialAccess.needs（按题材组合元素） */
+        respectGenreAccess: true,
         /** 不参与相关性门控的类型（由各 Agent 声明自行决定） */
         exemptTypes: Object.freeze(['character', 'relationship', 'worldview', 'foreshadowing']),
     }),

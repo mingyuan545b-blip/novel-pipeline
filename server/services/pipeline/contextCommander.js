@@ -10,10 +10,10 @@ const {
     resolveChapterPhase, detectSceneTypes,
     getDepthAdjustment, getScenePriorityBoost, allocateBudget,
 } = require('./contextDecisionRules');
-const { assessRelevance, collectOutlineMentionedTypes } = require('./contextRelevance');
+const { assessRelevance, collectOutlineMentionedTypes, genreAccessForAgent, NEVER_DROP_TYPES } = require('./contextRelevance');
 const { getOverridesMap } = require('./contextOverrideStore');
+const { resolveServants, resolveTimelineContext } = require('./contextCommanderLoaders');
 const { resolveServantLoads } = require('./servantDecisionEngine');
-const { resolveTimelineContext } = require('./timelineContextResolver');
 const { calculateBudget } = require('./unifiedBudgetPool');
 const { scheduleTechniques } = require('./techniqueScheduler');
 const { resolveIntentDepth, applyIntentDepthOverride } = require('./intentDepthResolver');
@@ -30,13 +30,15 @@ const logger = require('../../shared/logger');
  * @returns {object} { materialNeeds, totalBudget, constraintNeeds, decisionLog }
  */
 async function resolveContext(agentType, params) {
-    const { projectId, chapter, materials, project } = params;
+    const { projectId, chapter, materials, project, genre } = params;
     const baseDecl = getDeclaration(agentType);
     if (!baseDecl) return _emptyResult(agentType);
 
     const chapterNumber = chapter?.chapterNumber || chapter?.number || 1;
     const outlineText = (chapter?.outline || '').substring(0, 2000).toLowerCase();
-    const phase = resolveChapterPhase(chapterNumber);
+    const totalChapters = project?.targetChapters || project?.targetWordCount && Math.ceil(project.targetWordCount / 2500) || 0;
+    const phase = resolveChapterPhase(chapterNumber, totalChapters);
+    const genreAllowed = genreAccessForAgent(genre, agentType);
     const sceneTypes = detectSceneTypes(outlineText);
     const materialIds = (materials || []).map(m => m.id);
 
@@ -63,6 +65,12 @@ async function resolveContext(agentType, params) {
         } else {
             resolved.dropped = true;
             resolved.dropReason = 'not-relevant';
+        }
+        // 题材元素组合：题材插件声明的可见素材类型之外的，整类不注入
+        if (!resolved.dropped && genreAllowed && !genreAllowed.has(resolved.type)
+            && !NEVER_DROP_TYPES.includes(resolved.type)) {
+            resolved.dropped = true;
+            resolved.dropReason = 'genre-excluded';
         }
         resolvedNeeds.push(resolved);
         decisionLog.push(_logEntry(need, resolved, phase));
@@ -96,8 +104,8 @@ async function resolveContext(agentType, params) {
         constraintNeeds: baseDecl.constraintNeeds,
         lifecycleFilter: baseDecl.lifecycleFilter,
         decisionLog,
-        servantDecisions: await _resolveServants(params, outlineText),
-        timelineContext: await _safeResolveTimeline(projectId, chapterNumber),
+        servantDecisions: await resolveServants(params, outlineText),
+        timelineContext: await resolveTimelineContext(projectId, chapterNumber),
         budgetAssessment,
         techniqueSchedule: techResult,
         intentResult, // 意图深度映射结果，供调度器使用
@@ -162,31 +170,6 @@ function _extractKnownCharNames(materials) {
 
 function _applyDegradation(needs, plan) {
     return applyDegradation(needs, plan);
-}
-
-async function _resolveServants(params, outlineText) {
-    try {
-        const { chapter, materials } = params;
-        const entityCenter = require('../entityCenter');
-        const entities = await entityCenter.getEntitiesForProject(params.projectId, {});
-        const servants = entities.filter(e =>
-            (e.bindsSummary || []).some(b => require('./contextDepthConstants').SERVANT_BIND_TYPES.has(b.bindType || b.type))
-        );
-        if (servants.length === 0) return [];
-        return resolveServantLoads(servants, { chapter, entities, outlineText });
-    } catch (e) {
-        logger.warn('contextCommander', `Servant resolution failed: ${e.message}`);
-        return [];
-    }
-}
-
-async function _safeResolveTimeline(projectId, chapterNumber) {
-    try {
-        return await resolveTimelineContext(projectId, chapterNumber);
-    } catch (e) {
-        logger.warn('contextCommander', `Timeline resolution failed: ${e.message}`);
-        return null;
-    }
 }
 
 module.exports = { resolveContext };
