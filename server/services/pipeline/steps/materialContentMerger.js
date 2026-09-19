@@ -13,7 +13,10 @@
  */
 const logger = require('../../../shared/logger');
 const { MATERIAL_CONTENT_POLICY } = require('../../../config/materialContentPolicy');
+const { pruneContent } = require('./materialContentPruner');
 
+// 配置缺失时显式报错，避免"正则退化成逐字符匹配"这种静默错误
+if (!MATERIAL_CONTENT_POLICY.sectionPattern) throw new Error('materialContentPolicy.sectionPattern 缺失');
 const SECTION_RE = new RegExp(MATERIAL_CONTENT_POLICY.sectionPattern, 'g');
 
 /** 解析【标签】分节内容；无标签时返回 null */
@@ -67,9 +70,17 @@ function mergeMaterialContent(existingContent, incomingContent) {
  * 以"更丰富的基线"合并：initialContent 是人设基座，currentContent 是章节演进的累积。
  * 取更长的作为基线，避免任一方被短内容冲掉（陷阱清单 P0：素材深度字段被覆盖）。
  */
-function mergeWithBaseline(initialContent, currentContent, incoming) {
+function mergeWithBaseline(initialContent, currentContent, incoming, options = {}) {
     const base = (initialContent || '').length > (currentContent || '').length ? initialContent : currentContent;
-    return mergeMaterialContent(base, incoming);
+    const merged = mergeMaterialContent(base, incoming);
+    if (!merged) return merged;
+    // 防膨胀：事件类滚动窗口 + 单素材字数上限（人设类永不整段删除）
+    const parsed = parseSections(merged);
+    const { text, report } = pruneContent(parsed, options.type || 'default');
+    if (report.dropped.length || report.truncatedFields.length) {
+        logger.info('materialContentMerger', '防膨胀报告: ' + JSON.stringify(report));
+    }
+    return text || merged;
 }
 
 module.exports = { mergeMaterialContent, mergeWithBaseline, parseSections };

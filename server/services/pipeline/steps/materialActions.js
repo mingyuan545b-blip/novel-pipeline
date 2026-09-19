@@ -20,8 +20,9 @@ function resolveCurrentContent(update, existing) {
     const { MATERIAL_CONTENT_POLICY } = require('../../../config/materialContentPolicy');
     if (!update.content) return existing.currentContent;
     if (!MATERIAL_CONTENT_POLICY.mergeTypes.includes(existing.type)) return update.content;
-    const { mergeMaterialContent } = require('./materialContentMerger');
-    const merged = mergeMaterialContent(existing.currentContent, update.content);
+    const { mergeWithBaseline } = require('./materialContentMerger');
+    // 以更丰富的基线（initialContent/currentContent）合并，并叠加防膨胀裁剪
+    const merged = mergeWithBaseline(existing.initialContent, existing.currentContent, update.content, { type: existing.type });
     return merged || update.content;
 }
 

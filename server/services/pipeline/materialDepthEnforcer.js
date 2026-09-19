@@ -146,4 +146,38 @@ async function enforceMaterialDepth(projectId, options = {}) {
     return stats;
 }
 
-module.exports = { enforceMaterialDepth, ENFORCED_ROLE_LEVELS };
+/**
+ * 章节更新后的深度巡检（每章调用，默认不花 token）：
+ *   先用 validateMaterialDepth 免费校验；只有当某角色跌破"要求字数 × driftRepairTriggerRatio"
+ *   时才触发一次批量补全 —— 兼顾"人设不崩"与 token 成本。
+ * @param {string} projectId
+ * @param {object} options { apiConfig, roleWordCounts, chapterNumber }
+ * @returns {Promise<{checked:number, drifted:string[], repaired:number}>}
+ */
+async function enforceChapterDrift(projectId, options = {}) {
+    const { MATERIAL_CONTENT_POLICY } = require('../../../config/materialContentPolicy');
+    const stats = { checked: 0, drifted: [], repaired: 0 };
+    if (!MATERIAL_CONTENT_POLICY.driftCheckEnabled) return stats;
+    try {
+        const all = await store.queryItems('materials', { projectId });
+        const chars = all.filter((m) => m.type === 'character' && !m.archived);
+        stats.checked = chars.length;
+        const thresholdRatio = MATERIAL_CONTENT_POLICY.driftRepairTriggerRatio;
+        for (const material of chars) {
+            if (!ENFORCED_ROLE_LEVELS.includes(material.roleLevel)) continue;
+            const validation = validateMaterialDepth(material);
+            const required = Math.max(validation.minTotalChars, _roleMinChars(material.roleLevel, options.roleWordCounts));
+            const floor = Math.round(required * thresholdRatio);
+            if (validation.totalChars < floor) stats.drifted.push(`${material.name}(${validation.totalChars}<${floor})`);
+        }
+        if (stats.drifted.length === 0) return stats;
+        logger.warn('materialDepthEnforcer', `第${options.chapterNumber ?? '-'}章深度巡检发现退化: ${stats.drifted.join(', ')} → 触发补全`);
+        const repairStats = await enforceMaterialDepth(projectId, options);
+        stats.repaired = repairStats.repaired;
+    } catch (e) {
+        logger.warn('materialDepthEnforcer', `深度巡检失败: ${e.message}`);
+    }
+    return stats;
+}
+
+module.exports = { enforceMaterialDepth, enforceChapterDrift, ENFORCED_ROLE_LEVELS };

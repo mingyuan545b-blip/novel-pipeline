@@ -10,6 +10,9 @@ const mapInfiniteLogs = (logs) => logs.map(e => ({
     error: e.error,
     timestamp: e.time || e.timestamp,
     round: e.round,
+    runRound: e.runRound,
+    summary: e.summary,
+    errors: e.errors,
     chapterNumber: e.chapterNumber,
     msg: e.msg,
     affectedChapter: e.affectedChapter

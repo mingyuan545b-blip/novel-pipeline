@@ -101,18 +101,23 @@ async function runKnowledgeExtraction(projectId, chapterId, chapterNumber, pipel
         }
         if (organizingPlan?.knowledgeChanges) {
             const result = await processKnowledgeChanges(projectId, chapterNumber, organizingPlan);
+            const createdCount = Array.isArray(result.created) ? result.created.length : (result.created || 0);
+            const errCount = (result.errors || []).length;
             pipelineLog.push({
                 step: 'knowledge-extraction',
                 status: 'completed',
+                passed: errCount === 0,
                 created: result.created,
                 errors: result.errors,
+                summary: '知识抽取完成：新增认知' + createdCount + '条' + (errCount ? '，失败' + errCount + '条' : ''),
                 timestamp: new Date().toISOString()
             });
         } else {
             pipelineLog.push({
                 step: 'knowledge-extraction',
                 status: 'skipped',
-                reason: 'no knowledgeChanges in organizingPlan',
+                passed: true,
+                summary: '本章无限知认知变化（organizingPlan无knowledgeChanges）',
                 timestamp: new Date().toISOString()
             });
         }

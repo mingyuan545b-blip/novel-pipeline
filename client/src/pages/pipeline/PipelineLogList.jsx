@@ -33,20 +33,30 @@ export default function PipelineLogList({ pipelineState, pipelineSteps, reviewLo
                             // 章节号：优先日志自带，其次当前选中章节（避免"只显示R1/R2、看不出第几章"）
                             const affectedCh = log.affectedChapter || log.chapterNumber
                                 || log.result?.affectedChapter || selectedChapter?.chapterNumber;
-                            const detail = log.detail || log.feedback?.summary || (log.result?.feedback?.summary ?? cleanMsg(log.msg));
+                            const errList = Array.isArray(log.errors) ? log.errors.filter(Boolean) : [];
+                            const detail = log.detail || log.feedback?.summary || log.summary
+                                || log.result?.feedback?.summary
+                                || (errList.length ? errList.slice(0, 2).join(' ｜ ') : null)
+                                || cleanMsg(log.error) || cleanMsg(log.msg);
                             const roundNo = log.round || log.result?.round;
+                            const runRound = log.runRound || log.result?.runRound;
+                            const roundLabel = runRound
+                                ? (runRound === roundNo ? `第${runRound}轮` : `第${runRound}轮(累计${roundNo})`)
+                                : (roundNo ? `第${roundNo}轮` : null);
                             const icon = stepInfo?.icon || AGENT_ICONS[log.step] || '❓';
                             const label = stepInfo?.label || AGENT_LABELS[log.step] || log.step || '';
                             const isPassed = log.result?.passed ?? log.passed;
+                            const hasErrors = Array.isArray(log.errors) && log.errors.length > 0;
                             const isStatusMsg = !stepInfo && STATUS_STEPS.includes(log.step);
                             return (
                                 <div key={`pl-${idx}`} className={`${s.logRow} ${isStatusMsg ? s.logRowStatus : ''}`}>
                                     <div className={s.logContent}>
                                         <span className={s.logStep} style={{ color: stepInfo?.color || undefined }}>{icon} {label}</span>
                                         {affectedCh && <span className={`${s.logChapter} cyber-badge`}>第${affectedCh}章</span>}
-                                        {roundNo ? <span className={s.logRound}>第{roundNo}轮</span> : null}
+                                        {roundLabel ? <span className={s.logRound} title="本次运行内的轮次；括号内为本章跨运行的累计轮次">{roundLabel}</span> : null}
                                         {log.status === 'running' && <span className="cyber-loading"></span>}
                                         {log.status === 'error' && <span className={s.logError}>{cleanMsg(log.error) ? '错误：' + cleanMsg(log.error).substring(0, 60) : '错误'}</span>}
+                                        {hasErrors && <span className={s.logError} title={errList.slice(0, 5).join(" / ")}>问题{errList.length}项</span>}
                                         {isPassed !== undefined && (
                                             <span className={`cyber-badge ${isPassed ? 'cyber-badge-green' : 'cyber-badge-red'}`}>
                                                 {isPassed ? '通过' : '未通过'}

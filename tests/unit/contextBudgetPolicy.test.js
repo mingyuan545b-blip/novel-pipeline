@@ -299,3 +299,47 @@ describe('素材内容合并：以更丰富基线为底（防深度流失）', (
         expect(merged).toContain('在窑厂');
     });
 });
+
+describe('防膨胀：事件滚动窗口 + 字数上限（人设不删）', () => {
+    const { mergeWithBaseline } = require('../../server/services/pipeline/steps/materialContentMerger');
+    const { slideEventWindow, _isEventLabel } = require('../../server/services/pipeline/steps/materialContentPruner');
+    const { MATERIAL_CONTENT_POLICY } = require('../../server/config/materialContentPolicy');
+
+    test('事件类标签识别正确（配置正则可编译）', () => {
+        expect(_isEventLabel('第12章事件')).toBe(true);
+        expect(_isEventLabel('身份')).toBe(false);
+    });
+    test('事件类只保留最近 N 条（防设定无限追加）', () => {
+        const sections = Array.from({ length: 9 }, (_, i) => ({ label: `第${i + 1}章事件`, text: `【第${i + 1}章事件】内容` }));
+        const { sections: kept, dropped } = slideEventWindow(sections);
+        expect(kept.length).toBe(MATERIAL_CONTENT_POLICY.eventSectionWindow);
+        expect(dropped).toContain('第1章事件');
+        expect(kept.some((s) => s.label === '第9章事件')).toBe(true);
+    });
+    test('合并后仍保留人设且不超上限', () => {
+        const persona = '【身份】收殓师\n【性格】' + '沉稳'.repeat(60);
+        const events = Array.from({ length: 9 }, (_, i) => `【第${i + 1}章事件】事情${i}`).join('\n');
+        const merged = mergeWithBaseline(persona, '', events, { type: 'character' });
+        expect(merged).toContain('沉稳');
+        expect(merged.length).toBeLessThanOrEqual(MATERIAL_CONTENT_POLICY.maxCharsByType.character + 50);
+    });
+    test('超上限时优先丢事件类，不删人设', () => {
+        const bigEvents = Array.from({ length: 30 }, (_, i) => `【第${i + 1}章事件】` + '内'.repeat(200)).join('\n');
+        const persona = '【身份】收殓师\n【性格】坚韧';
+        const merged = mergeWithBaseline(persona, '', bigEvents, { type: 'character' });
+        expect(merged).toContain('收殓师');
+        expect(merged.length).toBeLessThanOrEqual(MATERIAL_CONTENT_POLICY.maxCharsByType.character + 50);
+    });
+});
+
+describe('持久化日志的轮次双显示', () => {
+    const { tagLogMeta } = require('../../server/core/pipeline/orchestratorHelpers');
+    test('tagLogMeta 按 startRound 计算 runRound（本次运行第几轮）', () => {
+        const log = [{ step: 'writer', round: 6 }, { step: 'polisher', round: 6 }, { step: 'reviser', round: 7 }];
+        tagLogMeta(log, 4, 6);
+        expect(log[0].runRound).toBe(1);
+        expect(log[1].runRound).toBe(1);
+        expect(log[2].runRound).toBe(2);
+        expect(log[0].chapterNumber).toBe(4);
+    });
+});

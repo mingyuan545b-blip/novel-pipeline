@@ -59,6 +59,12 @@ async function persistPipelineLog(chapterId, projectId, pipelineLog) {
         let chapterNumber;
         try { chapterNumber = (await store.getItem('chapters', chapterId))?.chapterNumber; } catch (_) { /* 非阻塞 */ }
         const entries = pipelineLog.map(e => ({ ...e, timestamp: e.timestamp || new Date().toISOString(), chapterNumber: e.chapterNumber ?? chapterNumber }));
+        // 双显示：持久化时也补 runRound（本次运行内的相对轮次 = round - 本log最小round + 1）
+        const rounds = entries.map(e => e.round).filter(r => typeof r === 'number');
+        const baseRound = rounds.length ? Math.min(...rounds) : 1;
+        for (const e of entries) {
+            if (e.runRound === undefined && typeof e.round === 'number') e.runRound = Math.max(1, e.round - baseRound + 1);
+        }
         const trimmed = entries.length > MAX_PIPELINE_LOG_ENTRIES ? entries.slice(-150) : entries;
         await store.setItem('pipeline-logs', logId, { id: logId, chapterId, projectId, entries: trimmed, updatedAt: new Date().toISOString() });
     } catch (err) { logger.warn('pipeline', 'Failed to persist pipeline log', { error: err.message }); }
@@ -71,14 +77,18 @@ module.exports = { MAX_PIPELINE_LOG_ENTRIES, checkStopped, getSteps, clearDownst
  * 目的：前端"执行日志"要能显示 第X章 / 第N轮 / 细节，而不是只有 R1/R2。
  * 收尾步骤（material-manager/material-organizer 等）没有轮次 → 归属到刚结束的那一轮。
  */
-function tagLogMeta(log, chapterNumber) {
+function tagLogMeta(log, chapterNumber, startRound) {
     if (!Array.isArray(log)) return log;
-    let lastRound = 1;
+    let lastRound = startRound || 1;
     for (const entry of log) {
         if (!entry || typeof entry !== 'object') continue;
         if (entry.round === undefined) entry.round = lastRound;
         lastRound = entry.round || lastRound;
         if (entry.chapterNumber === undefined) entry.chapterNumber = chapterNumber;
+        // 双显示：round 为跨运行累计轮次，runRound 为本次运行内的第几轮
+        if (entry.runRound === undefined && typeof entry.round === 'number') {
+            entry.runRound = startRound ? Math.max(1, entry.round - startRound + 1) : entry.round;
+        }
     }
     return log;
 }

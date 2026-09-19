@@ -60,7 +60,7 @@ export default function OutputViewer({ selectedChapter, activeOutputTab, setActi
                             📋 第{selectedChapter.history[viewVersion]?.round}轮淘汰版本的Agent输出
                         </div>
                     )}
-                    {renderOutputContent(raw, activeOutputTab)}
+                    <div className={s.scrollAreaTall}>{renderOutputContent(raw, activeOutputTab)}</div>
                 </div>
             </div>
             <div className={s.outputSection}>

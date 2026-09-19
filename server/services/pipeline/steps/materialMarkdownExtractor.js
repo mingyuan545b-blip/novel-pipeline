@@ -30,13 +30,16 @@ async function extractFromMarkdown(mdText, chapter, projectId, materials, styleP
         const existing = materials.find(m => m.projectId === projectId && !m.archived && m.type === type && m.name === name);
 
         if (existing) {
+            // 合并模式：保留人设基座，只覆盖状态类标签；并按上限做防膨胀裁剪
+            // （否则一章就把角色深度冲没；见 config/materialContentPolicy）
+            const nextContent = mergeWithBaseline(existing.initialContent, existing.currentContent, content, { type: existing.type }) || content;
             await store.setItem('materials', existing.id, {
                 ...existing,
-                currentContent: content,
+                currentContent: nextContent,
                 sourceChapter: chapter.chapterNumber,
                 changeLog: [...(existing.changeLog || []), {
                     from: existing.currentContent || '',
-                    to: content,
+                    to: nextContent,
                     reason: 'Markdown extraction update',
                     chapterNumber: chapter.chapterNumber,
                     timestamp: new Date().toISOString()

@@ -35,7 +35,7 @@ export default function ChapterContentViewer({ selectedChapter, viewVersion, set
                     </div>
                 )}
                 {content && content !== '暂无内容' ? (
-                    <div className={s.contentText}>{content}</div>
+                    <div className={`${s.contentText} ${s.scrollArea}`}>{content}</div>
                 ) : (
                     <div className={s.emptyContent}>尚无内容，请运行流水线</div>
                 )}

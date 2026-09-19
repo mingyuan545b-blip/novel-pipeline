@@ -9,6 +9,18 @@
 
 ## 一、当前结论（重要）
 
+0d. **（2026-09-18 第三批）轮次双显示 / 深度巡检 / 防膨胀 / 日志可读性**（新窗口优先读本节）
+   - 轮次双显示：日志新增 `runRound`（本次运行第几轮），UI 显示"第1轮(累计6)"；
+     final-editor 多轮覆盖判定改用相对轮次（修掉"续跑章节首轮失败就被系统覆盖通过"）
+   - 每轮清理下游输出时写 `round-start` 日志（解释"定稿后又回初审"）
+   - 素材登记失败已修：`entityCenter.createEntity` 不存在 → 改 `getOrCreateEntity`
+   - 知识抽取补 passed+中文摘要（原先只有 created/errors，UI 看不出成败）
+   - 深度巡检接入每章：免费校验，跌破"要求×0.7"才 LLM 补全（`enforceChapterDrift`）
+   - **防膨胀策略**（config/materialContentPolicy）：人设类永不删 / 状态类覆盖 /
+     事件类滚动窗口5条 / 单素材上限（character 4000字）；超限按 事件→未知→人设截断 裁剪
+   - Agent输出详情滚动：滚动容器改放内层元素（`.scroll-area`），修 `cyber-card{overflow:hidden}` 裁剪
+   - 实测 ch4：茅十七 1418→1516字、白姑 767→928字（不降反增）；单测 3580 全绿
+
 0c. **（2026-09-18 第二批）装配图中文化 + 执行日志补章号/轮次/细节 + 关系与角色深度修复**
    - 装配图前端全中文（服务端下发 typeLabel/statusLabel/relevanceLabel，唯一数据源）
    - 执行日志：`tagLogMeta` 统一补 round/chapterNumber；步骤日志带 detail（结论+问题）；

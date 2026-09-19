@@ -94,14 +94,21 @@ class PipelineOrchestrator {
                     chapter.updatedAt = new Date().toISOString();
                     await store.setItem('chapters', chapterId, chapter);
                     await persistPipelineLog(chapterId, projectId, pipelineLog);
-                    return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber), message: '流水线已停止' };
+                    return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber, startRound), message: '流水线已停止' };
                 }
 
+                const beforeClear = await store.getItem('chapters', chapterId);
+                const hadDraft = Boolean(beforeClear?.finalEditorOutput || beforeClear?.reviserOutput);
                 await clearRoundOutputs(chapter, chapterId, round, startRound);
+                if (hadDraft) {
+                    const note = '第' + (startRound ? round - startRound + 1 : round) + '轮开始：清理上一轮的定稿/返修/素材输出，准备重跑审核链';
+                    pipelineLog.push({ step: 'round-start', status: 'info', summary: note, timestamp: new Date().toISOString() });
+                    if (typeof onStep === 'function') onStep({ step: 'round-start', round, passed: true, roleName: '轮次', feedback: { summary: note } });
+                }
 
                 if (round > 1) {
                     const cbResult = await checkCircuitBreaker(projectId, round, circuitBreaker, pipelineLog, chapterId, projectId, startRound);
-                    if (cbResult.tripped) return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber), message: '流水线熔断暂停', alertLoopReport: cbResult.alertResult };
+                    if (cbResult.tripped) return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber, startRound), message: '流水线熔断暂停', alertLoopReport: cbResult.alertResult };
                 }
 
                 const loopResult = await executeStepLoop({
@@ -112,7 +119,7 @@ class PipelineOrchestrator {
                 });
 
                 retryCount = loopResult.retryCount ?? retryCount;
-                if (loopResult.done) { if (loopResult.result) tagLogMeta(loopResult.result.log, chapterNumber); return loopResult.result; }
+                if (loopResult.done) { if (loopResult.result) tagLogMeta(loopResult.result.log, chapterNumber, startRound); return loopResult.result; }
                 if (loopResult.currentFeedback) lastFeedback = loopResult.currentFeedback;
                 if (loopResult.currentMaterialGuidance) materialGuidance = loopResult.currentMaterialGuidance;
             }
@@ -129,7 +136,7 @@ class PipelineOrchestrator {
 
             await persistPipelineLog(chapterId, projectId, pipelineLog);
             const lastFailedStep = pipelineLog.length > 0 ? pipelineLog[pipelineLog.length - 1].step : 'unknown';
-            return { success: false, rounds: effectiveMaxRounds, log: tagLogMeta(pipelineLog, chapterNumber), message: `Pipeline经${effectiveMaxRounds}轮审核仍未通过（最后失败步骤：${lastFailedStep}）`, lastFeedback, failureType: isWordCountFailure ? 'word-count' : 'review' };
+            return { success: false, rounds: effectiveMaxRounds, log: tagLogMeta(pipelineLog, chapterNumber, startRound), message: `Pipeline经${effectiveMaxRounds}轮审核仍未通过（最后失败步骤：${lastFailedStep}）`, lastFeedback, failureType: isWordCountFailure ? 'word-count' : 'review' };
         } finally {
             // 安全网：确保Pipeline日志总是持久化，无论通过哪个路径退出
             if (pipelineLog.length > 0) {

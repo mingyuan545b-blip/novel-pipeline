@@ -91,11 +91,9 @@ async function resolveRelationTargetId(rc, ctx) {
     logger.warn('materialRelationSync', `[trap#77] Auto-creating missing character entity: "${rc.with}"`);
     try {
         const entityCenter = require('../../entityCenter');
-        const newEntity = await entityCenter.createEntity({
-            projectId, entityType: 'character', name: rc.with,
+        const newEntity = await entityCenter.getOrCreateEntity(projectId, 'character', rc.with, {
             roleLevel: 'npc', lifecycleState: 'active',
             sourceChapter: chapter.chapterNumber,
-            summaryText: `由relationshipChanges自动创建（陷阱#77修复）`,
         });
         return newEntity.id;
     } catch (createErr) {

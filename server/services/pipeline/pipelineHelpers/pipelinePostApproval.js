@@ -1,4 +1,5 @@
 const logger = require('../../../shared/logger');
+const { STATUS_VALUES } = require('../../chapterStatus');
 const store = require('../../../store');
 const { cleanChapterContent, truncateChapter } = require('../../contentUtils');
 const { resolveGenreFromProject } = require('../../genreConfig');
@@ -17,6 +18,7 @@ const consistency = require('../../consistency');
 const pipelineRegistry = require('../../pipelineRegistry');
 const { handleMaterialRegistrar } = require('../steps/materialRegistrar');
 const { runMaterialOrganizer, runKnowledgeExtraction } = require('./pipelineKnowledgeExtraction');
+const { runDepthDriftCheck } = require('./pipelineDepthDriftCheck');
 const { getVisibleMaterials } = require('../volumeHelpers');
 const { getDataContext } = require('../../dataContext');
 const { runReaderCheck } = require('./pipelineReaderCheck');
@@ -41,6 +43,9 @@ async function runPostApproval(projectId, chapterId, chapterNumber, round, pipel
         const organizerPlan = await runMaterialOrganizer(projectId, chapterId, chapterNumber, round, pipelineLog, onStep, ctx);
         await _runMaterialRegistrar(projectId, chapterId, chapterNumber, round, pipelineLog, onStep, organizerPlan);
         await runKnowledgeExtraction(projectId, chapterId, chapterNumber, pipelineLog, organizerPlan, _convertMmOutputToOrganizingPlan);
+        // 角色深度巡检（Q2）：每章免费校验，只有跌破"要求×比例"才触发LLM补全 ——
+        // 防止长篇跑到几百章时人设被反复覆盖而缓慢退化
+        await runDepthDriftCheck(projectId, chapterId, chapterNumber, pipelineLog, onStep, _postGenre);
         // 陷阱#75修复：status=material-updated 此前在 material-manager 成功后立即设置，
         // 但后续 material-organizer/registrar/knowledge-extraction 未完成时若进程崩溃（如OOM），
         // 会导致 status=material-updated 但 materialOrganizerOutput 为空的误判完成状态。
@@ -48,8 +53,9 @@ async function runPostApproval(projectId, chapterId, chapterNumber, round, pipel
         // 注意：runMaterialOrganizer/_runMaterialRegistrar/runKnowledgeExtraction 内部已 try-catch，
         // 不会向上抛异常阻断 status 更新；OOM 进程级崩溃时 status 保持原状（approved），material-depth 校验不会误判。
         const matChapter = await store.getItem('chapters', chapterId);
-        if (matChapter && matChapter.status !== 'material-updated') {
-            matChapter.status = 'material-updated'; matChapter.updatedAt = new Date().toISOString();
+        if (matChapter && matChapter.status !== STATUS_VALUES.MATERIAL_UPDATED) {
+            matChapter.status = STATUS_VALUES.MATERIAL_UPDATED;
+            matChapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, matChapter);
         }
     }

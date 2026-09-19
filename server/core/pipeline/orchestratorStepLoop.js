@@ -7,6 +7,7 @@ const { handleStepError, buildRetryContext } = require('./orchestratorRoundHelpe
 const { getChapterIntentPlanner } = require('../../services/chapterIntent');
 const { getHookBudgetForProject } = require('../../services/hookBudget');
 const { STATUS_VALUES } = require('../../services/chapterStatus');
+const { countWords, needsSalvageExpansion } = require('../../services/pipeline/steps/expansionInstructionBuilder');
 const store = require('../../store');
 
 /**
@@ -32,9 +33,15 @@ async function prepareStepContext(params, stepIn, round, currentFeedback, curren
     const context = buildRetryContext(round, step, chapter, rejectionTracker, allFeedbackParts, currentFeedback, mode);
 
     if (round > 1 && step === 'writer') {
-        const currentWordCount = (chapter.content || '').length;
+        // 口径统一：与字数门禁一致用去空白计数（原raw .length会导致门禁拒绝但升级放行的单位错位）
+        const currentWordCount = countWords(chapter.content || '');
         if (currentWordCount >= config.word.rejectMin) {
             logger.info('pipeline', `Word count OK (${currentWordCount}), using reviser`);
+            step = 'reviser';
+        } else if (needsSalvageExpansion(currentWordCount, config.word) && /字数/.test(currentFeedback || '')) {
+            // 抢救区（≥80%下限的字数类退回）：writer整章重生成有长度先验（实测3轮同字数死循环），
+            // 改走reviser在原稿上执行结构化扩写指令（expansionInstructionBuilder统一构建）
+            logger.info('pipeline', `Word count salvage (${currentWordCount}/${config.word.targetMin}), using reviser for expansion`);
             step = 'reviser';
         }
     }
@@ -70,9 +77,10 @@ function upsertFeedbackPart(allFeedbackParts, header, feedback) {
  * 返回 { done, result } / { roundFailed, ... } / { currentMaterialGuidance }（继续循环）。
  */
 async function handleFinalEditorOutcome(params, stepResult, round) {
-    const { projectId, chapterId, chapter, pipelineLog, onStep, runStepFn, options, chapterIntent, genre, mode, abortController, rejectionTracker, allFeedbackParts } = params;
+    const { projectId, chapterId, chapter, pipelineLog, onStep, runStepFn, options, chapterIntent, genre, mode, abortController, rejectionTracker, allFeedbackParts, startRound } = params;
+    const optionsWithRound = { ...(options || {}), startRound };
     const materialGuidance = stepResult.materialGuidance || '';
-    const feResult = await handleFinalEditorResult(stepResult, chapterId, projectId, chapter, round, pipelineLog, onStep, runStepFn, materialGuidance, options, chapterIntent, genre, mode, abortController);
+    const feResult = await handleFinalEditorResult(stepResult, chapterId, projectId, chapter, round, pipelineLog, onStep, runStepFn, materialGuidance, optionsWithRound, chapterIntent, genre, mode, abortController);
     if (feResult.success) {
         // 陷阱#72防御：pipeline成功后自动校验4类素材深度，异常自动告警
         // 避免问题累积到多章后才发现（ch1-5 MO输出全无的教训）
@@ -110,7 +118,7 @@ async function handleReviewOutcome(params, step, stepResult, round) {
  * Returns { done, result } where done=true means the pipeline should return.
  */
 async function executeStepLoop(params) {
-    const { projectId, chapterId, steps, round, project, mode, pipelineLog, onStep, runStepFn, abortController, allFeedbackParts, lastFeedback, materialGuidance } = params;
+    const { projectId, chapterId, steps, round, project, mode, pipelineLog, onStep, runStepFn, abortController, allFeedbackParts, lastFeedback, materialGuidance, startRound } = params;
 
     let currentFeedback = lastFeedback;
     let currentMaterialGuidance = materialGuidance;

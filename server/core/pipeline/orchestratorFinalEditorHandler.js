@@ -20,7 +20,7 @@ async function handleFinalEditorResult(stepResult, chapterId, projectId, chapter
         chapter = await store.getItem('chapters', chapterId);
         if (chapter) {
             chapter.normalContent = chapter.content;
-            chapter.status = 'approved';
+            chapter.status = STATUS_VALUES.APPROVED;
             chapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, chapter);
         }
@@ -46,10 +46,14 @@ async function handleFinalEditorResult(stepResult, chapterId, projectId, chapter
     }
 
     const maxRounds = options?.maxRounds || 3;
+    // 轮次是跨运行累计的（startRound=chapter.round+1），覆盖判定必须用"本次运行内的相对轮次"，
+    // 否则续跑章节（round≥5起步）首轮失败就被系统覆盖通过 → 用户看到"定稿莫名通过"
+    const startRound = options?.startRound || 1;
+    const relativeRound = Math.max(1, round - startRound + 1);
     const hasHardBlock = stepResult.feedback?._hardBlock === true ||
         (stepResult.feedback?.issues || []).some(i => i._hardBlock === true);
-    if (round >= maxRounds && !hasHardBlock) {
-        return await _handleMultiRoundOverride(stepResult, chapterId, projectId, chapter, round, pipelineLog, onStep, materialGuidance, chapterIntent, genre, mode);
+    if (relativeRound >= maxRounds && !hasHardBlock) {
+        return await _handleMultiRoundOverride(stepResult, chapterId, projectId, chapter, round, pipelineLog, onStep, materialGuidance, chapterIntent, genre, mode, options);
     }
 
     const feedbackText = formatFeedbackText(stepResult.feedback);
@@ -66,7 +70,7 @@ async function _handleWordCountOverride(stepResult, chapterId, projectId, chapte
 
     chapter = await store.getItem('chapters', chapterId) || chapter;
     chapter.finalEditorOutput = generateOverrideOutput('字数控制由流水线自动管理', '定稿人', stepResult.feedback);
-    chapter.status = 'approved';
+    chapter.status = STATUS_VALUES.APPROVED;
     chapter.approvedAt = new Date().toISOString();
     chapter.round = round;
     await store.setItem('chapters', chapterId, chapter);
@@ -86,8 +90,8 @@ async function _handleWordCountOverride(stepResult, chapterId, projectId, chapte
     return { success: true, rounds: round, log: pipelineLog, message: 'Chapter approved (word-count override)' };
 }
 
-async function _handleMultiRoundOverride(stepResult, chapterId, projectId, chapter, round, pipelineLog, onStep, materialGuidance, chapterIntent, genre, mode) {
-    const overrideReason = `已返修${round}轮仍未通过，且无hardBlock硬性违规，系统覆盖通过（剩余问题降级为suggestion）`;
+async function _handleMultiRoundOverride(stepResult, chapterId, projectId, chapter, round, pipelineLog, onStep, materialGuidance, chapterIntent, genre, mode, options) {
+    const overrideReason = `本次运行已返修${Math.max(1, round - (options?.startRound || 1) + 1)}轮仍未通过，且无hardBlock硬性违规，系统覆盖通过（剩余问题降级为suggestion）`;
     logger.info('pipeline', `Multi-round override for final-editor: ${overrideReason}`);
     stepResult.passed = true;
     stepResult.feedback = stepResult.feedback || {};
@@ -99,7 +103,7 @@ async function _handleMultiRoundOverride(stepResult, chapterId, projectId, chapt
     if (chapter) {
         chapter.finalEditorOutput = generateOverrideOutput(overrideReason, '定稿人', stepResult.feedback);
         chapter.normalContent = chapter.content;
-        chapter.status = 'approved';
+        chapter.status = STATUS_VALUES.APPROVED;
         chapter.updatedAt = new Date().toISOString();
         await store.setItem('chapters', chapterId, chapter);
     }
