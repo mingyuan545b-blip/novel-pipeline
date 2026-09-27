@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import { GenerativeAvatar, RarityBadge, ProgressBar, handleCardKey } from './UiComponents';
 import { MASTERY_MAP } from './constants';
 import CategoryBrowser from './CategoryBrowser';
-import { defOwnerFacets, defFacetOf, defSearchOf, DEF_GROUPS, defSortOptions } from './entityBrowserConfig';
+import { defSearchOf, defSortOptions } from './entityBrowserConfig';
+import { ownerFacetsOf, ownerGroupsOf, useOwnership } from './ownershipUtils';
 
 function EmptyState({ icon, text }) {
     return (
@@ -42,7 +44,7 @@ function BindersList({ binders, getCharName }) {
     );
 }
 
-function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, borderColor }) {
+function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, borderColor, owner }) {
     const binders = allBinds.filter(b => b.defId === item.id);
     return (
         <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
@@ -59,6 +61,7 @@ function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc,
                         <RarityBadge rarity={item.rarity} />
                     </div>
                     {item.briefDesc && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc}</div>}
+                    {owner && <div className="ec-text-11 ec-text-muted ec-mt-6">{owner}</div>}
                 </div>
             </div>
             {isExpanded && (
@@ -69,13 +72,13 @@ function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc,
 }
 
 export function EquipmentTab({ equipment, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
-    const boundIds = new Set(allBinds.map(b => b.defId));
+    const { kindOf, ownerOf, boundIds } = useOwnership(equipment, allBinds, getCharName);
     return (
         <CategoryBrowser items={equipment} searchOf={defSearchOf} searchPlaceholder="搜索装备名 / 描述…"
-            facets={defOwnerFacets(equipment)} facetOf={defFacetOf} facetAllLabel="全部归属"
-            groups={DEF_GROUPS} groupOf={d => (boundIds.has(d.id) ? 'bound' : 'loose')}
+            facets={ownerFacetsOf(equipment, kindOf)} facetOf={kindOf} facetAllLabel="全部归属"
+            groups={ownerGroupsOf(equipment, kindOf)} groupOf={kindOf}
             sortOptions={defSortOptions(boundIds)}
-            renderCard={d => <DefinitionCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} borderColor="var(--neon-orange)" />}
+            renderCard={d => <DefinitionCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} owner={ownerOf(d)} borderColor="var(--neon-orange)" />}
             emptyIcon="⚔" emptyText="暂无装备数据（来源 item-definitions）" />
     );
 }
@@ -100,7 +103,7 @@ function TechniqueBinders({ binders, getCharName }) {
     );
 }
 
-function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
+function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, owner }) {
     const binders = allBinds.filter(b => b.defId === item.id);
     return (
         <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
@@ -117,6 +120,7 @@ function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, 
                         <RarityBadge rarity={item.rarity} />
                     </div>
                     {item.briefDesc && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc}</div>}
+                    {owner && <div className="ec-text-11 ec-text-muted ec-mt-6">{owner}</div>}
                 </div>
             </div>
             {isExpanded && (
@@ -138,13 +142,13 @@ function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, 
 }
 
 export function TechniquesTab({ techniques, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
-    const boundIds = new Set(allBinds.map(b => b.defId));
+    const { kindOf, ownerOf, boundIds } = useOwnership(techniques, allBinds, getCharName);
     return (
         <CategoryBrowser items={techniques} searchOf={defSearchOf} searchPlaceholder="搜索功法名 / 描述…"
-            facets={defOwnerFacets(techniques)} facetOf={defFacetOf} facetAllLabel="全部归属"
-            groups={DEF_GROUPS} groupOf={d => (boundIds.has(d.id) ? 'bound' : 'loose')}
+            facets={ownerFacetsOf(techniques, kindOf)} facetOf={kindOf} facetAllLabel="全部归属"
+            groups={ownerGroupsOf(techniques, kindOf)} groupOf={kindOf}
             sortOptions={defSortOptions(boundIds)}
-            renderCard={d => <TechniqueCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} />}
+            renderCard={d => <TechniqueCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} owner={ownerOf(d)} />}
             emptyIcon="📜" emptyText="暂无功法数据（来源 item-definitions）" />
     );
 }

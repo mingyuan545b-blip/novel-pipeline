@@ -2,9 +2,10 @@ import { GenerativeAvatar, RadialProgress, RarityBadge, handleCardKey } from './
 import { GROWTH_COLORS, SERVANT_LABELS } from './constants';
 import CategoryBrowser from './CategoryBrowser';
 import {
-    petFacets, petFacetOf, petGroupOf, petGroups, petSearchOf, PET_SORTS,
-    servantFacets, servantFacetOf, servantGroupOf, servantGroups, servantSearchOf, SERVANT_SORTS,
+    petGroupOf, petGroups, petSearchOf, PET_SORTS,
+    servantGroupOf, servantGroups, servantSearchOf, SERVANT_SORTS,
 } from './entityBrowserConfig';
+import { ownerFacetsOf, ownerGroupsOf } from './ownershipUtils';
 
 function PetStat({ value, label, color }) {
     return (
@@ -65,9 +66,10 @@ function PetCard({ pet, isExpanded, toggleExpand, getCharName }) {
 }
 
 export function PetsTab({ pets, expandedIds, toggleExpand, getCharName }) {
+    const kindOf = (p) => (p._adapted?.ownerId ? 'character' : 'none');
     return (
         <CategoryBrowser items={pets} searchOf={petSearchOf} searchPlaceholder="搜索宠物名 / 物种 / 技能…"
-            facets={petFacets(pets)} facetOf={petFacetOf} facetAllLabel="全部成长阶段"
+            facets={ownerFacetsOf(pets, kindOf)} facetOf={kindOf} facetAllLabel="全部归属"
             groups={petGroups(pets)} groupOf={petGroupOf} sortOptions={PET_SORTS}
             renderCard={p => <PetCard pet={p} isExpanded={expandedIds.has(p.id)} toggleExpand={toggleExpand} getCharName={getCharName} />}
             emptyIcon="🐾" emptyText="暂无宠物数据（由素材 / 管线自动提取）" />
@@ -119,9 +121,10 @@ function ServantCard({ sv, isExpanded, toggleExpand, getCharName }) {
 }
 
 export function ServantsTab({ servants, expandedIds, toggleExpand, getCharName }) {
+    const kindOf = (s) => (s._adapted?.masterId ? 'character' : 'none');
     return (
         <CategoryBrowser items={servants} searchOf={servantSearchOf} searchPlaceholder="搜索仆人名 / 专长…"
-            facets={servantFacets(servants)} facetOf={servantFacetOf} facetAllLabel="全部类型"
+            facets={ownerFacetsOf(servants, kindOf)} facetOf={kindOf} facetAllLabel="全部归属"
             groups={servantGroups(servants)} groupOf={servantGroupOf} sortOptions={SERVANT_SORTS}
             renderCard={s => <ServantCard sv={s} isExpanded={expandedIds.has(s.id)} toggleExpand={toggleExpand} getCharName={getCharName} />}
             emptyIcon="🧑‍💼" emptyText="暂无仆人数据（由素材 / 管线自动提取）" />

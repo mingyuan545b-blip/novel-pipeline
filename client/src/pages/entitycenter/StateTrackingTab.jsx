@@ -1,14 +1,15 @@
 import { useState, useMemo } from 'react';
 import { SCOPE_ICONS, SCOPE_LABELS, SCOPE_BORDER_COLORS } from './constants';
-import { entityTitle, sortFields, scopeCounts, filterKv, groupKv } from './stateTrackUtils';
+import { entityTitle, sortEntries, visibleFields, scopeCounts, filterKv, groupKv } from './stateTrackUtils';
 import './categoryBrowser.css';
 
 const FIELD_COLLAPSE = 8;
 
-function KvEntityCard({ entity }) {
+function KvEntityCard({ entity, showAll }) {
     const [expanded, setExpanded] = useState(false);
     const borderColor = SCOPE_BORDER_COLORS[entity.scope] || 'var(--neon-purple)';
-    const fields = sortFields(entity.fields);
+    const [kept, hidden] = visibleFields(entity.fields, showAll);
+    const fields = sortEntries(kept);
     const shown = expanded ? fields : fields.slice(0, FIELD_COLLAPSE);
     return (
         <div className="cyber-card" style={{ borderLeft: `3px solid ${borderColor}` }}>
@@ -16,7 +17,9 @@ function KvEntityCard({ entity }) {
                 <span className="ec-text-14" aria-hidden="true">{SCOPE_ICONS[entity.scope] || '📋'}</span>
                 <span className="ec-text-14 ec-font-600">{entityTitle(entity)}</span>
                 <span className="ec-badge-lg ec-badge-cyan">{SCOPE_LABELS[entity.scope] || entity.scope}</span>
-                <span className="st-field-count">{fields.length} 字段</span>
+                <span className="st-field-count">
+                    {fields.length} 字段{hidden > 0 ? `（隐藏 ${hidden} 个空值/无关字段）` : ''}
+                </span>
             </div>
             <div className="ec-grid-fields">
                 {shown.map(([key, field]) => (
@@ -73,7 +76,7 @@ function HistoryRecord({ record, toBeijingTime }) {
     );
 }
 
-function KvIndexSection({ kvData, kvScopeFilter, setKvScopeFilter, query, setQuery }) {
+function KvIndexSection({ kvData, kvScopeFilter, setKvScopeFilter, query, setQuery, showAll, setShowAll }) {
     const counts = useMemo(() => scopeCounts(kvData), [kvData]);
     const shown = useMemo(() => filterKv(kvData, { scope: kvScopeFilter, query }), [kvData, kvScopeFilter, query]);
     const groups = useMemo(() => groupKv(shown), [shown]);
@@ -93,6 +96,10 @@ function KvIndexSection({ kvData, kvScopeFilter, setKvScopeFilter, query, setQue
                         {SCOPE_ICONS[k]} {v} {counts[k] || 0}
                     </button>
                 ))}
+                <button className={`cb-chip ${showAll ? 'cb-chip-on' : ''}`} onClick={() => setShowAll(!showAll)}
+                    title="默认隐藏空值/默认值/无关字段（多为题材模板与关系记录混入）">
+                    {showAll ? '已显示全部字段' : '显示全部字段（含空值/无关）'}
+                </button>
             </div>
             {!kvData?.length ? (
                 <div className="cyber-card cyber-empty">
@@ -109,7 +116,7 @@ function KvIndexSection({ kvData, kvScopeFilter, setKvScopeFilter, query, setQue
                             <span className="cb-group-count">{g.items.length}</span>
                         </div>
                         <div className="ec-flex-col ec-gap-12">
-                            {g.items.map(entity => <KvEntityCard key={`${entity.scope}:${entity.entityKey}`} entity={entity} />)}
+                            {g.items.map(entity => <KvEntityCard key={`${entity.scope}:${entity.entityKey}`} entity={entity} showAll={showAll} />)}
                         </div>
                     </section>
                 ))
@@ -156,9 +163,11 @@ function HistorySection({ historyCharId, setHistoryCharId, historyData, csCharac
 
 export default function StateTrackingTab({ kvData, kvScopeFilter, setKvScopeFilter, historyCharId, setHistoryCharId, historyData, csCharactersData, statesData, toBeijingTime }) {
     const [query, setQuery] = useState('');
+    const [showAll, setShowAll] = useState(false);
     return (
         <div>
-            <KvIndexSection kvData={kvData} kvScopeFilter={kvScopeFilter} setKvScopeFilter={setKvScopeFilter} query={query} setQuery={setQuery} />
+            <KvIndexSection kvData={kvData} kvScopeFilter={kvScopeFilter} setKvScopeFilter={setKvScopeFilter}
+                query={query} setQuery={setQuery} showAll={showAll} setShowAll={setShowAll} />
             <HistorySection historyCharId={historyCharId} setHistoryCharId={setHistoryCharId} historyData={historyData}
                 csCharactersData={csCharactersData} statesData={statesData} toBeijingTime={toBeijingTime} />
         </div>

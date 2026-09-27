@@ -8,11 +8,15 @@ export function entityTitle(entity) {
     return entity.fields?.name?.value || entity.fields?.名称?.value || entity.entityKey;
 }
 
-/** 热字段优先，其次按更新章节倒序 */
-export function sortFields(fields) {
-    return Object.entries(fields || {}).sort((a, b) =>
+/** 热字段优先，其次按更新章节倒序（对 entries 排序） */
+export function sortEntries(entries) {
+    return [...entries].sort((a, b) =>
         ((b[1]?.isHot ? 1 : 0) - (a[1]?.isHot ? 1 : 0)) ||
         ((b[1]?.chapterUpdated || 0) - (a[1]?.chapterUpdated || 0)));
+}
+
+export function sortFields(fields) {
+    return sortEntries(Object.entries(fields || {}));
 }
 
 export function scopeCounts(kvData) {
@@ -43,4 +47,33 @@ export function groupKv(list) {
         .map(([scope, items]) => ({
             scope, meta: { label: SCOPE_LABELS[scope] || scope, icon: SCOPE_ICONS[scope] || '📋' }, items,
         }));
+}
+
+// ——— 垃圾/空值字段过滤 ———
+// 来源（实测）：server/config/genreStateFields.js 的通用修仙/游戏字段模板（hp/mp/combatPower/
+// cultivationStage/spiritualRoot/magicalTreasures…）带默认值，与本作题材不匹配却写进了 KV；
+// 另有 from/to/name 这类"关系记录形状"的字段被误写入角色状态。
+const NOISE_KEYS = new Set(['from', 'to', '_lastStateId', 'entityKey', 'projectId', 'id']);
+
+/** 值是否"无意义"（空串/0/无/null/[]/{}/[object Object]） */
+export function isNoiseValue(v) {
+    if (v === null || v === undefined) return true;
+    if (typeof v === 'number') return v === 0;
+    if (typeof v === 'string') return v.trim() === '' || v === '无' || v === '[object Object]' || v === 'undefined' || v === 'null';
+    if (Array.isArray(v)) return v.length === 0;
+    if (typeof v === 'object') return Object.keys(v).length === 0;
+    return false;
+}
+
+export function isNoiseField(key, field) {
+    if (NOISE_KEYS.has(key)) return true;
+    return isNoiseValue(field && field.value);
+}
+
+/** 过滤后的字段（默认隐藏无关/空值）；返回 [entries, hiddenCount] */
+export function visibleFields(fields, showAll) {
+    const all = Object.entries(fields || {});
+    if (showAll) return [all, 0];
+    const kept = all.filter(([k, f]) => !isNoiseField(k, f));
+    return [kept, all.length - kept.length];
 }

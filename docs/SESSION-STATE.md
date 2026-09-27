@@ -18,6 +18,14 @@
      P4 关系复合聚合+中心视图；P5 摘要/状态追踪分主次；
      **P6（用户第二轮反馈返工）自研 SVG 人物关系图**（中心+放射+带标签箭头，点谁谁变中心展开，带返回栈）
      + 世界域实体按 (类型,名字) 跨章去重（137→112，卡片显 Ch2–16）+ 关系按姓名合并重复人物节点。
+     **P7（用户第三轮反馈）**：① 归属标记（ownershipUtils：角色/组织·势力/未归属，覆盖装备·功法·宠物·仆人，
+     卡片显「归属：X（角色/组织）」）；② 关系图可读性返工（一对一线+标签径向旋转+中心名入圆内，解决标签覆盖）；
+     ③ 状态追踪垃圾数据**来源定位**（`server/config/genreStateFields.js` 通用修仙/游戏字段模板带默认值 +
+     from/to 关系形状字段误入）→ 前端默认隐藏空值/无关字段并在卡片标注，沈砚 28→14 字段。
+     > 管线侧根因（未排期）：不持久化默认值字段；题材 schema 按项目题材取，勿回落通用模板；查 from/to 写入源。
+   - **注意**：`client/src/pages/entitycenter/*` 新增了 utils（categoryUtils/knowledgeUtils/worldScopeUtils/
+     relationUtils/summaryUtils/stateTrackUtils/ownershipUtils）与组件（CategoryBrowser/WorldCard/RelationGraphView/
+     RelationPairRow 等），均 ≤200 行、useState ≤5；Playwright 探针脚本在 `tmp_*.cjs`（gitignored）。
    - **提交**：f3e001d / e18aaf0 / c1d34b1 / 75d9c39 / a40dd54 / 4a56e49
    - **验证（实测）**：单测 **214 套件/3601 用例全绿**；vite build 通过；`verifyFrontendComplexity` 0 error；
      Playwright **13 个 tab 全部 0 console 报错**。
