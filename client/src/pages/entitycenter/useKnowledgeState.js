@@ -6,7 +6,8 @@ const EMPTY_FORM = { factId: '', entityName: '', confidence: 'certain', sourceHo
 export default function useKnowledgeState(projectId, characters) {
     const [records, setRecords] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [filter, setFilter] = useState({ factId: '', entityId: '' });
+    // category/chapter/query 为客户端筛选（分类=factId前缀，章节=sinceChapter），不触发重新拉取
+    const [filter, setFilter] = useState({ factId: '', entityId: '', category: 'all', chapter: 'all', query: '' });
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
