@@ -1,5 +1,7 @@
 import { GenerativeAvatar, RarityBadge, ProgressBar, handleCardKey } from './UiComponents';
 import { MASTERY_MAP } from './constants';
+import CategoryBrowser from './CategoryBrowser';
+import { defOwnerFacets, defFacetOf, defSearchOf, DEF_GROUPS, defSortOptions } from './entityBrowserConfig';
 
 function EmptyState({ icon, text }) {
     return (
@@ -43,7 +45,7 @@ function BindersList({ binders, getCharName }) {
 function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, borderColor }) {
     const binders = allBinds.filter(b => b.defId === item.id);
     return (
-        <button className="cyber-card ec-card-btn"
+        <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
             onClick={() => toggleExpand(item.id)}
             onKeyDown={handleCardKey(() => toggleExpand(item.id))}
             aria-label={`展开 ${item.name || item.id}`}
@@ -62,18 +64,19 @@ function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc,
             {isExpanded && (
                 <ExpandedContent item={item} descLevel={descLevel} toggleDesc={toggleDesc} binders={binders} getCharName={getCharName} borderColor={borderColor} />
             )}
-        </button>
+        </div>
     );
 }
 
 export function EquipmentTab({ equipment, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
-    if (!equipment.length) return <EmptyState icon="⚔" text="暂无装备数据" />;
+    const boundIds = new Set(allBinds.map(b => b.defId));
     return (
-        <div className="ec-grid-auto">
-            {equipment.map(eq => (
-                <DefinitionCard key={eq.id} item={eq} isExpanded={expandedIds.has(eq.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} borderColor="var(--neon-orange)" />
-            ))}
-        </div>
+        <CategoryBrowser items={equipment} searchOf={defSearchOf} searchPlaceholder="搜索装备名 / 描述…"
+            facets={defOwnerFacets(equipment)} facetOf={defFacetOf} facetAllLabel="全部归属"
+            groups={DEF_GROUPS} groupOf={d => (boundIds.has(d.id) ? 'bound' : 'loose')}
+            sortOptions={defSortOptions(boundIds)}
+            renderCard={d => <DefinitionCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} borderColor="var(--neon-orange)" />}
+            emptyIcon="⚔" emptyText="暂无装备数据（来源 item-definitions）" />
     );
 }
 
@@ -100,7 +103,7 @@ function TechniqueBinders({ binders, getCharName }) {
 function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
     const binders = allBinds.filter(b => b.defId === item.id);
     return (
-        <button className="cyber-card ec-card-btn"
+        <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
             onClick={() => toggleExpand(item.id)}
             onKeyDown={handleCardKey(() => toggleExpand(item.id))}
             aria-label={`展开功法 ${item.name || item.id}`}
@@ -130,18 +133,19 @@ function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, 
                     {binders.length > 0 && <TechniqueBinders binders={binders} getCharName={getCharName} />}
                 </div>
             )}
-        </button>
+        </div>
     );
 }
 
 export function TechniquesTab({ techniques, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
-    if (!techniques.length) return <EmptyState icon="📜" text="暂无功法数据" />;
+    const boundIds = new Set(allBinds.map(b => b.defId));
     return (
-        <div className="ec-grid-auto">
-            {techniques.map(tc => (
-                <TechniqueCard key={tc.id} item={tc} isExpanded={expandedIds.has(tc.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} />
-            ))}
-        </div>
+        <CategoryBrowser items={techniques} searchOf={defSearchOf} searchPlaceholder="搜索功法名 / 描述…"
+            facets={defOwnerFacets(techniques)} facetOf={defFacetOf} facetAllLabel="全部归属"
+            groups={DEF_GROUPS} groupOf={d => (boundIds.has(d.id) ? 'bound' : 'loose')}
+            sortOptions={defSortOptions(boundIds)}
+            renderCard={d => <TechniqueCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} />}
+            emptyIcon="📜" emptyText="暂无功法数据（来源 item-definitions）" />
     );
 }
 

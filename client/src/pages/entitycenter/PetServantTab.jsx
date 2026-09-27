@@ -1,6 +1,10 @@
 import { GenerativeAvatar, RadialProgress, RarityBadge, handleCardKey } from './UiComponents';
 import { GROWTH_COLORS, SERVANT_LABELS } from './constants';
-import { EmptyState } from './EntityCard';
+import CategoryBrowser from './CategoryBrowser';
+import {
+    petFacets, petFacetOf, petGroupOf, petGroups, petSearchOf, PET_SORTS,
+    servantFacets, servantFacetOf, servantGroupOf, servantGroups, servantSearchOf, SERVANT_SORTS,
+} from './entityBrowserConfig';
 
 function PetStat({ value, label, color }) {
     return (
@@ -29,7 +33,7 @@ function PetCard({ pet, isExpanded, toggleExpand, getCharName }) {
     const petName = pet._adapted?.name || pet.id;
     const growthColor = GROWTH_COLORS[pet.growthStage] || 'var(--neon-cyan)';
     return (
-        <button className="cyber-card ec-card-btn"
+        <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
             onClick={() => toggleExpand(pet.id)}
             onKeyDown={handleCardKey(() => toggleExpand(pet.id))}
             aria-label={`展开宠物 ${petName}`}
@@ -56,18 +60,17 @@ function PetCard({ pet, isExpanded, toggleExpand, getCharName }) {
                 {pet.intelligence !== undefined && <PetStat value={pet.intelligence} label="智慧度" color="var(--neon-purple)" />}
             </div>
             {isExpanded && <PetExpanded pet={pet} getCharName={getCharName} />}
-        </button>
+        </div>
     );
 }
 
 export function PetsTab({ pets, expandedIds, toggleExpand, getCharName }) {
-    if (!pets.length) return <EmptyState icon="🐾" text="暂无宠物数据" />;
     return (
-        <div className="ec-grid-auto">
-            {pets.map(pet => (
-                <PetCard key={pet.id} pet={pet} isExpanded={expandedIds.has(pet.id)} toggleExpand={toggleExpand} getCharName={getCharName} />
-            ))}
-        </div>
+        <CategoryBrowser items={pets} searchOf={petSearchOf} searchPlaceholder="搜索宠物名 / 物种 / 技能…"
+            facets={petFacets(pets)} facetOf={petFacetOf} facetAllLabel="全部成长阶段"
+            groups={petGroups(pets)} groupOf={petGroupOf} sortOptions={PET_SORTS}
+            renderCard={p => <PetCard pet={p} isExpanded={expandedIds.has(p.id)} toggleExpand={toggleExpand} getCharName={getCharName} />}
+            emptyIcon="🐾" emptyText="暂无宠物数据（由素材 / 管线自动提取）" />
     );
 }
 
@@ -86,7 +89,7 @@ function ServantCard({ sv, isExpanded, toggleExpand, getCharName }) {
     const svName = sv._adapted?.name || sv.id;
     const typeLabel = SERVANT_LABELS[sv._adapted?.servantType] || sv._adapted?.servantType || '未知';
     return (
-        <button className="cyber-card ec-card-btn"
+        <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
             onClick={() => toggleExpand(sv.id)}
             onKeyDown={handleCardKey(() => toggleExpand(sv.id))}
             aria-label={`展开仆人 ${svName}`}
@@ -111,17 +114,16 @@ function ServantCard({ sv, isExpanded, toggleExpand, getCharName }) {
                 </div>
             )}
             {isExpanded && <ServantExpanded sv={sv} getCharName={getCharName} />}
-        </button>
+        </div>
     );
 }
 
 export function ServantsTab({ servants, expandedIds, toggleExpand, getCharName }) {
-    if (!servants.length) return <EmptyState icon="🧑‍💼" text="暂无仆人数据" />;
     return (
-        <div className="ec-grid-auto">
-            {servants.map(sv => (
-                <ServantCard key={sv.id} sv={sv} isExpanded={expandedIds.has(sv.id)} toggleExpand={toggleExpand} getCharName={getCharName} />
-            ))}
-        </div>
+        <CategoryBrowser items={servants} searchOf={servantSearchOf} searchPlaceholder="搜索仆人名 / 专长…"
+            facets={servantFacets(servants)} facetOf={servantFacetOf} facetAllLabel="全部类型"
+            groups={servantGroups(servants)} groupOf={servantGroupOf} sortOptions={SERVANT_SORTS}
+            renderCard={s => <ServantCard sv={s} isExpanded={expandedIds.has(s.id)} toggleExpand={toggleExpand} getCharName={getCharName} />}
+            emptyIcon="🧑‍💼" emptyText="暂无仆人数据（由素材 / 管线自动提取）" />
     );
 }
