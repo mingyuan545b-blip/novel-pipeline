@@ -1,187 +1,142 @@
-import { useState } from 'react';
-import { GenerativeAvatar, RadialProgress, StrengthBar } from './UiComponents';
-import { REL_TYPE_COLORS, REL_TYPE_LABELS } from './constants';
+/**
+ * EntityGraph.jsx — 关系视图
+ * 复合视图：按「一对角色」聚合，多边即复合关系（解决「关系都是单一」）
+ * 中心视图：以某角色为中心看 1 跳直接关系 + 2 跳关联
+ */
+import { useState, useMemo } from 'react';
+import RelationPairRow from './RelationPairRow';
+import CreateRelationForm from './CreateRelationForm';
+import { buildPairs, filterPairs, centerView, typeCounts, relMeta } from './relationUtils';
+import { REL_TYPE_LABELS, REL_TYPE_COLORS } from './constants';
+import './relationView.css';
 
-function RelationArrow({ color, strength }) {
-    return (
-        <svg width="20" height="10" aria-hidden="true" className="ec-shrink-0">
-            <line x1="0" y1="5" x2="14" y2="5" stroke={color} strokeWidth="1.5" strokeDasharray={strength > 60 ? 'none' : '3 2'} />
-            <polygon points="14,2 20,5 14,8" fill={color} />
-        </svg>
-    );
-}
-
-function RelationItem({ rel, getCharName }) {
-    const relColor = REL_TYPE_COLORS[rel.relType] || '#888';
-    const toId = rel._adapted?.toCharacterId || rel.toCharacterId;
-    return (
-        <div className="cyber-card" style={{ borderLeft: `3px solid ${relColor}` }}>
-            <div className="ec-flex ec-justify-between ec-items-center ec-mb-6">
-                <div className="ec-flex ec-items-center ec-gap-8 ec-min-w-0">
-                    <GenerativeAvatar name={getCharName(rel.fromCharacterId)} size={24} />
-                    <span className="ec-text-13 ec-ellipsis ec-font-500">{getCharName(rel.fromCharacterId)}</span>
-                    <RelationArrow color={relColor} strength={rel.strength} />
-                    <GenerativeAvatar name={getCharName(toId)} size={24} />
-                    <span className="ec-text-13 ec-ellipsis ec-font-500">{getCharName(toId)}</span>
-                </div>
-                <div className="ec-flex ec-gap-4 ec-items-center ec-shrink-0">
-                    <span className="ec-badge-lg ec-badge-dynamic" style={{ '--badge-bg': `${relColor}15`, '--badge-color': relColor }}>
-                        {REL_TYPE_LABELS[rel.relType] || rel.relType}
-                    </span>
-                    {rel.relLabel && (
-                        <span className="ec-badge ec-badge-muted">{rel.relLabel}</span>
-                    )}
-                </div>
-            </div>
-            <div className="ec-flex ec-gap-16 ec-items-center">
-                <div className="ec-flex-1">
-                    <div className="ec-text-10 ec-text-muted ec-mb-2">强度</div>
-                    <StrengthBar value={rel.strength || 50} />
-                </div>
-                {rel.trustLevel !== undefined && (
-                    <div className="ec-flex-1">
-                        <div className="ec-flex ec-items-center ec-gap-6">
-                            <RadialProgress value={rel.trustLevel} size={20} strokeWidth={2} color="var(--neon-green)" />
-                            <span className="ec-text-10 ec-text-muted">信任度 <span className="ec-tabular">{rel.trustLevel}</span></span>
-                        </div>
-                    </div>
-                )}
-            </div>
-            {rel.notes && <div className="ec-text-12 ec-text-muted ec-mt-6">{rel.notes}</div>}
-        </div>
-    );
-}
-
-function RelationStats({ relations }) {
-    const typeCounts = {};
-    for (const r of relations) {
-        const type = r.relType || 'other';
-        typeCounts[type] = (typeCounts[type] || 0) + 1;
-    }
-    return (
-        <div className="ec-flex ec-gap-8 ec-flex-wrap ec-mb-12">
-            <span className="ec-badge ec-badge-muted">共 {relations.length} 条关系</span>
-            {Object.entries(typeCounts).map(([type, count]) => {
-                const color = REL_TYPE_COLORS[type] || '#888';
-                const label = REL_TYPE_LABELS[type] || type;
-                return (
-                    <span key={type} className="ec-summary-tag" style={{ '--tag-color': color, '--tag-bg': `${color}15` }}>
-                        <span className="ec-summary-tag-label">{label}</span>
-                        <span className="ec-summary-tag-value">{count}</span>
-                    </span>
-                );
-            })}
-        </div>
-    );
-}
-
-function CreateRelationForm({ characters, getCharName: _getCharName, onSubmit, onCancel }) {
-    const [fromId, setFromId] = useState('');
-    const [toId, setToId] = useState('');
-    const [relType, setRelType] = useState('ally');
-    const [relLabel, setRelLabel] = useState('');
-    const [notes, setNotes] = useState('');
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!fromId || !toId || fromId === toId) return;
-        onSubmit({ fromCharacterId: fromId, toCharacterId: toId, relType, relLabel, notes, strength: 50, trustLevel: 50 });
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="cyber-card ec-border-cyan">
-            <h4 className="ec-text-14 ec-font-600 ec-mb-12 ec-color-cyan">新建关系</h4>
-            <div className="ec-grid-2 ec-gap-12">
-                <div>
-                    <label className="ec-text-12 ec-text-muted ec-mb-4">角色A</label>
-                    <select className="cyber-select ec-w-full" value={fromId} onChange={e => setFromId(e.target.value)}>
-                        <option value="">选择角色</option>
-                        {characters.map(c => (
-                            <option key={c.id} value={c.id}>{c._adapted?.name || c.name || c.id}</option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="ec-text-12 ec-text-muted ec-mb-4">角色B</label>
-                    <select className="cyber-select ec-w-full" value={toId} onChange={e => setToId(e.target.value)}>
-                        <option value="">选择角色</option>
-                        {characters.map(c => (
-                            <option key={c.id} value={c.id}>{c._adapted?.name || c.name || c.id}</option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="ec-text-12 ec-text-muted ec-mb-4">关系类型</label>
-                    <select className="cyber-select ec-w-full" value={relType} onChange={e => setRelType(e.target.value)}>
-                        {Object.entries(REL_TYPE_LABELS).map(([k, v]) => (
-                            <option key={k} value={k}>{v}</option>
-                        ))}
-                    </select>
-                </div>
-                <div>
-                    <label className="ec-text-12 ec-text-muted ec-mb-4">关系描述</label>
-                    <input className="cyber-input ec-w-full" value={relLabel} onChange={e => setRelLabel(e.target.value)} placeholder="如：师徒、恋人" />
-                </div>
-                <div className="ec-span-full">
-                    <label className="ec-text-12 ec-text-muted ec-mb-4">备注</label>
-                    <input className="cyber-input ec-w-full" value={notes} onChange={e => setNotes(e.target.value)} placeholder="关系说明（可选）" />
-                </div>
-            </div>
-            <div className="ec-flex ec-gap-8 ec-mt-12">
-                <button type="submit" className="cyber-btn cyber-btn-sm" disabled={!fromId || !toId || fromId === toId}>创建</button>
-                <button type="button" className="cyber-btn cyber-btn-sm cyber-btn-ghost" onClick={onCancel}>取消</button>
-            </div>
-        </form>
-    );
-}
+const MODES = [{ key: 'pairs', label: '复合视图' }, { key: 'center', label: '中心视图' }];
 
 export default function EntityGraph({ allRelations, getCharName, characters, onCreateRelation }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
+    const [mode, setMode] = useState('pairs');
+    const [filters, setFilters] = useState({ q: '', type: 'all', compoundOnly: false });
+    const [centerId, setCenterId] = useState('');
+
+    const nameOf = (id) => getCharName(id);
+    const pairs = useMemo(() => buildPairs(allRelations || [], nameOf), [allRelations, getCharName]);
+    const shown = useMemo(() => filterPairs(pairs, filters), [pairs, filters]);
+    const counts = useMemo(() => typeCounts(allRelations || []), [allRelations]);
+    const compoundCount = pairs.filter(p => p.compound).length;
+    const center = useMemo(() => (centerId ? centerView(allRelations || [], centerId, nameOf) : null), [centerId, allRelations, getCharName]);
+
+    const centerPairs = useMemo(() => {
+        if (!center) return [];
+        return center.direct.map(d => {
+            const edges = d.edges.map(e => e.rel);
+            return {
+                key: 'c-' + d.other.id, a: { id: centerId, name: nameOf(centerId) }, b: d.other, edges,
+                types: [...new Set(edges.map(e => e.relType || 'other'))],
+                strength: Math.max(...edges.map(e => e.strength || 50)), compound: edges.length > 1,
+            };
+        });
+    }, [center, centerId, allRelations, getCharName]);
 
     if (!allRelations.length && !showCreateForm) {
         return (
-            <div>
-                <div className="cyber-card cyber-empty">
-                    <div className="cyber-empty-icon" aria-hidden="true">🔗</div>
-                    <div>暂无关系数据</div>
-                    <div className="ec-text-12 ec-text-muted ec-mt-8">
-                        关系数据在大纲生成和Pipeline运行时自动创建。
-                        <br />也可以手动添加角色之间的关系。
-                    </div>
-                    <button className="cyber-btn cyber-btn-sm ec-mt-12" onClick={() => setShowCreateForm(true)}>
-                        手动创建关系
-                    </button>
-                </div>
+            <div className="cyber-card cyber-empty">
+                <div className="cyber-empty-icon" aria-hidden="true">🔗</div>
+                <div>暂无关系数据</div>
+                <div className="ec-text-12 ec-text-muted ec-mt-8">关系数据在大纲生成和 Pipeline 运行时自动创建，也可以手动添加。</div>
+                <button className="cyber-btn cyber-btn-sm ec-mt-12" onClick={() => setShowCreateForm(true)}>手动创建关系</button>
             </div>
         );
     }
 
+    const types = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    // 中心角色候选取自"关系里真实出现的 id"（关系用的是 UUID，可能与 characters[].id 不同源）
+    const centerOptions = (() => {
+        const ids = new Set();
+        for (const r of allRelations) { ids.add(r.fromCharacterId); ids.add(r._adapted?.toCharacterId || r.toCharacterId); }
+        return [...ids].map(id => ({ id, name: nameOf(id) })).sort((a, b) => a.name.localeCompare(b.name));
+    })();
+    const chip = (on) => 'cb-chip ' + (on ? 'cb-chip-on' : '');
+
     return (
         <div>
-            <div className="ec-flex ec-justify-between ec-items-center ec-mb-12">
-                <RelationStats relations={allRelations} />
+            <div className="ec-flex ec-justify-between ec-items-center ec-mb-12 ec-flex-wrap ec-gap-8">
+                <div className="ec-flex ec-gap-8 ec-items-center ec-flex-wrap">
+                    <span className="ec-badge ec-badge-muted">{allRelations.length} 条边 · {pairs.length} 对 · {compoundCount} 对复合</span>
+                    {MODES.map(m => (
+                        <button key={m.key} className={chip(mode === m.key)} onClick={() => setMode(m.key)}>{m.label}</button>
+                    ))}
+                </div>
                 <button className="cyber-btn cyber-btn-sm" onClick={() => setShowCreateForm(!showCreateForm)}>
                     {showCreateForm ? '收起' : '新建关系'}
                 </button>
             </div>
 
             {showCreateForm && (
-                <CreateRelationForm
-                    characters={characters}
-                    getCharName={getCharName}
-                    onSubmit={(data) => {
-                        if (onCreateRelation) onCreateRelation(data);
-                        setShowCreateForm(false);
-                    }}
-                    onCancel={() => setShowCreateForm(false)}
-                />
+                <CreateRelationForm characters={characters}
+                    onSubmit={(data) => { if (onCreateRelation) onCreateRelation(data); setShowCreateForm(false); }}
+                    onCancel={() => setShowCreateForm(false)} />
             )}
 
-            <div className="ec-flex-col ec-gap-8">
-                {allRelations.map(rel => (
-                    <RelationItem key={rel.id} rel={rel} getCharName={getCharName} />
-                ))}
-            </div>
+            {mode === 'pairs' ? (
+                <>
+                    <div className="cb-tools ec-mb-10">
+                        <input className="cb-search" placeholder="搜索角色 / 关系描述 / 备注…" value={filters.q}
+                            onChange={e => setFilters(f => ({ ...f, q: e.target.value }))} aria-label="搜索关系" />
+                        <button className={chip(filters.compoundOnly)}
+                            onClick={() => setFilters(f => ({ ...f, compoundOnly: !f.compoundOnly }))}>仅复合</button>
+                        <span className="cb-count">{shown.length}/{pairs.length}</span>
+                    </div>
+                    <div className="cb-chips ec-mb-12">
+                        <button className={chip(filters.type === 'all')} onClick={() => setFilters(f => ({ ...f, type: 'all' }))}>全部 {allRelations.length}</button>
+                        {types.map(t => (
+                            <button key={t} className={chip(filters.type === t)} onClick={() => setFilters(f => ({ ...f, type: t }))}>
+                                <span className="cb-chip-dot" style={{ background: REL_TYPE_COLORS[t] || '#888' }} />{REL_TYPE_LABELS[t] || t} {counts[t]}
+                            </button>
+                        ))}
+                    </div>
+                    {shown.length === 0 && <div className="cb-empty">没有匹配的关系</div>}
+                    <div className="ec-flex-col ec-gap-8">
+                        {shown.map(p => <RelationPairRow key={p.key} pair={p} getCharName={getCharName} />)}
+                    </div>
+                </>
+            ) : (
+                <>
+                    <div className="cb-tools ec-mb-12">
+                        <select className="cyber-select ec-select-max-250" value={centerId} onChange={e => setCenterId(e.target.value)} aria-label="中心角色">
+                            <option value="">选择中心角色…</option>
+                            {centerOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                        {center && <span className="cb-count">{center.direct.length} 个直接对象 · {center.second.length} 条二跳</span>}
+                    </div>
+                    {!center && <div className="cb-empty">选择一个角色，查看以他为中心的关系网</div>}
+                    {center && (
+                        <>
+                            <div className="rp-section-title">直接关系（1 跳）</div>
+                            <div className="ec-flex-col ec-gap-8">
+                                {centerPairs.map(p => <RelationPairRow key={p.key} pair={p} getCharName={getCharName} defaultOpen />)}
+                            </div>
+                            {center.second.length > 0 && (
+                                <>
+                                    <div className="rp-section-title">关联关系（2 跳，涉及直接对象）</div>
+                                    <div className="ec-flex-col ec-gap-6">
+                                        {center.second.map(s => {
+                                            const m = relMeta(s.rel.relType);
+                                            return (
+                                                <div key={s.id} className="cyber-card rp-2hop" style={{ borderLeftColor: m.color }}>
+                                                    <span className="ec-text-12">{s.fromName}</span>
+                                                    <span className="rp-badge" style={{ '--badge-bg': m.color + '1a', '--badge-color': m.color }}>{m.label}</span>
+                                                    <span className="ec-text-12">{s.toName}</span>
+                                                    {s.rel.relLabel && <span className="rp-label">{s.rel.relLabel}</span>}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            )}
+                        </>
+                    )}
+                </>
+            )}
         </div>
     );
 }

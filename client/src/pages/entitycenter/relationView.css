@@ -1,0 +1,27 @@
+/* 关系视图 —— 复合关系行 / 中心视图（前缀 rp-） */
+
+.rp-card { padding: 10px 12px; }
+.rp-head { display: flex; align-items: center; gap: 8px; cursor: pointer; flex-wrap: wrap; }
+.rp-link { color: #64748b; font-size: 13px; }
+.rp-types { display: flex; gap: 4px; flex-wrap: wrap; }
+.rp-badge { padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 999px;
+    color: var(--badge-color, #888); background: var(--badge-bg, rgba(255,255,255,.05)); }
+.rp-label { font-size: 11px; color: #94a3b8; }
+.rp-compound { margin-left: auto; padding: 2px 8px; font-size: 11px; font-weight: 700;
+    color: #ffd700; background: rgba(255, 215, 0, 0.12); border-radius: 999px; }
+.rp-caret { color: #64748b; font-size: 12px; }
+.rp-secret { font-size: 10px; color: #ff6b9d; border: 1px solid rgba(255,107,157,.4); border-radius: 4px; padding: 0 4px; }
+.rp-chapter { font-size: 10px; color: #5b6b80; }
+
+.rp-edges { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid #1e2b40; }
+.rp-edge { padding: 8px 10px; background: #0b1220; border-radius: 8px; border-left: 2px solid #888; }
+.rp-edge-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rp-edge-meta { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
+.rp-meter { flex: 1; }
+.rp-meter-label { font-size: 10px; color: #7c8ba1; }
+.rp-trust { display: flex; align-items: center; gap: 6px; }
+.rp-notes { margin-top: 6px; font-size: 12px; color: #94a3b8; }
+
+.rp-section-title { margin: 14px 2px 8px; font-size: 13px; font-weight: 700; color: #94a3b8; }
+.rp-2hop { display: flex; align-items: center; gap: 8px; padding: 6px 10px; flex-wrap: wrap; }
