@@ -278,3 +278,16 @@
 .ws-faction-status-emerging { background: rgba(0, 255, 150, 0.12); color: #00ff96; }
 .ws-faction-leader { color: var(--text-muted); font-size: 12px; }
 .ws-faction-desc { color: var(--text-muted); font-size: 12px; flex-basis: 100%; margin-top: 3px; }
+
+/* ——— P3 世界域：归属可读化（类型 chips + 分组 + 折叠） ——— */
+.ws-world-count { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--neon-cyan); }
+.ws-type-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.ws-type-chip { padding: 3px 9px; font-size: 11px; color: #cbd5e1; background: rgba(255, 255, 255, 0.04);
+    border: 1px solid #263449; border-radius: 999px; }
+.ws-type-chip-empty { color: #64748b; }
+.ws-entity-groups { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.ws-entity-group-head { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700;
+    color: #94a3b8; margin-bottom: 3px; }
+.ws-entity-group-count { color: #64748b; }
+.ws-entity-more { font-size: 11px; color: #5b6b80; padding: 2px 0 0 4px; }
+.ws-expand-btn { align-self: flex-start; margin-top: 2px; }

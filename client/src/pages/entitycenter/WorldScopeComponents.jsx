@@ -1,88 +1,4 @@
 import { useState } from 'react';
-import { POWER_SYSTEMS, TECH_LEVELS, DANGER_LEVELS, WORLD_TYPES, getPowerSystemLabels, getWorldTypeLabel } from './worldConstants';
-
-const ENTITY_TYPE_ICONS = {
-    character: '👤', npc: '🧑', equipment: '⚔', pet: '🐾', servant: '🧑‍💼'
-};
-
-function WorldAttributeRow({ label, children }) {
-    if (!children) return null;
-    return (
-        <div className="ws-world-attr-row">
-            <span className="ws-world-attr-label">{label}</span>
-            <span className="ws-world-attr-value">{children}</span>
-        </div>
-    );
-}
-
-function WorldCard({ world, entities }) {
-    const residents = entities.filter(e => e.status !== 'visitor');
-    const visitors = entities.filter(e => e.status === 'visitor');
-    const powerLabels = getPowerSystemLabels(world.powerSystem);
-    const hasAttributes = powerLabels.length > 0 || world.culture || world.rules || world.techLevel || world.dangerLevel || world.description;
-
-    return (
-        <div className="ws-world-card" style={{ borderLeftColor: world.color || '#888' }}>
-            <div className="ws-world-header">
-                <div className="ws-world-dot" style={{ background: world.color || '#888' }} />
-                <div className="ws-world-name" style={{ color: world.color || '#888' }}>{world.name}</div>
-                {world.worldType && world.worldType !== 'main' && (
-                    <span className="ws-badge-type">{WORLD_TYPES[world.worldType]?.icon} {getWorldTypeLabel(world.worldType)}</span>
-                )}
-                {world.isDefault && <span className="ws-badge-default">默认</span>}
-            </div>
-
-            {/* 世界属性区域（武力体系/文化/科技/规则等） */}
-            {hasAttributes && (
-                <div className="ws-world-attrs">
-                    {powerLabels.length > 0 && (
-                        <WorldAttributeRow label="武力体系">
-                            <div className="ws-power-tags">
-                                {powerLabels.map((label, i) => (
-                                    <span key={i} className="ws-power-tag">
-                                        {POWER_SYSTEMS[world.powerSystem[i]]?.icon} {label}
-                                    </span>
-                                ))}
-                            </div>
-                        </WorldAttributeRow>
-                    )}
-                    {world.techLevel && TECH_LEVELS[world.techLevel] && (
-                        <WorldAttributeRow label="科技水平">
-                            {TECH_LEVELS[world.techLevel].icon} {TECH_LEVELS[world.techLevel].label}
-                        </WorldAttributeRow>
-                    )}
-                    {world.dangerLevel && DANGER_LEVELS[world.dangerLevel] && (
-                        <WorldAttributeRow label="危险等级">
-                            {DANGER_LEVELS[world.dangerLevel].icon} {DANGER_LEVELS[world.dangerLevel].label}
-                        </WorldAttributeRow>
-                    )}
-                    {world.culture && <WorldAttributeRow label="文化">{world.culture}</WorldAttributeRow>}
-                    {world.rules && <WorldAttributeRow label="世界规则">{world.rules}</WorldAttributeRow>}
-                    {world.entryMethod && <WorldAttributeRow label="进入方式">{world.entryMethod}</WorldAttributeRow>}
-                    {world.description && <WorldAttributeRow label="简介">{world.description}</WorldAttributeRow>}
-                </div>
-            )}
-
-            <div className="ws-world-stats">
-                <span className="ws-stat-resident">{residents.length} 归属</span>
-                {visitors.length > 0 && <span className="ws-stat-visitor">{visitors.length} 穿越</span>}
-            </div>
-            {entities.length > 0 && (
-                <div className="ws-entity-list">
-                    {entities.map((e, i) => (
-                        <div key={i} className="ws-entity-item">
-                            <span className="ws-entity-icon">{ENTITY_TYPE_ICONS[e.entityType] || '📋'}</span>
-                            <span className="ws-entity-name">{e.entityName}</span>
-                            <span className={`ws-entity-badge ${e.status === 'visitor' ? 'ws-badge-visitor' : 'ws-badge-resident'}`}>
-                                {e.status === 'visitor' ? '穿越' : '归属'}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
 
 function TransitionTimeline({ events }) {
     if (!events || events.length === 0) return null;
@@ -192,4 +108,4 @@ function FactionsPanel({ factionsByWorld, worlds }) {
     );
 }
 
-export { WorldCard, TransitionTimeline, ViolationPanel, AddWorldForm, FactionsPanel };
+export { TransitionTimeline, ViolationPanel, AddWorldForm, FactionsPanel };
