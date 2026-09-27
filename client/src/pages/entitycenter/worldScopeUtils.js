@@ -44,13 +44,24 @@ export function buildWorlds(items, defaultWorlds = []) {
     }));
 }
 
-/** 实体按归一世界名聚合；name 字段兼容 entityName */
+/** 实体按归一世界名聚合；同一实体跨章重复登记合并为一条（含 first/lastChapter） */
 export function buildEntityIndex(items) {
     const map = {};
     for (const it of items) {
         if (it.type !== 'entity-scope' && !it.entityType) continue;
         const key = baseWorldName(it.worldName || it.worldId);
-        (map[key] = map[key] || []).push({ ...it, name: it.name || it.entityName || it.id });
+        const list = (map[key] = map[key] || []);
+        const name = it.name || it.entityName || it.id;
+        const entityType = it.entityType || 'other';
+        const ch = it.chapterNumber || 0;
+        const hit = list.find(e => e.entityType === entityType && e.name === name);
+        if (hit) {
+            hit.firstChapter = Math.min(hit.firstChapter || ch, ch || hit.firstChapter || 0);
+            hit.lastChapter = Math.max(hit.lastChapter || 0, ch);
+            hit.isVisitor = hit.isVisitor === true || it.isVisitor === true;
+            continue;
+        }
+        list.push({ ...it, name, entityType, firstChapter: ch, lastChapter: ch, isVisitor: it.isVisitor === true });
     }
     return map;
 }

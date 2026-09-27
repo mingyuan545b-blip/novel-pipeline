@@ -5,16 +5,21 @@
  */
 import { useState, useMemo } from 'react';
 import RelationPairRow from './RelationPairRow';
+import RelationGraphView from './RelationGraphView';
 import CreateRelationForm from './CreateRelationForm';
 import { buildPairs, filterPairs, centerView, typeCounts, relMeta } from './relationUtils';
 import { REL_TYPE_LABELS, REL_TYPE_COLORS } from './constants';
 import './relationView.css';
 
-const MODES = [{ key: 'pairs', label: '复合视图' }, { key: 'center', label: '中心视图' }];
+const MODES = [
+    { key: 'graph', label: '关系图' },
+    { key: 'pairs', label: '复合视图' },
+    { key: 'center', label: '中心视图' },
+];
 
 export default function EntityGraph({ allRelations, getCharName, characters, onCreateRelation }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
-    const [mode, setMode] = useState('pairs');
+    const [mode, setMode] = useState('graph');
     const [filters, setFilters] = useState({ q: '', type: 'all', compoundOnly: false });
     const [centerId, setCenterId] = useState('');
 
@@ -36,6 +41,18 @@ export default function EntityGraph({ allRelations, getCharName, characters, onC
             };
         });
     }, [center, centerId, allRelations, getCharName]);
+
+    // 关系图：默认中心=连接数最多的人；点击节点即以他为中心重新展开（带返回栈）
+    const [history, setHistory] = useState([]);
+    const mostConnected = useMemo(() => {
+        const deg = new Map();
+        for (const p of pairs) { deg.set(p.a.id, (deg.get(p.a.id) || 0) + 1); deg.set(p.b.id, (deg.get(p.b.id) || 0) + 1); }
+        return [...deg.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+    }, [pairs]);
+    const gCenterId = centerId || mostConnected;
+    const gCenter = useMemo(() => (gCenterId ? centerView(allRelations || [], gCenterId, nameOf) : null), [gCenterId, allRelations, getCharName]);
+    const pickNode = (id) => { setHistory(h => [...h, gCenterId]); setCenterId(id); };
+    const goBack = () => setHistory(h => { setCenterId(h[h.length - 1] || ''); return h.slice(0, -1); });
 
     if (!allRelations.length && !showCreateForm) {
         return (
@@ -77,7 +94,21 @@ export default function EntityGraph({ allRelations, getCharName, characters, onC
                     onCancel={() => setShowCreateForm(false)} />
             )}
 
-            {mode === 'pairs' ? (
+            {mode === 'graph' ? (
+                <>
+                    <div className="cb-tools ec-mb-12">
+                        <select className="cyber-select ec-select-max-250" value={gCenterId || ''}
+                            onChange={e => { setHistory([]); setCenterId(e.target.value); }} aria-label="中心角色">
+                            {centerOptions.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                        <button className="cb-chip" disabled={!history.length} onClick={goBack}>← 返回</button>
+                        {gCenter && <span className="cb-count">{gCenter.direct.length} 个直接关系 · {gCenter.second.length} 条二跳</span>}
+                    </div>
+                    {gCenter
+                        ? <RelationGraphView center={{ id: gCenterId, name: nameOf(gCenterId) }} direct={gCenter.direct} onPick={pickNode} />
+                        : <div className="cb-empty">选择一个人物开始</div>}
+                </>
+            ) : mode === 'pairs' ? (
                 <>
                     <div className="cb-tools ec-mb-10">
                         <input className="cb-search" placeholder="搜索角色 / 关系描述 / 备注…" value={filters.q}

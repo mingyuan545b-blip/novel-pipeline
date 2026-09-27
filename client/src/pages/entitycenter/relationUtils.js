@@ -51,25 +51,31 @@ export function filterPairs(pairs, { q, type, compoundOnly }) {
     });
 }
 
-/** 以某角色为中心：直接关系（按对手聚合）+ 二跳（对手的其他关系） */
+/**
+ * 以某角色为中心：直接关系（按对手聚合）+ 二跳（对手的其他关系）。
+ * 注意：同一人物在关系里可能存在**多套 id**（如 legacy UUID 与 character-xxx），
+ * 因此按**姓名**聚合对手，避免关系图/列表出现重复人物节点。
+ */
 export function centerView(relations, entityId, nameOf) {
-    const byOther = new Map();
+    const byName = new Map();
+    const otherIds = new Set();
     for (const r of relations) {
         const from = r.fromCharacterId;
         const to = otherOf(r);
         if (from !== entityId && to !== entityId) continue;
         const otherId = from === entityId ? to : from;
-        if (!byOther.has(otherId)) byOther.set(otherId, { other: { id: otherId, name: nameOf(otherId) }, edges: [] });
-        byOther.get(otherId).edges.push({ rel: r, outgoing: from === entityId });
+        const name = nameOf(otherId);
+        otherIds.add(otherId);
+        if (!byName.has(name)) byName.set(name, { other: { id: otherId, name }, edges: [] });
+        byName.get(name).edges.push({ rel: r, outgoing: from === entityId });
     }
-    const direct = [...byOther.values()].sort((a, b) => b.edges.length - a.edges.length);
-    const ids = new Set(byOther.keys());
+    const direct = [...byName.values()].sort((a, b) => b.edges.length - a.edges.length);
     const second = [];
     for (const r of relations) {
         const from = r.fromCharacterId;
         const to = otherOf(r);
         if (from === entityId || to === entityId) continue;
-        if (ids.has(from) || ids.has(to)) {
+        if (otherIds.has(from) || otherIds.has(to)) {
             second.push({ id: r.id, rel: r, fromName: nameOf(from), toName: nameOf(to) });
         }
     }

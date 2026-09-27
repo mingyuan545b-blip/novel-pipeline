@@ -86,6 +86,9 @@ export default function WorldCard({ world, entities }) {
                                 {(expanded ? list : list.slice(0, COLLAPSE_AT)).map((e, i) => (
                                     <div key={i} className="ws-entity-item">
                                         <span className="ws-entity-name">{e.name}</span>
+                                        {e.firstChapter > 0 && (
+                                            <span className="ws-entity-chapter">Ch{e.firstChapter}{e.lastChapter > e.firstChapter ? `–${e.lastChapter}` : ''}</span>
+                                        )}
                                         <span className={`ws-entity-badge ${isVisitor(e) ? 'ws-badge-visitor' : 'ws-badge-resident'}`}>
                                             {isVisitor(e) ? '穿越' : '归属'}
                                         </span>
