@@ -11,13 +11,13 @@ const { buildCharNameMap } = require('./outlineRelationCreator');
 const { resolveMaterialName } = require('./materialNameResolver');
 
 function buildItemDefinition(defId, projectId, mat) {
-    const content = mat.content || '';
+    // P0-3 止血：内容唯一存 materials，定义行**不再复制 4 级描述**，只保留身份并回指素材
     return {
         id: defId, projectId, defType: mat.type, name: resolveMaterialName(mat),
-        rarity: 'common', briefDesc: content.substring(0, 100),
-        summaryDesc: content.substring(0, 300), detailDesc: content,
-        loreDesc: '', briefTokens: 50, summaryTokens: 150, detailTokens: Math.ceil(content.length / 2),
-        loreTokens: 0, propertiesJson: {}, constraintsJson: {},
+        materialId: mat.id || null,
+        rarity: 'common', briefDesc: '', summaryDesc: '', detailDesc: '', loreDesc: '',
+        briefTokens: 0, summaryTokens: 0, detailTokens: 0, loreTokens: 0,
+        propertiesJson: {}, constraintsJson: {},
         sourceChapter: 0, tags: [],
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     };
@@ -42,9 +42,11 @@ async function createEquipmentBinds(projectId, materials, createdItems) {
     for (const mat of materials) {
         if (!BINDABLE_TYPES.has(mat.type) || !mat.content) continue;
         try {
-            // 先创建item-definition（无论是否有持有者信息，定义都必须存在）
-            const defId = `def-${uuidv4()}`;
-            await store.setItem('item-definitions', defId, buildItemDefinition(defId, projectId, mat));
+            // 先确保 item-definition 存在（幂等：按名字复用，避免重复定义）
+            const defName = resolveMaterialName(mat);
+            const existingDefs = await store.queryItems('item-definitions', { projectId, name: defName });
+            const defId = existingDefs[0]?.id || `def-${uuidv4()}`;
+            if (!existingDefs[0]) await store.setItem('item-definitions', defId, buildItemDefinition(defId, projectId, mat));
 
             // 再尝试创建bind关系（需要content中有持有者信息）
             const ownerMatch = mat.content.match(/(?:持有者|使用者|归属|主人|绑定|修炼者)[：:]\s*(.{2,10})/);

@@ -5,6 +5,7 @@ const entityRegistry = require('../../entityRegistry');
 const { validateMaterial } = require('../../materialValidator');
 const { validateMaterialDepth } = require('../../materialDepthValidator');
 const stateKVIndex = require('../../stateKVIndex');
+const { resolveTopicKey } = require('../../worldviewTopics');
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
 const { v4: uuidv4 } = require('uuid');
 const { findMaterialByName: _findMat, findForeshadowByName: _findForeshadow } = require('./materialFinder');
@@ -143,11 +144,24 @@ async function processForeshadowProgress(organizingPlan, chapter, projectId, mat
 
 async function processWorldviewChanges(organizingPlan, chapter, projectId, operations, errors) {
     if (!organizingPlan.worldviewChanges) return;
+    // 主题归一（P0-3）：先取已有主题（KV + 素材库世界观），把"新名字"归到既有主题，
+    // 避免同一设定跨章被拆成多条碎片（实测 34 条：三账合议制 ×3、机制/模式并存）。
+    let existingKeys = [];
+    try {
+        const kvRows = await store.queryItems('state-kv-index', { projectId, scope: 'worldview' });
+        const mats = await store.queryItems('materials', { projectId, type: 'worldview' });
+        existingKeys = [...new Set([...kvRows.map(r => r.entityKey), ...mats.map(m => m.name)])].filter(Boolean);
+    } catch (e) { logger.warn('materialItem', 'worldview topic keys load failed:', e.message); }
+    const seen = new Set(existingKeys);
+
     for (const wc of organizingPlan.worldviewChanges) {
         if (!wc.name) continue;
         try {
-            await stateKVIndex.set(projectId, 'worldview', wc.name, 'evolution', { type: wc.type, detail: wc.detail, chapter: chapter.chapterNumber }, chapter.chapterNumber);
-            operations.push({ type: 'updateWorldview', scope: 'worldview', entityKey: wc.name, data: { type: wc.type, detail: wc.detail }, status: 'success' });
+            const key = resolveTopicKey(wc.name, seen);
+            if (key !== wc.name) operations.push({ type: 'worldviewTopicMerged', scope: 'worldview', entityKey: key, data: { incoming: wc.name }, status: 'success' });
+            seen.add(key);
+            await stateKVIndex.set(projectId, 'worldview', key, 'evolution', { type: wc.type, detail: wc.detail, chapter: chapter.chapterNumber }, chapter.chapterNumber);
+            operations.push({ type: 'updateWorldview', scope: 'worldview', entityKey: key, data: { type: wc.type, detail: wc.detail }, status: 'success' });
         } catch (e) { errors.push(`Failed to update worldview ${wc.name}: ${e.message}`); }
     }
 }

@@ -25,13 +25,13 @@ async function handleBindAcquire(bc, existingMat, chapter, projectId, operations
     let defId = existingDefs.length > 0 ? existingDefs[0].id : null;
     if (!defId) {
         defId = `def-${uuidv4()}`;
+        // P0-3 止血：不再把 bindChange 描述复制进定义（内容唯一存 materials），只留身份 + 回指素材
+        const sameMats = await store.queryItems('materials', { projectId, name: bc.itemName });
         await store.setItem('item-definitions', defId, {
             id: defId, projectId, defType: bc.bindType || 'equipment',
-            name: bc.itemName, rarity: 'common',
-            briefDesc: bc.description || bc.itemName,
-            summaryDesc: bc.description || bc.itemName,
-            detailDesc: bc.description || bc.itemName, loreDesc: '',
-            briefTokens: 50, summaryTokens: 50, detailTokens: 50, loreTokens: 0,
+            name: bc.itemName, materialId: sameMats[0]?.id || null, rarity: 'common',
+            briefDesc: '', summaryDesc: '', detailDesc: '', loreDesc: '',
+            briefTokens: 0, summaryTokens: 0, detailTokens: 0, loreTokens: 0,
             propertiesJson: {}, constraintsJson: {}, sourceChapter: chapter.chapterNumber, tags: [],
             createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         });

@@ -26,7 +26,7 @@ function ExpandedContent({ item, descLevel, toggleDesc, binders, getCharName, bo
                 </button>
             </div>
             <div className="ec-text-12 ec-text-secondary ec-desc-block">
-                {descLevel[item.id] === 'detail' ? (item.detailDesc || item.summaryDesc || '暂无详细描述') : (item.summaryDesc || item.detailDesc || '暂无描述')}
+                {descLevel[item.id] === 'detail' ? (item.detailDesc || item.summaryDesc || material?.currentContent || '暂无详细描述') : (item.summaryDesc || item.detailDesc || material?.currentContent || '暂无描述')}
             </div>
             {binders.length > 0 && <BindersList binders={binders} getCharName={getCharName} />}
             <MaterialLifecycleBar material={material} onPatch={onPatchLifecycle} />
@@ -63,7 +63,7 @@ function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc,
                         <span className="ec-text-14 ec-font-600 ec-ellipsis">{item.name || item.defName || item.id}</span>
                         <RarityBadge rarity={item.rarity} />
                     </div>
-                    {item.briefDesc && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc}</div>}
+                    {(item.briefDesc || material?.description) && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc || material?.description}</div>}
                     {owner && <div className="ec-text-11 ec-text-muted ec-mt-6">{owner}</div>}
                     {material && <div className={`ec-text-11 ec-mt-6 ${isRetired(material) ? 'ec-text-muted' : 'ec-text-secondary'}`}>生命周期：{lifecycleLabel(material)}</div>}
                 </div>
@@ -134,7 +134,7 @@ function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, 
                         <span className="ec-text-14 ec-font-600 ec-ellipsis">{item.name || item.defName || item.id}</span>
                         <RarityBadge rarity={item.rarity} />
                     </div>
-                    {item.briefDesc && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc}</div>}
+                    {(item.briefDesc || material?.description) && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc || material?.description}</div>}
                     {owner && <div className="ec-text-11 ec-text-muted ec-mt-6">{owner}</div>}
                 </div>
             </div>
@@ -147,7 +147,7 @@ function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, 
                         </button>
                     </div>
                     <div className="ec-text-12 ec-text-secondary ec-desc-block">
-                        {descLevel[item.id] === 'detail' ? (item.detailDesc || item.summaryDesc || '暂无详细描述') : (item.summaryDesc || item.detailDesc || '暂无描述')}
+                        {descLevel[item.id] === 'detail' ? (item.detailDesc || item.summaryDesc || material?.currentContent || '暂无详细描述') : (item.summaryDesc || item.detailDesc || material?.currentContent || '暂无描述')}
                     </div>
                     {binders.length > 0 && <TechniqueBinders binders={binders} getCharName={getCharName} />}
                     <MaterialLifecycleBar material={material} onPatch={onPatchLifecycle} />

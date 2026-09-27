@@ -40,9 +40,11 @@
      是 token 黑洞）、**与题材无关字段过滤**。
      分批：**P0** ①✅题材中性字段兜底（已做）②✅**生命周期落在被加载的 `materials`**
      （新增 `materialLifecycle` 纯函数 + `materialIndex/materialBudgetCalc` 按章过滤 + 迁移脚本干跑 +
-     装备/功法卡片「生命周期/归档/章节区间」单点写 materials）③⬜双存止血（停写副本）；
-     **P1** 单点装配 `materialStateAssembler` / 世界观主题归一 / 素材体检面板；
-     **P2** 迁移去重脚本。**下一步建议 P0-3 或 P1-4（单点装配）**。
+     装备/功法卡片「生命周期/归档/章节区间」单点写 materials）③✅**双存止血**（定义不再复制内容+回指 materialId+幂等；世界观主题归一防碎片；
+     体检 `verifySourceUniqueness` + 迁移 `migrateDefinitionContent` 干跑/apply）；
+     **P1** 单点装配 `materialStateAssembler`（⬜待做）/ 素材体检面板（脚本已先行）/ 世界观历史主题迁移；
+     **P2** 其余迁移去重脚本。**下一步建议 P1-4（单点预处理入口）**。
+     > P0-3 实测：装备/功法双存 18 → 定义含内容 27→9、已回指素材 18；世界观 KV 主题 34（写入已归一，历史待迁）。
      > 落点修正：实测 `item-definitions` 管线不读（只有 UI/迁移脚本用），故生命周期改落 `materials`
      > （否则省不到 token）。实测该项目素材 106 条：已归档 51、区间 0（区间是缺的杠杆）。
    - **已知抖动**：`pipelineMetricsPercentile.test.js` 的"getSlowestSteps 按 p95Ms 降序"偶发失败（p95 并列），复跑即过。
