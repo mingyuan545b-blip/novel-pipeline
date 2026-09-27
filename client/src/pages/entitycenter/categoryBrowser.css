@@ -32,3 +32,8 @@
 
 .cb-empty { padding: 30px 16px; text-align: center; font-size: 13px; color: #7c8ba1; }
 .cb-empty-icon { font-size: 30px; margin-bottom: 8px; opacity: 0.7; }
+
+/* 状态追踪：实体头 + 折叠按钮 */
+.st-entity-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.st-field-count { margin-left: auto; font-size: 11px; color: #64748b; }
+.st-more { margin-top: 8px; }

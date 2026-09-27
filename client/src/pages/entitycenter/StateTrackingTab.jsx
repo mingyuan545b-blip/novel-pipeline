@@ -1,16 +1,25 @@
+import { useState, useMemo } from 'react';
 import { SCOPE_ICONS, SCOPE_LABELS, SCOPE_BORDER_COLORS } from './constants';
+import { entityTitle, sortFields, scopeCounts, filterKv, groupKv } from './stateTrackUtils';
+import './categoryBrowser.css';
+
+const FIELD_COLLAPSE = 8;
 
 function KvEntityCard({ entity }) {
+    const [expanded, setExpanded] = useState(false);
     const borderColor = SCOPE_BORDER_COLORS[entity.scope] || 'var(--neon-purple)';
+    const fields = sortFields(entity.fields);
+    const shown = expanded ? fields : fields.slice(0, FIELD_COLLAPSE);
     return (
         <div className="cyber-card" style={{ borderLeft: `3px solid ${borderColor}` }}>
-            <div className="ec-flex ec-items-center ec-gap-8 ec-mb-8">
+            <div className="st-entity-head">
                 <span className="ec-text-14" aria-hidden="true">{SCOPE_ICONS[entity.scope] || '📋'}</span>
-                <span className="ec-text-14 ec-font-600">{entity.fields?.name?.value || entity.fields?.名称?.value || entity.entityKey}</span>
+                <span className="ec-text-14 ec-font-600">{entityTitle(entity)}</span>
                 <span className="ec-badge-lg ec-badge-cyan">{SCOPE_LABELS[entity.scope] || entity.scope}</span>
+                <span className="st-field-count">{fields.length} 字段</span>
             </div>
             <div className="ec-grid-fields">
-                {Object.entries(entity.fields).map(([key, field]) => (
+                {shown.map(([key, field]) => (
                     <div key={key} className={`ec-kv-field ${field.isHot ? 'ec-kv-hot' : 'ec-kv-normal'}`}>
                         <div className="ec-text-10 ec-text-muted ec-flex ec-justify-between">
                             <span>{key}{field.isHot && ' 🔥'}</span>
@@ -20,6 +29,11 @@ function KvEntityCard({ entity }) {
                     </div>
                 ))}
             </div>
+            {fields.length > FIELD_COLLAPSE && (
+                <button className="cyber-btn cyber-btn-sm cyber-btn-outline st-more" onClick={() => setExpanded(!expanded)}>
+                    {expanded ? '收起' : `展开全部 ${fields.length} 字段`}
+                </button>
+            )}
         </div>
     );
 }
@@ -43,13 +57,11 @@ function HistoryRecord({ record, toBeijingTime }) {
                     <div className="ec-grid-delta">
                         {deltaEntries.map(([key, change]) => {
                             const from = change?.from ?? '(无)';
-            const _to = change?.to ?? change;
-            const displayTo = change?.to !== undefined ? change.to : change;
+                            const displayTo = change?.to !== undefined ? change.to : change;
                             return (
                                 <div key={key} className="ec-delta-item">
                                     <span className="ec-text-muted">{key}:</span>{' '}
-                                    <span className="ec-delta-from">{String(from)}</span>
-                                    {' → '}
+                                    <span className="ec-delta-from">{String(from)}</span>{' → '}
                                     <span className="ec-delta-to">{String(displayTo)}</span>
                                 </div>
                             );
@@ -61,26 +73,46 @@ function HistoryRecord({ record, toBeijingTime }) {
     );
 }
 
-function KvIndexSection({ kvData, kvScopeFilter, setKvScopeFilter }) {
+function KvIndexSection({ kvData, kvScopeFilter, setKvScopeFilter, query, setQuery }) {
+    const counts = useMemo(() => scopeCounts(kvData), [kvData]);
+    const shown = useMemo(() => filterKv(kvData, { scope: kvScopeFilter, query }), [kvData, kvScopeFilter, query]);
+    const groups = useMemo(() => groupKv(shown), [shown]);
     return (
         <>
-            <div className="ec-flex ec-gap-12 ec-mb-16 ec-items-center ec-flex-wrap">
-                <label className="ec-text-13 ec-text-muted">范围筛选:</label>
-                <select className="cyber-select ec-select-max-150" value={kvScopeFilter} onChange={e => setKvScopeFilter(e.target.value)}>
-                    <option value="all">全部范围</option>
-                    {Object.entries(SCOPE_LABELS).map(([k, v]) => <option key={k} value={k}>{SCOPE_ICONS[k]} {v}</option>)}
-                </select>
-                <div className="ec-ml-auto ec-text-13 ec-text-muted">{kvData?.length || 0} 个实体</div>
+            <div className="cb-tools ec-mb-10">
+                <input className="cb-search" placeholder="搜索实体名 / 字段名…" value={query}
+                    onChange={e => setQuery(e.target.value)} aria-label="搜索实体" />
+                <span className="cb-count">{shown.length}/{kvData?.length || 0} 个实体</span>
+            </div>
+            <div className="cb-chips ec-mb-12">
+                <button className={`cb-chip ${kvScopeFilter === 'all' ? 'cb-chip-on' : ''}`} onClick={() => setKvScopeFilter('all')}>
+                    全部范围 {kvData?.length || 0}
+                </button>
+                {Object.entries(SCOPE_LABELS).map(([k, v]) => (
+                    <button key={k} className={`cb-chip ${kvScopeFilter === k ? 'cb-chip-on' : ''}`} onClick={() => setKvScopeFilter(k)}>
+                        {SCOPE_ICONS[k]} {v} {counts[k] || 0}
+                    </button>
+                ))}
             </div>
             {!kvData?.length ? (
                 <div className="cyber-card cyber-empty">
                     <div className="cyber-empty-icon" aria-hidden="true">⚡</div>
                     <div>暂无 KV 索引数据。请先运行 Pipeline 的 material-manager 步骤。</div>
                 </div>
+            ) : groups.length === 0 ? (
+                <div className="cb-empty">没有匹配的实体</div>
             ) : (
-                <div className="ec-flex-col ec-gap-12">
-                    {kvData.map(entity => <KvEntityCard key={`${entity.scope}:${entity.entityKey}`} entity={entity} />)}
-                </div>
+                groups.map(g => (
+                    <section key={g.scope} className="cb-group">
+                        <div className="cb-group-head">
+                            <span className="cb-group-name">{g.meta.icon} {g.meta.label}</span>
+                            <span className="cb-group-count">{g.items.length}</span>
+                        </div>
+                        <div className="ec-flex-col ec-gap-12">
+                            {g.items.map(entity => <KvEntityCard key={`${entity.scope}:${entity.entityKey}`} entity={entity} />)}
+                        </div>
+                    </section>
+                ))
             )}
         </>
     );
@@ -123,10 +155,12 @@ function HistorySection({ historyCharId, setHistoryCharId, historyData, csCharac
 }
 
 export default function StateTrackingTab({ kvData, kvScopeFilter, setKvScopeFilter, historyCharId, setHistoryCharId, historyData, csCharactersData, statesData, toBeijingTime }) {
+    const [query, setQuery] = useState('');
     return (
         <div>
-            <KvIndexSection kvData={kvData} kvScopeFilter={kvScopeFilter} setKvScopeFilter={setKvScopeFilter} />
-            <HistorySection historyCharId={historyCharId} setHistoryCharId={setHistoryCharId} historyData={historyData} csCharactersData={csCharactersData} statesData={statesData} toBeijingTime={toBeijingTime} />
+            <KvIndexSection kvData={kvData} kvScopeFilter={kvScopeFilter} setKvScopeFilter={setKvScopeFilter} query={query} setQuery={setQuery} />
+            <HistorySection historyCharId={historyCharId} setHistoryCharId={setHistoryCharId} historyData={historyData}
+                csCharactersData={csCharactersData} statesData={statesData} toBeijingTime={toBeijingTime} />
         </div>
     );
 }
