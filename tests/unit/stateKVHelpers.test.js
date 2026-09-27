@@ -76,10 +76,11 @@ describe('stateKVHelpers', () => {
     });
 
     describe('getGenreImportantKeys', () => {
-        test('returns default keys for unknown genre', () => {
+        test('unknown genre 只给与题材无关的身份/叙事字段（不注入 hp/combatPower）', () => {
             const keys = getGenreImportantKeys('unknown-genre');
             expect(keys).toContain('name');
-            expect(keys).toContain('hp');
+            expect(keys).not.toContain('hp');
+            expect(keys).not.toContain('combatPower');
         });
 
         test('returns genre-specific keys for high-martial-comedy', () => {

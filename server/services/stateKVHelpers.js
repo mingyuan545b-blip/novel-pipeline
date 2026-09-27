@@ -31,6 +31,10 @@ function _inferType(value) {
     return typeof value;
 }
 
+// 兜底（题材未登记）：只取**与题材无关**的身份/叙事字段。
+// 修复：原兜底含 hp/combatPower，会把战斗/游戏字段注入任何题材（古代账目世界也会出现"血量/战力"）。
+const GENRE_NEUTRAL_KEYS = ['name', 'position', 'factionName', 'speakingTone', 'personality', 'signatureDetail'];
+
 function getGenreImportantKeys(genreId) {
     try {
         const genre = getGenreById(genreId);
@@ -41,7 +45,7 @@ function getGenreImportantKeys(genreId) {
         'baby': ['name', 'hp', 'affectionLevel', 'relationshipStatus', 'guardianStatus'],
     };
     if (GENRE_DEFAULTS[genreId]) return GENRE_DEFAULTS[genreId];
-    return ['name', 'hp', 'combatPower', 'position', 'factionName', 'speakingTone'];
+    return GENRE_NEUTRAL_KEYS;
 }
 
 function _deserializeValue(item) {
