@@ -45,6 +45,18 @@ export function useUpdateMaterial(id, projectId) {
     });
 }
 
+/** 素材生命周期（归档/报废 + 章节区间）：单点写入被加载的 materials */
+export function useMaterialLifecycle(projectId) {
+    const qc = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, patch }) => materialsApi.update(id, patch).then(r => r.data),
+        onSuccess: (_, v) => {
+            qc.invalidateQueries({ queryKey: MATERIAL_KEYS.detail(v.id) });
+            if (projectId) qc.invalidateQueries({ queryKey: MATERIAL_KEYS.lists(projectId) });
+        },
+    });
+}
+
 export function useDeleteMaterial() {
     const qc = useQueryClient();
     return useMutation({

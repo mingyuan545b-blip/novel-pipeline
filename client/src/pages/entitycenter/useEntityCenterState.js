@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import useAppStore from '../../store/useAppStore';
-import { useMaterials } from '../../hooks/queries/useMaterials';
+import { useMaterials, useMaterialLifecycle } from '../../hooks/queries/useMaterials';
 import {
     useEntityRegistry,
     useItemDefinitions,
@@ -52,6 +52,8 @@ export default function useEntityCenterState() {
     const { data: petsData } = usePetEntities(projectId);
     const { data: servantsData } = useServantEntities(projectId);
     const { data: materialsData } = useMaterials(projectId, { type: 'character' });
+    const { data: allMaterialsData } = useMaterials(projectId, {});
+    const patchLifecycle = useMaterialLifecycle(projectId);
 
     const { data: csCharactersData } = useCharacterList(projectId, selectedChapter);
     const { data: kvData } = useKVIndex(projectId, kvScopeFilter !== 'all' ? { scope: kvScopeFilter } : {});
@@ -67,6 +69,15 @@ export default function useEntityCenterState() {
         (materialsData || []).forEach(m => { map[m.id] = m; });
         return map;
     }, [materialsData]);
+
+    // 名称 → 素材（装备/功法）：卡片上的生命周期（归档/报废 + 章节区间）写这份"被加载的"源
+    const materialsByName = useMemo(() => {
+        const map = new Map();
+        for (const m of (allMaterialsData || [])) {
+            if (m.type === 'equipment' || m.type === 'technique') map.set(m.name, m);
+        }
+        return map;
+    }, [allMaterialsData]);
 
     const characters = useMemo(() => adaptList((registryData || []).filter(e => e.entityType === 'character'), adaptEntity, materialsMap), [registryData, materialsMap]);
     const equipment = useMemo(() => (definitionsData || []).filter(d => d.defType === 'equipment'), [definitionsData]);
@@ -175,7 +186,7 @@ export default function useEntityCenterState() {
         allBinds, allRelations, csCharactersData, kvData, summaryData,
         statesData, csMeta, historyData, syncMut, chapterOptions,
         getCharName, toBeijingTime, handleSync, handleMigrateChineseKeys,
-        handleCreateRelation, handleRepaired,
+        handleCreateRelation, handleRepaired, materialsByName, patchLifecycle,
         selectedChar, charBinds, charRelations, toggleExpand, toggleDesc,
         statsValues,
     };

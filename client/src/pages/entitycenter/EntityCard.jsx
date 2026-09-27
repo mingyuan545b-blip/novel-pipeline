@@ -1,9 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { GenerativeAvatar, RarityBadge, ProgressBar, handleCardKey } from './UiComponents';
 import { MASTERY_MAP } from './constants';
 import CategoryBrowser from './CategoryBrowser';
 import { defSearchOf, defSortOptions } from './entityBrowserConfig';
 import { ownerFacetsOf, ownerGroupsOf, useOwnership } from './ownershipUtils';
+import MaterialLifecycleBar from './MaterialLifecycleBar';
+import { lifecycleLabel, isRetired } from './lifecycleUi';
 
 function EmptyState({ icon, text }) {
     return (
@@ -14,7 +16,7 @@ function EmptyState({ icon, text }) {
     );
 }
 
-function ExpandedContent({ item, descLevel, toggleDesc, binders, getCharName, borderColor }) {
+function ExpandedContent({ item, descLevel, toggleDesc, binders, getCharName, borderColor, material, onPatchLifecycle }) {
     return (
         <div className="ec-expand-area" style={{ borderLeft: `3px solid ${borderColor}` }} onClick={e => e.stopPropagation()}>
             <div className="ec-flex ec-gap-6 ec-mb-8">
@@ -27,6 +29,7 @@ function ExpandedContent({ item, descLevel, toggleDesc, binders, getCharName, bo
                 {descLevel[item.id] === 'detail' ? (item.detailDesc || item.summaryDesc || '暂无详细描述') : (item.summaryDesc || item.detailDesc || '暂无描述')}
             </div>
             {binders.length > 0 && <BindersList binders={binders} getCharName={getCharName} />}
+            <MaterialLifecycleBar material={material} onPatch={onPatchLifecycle} />
         </div>
     );
 }
@@ -44,7 +47,7 @@ function BindersList({ binders, getCharName }) {
     );
 }
 
-function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, borderColor, owner }) {
+function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, borderColor, owner, material, onPatchLifecycle }) {
     const binders = allBinds.filter(b => b.defId === item.id);
     return (
         <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
@@ -62,24 +65,36 @@ function DefinitionCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc,
                     </div>
                     {item.briefDesc && <div className="ec-text-12 ec-text-muted ec-line-clamp-2 ec-line-height-15">{item.briefDesc}</div>}
                     {owner && <div className="ec-text-11 ec-text-muted ec-mt-6">{owner}</div>}
+                    {material && <div className={`ec-text-11 ec-mt-6 ${isRetired(material) ? 'ec-text-muted' : 'ec-text-secondary'}`}>生命周期：{lifecycleLabel(material)}</div>}
                 </div>
             </div>
             {isExpanded && (
-                <ExpandedContent item={item} descLevel={descLevel} toggleDesc={toggleDesc} binders={binders} getCharName={getCharName} borderColor={borderColor} />
+                <ExpandedContent item={item} descLevel={descLevel} toggleDesc={toggleDesc} binders={binders} getCharName={getCharName} borderColor={borderColor} material={material} onPatchLifecycle={onPatchLifecycle} />
             )}
         </div>
     );
 }
 
-export function EquipmentTab({ equipment, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
+export function EquipmentTab({ equipment, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, materialsByName, onPatchLifecycle }) {
     const { kindOf, ownerOf, boundIds } = useOwnership(equipment, allBinds, getCharName);
+    const [showRetired, setShowRetired] = useState(false);
+    const matOf = (d) => materialsByName && materialsByName.get(d.name);
+    const retiredCount = equipment.filter(d => isRetired(matOf(d))).length;
+    const items = useMemo(() => (showRetired ? equipment : equipment.filter(d => !isRetired(matOf(d)))), [equipment, showRetired, materialsByName]);
     return (
-        <CategoryBrowser items={equipment} searchOf={defSearchOf} searchPlaceholder="搜索装备名 / 描述…"
+        <>
+        <div className="cb-chips ec-mb-8">
+            <button className={`cb-chip ${showRetired ? 'cb-chip-on' : ''}`} onClick={() => setShowRetired(v => !v)}>
+                含已归档/报废 {retiredCount} 个
+            </button>
+        </div>
+        <CategoryBrowser items={items} searchOf={defSearchOf} searchPlaceholder="搜索装备名 / 描述…"
             facets={ownerFacetsOf(equipment, kindOf)} facetOf={kindOf} facetAllLabel="全部归属"
             groups={ownerGroupsOf(equipment, kindOf)} groupOf={kindOf}
             sortOptions={defSortOptions(boundIds)}
-            renderCard={d => <DefinitionCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} owner={ownerOf(d)} borderColor="var(--neon-orange)" />}
-            emptyIcon="⚔" emptyText="暂无装备数据（来源 item-definitions）" />
+            renderCard={d => <DefinitionCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} owner={ownerOf(d)} material={matOf(d)} onPatchLifecycle={onPatchLifecycle} borderColor="var(--neon-orange)" />}
+            emptyIcon="⚔" emptyText={retiredCount ? '装备都已归档/报废（勾选上方可查看）' : '暂无装备数据（来源 item-definitions）'} />
+        </>
     );
 }
 
@@ -103,7 +118,7 @@ function TechniqueBinders({ binders, getCharName }) {
     );
 }
 
-function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, owner }) {
+function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, owner, material, onPatchLifecycle }) {
     const binders = allBinds.filter(b => b.defId === item.id);
     return (
         <div className="cyber-card ec-card-btn" role="button" tabIndex={0}
@@ -135,20 +150,24 @@ function TechniqueCard({ item, isExpanded, descLevel, toggleExpand, toggleDesc, 
                         {descLevel[item.id] === 'detail' ? (item.detailDesc || item.summaryDesc || '暂无详细描述') : (item.summaryDesc || item.detailDesc || '暂无描述')}
                     </div>
                     {binders.length > 0 && <TechniqueBinders binders={binders} getCharName={getCharName} />}
+                    <MaterialLifecycleBar material={material} onPatch={onPatchLifecycle} />
                 </div>
             )}
         </div>
     );
 }
 
-export function TechniquesTab({ techniques, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName }) {
+export function TechniquesTab({ techniques, expandedIds, descLevel, toggleExpand, toggleDesc, allBinds, getCharName, materialsByName, onPatchLifecycle }) {
     const { kindOf, ownerOf, boundIds } = useOwnership(techniques, allBinds, getCharName);
+    const [showRetired, setShowRetired] = useState(false);
+    const matOf = (d) => materialsByName && materialsByName.get(d.name);
+    const items = useMemo(() => (showRetired ? techniques : techniques.filter(d => !isRetired(matOf(d)))), [techniques, showRetired, materialsByName]);
     return (
-        <CategoryBrowser items={techniques} searchOf={defSearchOf} searchPlaceholder="搜索功法名 / 描述…"
+        <CategoryBrowser items={items} searchOf={defSearchOf} searchPlaceholder="搜索功法名 / 描述…"
             facets={ownerFacetsOf(techniques, kindOf)} facetOf={kindOf} facetAllLabel="全部归属"
             groups={ownerGroupsOf(techniques, kindOf)} groupOf={kindOf}
             sortOptions={defSortOptions(boundIds)}
-            renderCard={d => <TechniqueCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} owner={ownerOf(d)} />}
+            renderCard={d => <TechniqueCard item={d} isExpanded={expandedIds.has(d.id)} descLevel={descLevel} toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} owner={ownerOf(d)} material={matOf(d)} onPatchLifecycle={onPatchLifecycle} />}
             emptyIcon="📜" emptyText="暂无功法数据（来源 item-definitions）" />
     );
 }

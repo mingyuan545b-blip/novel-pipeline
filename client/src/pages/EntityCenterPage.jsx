@@ -32,8 +32,9 @@ export default function EntityCenterPage() {
         statesData, csMeta, historyData, syncMut, chapterOptions,
         getCharName, toBeijingTime, handleSync, handleMigrateChineseKeys,
         selectedChar, charBinds, charRelations, toggleExpand, toggleDesc,
-        statsValues, handleRepaired,
+        statsValues, handleRepaired, materialsByName, patchLifecycle,
     } = state;
+    const onPatchLifecycle = (id, patch) => patchLifecycle.mutate({ id, patch });
 
     if (!currentProject) {
         return (
@@ -104,11 +105,13 @@ export default function EntityCenterPage() {
                 )}
                 {activeTab === 'equipment' && (
                     <EquipmentTab equipment={equipment} expandedIds={expandedIds} descLevel={descLevel}
-                        toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} />
+                        toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName}
+                        materialsByName={materialsByName} onPatchLifecycle={onPatchLifecycle} />
                 )}
                 {activeTab === 'techniques' && (
                     <TechniquesTab techniques={techniques} expandedIds={expandedIds} descLevel={descLevel}
-                        toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName} />
+                        toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName}
+                        materialsByName={materialsByName} onPatchLifecycle={onPatchLifecycle} />
                 )}
                 {activeTab === 'pets' && (
                     <PetsTab pets={pets} expandedIds={expandedIds} toggleExpand={toggleExpand} getCharName={getCharName} />

@@ -37,3 +37,13 @@
 .st-entity-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 .st-field-count { margin-left: auto; font-size: 11px; color: #64748b; }
 .st-more { margin-top: 8px; }
+
+/* 生命周期条（素材归档/报废 + 章节区间） */
+.mlb { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px;
+    padding-top: 8px; border-top: 1px dashed #1e2b40; }
+.mlb-label { font-size: 11px; color: #94a3b8; }
+.mlb-label b { color: #e2e8f0; }
+.mlb-note { margin-top: 8px; font-size: 11px; color: #5b6b80; }
+.mlb-range { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: #94a3b8; }
+.mlb-input { width: 52px; padding: 2px 6px; font-size: 11px; color: #e2e8f0; background: #0b1220;
+    border: 1px solid #263449; border-radius: 6px; }

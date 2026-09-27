@@ -1,5 +1,6 @@
 const store = require('../store');
 const { detectGenre } = require('./genreConfig');
+const { isMaterialActiveAt } = require('./materialLifecycle');
 
 const LIFECYCLE_CONFIG = {
     DECAY_THRESHOLD_CHAPTERS: 15,
@@ -12,7 +13,7 @@ const LIFECYCLE_CONFIG = {
 
 async function calculateTokenBudget(projectId, chapterNumber) {
     const allMaterials = await store.queryItems('materials', { projectId });
-    const materials = allMaterials.filter(m => !m.archived);
+    const materials = allMaterials.filter(m => isMaterialActiveAt(m, chapterNumber));
     const { getStyleProfileForProject } = require('./prompts/styleInjector');
     const styleProfile = await getStyleProfileForProject(projectId);
     const genre = detectGenre(styleProfile);

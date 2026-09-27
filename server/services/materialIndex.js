@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { getDataContext } = require('./dataContext');
 const io = require('./materialIndexIO');
+const { isMaterialActiveAt } = require('./materialLifecycle');
 
 const PERMANENT_TYPES = new Set(['worldview', 'power-system', 'sub-plane', 'craft', 'writing-technique']);
 const EPHEMERAL_TYPES = new Set(['mechanism', 'location', 'catchphrase', 'famous-scene', 'index', 'other', 'narrative-bridge']);
@@ -25,7 +26,8 @@ class MaterialIndex {
 
     async rebuildIndex(projectId) {
         const materials = await store.queryItems('materials', { projectId });
-        const activeMats = materials.filter(m => !m.archived);
+        // 建索引无章节上下文 → chapter=0（只排除归档/报废，不裁剪区间）
+        const activeMats = materials.filter(m => isMaterialActiveAt(m, 0));
         const planeIndex = {};
         const typeIndex = {};
         const lifecycleIndex = {};
@@ -73,7 +75,7 @@ class MaterialIndex {
         }
 
         const materials = [];
-        for (const id of idsToLoad) { const m = await store.getItem('materials', id); if (m && !m.archived) materials.push(m); }
+        for (const id of idsToLoad) { const m = await store.getItem('materials', id); if (isMaterialActiveAt(m, chapterNumber)) materials.push(m); }
         return materials;
     }
 
@@ -81,7 +83,7 @@ class MaterialIndex {
         const typeIndex = this._readJson(io.TYPE_INDEX_FILE(projectId));
         if (!typeIndex || !typeIndex[type]) return [];
         const materials = [];
-        for (const id of typeIndex[type]) { const m = await store.getItem('materials', id); if (m && !m.archived) materials.push(m); }
+        for (const id of typeIndex[type]) { const m = await store.getItem('materials', id); if (isMaterialActiveAt(m, 0)) materials.push(m); }
         return materials;
     }
 
@@ -91,7 +93,7 @@ class MaterialIndex {
         const ids = [];
         for (const type of Object.keys(planeIndex[plane])) planeIndex[plane][type].forEach(id => ids.push(id));
         const materials = [];
-        for (const id of ids) { const m = await store.getItem('materials', id); if (m && !m.archived) materials.push(m); }
+        for (const id of ids) { const m = await store.getItem('materials', id); if (isMaterialActiveAt(m, 0)) materials.push(m); }
         return materials;
     }
 
@@ -99,7 +101,7 @@ class MaterialIndex {
         const typeIndex = this._readJson(io.TYPE_INDEX_FILE(projectId));
         if (!typeIndex || !typeIndex['character']) return [];
         const names = [];
-        for (const id of typeIndex['character']) { const m = await store.getItem('materials', id); if (m && !m.archived) names.push(m.name); }
+        for (const id of typeIndex['character']) { const m = await store.getItem('materials', id); if (isMaterialActiveAt(m, 0)) names.push(m.name); }
         return names;
     }
 
