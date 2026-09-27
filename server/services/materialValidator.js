@@ -7,14 +7,46 @@ const {
     inferTypeFromContent
 } = require('../config/materialTypes');
 
+/** 需要"势力归属"的角色等级（主角/配角是长线角色，必须挂靠势力） */
+const ROLES_NEEDING_FACTION = new Set(['protagonist', 'supporting']);
+
+/**
+ * 角色是否需要 parentFaction（2026-09-21 按用户规则重写）
+ *
+ * 规则：**按等级 + 是否长线判定**，而不是一刀切要求所有人物都归属势力。
+ *   - 路人/一次性角色（npc，且无伏笔、无深度标记）→ 免归属：用一章就丢，强求归属只会让素材被拒、内容白白丢失
+ *     （实测 ch1 的"赵四"因此登记失败，实体却已建 → 素材库与实体中心不一致）
+ *   - 主角/配角 → 必须归属
+ *   - 有铺垫/伏笔/势力关联的任意角色（显式标记或正文里出现伏笔线索）→ 必须归属
+ *
+ * @returns {boolean} true=必须填写 parentFaction
+ */
+function characterNeedsFaction(material) {
+    const role = String(material.roleLevel || material.role || '').toLowerCase();
+    if (ROLES_NEEDING_FACTION.has(role)) return true;
+
+    // 显式叙事权重标记（组织者/注册器产出）
+    if (material.narrativeWeight === true || material.isRecurring === true || material.hasForeshadowing === true) return true;
+    if (Array.isArray(material.foreshadowIds) && material.foreshadowIds.length > 0) return true;
+    if (material.depthLevel === 'deep' || material.depthLevel === 'full') return true;
+
+    // 正文出现伏笔/铺垫线索 → 说明是长线角色
+    const text = `${material.currentContent || material.initialContent || ''} ${material.briefText || ''}`;
+    if (/伏笔|铺垫|后续将|线索|幕后|暗中操控/.test(text)) return true;
+
+    return false;
+}
+
 async function validateHierarchy(material) {
     const type = material.type || '';
     const rule = HIERARCHY_RULES[type];
     if (!rule) return { valid: true, missing: [], message: '' };
 
     const missing = [];
+    // character 走"按等级判定"分支，其余类型沿用配置里的 parentRequired
+    const parentRequired = type === 'character' ? characterNeedsFaction(material) : rule.parentRequired;
     for (const field of rule.parentFields) {
-        if (rule.parentRequired && material[field] === undefined) {
+        if (parentRequired && material[field] === undefined) {
             missing.push(field);
         }
     }
@@ -106,4 +138,4 @@ async function getMaterialValidationPrompt(material) {
     return `\n【⚠ 素材标准校验未通过】${result.message}。请在更新素材时补充这些必要字段。`;
 }
 
-module.exports = { MATERIAL_STANDARDS, HIERARCHY_RULES, validateHierarchy, validateMaterial, validateMaterialBatch, getMaterialValidationPrompt };
+module.exports = { MATERIAL_STANDARDS, HIERARCHY_RULES, validateHierarchy, validateMaterial, validateMaterialBatch, getMaterialValidationPrompt, characterNeedsFaction, ROLES_NEEDING_FACTION };

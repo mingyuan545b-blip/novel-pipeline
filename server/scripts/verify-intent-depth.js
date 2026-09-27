@@ -2,7 +2,7 @@
  * verify-intent-depth.js — 验证意图规划→素材深度映射
  * 测试意图中提及的角色是否获得L3深度提升
  */
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
 process.env.USE_PG = 'true';
 const store = require('../store');
 const { resolveIntentDepth, applyIntentDepthOverride, extractCharacterNamesFromIntent, resolveEntityIntentDepth } = require('../services/pipeline/intentDepthResolver');

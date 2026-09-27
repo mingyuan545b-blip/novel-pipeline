@@ -28,6 +28,8 @@ function appendRoundLogs(addPipelineLog, result, chapterNumber, selectedChapter)
 
 const TASK_ID_DISPLAY_LENGTH = 12;
 const POLL_INTERVAL_MS = 3000;
+// 与服务端 asyncTaskManager.TERMINAL_STATUSES 对齐：失败类终止态（含看门狗的超时）
+const TERMINAL_FAILURE_STATUSES = ['failed', 'error', 'timeout', 'cancelled'];
 
 export function useFullPipelineHandler(currentProject, selectedChapter) {
     const queryClient = useQueryClient();
@@ -105,10 +107,15 @@ export function useFullPipelineHandler(currentProject, selectedChapter) {
             setFullPipelinePolling(false);
             setFullPipelineTaskId(null);
             queryClient.invalidateQueries({ queryKey: PIPELINE_KEYS.outputPaths(currentProject?.id) });
-        } else if (taskStatusData.status === 'failed') {
-            const failMsg = taskStatusData.error || taskStatusData.result?.error || taskStatusData.result?.message || '流水线执行失败';
-            addPipelineLog({ step: 'full-pipeline', status: 'error', error: failMsg, chapterNumber: selectedChapter?.chapterNumber, detail: `第${selectedChapter?.chapterNumber}章 失败：` + failMsg, timestamp: new Date().toISOString() });
-            alert('本章流水线执行失败：' + failMsg);
+        } else if (TERMINAL_FAILURE_STATUSES.includes(taskStatusData.status)) {
+            // 修复：原来只认 'failed'，看门狗把卡死任务标成 'timeout' 后前端会永远轮询下去
+            const isTimeout = taskStatusData.status === 'timeout';
+            const failMsg = taskStatusData.error
+                || taskStatusData.result?.error
+                || taskStatusData.result?.message
+                || (isTimeout ? '任务超时（服务端看门狗判定，疑似LLM调用悬挂），请重试本章' : '流水线执行失败');
+            addPipelineLog({ step: 'full-pipeline', status: 'error', error: failMsg, chapterNumber: selectedChapter?.chapterNumber, detail: `第${selectedChapter?.chapterNumber}章 ${isTimeout ? '超时终止' : '失败'}：` + failMsg, timestamp: new Date().toISOString() });
+            alert('本章流水线' + (isTimeout ? '超时终止' : '执行失败') + '：' + failMsg);
             setFullPipelinePolling(false);
             setFullPipelineTaskId(null);
         } else if (taskStatusData.progress && typeof taskStatusData.progress === 'string') {

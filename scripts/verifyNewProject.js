@@ -2,7 +2,7 @@
  * verifyNewProject.js — 验证4个模块：装备/功法/世界域/编年史
  * 用法: node scripts/verifyNewProject.js <projectId>
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
 const PROJECT_ID = process.argv[2];

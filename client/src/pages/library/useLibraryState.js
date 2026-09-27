@@ -87,6 +87,12 @@ export default function useLibraryState() {
 
     useEffect(() => { loadTree(); loadStats(); loadFeedback(); }, [loadTree, loadStats, loadFeedback]);
 
+    /** 提取入库/编辑后刷新技法树与统计 */
+    const reload = useCallback(async () => {
+        await loadTree();
+        await loadStats();
+    }, [loadTree, loadStats]);
+
     const handleSelectTech = async (id) => { setSelectedTech(id); await loadTechnique(id); };
 
     const handleSaveField = async (field, value) => {
@@ -127,6 +133,6 @@ export default function useLibraryState() {
         editingField, setEditingField, editValue, setEditValue, showSearch,
         mode, viewMode, setViewMode, depthTree, feedbackData, loadFeedback,
         toggleNode, loadTree, handleSelectTech, handleSaveField,
-        handleToggleDisabled, handleResetMeta, expandAll, collapseAll, doSearch, closeSearch,
+        handleToggleDisabled, handleResetMeta, expandAll, collapseAll, doSearch, closeSearch, reload,
     };
 }

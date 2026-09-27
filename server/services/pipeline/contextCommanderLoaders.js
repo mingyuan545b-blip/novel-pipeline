@@ -6,6 +6,10 @@
 'use strict';
 const logger = require('../../shared/logger');
 const { SERVANT_BIND_TYPES } = require('./contextDepthConstants');
+// 拆分（2026-09-18）时漏掉的两个真实实现：原先 resolveServantLoads 未定义、
+// resolveTimelineContext 自己调自己 → 仆从/时间轴上下文永久失效（被 try/catch 静默吞掉）
+const { resolveServantLoads } = require('./servantDecisionEngine');
+const { resolveTimelineContext: _resolveTimelineContextImpl } = require('./timelineContextResolver');
 
 async function resolveServants(params, outlineText) {
     try {
@@ -25,7 +29,7 @@ async function resolveServants(params, outlineText) {
 
 async function resolveTimelineContext(projectId, chapterNumber) {
     try {
-        return await resolveTimelineContext(projectId, chapterNumber);
+        return await _resolveTimelineContextImpl(projectId, chapterNumber);
     } catch (e) {
         logger.warn('contextCommander', `Timeline resolution failed: ${e.message}`);
         return null;

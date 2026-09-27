@@ -1,7 +1,7 @@
 /**
  * 检查异步任务状态
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
 const TASK_ID = 'task_1782496922242_kpwu4r';

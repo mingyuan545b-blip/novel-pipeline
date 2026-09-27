@@ -3,7 +3,7 @@
  * 用法: node scripts/smoke-test.js [BASE_URL]
  * 默认: http://localhost:3001
  */
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const http = require('http');
 const https = require('https');
 const { SERVER_DEFAULTS } = require('../config/systemConfig');

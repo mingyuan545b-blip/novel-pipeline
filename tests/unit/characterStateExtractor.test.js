@@ -99,3 +99,33 @@ describe('characterStateExtractor - 人物魅力系统4维度', () => {
         expect(state.quoteLibrary).toBeUndefined();
     });
 });
+
+/**
+ * 20章E2E回归：组合标签《身份/职位》《性格/动机》残留
+ * 实测：陈默 position="职位】前户曹档案库职员"、personality="动机】狂热、绝望、自我感动"
+ */
+describe('组合标签残留清除', () => {
+    const { extractCharacterStateFromContent } = require('../../server/services/pipeline/characterStateExtractor');
+
+    it('【身份/职位】不把第二个标签带进 position', () => {
+        const r = extractCharacterStateFromContent('【身份/职位】前户曹档案库职员，“透明人”。', {});
+        expect(r.position).toBe('前户曹档案库职员');
+    });
+
+    it('【性格/动机】不把第二个标签带进 personality', () => {
+        const r = extractCharacterStateFromContent('【性格/动机】狂热、绝望、自我感动。', {});
+        expect(r.personality).toBe('狂热、绝望、自我感动');
+    });
+
+    it('普通单标签行为不变', () => {
+        const r = extractCharacterStateFromContent('【身份】丧仪司最年轻的收殓师\n【性格】表面玩世不恭、嘴贫', {});
+        expect(r.position).toBe('丧仪司最年轻的收殓师');
+        expect(r.personality).toBe('表面玩世不恭、嘴贫');
+    });
+
+    it('【习惯】走标签层而不是畸形 fallback（不残留右括号）', () => {
+        const r = extractCharacterStateFromContent('【习惯】收殓时必与尸体低声交谈，记录疑点', {});
+        expect(r.signatureDetail).toBe('收殓时必与尸体低声交谈');
+        expect(r.signatureDetail).not.toContain('】');
+    });
+});

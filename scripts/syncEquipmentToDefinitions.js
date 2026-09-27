@@ -7,7 +7,7 @@
  *
  * 本脚本扫描所有项目的 equipment 类型 materials，补同步到 item-definitions 表。
  */
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
 const store = require('../server/store');
 const itemDefinition = require('../server/services/itemDefinition');
 

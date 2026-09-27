@@ -9,7 +9,7 @@ const { extractRoleLevelFromContent, extractGenreStateFromContent, extractFieldF
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
 
 async function populateCharacterFields(newMaterial, update, chapter, projectId, protagonistName, genreId) {
-    newMaterial.roleLevel = extractRoleLevelFromContent(update.content, protagonistName) || update.roleLevel || 'npc';
+    newMaterial.roleLevel = extractRoleLevelFromContent(update.content, protagonistName, update.name) || update.roleLevel || 'npc';
     newMaterial.firstAppearChapter = chapter.chapterNumber || 0;
     newMaterial.lastAppearChapter = chapter.chapterNumber || 0;
     try {
@@ -68,7 +68,7 @@ async function syncToRegistries(newMaterial, update, chapter, projectId, protago
         if (newMaterial.type === 'character') {
             await entityRegistry.registerEntity(projectId, newMaterial.type, update.name, {
                 id: newMaterial.id,
-                roleLevel: extractRoleLevelFromContent(update.content, protagonistName) || update.roleLevel || 'npc',
+                roleLevel: extractRoleLevelFromContent(update.content, protagonistName, update.name) || update.roleLevel || 'npc',
                 firstAppearChapter: chapter.chapterNumber || 0, lastAppearChapter: chapter.chapterNumber || 0,
                 parentPlane: newMaterial.parentPlane || null, parentFaction: newMaterial.parentFaction || null
             });

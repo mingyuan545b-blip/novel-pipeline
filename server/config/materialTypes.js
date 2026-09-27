@@ -67,7 +67,7 @@ const CRAFT_TYPES = new Set(['mechanism', 'writing-technique', 'index', 'craft']
 const HIERARCHY_RULES = {
     'sub-plane': { parentRequired: false, parentFields: [] },
     'faction': { parentRequired: true, parentFields: ['parentPlane'], description: '势力必须归属一个位面（小世界或主世界），parentPlane字段必填' },
-    'character': { parentRequired: true, parentFields: ['parentFaction'], description: '人物必须归属一个势力，parentFaction字段必填；若属于小世界势力，还需parentPlane' },
+    'character': { parentRequired: true, parentFields: ['parentFaction'], description: '主角/配角及有伏笔铺垫的长线角色必须归属一个势力（parentFaction必填）；一次性路人（npc且无伏笔）可免归属，判定见 materialValidator.characterNeedsFaction' },
     'equipment': { parentRequired: false, parentFields: ['parentPlane'], description: '道具可归属小世界，parentPlane可选' },
     'institution': { parentRequired: true, parentFields: ['parentPlane'], description: '机构必须归属一个位面，parentPlane字段必填' },
     'worldview': { parentRequired: false, parentFields: [] },

@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const store = require('../store');
 const { runAgent } = require('../services/pipeline/agentRunner');
 const { v4: uuidv4 } = require('uuid');

@@ -14,6 +14,7 @@ const { checkStopped, getSteps, persistPipelineLog, tagLogMeta } = require('./or
 const { runPreflightChecks, handleChapterIntent, syncHooksAndRules } = require('./orchestratorPreflight');
 const { clearRoundOutputs, checkCircuitBreaker } = require('./orchestratorRoundHelpers');
 const { executeStepLoop } = require('./orchestratorStepLoop');
+const { runWithContext } = require('../../shared/runContext');
 
 class PipelineOrchestrator {
     constructor(config = {}) {
@@ -89,10 +90,7 @@ class PipelineOrchestrator {
                 chapter = await store.getItem('chapters', chapterId) || chapter;
 
                 if (checkStopped(projectId, chapterNumber, abortController)) {
-                    chapter.status = STATUS_VALUES.OUTLINED;
-                    delete chapter.skipUntil;
-                    chapter.updatedAt = new Date().toISOString();
-                    await store.setItem('chapters', chapterId, chapter);
+                    await resetChapterToOutlined(chapterId);
                     await persistPipelineLog(chapterId, projectId, pipelineLog);
                     return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber, startRound), message: '流水线已停止' };
                 }
@@ -111,12 +109,19 @@ class PipelineOrchestrator {
                     if (cbResult.tripped) return { success: false, rounds: round, log: tagLogMeta(pipelineLog, chapterNumber, startRound), message: '流水线熔断暂停', alertLoopReport: cbResult.alertResult };
                 }
 
-                const loopResult = await executeStepLoop({
+                // 运行上下文：把 startRound 透传到步骤内部（reviews 写入时补 runRound，供 UI 显示"第x轮(累计y)"）
+                const loopResult = await runWithContext({
+                    projectId, chapterId, startRound, round,
+                    // 末轮标记：审核链内部（first-review 硬性检测等）据此对"轻微字数不足"降级处理，
+                    // 否则 hardBlock 不可覆盖 → 末轮宽限形同虚设（20章E2E ch6 实测）
+                    isLastRound: round >= startRound + effectiveMaxRounds - 1
+                }, () => executeStepLoop({
                     projectId, chapterId, steps, round, chapter, config, project, mode,
                     pipelineLog, onStep, runStepFn: this._getRunPipelineStep(),
                     abortController, rejectionTracker, allFeedbackParts, lastFeedback,
-                    materialGuidance, chapterIntent, genre, circuitBreaker, options, retryCount
-                });
+                    materialGuidance, chapterIntent, genre, circuitBreaker, options, retryCount,
+                    startRound, effectiveMaxRounds
+                }));
 
                 retryCount = loopResult.retryCount ?? retryCount;
                 if (loopResult.done) { if (loopResult.result) tagLogMeta(loopResult.result.log, chapterNumber, startRound); return loopResult.result; }
@@ -126,13 +131,7 @@ class PipelineOrchestrator {
 
             const lastLog = pipelineLog.length > 0 ? pipelineLog[pipelineLog.length - 1] : null;
             const isWordCountFailure = lastLog && lastLog.feedback?.issues?.some(i => i.desc && i.desc.includes('字数') && i.desc.includes('低于最低要求'));
-            const failedChapter = await store.getItem('chapters', chapterId);
-            if (failedChapter) {
-                failedChapter.status = STATUS_VALUES.OUTLINED;
-                delete failedChapter.skipUntil;
-                failedChapter.updatedAt = new Date().toISOString();
-                await store.setItem('chapters', chapterId, failedChapter);
-            }
+            await resetChapterToOutlined(chapterId);
 
             await persistPipelineLog(chapterId, projectId, pipelineLog);
             const lastFailedStep = pipelineLog.length > 0 ? pipelineLog[pipelineLog.length - 1].step : 'unknown';
@@ -153,6 +152,16 @@ class PipelineOrchestrator {
             this._activeAbortController = null;
         }
     }
+}
+
+/** 把章节置回 outlined（停止/失败路径共用）：清 skipUntil 并落盘 */
+async function resetChapterToOutlined(chapterId) {
+    const chapter = await store.getItem('chapters', chapterId);
+    if (!chapter) return;
+    chapter.status = STATUS_VALUES.OUTLINED;
+    delete chapter.skipUntil;
+    chapter.updatedAt = new Date().toISOString();
+    await store.setItem('chapters', chapterId, chapter);
 }
 
 module.exports = { PipelineOrchestrator };

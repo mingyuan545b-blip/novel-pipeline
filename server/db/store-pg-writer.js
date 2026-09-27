@@ -14,6 +14,7 @@ const { trimItemData } = require('./storeCommon');
 const { getEntityTableHandlers } = require('./store-pg-writer-entity');
 const { getRegistryHandlers } = require('./store-pg-writer-registry');
 const { getWorldScopeTableHandlers } = require('./store-pg-writer-worldscope');
+const { getLibraryTableHandlers } = require('./store-pg-writer-library');
 const logger = require('../shared/logger');
 
 const IMMEDIATE_SAVE_TYPES = new Set(['chapters', 'materials', 'circuit-breakers', 'infinite-pipeline-state']);
@@ -37,7 +38,7 @@ async function _writeItemUnlocked(type, id, data, options = {}) {
             if (!data.createdAt) data.createdAt = createdAt || now;
             data.updatedAt = now;
 
-            const handlers = { ..._getTableHandlers(), ...getEntityTableHandlers(), ...getRegistryHandlers(), ...getWorldScopeTableHandlers() };
+            const handlers = { ..._getTableHandlers(), ...getEntityTableHandlers(), ...getRegistryHandlers(), ...getWorldScopeTableHandlers(), ...getLibraryTableHandlers() };
             const handler = handlers[table];
             if (handler) {
                 await handler(db, existingInDb, data, id, now);

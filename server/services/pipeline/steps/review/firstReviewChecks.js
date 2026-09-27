@@ -77,10 +77,17 @@ async function runHardBlockChecks(chapter, ctx, projectId) {
 
         let sensitiveBlock = false; let sensitiveHits = [];
         try { const scanResult = scanSensitiveWords(content); const blockHits = scanResult.hits.filter(h => h.severity === 'block'); if (blockHits.length > 0) { sensitiveBlock = true; sensitiveHits = blockHits; } } catch (e) { logger.warn('firstReview', e.message || e); }
-        if (sensitiveBlock) hardBlockIssues.push({ severity: 'critical', description: `敏感词拦截：发现${sensitiveHits.length}处block级敏感词`, title: '敏感词拦截' });
+        // 对齐审计系统（auditMethods/hardBlockChecks均带命中词）：反馈必须含具体词，
+        // 否则返修员无从定位修改（2026-09-06实测：不含词的反馈导致reviser两轮修复无效）
+        if (sensitiveBlock) hardBlockIssues.push({ severity: 'critical', description: `敏感词拦截：发现${sensitiveHits.length}处block级敏感词：${sensitiveHits.slice(0, 5).map(h => `"${h.word}"`).join('、')}。必须将这些词所在句子改写为合规表达（保持剧情走向，可用动作替代或侧面描写）。`, title: '敏感词拦截' });
 
-        const wcBlocks = await checkWordCountGate(content, projectId);
-        for (const b of wcBlocks) hardBlockIssues.push(b);
+        // 末轮宽限：本次运行已无重试轮次时，轻微字数不足降级为 warning（否则 hardBlock 不可覆盖 → 整章作废）
+        let allowGrace = false;
+        try { allowGrace = require('../../../../shared/runContext').isLastRound(); } catch (_) { allowGrace = false; }
+        const wcBlocks = await checkWordCountGate(content, projectId, { allowLastRoundGrace: allowGrace });
+        for (const b of wcBlocks) {
+            if (b.severity === 'warning') warningIssues.push(b); else hardBlockIssues.push(b);
+        }
 
         const genreIntercept = runGenreFirstReviewIntercept(content, styleProfile, { scene: chapter.scene, outline: chapter.outline });
         if (genreIntercept.hardBlockIssues?.length > 0) hardBlockIssues.push(...genreIntercept.hardBlockIssues);

@@ -1,7 +1,7 @@
 /**
  * _querySettings.js — 临时查询项目settings（验证后删除）
  */
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const { Pool } = require('pg');
 const p = new Pool({ connectionString: process.env.DATABASE_URL });
 (async () => {

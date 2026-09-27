@@ -8,6 +8,7 @@ const logger = require('../../shared/logger');
 const { _recomputePromptTexts } = require('./formatters');
 const { migrateIsActive, isValidTransition } = require('./entityLifecycle');
 const { syncToRegistry, resolveBehaviorRules, injectBehaviorRulesFromGenre, mergeExistingEntity, getEntityStats } = require('./entityBehaviorRules');
+const { detectGenreId } = require('./entityGenreDetect');
 
 const ENTITY_TYPE = 'entities';
 // 双主角题材白名单（仅保留通过质量门禁的题材）
@@ -23,7 +24,7 @@ async function getOrCreateEntity(center, projectId, entityType, name, defaults =
     }
 
     if (defaults.roleLevel === 'protagonist' && entityType === 'character') {
-        defaults = await _enforceProtagonistLimit(projectId, defaults);
+        defaults = await enforceProtagonistLimit(projectId, defaults);
     }
 
     const id = defaults.id || `${entityType}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -152,30 +153,27 @@ async function transitionLifecycle(entityId, toState, reason = '') {
     return entity;
 }
 
-async function detectGenreId(projectId) {
-    try {
-        const { getStyleProfileForProject } = require('../prompts/styleInjector');
-        const styleProfile = await getStyleProfileForProject(projectId);
-        if (styleProfile) { const { detectGenre } = require('../genreConfig'); const genre = detectGenre(styleProfile); if (genre) return genre.id; }
-    } catch (_) { logger.warn('entityCRUD', '[entity-crud]', _.message || _); }
-    return '';
-}
-
 async function _fuzzyMatchCharacter(projectId, name) {
     const normalizedName = name.toLowerCase().replace(/[\s\-_··]/g, '');
+    // 空名/单字名不参与模糊匹配：''.includes(x) 恒真，会把任意新角色并进"无名实体"
+    if (normalizedName.length < 2) return null;
     const allChars = await store.queryItems(ENTITY_TYPE, { projectId, entityType: 'character' });
     const match = allChars.find(e => {
         if (e.lifecycleState === 'archived' || e.archived) return false;
         const eName = (e.name || '').toLowerCase().replace(/[\s\-_··]/g, '');
+        if (eName.length < 2) return false;
         return eName === normalizedName || eName.includes(normalizedName) || normalizedName.includes(eName);
     });
     if (match) logger.info('entityCenter', `Fuzzy match: "${name}" -> existing "${match.name}" (${match.id})`);
     return match || null;
 }
 
-async function _enforceProtagonistLimit(projectId, defaults) {
+async function enforceProtagonistLimit(projectId, defaults, options = {}) {
     const allChars = await store.queryItems(ENTITY_TYPE, { projectId, entityType: 'character' });
-    const existingProtagonists = allChars.filter(e => e.roleLevel === 'protagonist' && e.lifecycleState !== 'archived' && !e.archived);
+    // excludeEntityId：升级已有角色时，把自己排除在"已占位的主角"之外
+    const existingProtagonists = allChars.filter(e =>
+        e.roleLevel === 'protagonist' && e.lifecycleState !== 'archived' && !e.archived &&
+        e.id !== options.excludeEntityId);
     const genreId = await detectGenreId(projectId);
     const maxProtagonists = DUAL_PROTAGONIST_GENRE_IDS.has(genreId) ? 2 : 1;
     if (existingProtagonists.length >= maxProtagonists) {
@@ -186,6 +184,7 @@ async function _enforceProtagonistLimit(projectId, defaults) {
 }
 
 module.exports = {
+    enforceProtagonistLimit,
     getOrCreateEntity, findEntityByName, findEntityById, getEntitiesForProject,
     updateEntity, recordAppearance, archiveEntity, transitionLifecycle,
     detectGenreId, syncToRegistry, mergeExistingEntity, getEntityStats,

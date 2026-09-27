@@ -12,6 +12,8 @@ const { getDataContext } = require('../../dataContext');
 const { buildModuleHint } = require('../../genres/moduleHintBuilder');
 const { buildWriterPovRuleSection } = require('../povRuleSectionBuilder');
 const { buildWritingGuardSection } = require('../writingGuardSectionBuilder');
+const { countWords, buildExpansionInstruction } = require('./expansionInstructionBuilder');
+const { resolveConfig } = require('../../../config/unifiedConfig');
 const logger = require('../../../shared/logger');
 
 /** 加载素材和构建prompt上下文 */
@@ -52,6 +54,17 @@ async function buildReviserContext({ projectId, chapter, materials, agentContext
     // 写作红线（敏感词/方括号/系统交互）由统一构建器注入，禁止硬编码
     const writingGuardSection = buildWritingGuardSection();
 
+    // 字数缺口时注入结构化扩写任务（统一构建器）——修复reviser对含糊指令"必须扩充"只加十几字的平台期
+    // （2026-09-06云端E2E实测2157→2170→2170；与本地RUN3三连败同根因）
+    const reviserWordConfig = resolveConfig(genre, project).word;
+    const wordCountBefore = countWords(chapterContent);
+    const expansionInstruction = buildExpansionInstruction(
+        wordCountBefore, reviserWordConfig,
+        { mode: 'revise', attempt: Math.max(0, (context.round || 2) - 1) }
+    );
+    // 扩写任务信息随返回值下传：reviser.js据此做步内升级重试（首轮扩写未达标不白烧轮次）
+    const expansionTask = expansionInstruction ? { targetMin: reviserWordConfig.targetMin, wordCountBefore } : null;
+
     agentContext.content = `${povRuleSection}${relationshipGuard}
 ${constraintsText ? '\n\n【行为约束（修改依据——必须遵守行为规则）】\n' + constraintsText + '\n' : ''}
 ${charSection}${materialAgentContext.content}${intentSection}${timelineSection}${foreshadowSection}${moduleHintSection}
@@ -59,7 +72,7 @@ ${charSection}${materialAgentContext.content}${intentSection}${timelineSection}$
 ${writingGuardSection}
 
 请根据审核反馈对正文进行精准修改。
-
+${expansionInstruction ? '\n' + expansionInstruction + '\n' : ''}
 【当前正文】
 ${chapterContent.substring(0, 12000)}
 
@@ -86,7 +99,7 @@ ${nameLockSection}
 5. 角色状态/进度是否与前章一致？（石化/伤势/境界等进度不能倒退）
 6. 审核反馈的每一条是否都已修改？`;
 
-    return { scheduled };
+    return { scheduled, expansionTask };
 }
 
 function _buildIntentSection(agentContext, context) {

@@ -2,6 +2,8 @@ import useLibraryState from './library/useLibraryState';
 import { DEPT_ICONS, DEPT_COLORS, SLOT_LABELS, INJECTION_LABELS, DEPTH_LABELS, DEPTH_COLORS, cleanName } from './library/useLibraryState';
 import { TreeNode, TechLeaf } from './library/BookCard';
 import FeedbackPanel from './library/FeedbackPanel';
+import ExtractDialog from './library/ExtractDialog';
+import useExtractState from './library/useExtractState';
 import s from './library/library.module.css';
 
 const VIEW_TABS = [
@@ -16,8 +18,11 @@ export default function LibraryPage() {
         editingField, setEditingField, editValue, setEditValue, showSearch,
         viewMode, setViewMode, depthTree, feedbackData, loadFeedback,
         toggleNode, handleSelectTech, handleSaveField, handleToggleDisabled,
-        handleResetMeta, expandAll, collapseAll, doSearch, closeSearch,
+        handleResetMeta, expandAll, collapseAll, doSearch, closeSearch, reload,
     } = useLibraryState();
+
+    // 一键提取：提取完成后刷新技法树（新技法直接入库）
+    const extractState = useExtractState({ onFinished: () => reload?.() });
 
     const renderDetail = () => {
         if (!selectedTech || !techDetail) return <div className={s.emptyDetail}><div style={{ fontSize: 40, marginBottom: 12 }}>📖</div><div style={{ fontSize: 14 }}>点击左侧技法查看详情</div></div>;
@@ -87,6 +92,7 @@ export default function LibraryPage() {
                     <select value={modeFilter} onChange={e => setModeFilter(e.target.value)} className={s.modeSelect}>
                         <option value="">全部模式</option><option value="novel">长篇</option><option value="shuangwen">爽文</option><option value="tomato-short">番茄短篇</option>
                     </select>
+                    <button onClick={() => extractState.setOpen(true)} className={s.saveBtn}>⬆ 一键提取</button>
                     <button onClick={expandAll} className={s.toolbarBtn}>展开全部</button>
                     <button onClick={collapseAll} className={s.toolbarBtn}>折叠全部</button>
                 </div>
@@ -141,6 +147,7 @@ export default function LibraryPage() {
                 </div>
                 <div className={s.detailPanel}>{renderDetail()}</div>
             </div>
+            <ExtractDialog state={extractState} />
             <FeedbackPanel feedbackData={feedbackData} projectId={currentProject?.id} onRefresh={loadFeedback} />
         </div>
     );

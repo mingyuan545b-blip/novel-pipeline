@@ -36,8 +36,15 @@ function registerRoutes(app, { pipelineLimiter, authRoutes, genreDebugRoutes, ap
     const contextCommanderRoutes = require('../routes/pipeline/contextCommanderRoutes');
     app.use('/api/pipeline', requireFeature('pipeline'), contextCommanderRoutes);
 
+    // Token 去向面板：每章每步花了多少 token、花在哪几段提示词、哪段被截断
+    const tokenLedgerRoutes = require('../routes/pipeline/tokenLedgerRoutes');
+    app.use('/api/pipeline', requireFeature('pipeline'), tokenLedgerRoutes);
+
     // worldscopeRoutes 已统一为标准 router 方式（原 app.get 直接注册的 workaround 已移除）
     app.use('/api/pipeline', require('../routes/worldscopeRoutes'));
+
+    // 库维护：一键扫描/清理孤儿数据 + 运行时预警快照
+    app.use('/api/maintenance', require('../routes/maintenanceRoutes'));
 
     app.use('/api/workshop', (req, res, next) => {
         if (req.path.includes('fuse')) return requireFeature('workshop-fusion')(req, res, next);

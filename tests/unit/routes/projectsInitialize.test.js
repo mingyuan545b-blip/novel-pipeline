@@ -123,6 +123,30 @@ describe('projects initializeRoutes (S5.2)', () => {
             expect(outStep.status).toBe('failed');
         });
 
+        test('主线任务初始化失败但其他步骤成功', async () => {
+            autoInitProject.mockRejectedValue(new Error('任务初始化失败'));
+            const { res } = await executeRoute(getRoutes(), 'POST', '/initialize', { body: { name: '项目' } });
+            expect(res._statusCode).toBe(201);
+            expect(res._body.data.allStepsSucceeded).toBe(false);
+            const questStep = res._body.data.steps.find(s => s.step === 'quests');
+            expect(questStep.status).toBe('failed');
+            expect(questStep.error).toContain('任务初始化失败');
+        });
+
+        test('步骤结果缺字段时计数与安全字段降级为默认值', async () => {
+            pipeline.generateInitialMaterials.mockResolvedValue({});
+            pipeline.generateChapterOutlines.mockResolvedValue({});
+            autoInitProject.mockResolvedValue({});
+            const { res } = await executeRoute(getRoutes(), 'POST', '/initialize', { body: { name: '项目' } });
+            expect(res._statusCode).toBe(201);
+            expect(res._body.data.allStepsSucceeded).toBe(true);
+            expect(res._body.data.steps[1].count).toBe(0);
+            expect(res._body.data.steps[2].count).toBe(0);
+            expect(res._body.data.steps[3].questsCreated).toBe(0);
+            expect(res._body.data.steps[3].timelinesCreated).toBe(0);
+            expect(res._body.data.steps[3].mainQuest).toBe('');
+        });
+
         test('targetChapters 未传时为 null', async () => {
             await executeRoute(getRoutes(), 'POST', '/initialize', { body: { name: '项目' } });
             expect(pipeline.generateChapterOutlines).toHaveBeenCalledWith('new-pid', '', null);

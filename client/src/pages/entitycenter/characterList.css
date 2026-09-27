@@ -1,0 +1,84 @@
+/* 角色列表 —— 按等级分组、按重要度分级显示，解决"密密麻麻分不清主次" */
+
+.cl-panel { display: flex; flex-direction: column; gap: 10px; width: 340px; flex-shrink: 0;
+    max-height: calc(100vh - 240px); overflow-y: auto; padding-right: 4px; }
+
+/* 工具条：搜索 + 排序 */
+.cl-tools { display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; z-index: 2;
+    padding: 10px; background: #0f1626; border: 1px solid #1e2b40; border-radius: 10px; }
+.cl-search { width: 100%; padding: 7px 10px; font-size: 13px; color: #e2e8f0;
+    background: #0b1220; border: 1px solid #263449; border-radius: 8px; }
+.cl-search:focus { outline: none; border-color: #3b82f6; }
+.cl-sortrow { display: flex; align-items: center; gap: 8px; }
+.cl-sort { flex: 1; padding: 5px 8px; font-size: 12px; color: #cbd5e1;
+    background: #0b1220; border: 1px solid #263449; border-radius: 7px; }
+.cl-count { font-size: 12px; color: #7c8ba1; white-space: nowrap; }
+
+/* 等级筛选 */
+.cl-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cl-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; font-size: 12px; font-weight: 600;
+    color: #8fa0b8; background: rgba(22, 32, 48, 0.4); border: 1px solid #263449; border-radius: 999px; cursor: pointer; }
+.cl-chip:hover { color: #dbeafe; border-color: #3b82f6; }
+.cl-chip-on { color: #0b1220; background: #60a5fa; border-color: #60a5fa; }
+.cl-chip-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+/* 分组标题 */
+.cl-group { display: flex; align-items: baseline; gap: 8px; margin: 8px 2px 2px; }
+.cl-group-name { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+.cl-group-count { font-size: 12px; font-weight: 600; color: #94a3b8; }
+.cl-group-hint { font-size: 11px; color: #5b6b80; }
+
+/* 角色行 */
+.cl-row { position: relative; display: flex; align-items: center; border-radius: 10px;
+    background: #111a2b; border: 1px solid #1e2b40; transition: border-color 0.15s, transform 0.15s; }
+.cl-row:hover { border-color: rgba(96, 165, 250, 0.5); transform: translateX(2px); }
+.cl-row-on { background: rgba(59, 130, 246, 0.1); }
+.cl-row-btn { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; background: none; border: none; cursor: pointer; text-align: left; color: inherit; }
+.cl-row-body { flex: 1; min-width: 0; }
+.cl-row-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.cl-row-name { font-weight: 700; color: #f1f5f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cl-row-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #7c8ba1; }
+.cl-appear { font-weight: 600; }
+
+/* 分级：主角最醒目 / 配角次之 / NPC 收敛 */
+.cl-p1 { border-left: 3px solid #ffd700; box-shadow: inset 0 0 24px rgba(255, 215, 0, 0.06); }
+.cl-p1 .cl-row-name { font-size: 15px; }
+.cl-p1 .cl-row-btn { padding: 13px 14px; }
+.cl-p2 { border-left: 3px solid #2b6cb0; }
+.cl-p2 .cl-row-name { font-size: 14px; }
+.cl-p3 { border-left: 3px solid #2a3446; }
+.cl-p3 .cl-row-name { font-size: 13px; color: #c3ccd9; }
+.cl-p3 .cl-row-btn { padding: 8px 12px; opacity: 0.9; }
+
+.cl-del { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 13px; line-height: 1;
+    color: #7c8ba1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer; opacity: 0; transition: opacity 0.15s; }
+.cl-row:hover .cl-del { opacity: 1; }
+.cl-del-on { width: auto; padding: 0 7px; border-radius: 6px; opacity: 1; color: #ff8f8f;
+    background: rgba(255, 80, 80, 0.16); border-color: rgba(255, 80, 80, 0.4); }
+
+.cl-empty { padding: 26px 16px; text-align: center; font-size: 13px; color: #7c8ba1; }
+
+/* 未选中角色时的概览（避免右侧大片空白） */
+.cl-overview { padding: 22px 24px; background: #111a2b; border: 1px solid #1e2b40; border-radius: 14px; }
+.cl-ov-title { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: #f1f5f9; }
+.cl-ov-sub { margin: 0 0 18px; font-size: 13px; color: #7c8ba1; }
+.cl-ov-section { margin-bottom: 20px; }
+.cl-ov-label { margin-bottom: 10px; font-size: 13px; font-weight: 700; color: #94a3b8; }
+.cl-ov-bars { display: flex; flex-direction: column; gap: 9px; }
+.cl-ov-bar { display: grid; grid-template-columns: 78px 1fr 62px; align-items: center; gap: 10px; font-size: 13px; }
+.cl-ov-track { height: 9px; background: #0b1220; border-radius: 999px; overflow: hidden; }
+.cl-ov-fill { height: 100%; border-radius: 999px; }
+.cl-ov-value { text-align: right; font-weight: 600; color: #e2e8f0; }
+.cl-ov-top { display: flex; flex-wrap: wrap; gap: 8px; }
+.cl-ov-chip { display: flex; align-items: center; gap: 7px; padding: 7px 12px; font-size: 13px;
+    background: #0d1420; border: 1px solid #1e2b40; border-radius: 10px; }
+.cl-ov-chip-name { font-weight: 600; color: #e2e8f0; }
+.cl-ov-chip-meta { font-size: 11px; color: #7c8ba1; }
+.cl-ov-tip { margin-top: 6px; font-size: 12px; color: #5b6b80; }
+
+.cl-group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.cl-ov-chip { cursor: pointer; }
+.cl-ov-chip:hover { border-color: rgba(96, 165, 250, 0.5); }

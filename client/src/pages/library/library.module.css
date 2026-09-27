@@ -34,3 +34,23 @@
 .fb-bar-track { flex: 1; height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; }
 .fb-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
 .fb-rate { font-size: 11px; font-weight: 600; width: 40px; text-align: right; flex-shrink: 0; }
+
+/* ---- 一键提取弹窗 ---- */
+.dlg-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.dlg-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; width: 720px; max-width: 92vw; max-height: 88vh; overflow: auto; }
+.dlg-hint { font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin: 8px 0 14px; }
+.dlg-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.dlg-input { flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 13px; }
+.dlg-file-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-secondary); font-size: 13px; cursor: pointer; white-space: nowrap; }
+.dlg-textarea { width: 100%; height: 180px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 12px; line-height: 1.6; resize: vertical; box-sizing: border-box; }
+.dlg-dim-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.dlg-dim-on { padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer; border: 1px solid var(--accent-primary); background: var(--accent-primary); color: #fff; }
+.dlg-dim-off { padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-secondary); }
+.dlg-progress { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+.dlg-progress-track { flex: 1; height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
+.dlg-progress-fill { height: 100%; background: var(--accent-primary); transition: width 0.3s ease; }
+.dlg-progress-text { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+.dlg-result { margin-top: 10px; padding: 10px 12px; border-radius: 8px; background: var(--bg-secondary); font-size: 12px; line-height: 1.8; }
+.dlg-list { margin: 6px 0 0; padding-left: 18px; color: var(--text-secondary); }
+.dlg-warn { margin-top: 8px; font-size: 12px; color: #ffa502; }
+.dlg-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 16px; }

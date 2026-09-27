@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 process.env.USE_PG = 'true';
 process.env.USE_SQLITE = 'false';
 

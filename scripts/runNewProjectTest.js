@@ -3,7 +3,7 @@
  * 只复用世界观框架（高武·反套路喜剧），角色/剧情/装备/功法全部重新设计
  * 步骤: 创建项目 → 生成素材 → 生成大纲 → 逐章流水线
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
 

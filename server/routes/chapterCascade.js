@@ -53,8 +53,8 @@ async function cascadeCleanup(chapterId, projectId, chapterNumber, chapter) {
 
     try {
         const materialIndex = require('../services/materialIndex');
-        const mi = new materialIndex();
-        mi.removeChapterDiscoveries(projectId, chapterNumber);
+        // materialIndex 导出的是单例实例（module.exports = new MaterialIndex()），不能再 new
+        materialIndex.removeChapterDiscoveries(projectId, chapterNumber);
         result.success.push('materialIndexCleaned');
     } catch (err) { result.errors.push({ type: 'materialIndex', error: err.message || err }); }
 

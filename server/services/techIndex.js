@@ -1,160 +1,120 @@
-const fs = require('fs');
-const path = require('path');
-
-const LIBRARY_DIR = path.join(__dirname, '..', 'data', 'library');
-const IDF_SMOOTHING = 0.5;
-const K1 = 1.5;
-const B = 0.75;
+/**
+ * techIndex — 藏经阁技法检索门面
+ *
+ * 数据源（2026-09-21 起）：PG表 library_techniques，经 libraryStore 读取；
+ *   PG为空/不可用时自动兜底读取 server/data/library/*.json（techIndexJsonSeed）。
+ * 设计取舍：Pipeline侧（techniqueScheduler）是**同步调用**，而PG是异步IO，
+ *   因此启动时把全库载入内存（一百余条，内存成本可忽略），对外保持同步API。
+ *   提取/编辑后由 libraryStore 触发 reload() 刷新内存。
+ * 文件位置：server/services/techIndex.js
+ */
+const search = require('./techIndexSearch');
+const jsonSeed = require('./techIndexJsonSeed');
+const logger = require('../shared/logger');
 
 class TechIndex {
     constructor() {
-        this._index = null;
+        this._entries = [];      // 轻量条目（检索/过滤用）
+        this._leaves = {};       // id -> 技法全文
+        this._stats = null;      // BM25统计量
+        this._source = 'none';   // 'pg' | 'json' | 'none'
+        this._loadedAt = null;
+    }
+
+    _toEntry(t) {
+        return {
+            id: t.id,
+            display_name: t.display_name,
+            tags: t.retrieval_tags || t.tags || [],
+            modes: t.applicable_modes || t.modes || [],
+            department: t.department,
+            subcategory: t.subcategory || '',
+            context_slot: t.context_slot,
+            injection_point: t.injection_point,
+            worldviewDepth: t.worldviewDepth || t.worldview_depth || 'meso',
+        };
+    }
+
+    _setAll(records, source) {
         this._leaves = {};
-        this._avgDocLen = 0;
-        this._docCount = 0;
-        this._idfCache = {};
-        this._injectionCache = {};
-        this._watcher = null;
-        this._watchDebounce = null;
-        this._startWatcher();
+        this._entries = [];
+        for (const t of records) {
+            if (!t || !t.id) continue;
+            this._leaves[t.id] = t;
+            this._entries.push(this._toEntry(t));
+        }
+        this._stats = search.buildStats(this._entries);
+        this._source = source;
+        this._loadedAt = new Date().toISOString();
     }
 
-    _startWatcher() {
-        const idxPath = path.join(LIBRARY_DIR, 'index.json');
-        if (!fs.existsSync(idxPath)) return;
+    /** 从PG装载（启动时调用；PG不可用则回落JSON） */
+    async initFromPg() {
         try {
-            this._watcher = fs.watch(idxPath, { persistent: false }, () => {
-                clearTimeout(this._watchDebounce);
-                this._watchDebounce = setTimeout(() => this.refreshIndex(), 300);
-            });
-            this._watcher.on('error', () => { /* ignore watch errors */ });
-        } catch (_) { /* fs.watch not available */ }
-    }
-
-    _loadIndex() {
-        if (this._index) return this._index;
-        const idxPath = path.join(LIBRARY_DIR, 'index.json');
-        if (!fs.existsSync(idxPath)) { this._index = { entries: [], total_entries: 0 }; return this._index; }
-        this._index = JSON.parse(fs.readFileSync(idxPath, 'utf-8').replace(/^\uFEFF/, ''));
-        return this._index;
-    }
-
-    _loadLeaf(techId) {
-        if (this._leaves[techId]) return this._leaves[techId];
-        const index = this._loadIndex();
-        const entry = index.entries.find(e => e.id === techId);
-        if (!entry) return null;
-        const leafPath = path.join(LIBRARY_DIR, entry.path);
-        if (!fs.existsSync(leafPath)) return null;
-        this._leaves[techId] = JSON.parse(fs.readFileSync(leafPath, 'utf-8').replace(/^\uFEFF/, ''));
-        return this._leaves[techId];
-    }
-
-    _tokenize(text) {
-        if (!text) return [];
-        const cleaned = text.toLowerCase().replace(/[^\u4e00-\u9fff\w]/g, ' ');
-        const tokens = [];
-        const chineseChars = cleaned.match(/[\u4e00-\u9fff]{2,}/g) || [];
-        for (const seg of chineseChars) {
-            for (let i = 0; i < seg.length - 1; i++) {
-                tokens.push(seg.substring(i, i + 2));
+            const libraryStore = require('./libraryStore');
+            const records = await libraryStore.listTechniques();
+            if (records.length > 0) {
+                this._setAll(records, 'pg');
+                logger.info('techIndex', `[TECH-INDEX] 已从PG装载 ${records.length} 条技法`);
+                return { source: 'pg', count: records.length };
             }
+            logger.warn('techIndex', '[TECH-INDEX] PG技法库为空，回落JSON种子');
+        } catch (e) {
+            logger.warn('techIndex', `[TECH-INDEX] PG装载失败(${e.message})，回落JSON种子`);
         }
-        const words = cleaned.match(/[a-z0-9]+/g) || [];
-        tokens.push(...words);
-        return tokens;
+        return this._loadJsonFallback();
     }
 
-    _buildStats() {
-        const index = this._loadIndex();
-        this._docCount = index.entries.length;
-        let totalLen = 0;
-        const df = {};
-
-        for (const entry of index.entries) {
-            const allText = [entry.display_name, ...(entry.tags || []), entry.department, entry.subcategory || ''].join(' ');
-            const tokens = this._tokenize(allText);
-            totalLen += tokens.length;
-            const seen = new Set(tokens);
-            for (const t of seen) {
-                df[t] = (df[t] || 0) + 1;
-            }
-        }
-
-        this._avgDocLen = this._docCount > 0 ? totalLen / this._docCount : 1;
-        this._idfCache = {};
-        for (const [term, freq] of Object.entries(df)) {
-            this._idfCache[term] = Math.log((this._docCount - freq + IDF_SMOOTHING) / (freq + IDF_SMOOTHING) + 1);
+    /** 兜底：读JSON种子 */
+    _loadJsonFallback() {
+        try {
+            const records = jsonSeed.loadAll();
+            this._setAll(records, records.length ? 'json' : 'none');
+            logger.warn('techIndex', `[TECH-INDEX] 使用JSON兜底，${records.length} 条技法（数据可能与PG不一致）`);
+            return { source: this._source, count: records.length };
+        } catch (e) {
+            logger.error('techIndex', `[TECH-INDEX] JSON兜底失败: ${e.message}`);
+            this._setAll([], 'none');
+            return { source: 'none', count: 0 };
         }
     }
 
-    _bm25Score(queryTokens, docTokens) {
-        if (!this._docCount) this._buildStats();
-        const docFreq = {};
-        for (const t of docTokens) docFreq[t] = (docFreq[t] || 0) + 1;
-        const docLen = docTokens.length;
-
-        let score = 0;
-        const seen = new Set();
-        for (const qt of queryTokens) {
-            if (seen.has(qt)) continue;
-            seen.add(qt);
-            const tf = docFreq[qt] || 0;
-            if (tf === 0) continue;
-            const idf = this._idfCache[qt] || 0;
-            const numerator = tf * (K1 + 1);
-            const denominator = tf + K1 * (1 - B + B * docLen / this._avgDocLen);
-            score += idf * numerator / denominator;
-        }
-        return score;
+    /** 保证已装载（惰性兜底，供未走启动初始化的脚本/测试使用） */
+    _ensureLoaded() {
+        if (this._entries.length === 0 && this._source === 'none') this._loadJsonFallback();
     }
+
+    /** 重新装载（提取入库/编辑后调用） */
+    async reload() {
+        return await this.initFromPg();
+    }
+
+    getSource() { return this._source; }
+    getLoadedAt() { return this._loadedAt; }
+    count() { this._ensureLoaded(); return this._entries.length; }
 
     search(query, options = {}) {
-        const { mode, injectionPoint, topK = 5, minScore = 0.1 } = options;
-        const index = this._loadIndex();
-        if (!index.entries.length) return [];
-
-        if (!this._docCount) this._buildStats();
-
-        const queryTokens = this._tokenize(query);
-        if (queryTokens.length === 0) return [];
-
-        const results = [];
-        for (const entry of index.entries) {
-            if (mode && !entry.modes.includes(mode)) continue;
-            if (injectionPoint && entry.injection_point !== injectionPoint) continue;
-
-            const docText = [entry.display_name, ...(entry.tags || []), entry.department].join(' ');
-            const docTokens = this._tokenize(docText);
-            const score = this._bm25Score(queryTokens, docTokens);
-
-            if (score >= minScore) {
-                results.push({ ...entry, score });
-            }
-        }
-
-        results.sort((a, b) => b.score - a.score);
-        return results.slice(0, topK);
+        this._ensureLoaded();
+        return search.searchEntries(this._entries, query, this._stats, options);
     }
 
     getTechnique(techId) {
-        return this._loadLeaf(techId);
+        this._ensureLoaded();
+        return this._leaves[techId] || null;
     }
 
     getTechniquesByInjectionPoint(injectionPoint, mode) {
-        const cacheKey = `${injectionPoint}:${mode || '*'}`;
-        if (this._injectionCache[cacheKey]) return this._injectionCache[cacheKey];
-        const index = this._loadIndex();
-        const result = index.entries
-            .filter(e => {
-                if (e.injection_point !== injectionPoint) return false;
-                if (mode && !e.modes.includes(mode)) return false;
-                return true;
-            })
-            .map(e => this._loadLeaf(e.id))
+        this._ensureLoaded();
+        return this._entries
+            .filter(e => e.injection_point === injectionPoint && (!mode || e.modes.includes(mode)))
+            .map(e => this._leaves[e.id])
             .filter(Boolean);
-        this._injectionCache[cacheKey] = result;
-        return result;
+    }
+
+    /** 全部技法全文（前端/统计用） */
+    getAll() {
+        this._ensureLoaded();
+        return Object.values(this._leaves);
     }
 
     formatTechniquesForPrompt(techniques, maxTokens = 800) {
@@ -162,27 +122,15 @@ class TechIndex {
         const lines = ['\n[写作技法参考 - 仅供内部参考，严禁在正文中输出本节标题或技法名称]'];
         let usedTokens = 0;
         const estimateTokens = (t) => Math.ceil(t.length * 1.5);
-
         for (const tech of techniques) {
-            const line = `- ${tech.display_name} (${tech.department.replace(/^\d+_/, '')}/${tech.subcategory.replace(/^\d+_/, '')})`;
+            const line = `- ${tech.display_name} (${(tech.department || '').replace(/^\d+_/, '')}/${(tech.subcategory || '').replace(/^\d+_/, '')})`;
             const tokens = estimateTokens(line);
             if (usedTokens + tokens > maxTokens) break;
             lines.push(line);
             usedTokens += tokens;
         }
-
         lines.push('（按场景自然融入，不得在正文中提及技法名或本节标记）');
         return lines.join('\n');
-    }
-
-    refreshIndex() {
-        this._index = null;
-        this._leaves = {};
-        this._idfCache = {};
-        this._docCount = 0;
-        this._avgDocLen = 0;
-        this._injectionCache = {};
-        this._loadIndex();
     }
 }
 

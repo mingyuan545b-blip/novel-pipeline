@@ -59,5 +59,8 @@
 .chapter-number { font-family: var(--font-primary); font-size: 28px; font-weight: 700; color: var(--neon-blue); min-width: 48px; text-align: center; opacity: 0.6; }
 .chapter-info { flex: 1; min-width: 0; }
 .chapter-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.chapter-meta { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); }
+.chapter-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12px; color: var(--text-muted); }
+.chapter-meta .cyber-badge { white-space: nowrap; }
+.chapter-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.chapter-actions .cyber-btn-sm { padding: 5px 10px; font-size: 11px; white-space: nowrap; }
 .chapter-status-badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }

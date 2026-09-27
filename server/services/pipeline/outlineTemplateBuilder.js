@@ -89,7 +89,7 @@ ${genreInjection}
 ${styleInjection}
 ${rhythmGuidance}
 ${advisoryStr}
-请生成第1章到第${targetCount}章的大纲，每章大纲200-500字，包含场景、人物、事件、伏笔安排。
+请生成第1章到第${targetCount}章的大纲。每章大纲300-500字，必须按四段节拍写：【场景1·铺垫】【场景2·核心冲突】【场景3·推进/转折】【场景4·章末钩子】；每段至少给出：地点、在场人物、关键动作或交锋、埋下/回收的伏笔。四段节拍合计要能支撑成稿2500-3000字（每段对应一个可展开的场景）。
 输出格式（JSON数组）：
 [{"chapterNumber": 1, "title": "章节标题", "outline": "章节大纲"}]`;
 }
@@ -98,7 +98,7 @@ function buildSupplementOutlineSystemPrompt(genreInjection, styleInjection, star
     return `你是一个小说章节大纲补充器。根据已有素材和已有大纲，为小说补充新的章节大纲。
 ${genreInjection}
 ${styleInjection}
-请生成第${startChapter}章到第${endChapter}章的大纲，每章200-500字。
+请生成第${startChapter}章到第${endChapter}章的大纲。每章大纲300-500字，必须按四段节拍写：【场景1·铺垫】【场景2·核心冲突】【场景3·推进/转折】【场景4·章末钩子】；每段至少给出：地点、在场人物、关键动作或交锋、埋下/回收的伏笔。四段节拍合计要能支撑成稿2500-3000字（每段对应一个可展开的场景）。
 输出格式（JSON数组）：
 [{"chapterNumber": ${startChapter}, "title": "章节标题", "outline": "章节大纲"}]`;
 }
@@ -148,7 +148,7 @@ ${materialLines}${materialRulePrompt}${genreConstraintStr}
 
 【主线任务说明】设计3-5条主线任务，每条可包含2-4个子任务，任务之间应有逻辑关联。priority: 普通用normal，关键转折用high，核心主线用critical
 【时间线说明】按故事发展顺序排列10-20个关键事件。eventType: plot/character/world/conflict/revelation/foreshadow/resolution。isKeyEvent标记重大影响事件
-【章节大纲说明】生成${targetChapterCount}章的大纲，每章200-500字，包含场景、人物、事件、伏笔安排，章节之间要连贯
+【章节大纲说明】生成${targetChapterCount}章的大纲，章节之间要连贯。每章大纲300-500字，必须按四段节拍写：【场景1·铺垫】【场景2·核心冲突】【场景3·推进/转折】【场景4·章末钩子】；每段至少给出：地点、在场人物、关键动作或交锋、埋下/回收的伏笔。四段节拍合计要能支撑成稿2500-3000字（每段对应一个可展开的场景）。
 
 重要：只输出JSON，不要输出其他任何文字。content字段必须包含详细内容。`;
 }

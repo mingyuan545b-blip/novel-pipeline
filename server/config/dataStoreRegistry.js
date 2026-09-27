@@ -46,6 +46,9 @@ const DATA_STORE_REGISTRY = {
     'api-keys':              { dedicated: false, syncable: true,  cascadable: false, hasProjectId: false, aliases: [] },
     'agent-bindings':        { dedicated: false, syncable: true,  cascadable: false, hasProjectId: false, aliases: [] },
 
+    // === 仅可同步类型 + 专用表（不含projectId，不级联删除）===
+    'library-techniques':    { dedicated: true,  syncable: true,  cascadable: false, hasProjectId: false, aliases: ['library_techniques'] },
+
     // === 仅可级联类型（含projectId，当前未加入syncable列表）===
     'reviews':               { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'state-meta':            { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
@@ -56,6 +59,7 @@ const DATA_STORE_REGISTRY = {
     'character-chronicle':   { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'knowledge-access':      { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'context-assemblies':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
+    'token-ledger':          { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: ['token_ledger'] },
     'technique-feedback':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'world-scope-events':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'timelines':             { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },

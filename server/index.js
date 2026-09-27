@@ -9,7 +9,9 @@ const logger = require('shared/logger');
 const { ensureEnvFile, syncFrontendEnv, ENV_PATH } = require('./config/envSync');
 ensureEnvFile();
 
-require('dotenv').config({ path: ENV_PATH });
+// override:true — .env是唯一事实源。修复：Windows用户级环境变量残留旧API key时，
+// dotenv默认不覆盖已存在变量，导致.env新key永不生效（2026-09-06实锤，详见worklog）
+require('dotenv').config({ path: ENV_PATH, override: true });
 if (process.env.REQUEST_SECRET === '' || !process.env.REQUEST_SECRET) {
     delete process.env.REQUEST_SECRET;
 }
@@ -111,6 +113,16 @@ store.ensureBackend().then(async () => {
     require('./startupChecks/apiSelfCheckRegistration');
     require('./startupChecks/envValidationRegistration');
     await runStartupChecks();
+
+    // 藏经阁技法索引预热：PG(library_techniques) → 内存视图。
+    // 技法注入链（techniqueScheduler→writer/polisher prompt）是同步调用，必须在起服前装载完成。
+    try {
+        const techIndex = require('./services/techIndex');
+        const techResult = await techIndex.initFromPg();
+        logger.info('index', `[TECH-INDEX] 藏经阁技法索引就绪：${techResult.count} 条（来源 ${techResult.source}）`);
+    } catch (e) {
+        logger.warn('index', `[TECH-INDEX] 藏经阁索引预热失败（将使用JSON兜底）: ${e.message}`);
+    }
 
     const { validateEnv } = require('./config/envValidator');
     const envReport = validateEnv();

@@ -25,7 +25,7 @@ const SERVER_ENTRY = path.join(PROJECT_ROOT, 'server', 'index.js');
 // 加载.env获取PORT
 function loadPort() {
     if (fs.existsSync(ENV_PATH)) {
-        require('dotenv').config({ path: ENV_PATH });
+        require('dotenv').config({ path: ENV_PATH, override: true }); // .env唯一事实源，同server/index.js
     }
     return parseInt(process.env.PORT, 10) || 3001;
 }

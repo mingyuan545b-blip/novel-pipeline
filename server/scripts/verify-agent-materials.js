@@ -2,7 +2,7 @@
  * verify-agent-materials.js — 验证所有Agent素材获取链路
  * 检查每个agent是否通过scheduleMaterials拿到该拿的素材
  */
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
 process.env.USE_PG = 'true';
 const store = require('../store');
 const { scheduleMaterials } = require('../services/pipeline/agentMaterialScheduler');

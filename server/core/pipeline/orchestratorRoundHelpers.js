@@ -5,17 +5,47 @@ const { DomainError } = require('../../shared/errors');
 const { classifyError } = require('./errorRecovery');
 const { checkStopped, clearDownstreamOutputs, persistPipelineLog } = require('./orchestratorHelpers');
 const { AGENT_ROLE_NAMES } = require('../../services/fileOutput');
+const { STATUS_VALUES } = require('../../services/chapterStatus');
 
 /**
  * Handle a stopped pipeline — update chapter status and persist log.
  */
 async function handleStopped(projectId, chapterId, chapterNumber, chapter, pipelineLog, abortController) {
-    chapter.status = 'outlined';
+    chapter.status = STATUS_VALUES.OUTLINED;
     delete chapter.skipUntil;
     chapter.updatedAt = new Date().toISOString();
     await store.setItem('chapters', chapterId, chapter);
     await persistPipelineLog(chapterId, projectId, pipelineLog);
     return { success: false, rounds: 0, log: pipelineLog, message: '流水线已停止' };
+}
+
+/**
+ * 记录"字数硬门槛拦截"的审查留痕。
+ *
+ * 背景（bug 修复）：checkWordCountHardLimit 在 first-review 之前就 blocked 返回，
+ * 只 push 进内存 pipelineLog（刷新即丢）+ 只保留最后一次运行的持久化日志，
+ * 于是这些轮次在"执行日志"里完全没有记录 —— 用户看到的就是"只有 R3 以后，没有 R1/R2"。
+ * 这里补一条 reviews 行，让每一轮都有可追溯的结论。
+ */
+async function recordBlockedRound(projectId, chapterId, step, round, stepResult, reviewer = 'word-count-gate') {
+    try {
+        const feedback = stepResult?.feedback || {};
+        const now = new Date().toISOString();
+        const revId = `${chapterId}_${step}_blocked_r${round}`;
+        await store.setItem('reviews', revId, {
+            id: revId, chapterId, projectId,
+            step, type: step, reviewer,
+            result: { passed: false, summary: feedback.summary, issues: feedback.issues || [] },
+            passed: false,
+            content: feedback.summary || '字数硬门槛拦截',
+            issues: feedback.issues || [],
+            suggestions: feedback.suggestions || [],
+            round,
+            createdAt: now
+        });
+    } catch (e) {
+        logger.warn('pipeline', '[wc-block] 写入审查留痕失败: ' + (e.message || e));
+    }
 }
 
 /**
@@ -40,12 +70,14 @@ async function clearRoundOutputs(chapter, chapterId, round, startRound) {
 /**
  * Check alert loop and circuit breaker.
  */
-async function checkCircuitBreaker(projectId, round, circuitBreaker, pipelineLog, chapterId, projectIdRef) {
+async function checkCircuitBreaker(projectId, round, circuitBreaker, pipelineLog, chapterId, projectIdRef, startRound = 1) {
     const alertResult = await require('../../services/pipeline/pipelineUtils').checkAlertLoop(projectId);
     if (alertResult) {
         logger.error('pipeline', `Alert loop triggered at round ${round}`);
         const isTripped = await circuitBreaker.isTripped();
-        if (isTripped && round >= 5) {
+        // 相对轮次：round是跨run累计的绝对值（startRound=chapter.round+1），
+        // 用绝对值比较会导致续跑章节（round≥5起步）首个告警即熔断（2026-09-06实测）
+        if (isTripped && (round - startRound + 1) >= 5) {
             await persistPipelineLog(chapterId, projectIdRef, pipelineLog);
             return { tripped: true, alertResult };
         }
@@ -99,7 +131,8 @@ function buildRetryContext(round, step, chapter, rejectionTracker, allFeedbackPa
         const feedbackToUse = multipleRejected && allFeedbackParts.length > 1
             ? '【⚠ 多位审核者意见汇总】\n\n' + allFeedbackParts.join('\n\n')
             : allFeedbackParts.join('\n\n') || lastFeedback;
-        context = { reviewFeedback: feedbackToUse.substring(0, 3000), mode };
+        // round随context下传：扩写指令按轮次递增标记，保证每轮prompt不同（打破同prompt→同补全死循环）
+        context = { reviewFeedback: feedbackToUse.substring(0, 3000), mode, round };
     }
     return context;
 }
@@ -107,6 +140,7 @@ function buildRetryContext(round, step, chapter, rejectionTracker, allFeedbackPa
 module.exports = {
     handleStopped,
     clearRoundOutputs,
+    recordBlockedRound,
     checkCircuitBreaker,
     handleStepError,
     buildRetryContext

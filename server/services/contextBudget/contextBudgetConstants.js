@@ -4,6 +4,7 @@ const CONTEXT_BUDGETS = {
     'qwen-max': 16000, 'qwen-plus': 12000, 'qwen-long': 80000,
     'qwen-max-latest': 16000, 'qwen-plus-latest': 12000, 'qwen-turbo': 12000,
     'qwen3.5-plus': 256000, 'qwen3.5-max': 128000,
+    'qwen3.8-max': 256000, 'qwen3.8-flash': 128000,
     'qwen3-235b-a22b': 128000, 'qwen3-32b': 128000,
     'Qwen3.5-27B': 128000, 'Qwen3.5-397B-A17B': 128000,
     'qwen3.6-plus': 800000, 'Qwen3.6-plus': 800000,

@@ -26,7 +26,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PROJECT_ROOT = path.join(__dirname, '..');
-require('dotenv').config({ path: path.join(PROJECT_ROOT, '.env') });
+require('dotenv').config({ path: path.join(PROJECT_ROOT, '.env'), override: true });
 
 function parseArgs(argv) {
     const args = { maxTokens: 8192, temperature: 0.8, words: 3000 };

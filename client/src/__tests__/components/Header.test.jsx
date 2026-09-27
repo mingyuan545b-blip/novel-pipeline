@@ -44,12 +44,22 @@ describe('Header', () => {
             });
         });
         renderWithRouter(<Header />);
-        expect(screen.getByText(/流水线运行中/)).toBeInTheDocument();
+        expect(screen.getByTitle(/流水线运行中/)).toBeInTheDocument();
+        expect(screen.getByText(/第2轮/)).toBeInTheDocument();
     });
 
     test('renders guide and pipeline buttons', () => {
         renderWithRouter(<Header />);
-        expect(screen.getByText('操作指南')).toBeInTheDocument();
+        expect(screen.getByText('指南')).toBeInTheDocument();
         expect(screen.getByText('启动流水线')).toBeInTheDocument();
+    });
+
+    test('opens command palette from header button', () => {
+        renderWithRouter(<Header />);
+        act(() => {
+            screen.getByLabelText('打开命令面板').click();
+        });
+        expect(useAppStore.getState().paletteOpen).toBe(true);
+        act(() => { useAppStore.setState({ paletteOpen: false }); });
     });
 });

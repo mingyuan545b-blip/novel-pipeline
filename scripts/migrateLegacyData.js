@@ -10,7 +10,7 @@
  * 同时扫描所有项目，不只是测试项目。
  */
 // 必须先加载.env，否则store会用JSON file backend而非PostgreSQL
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
 const store = require('../server/store');
 
 const REPLACEMENTS = Object.freeze({

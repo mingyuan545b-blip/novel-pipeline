@@ -9,6 +9,8 @@ import NotificationContainer from './components/NotificationContainer';
 import appStyles from './App.module.css';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import CommandPalette from './components/CommandPalette';
+import useKonami from './hooks/useKonami';
 import Dashboard from './pages/Dashboard';
 import PipelinePage from './pages/PipelinePage';
 import MaterialsPage from './pages/MaterialsPage';
@@ -31,6 +33,7 @@ import EntityCenterPage from './pages/EntityCenterPage';
 import GenreDebugPage from './pages/GenreDebugPage';
 import MetricsPage from './pages/metrics/MetricsPage';
 import ContextAssemblyPage from './pages/contextAssembly/ContextAssemblyPage';
+import TokenLedgerPage from './pages/tokenLedger/TokenLedgerPage';
 import DebugLogsPage from './pages/debug/DebugLogsPage';
 
 function App() {
@@ -38,6 +41,21 @@ function App() {
     const { setActivePage, theme, bgImage, bgOpacity, bgBlur } = useAppStore();
     const { initError, clearInitError, retryInit } = useAppInit();
     useServerVersionGuard();
+    useKonami();
+
+    // 全局快捷键：Ctrl+B 折叠/展开侧边栏（输入框内不触发）
+    useEffect(() => {
+        const onKey = (e) => {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B')) {
+                const t = e.target;
+                if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+                e.preventDefault();
+                useAppStore.getState().toggleSidebar();
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, []);
 
     useEffect(() => {
         setActivePage(location.pathname);
@@ -63,6 +81,7 @@ function App() {
         <ErrorBoundary>
             <OfflineBanner />
             <NotificationContainer />
+            <CommandPalette />
             <div className="app-layout" data-theme={theme}>
                 <div className="app-bg-layer"></div>
                 {initError && (
@@ -100,6 +119,7 @@ function App() {
                             <Route path="/genre-debug" element={<ErrorBoundary><GenreDebugPage /></ErrorBoundary>} />
                             <Route path="/metrics" element={<ErrorBoundary><MetricsPage /></ErrorBoundary>} />
                             <Route path="/context-assembly" element={<ErrorBoundary><ContextAssemblyPage /></ErrorBoundary>} />
+                            <Route path="/token-ledger" element={<ErrorBoundary><TokenLedgerPage /></ErrorBoundary>} />
                             <Route path="/context-map" element={<Navigate to="/context-assembly" replace />} />
                             <Route path="/debug-logs" element={<ErrorBoundary><DebugLogsPage /></ErrorBoundary>} />
                             {/* 陷阱#21：必须有通配符路由，否则用户访问 /projects 等未定义路径时

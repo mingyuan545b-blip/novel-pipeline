@@ -12,7 +12,8 @@ jest.mock('../../server/shared/logger', () => ({
 }));
 
 jest.mock('../../server/services/pipeline/pipelineHelpers', () => ({
-    checkWordCountHardLimit: jest.fn()
+    checkWordCountHardLimit: jest.fn(),
+    LAST_ROUND_GRACE_RATIO: 0.8
 }));
 
 jest.mock('../../server/services/fileOutput', () => ({
@@ -41,7 +42,8 @@ jest.mock('../../server/core/pipeline/orchestratorStepHandlers', () => ({
 
 jest.mock('../../server/core/pipeline/orchestratorRoundHelpers', () => ({
     handleStepError: jest.fn(),
-    buildRetryContext: jest.fn(() => ({ mode: 'novel' }))
+    buildRetryContext: jest.fn(() => ({ mode: 'novel' })),
+    recordBlockedRound: jest.fn()
 }));
 
 const store = require('../../server/store');
@@ -134,10 +136,52 @@ describe('orchestratorStepLoop.executeStepLoop - 字数硬拦截', () => {
         expect(params.pipelineLog).toContain(wcStepResult);
         expect(params.onStep).toHaveBeenCalledWith(expect.objectContaining({ passed: false }));
     });
+
+    test('被字数硬拦截的轮次必须写入审查留痕（否则执行日志出现"缺轮"）', async () => {
+        const wcStepResult = { passed: false, feedback: { summary: '字数硬拦截' } };
+        checkWordCountHardLimit.mockResolvedValue({ blocked: true, stepResult: wcStepResult });
+        const params = baseParams();
+        params.steps = ['first-review'];
+
+        await executeStepLoop(params);
+
+        const { recordBlockedRound } = require('../../server/core/pipeline/orchestratorRoundHelpers');
+        expect(recordBlockedRound).toHaveBeenCalledWith('p1', 'ch-1', 'first-review', 1, wcStepResult);
+    });
 });
 
 describe('orchestratorStepLoop.executeStepLoop - writer 步骤分支', () => {
     beforeEach(() => { jest.clearAllMocks(); setupDefaultMocks(); });
+
+    test('末轮宽限：执笔轻微不足（≥80%下限）时放行到审核链，不判整轮失败', async () => {
+        // 20章E2E实测：ch6 三轮均 2413/2500 字（96%），被 writer 自身门禁掐断 → 整章作废
+        store.getItem.mockResolvedValue({ chapterNumber: 5, content: 'C'.repeat(90) }); // 90/100 = 90% ≥ 80%
+        executeStep.mockResolvedValue({ result: { passed: false, feedback: { summary: '【字数严重不足】当前90字' } }, durationMs: 5 });
+        const params = baseParams();
+        params.steps = ['writer'];
+        params.startRound = 1;
+        params.effectiveMaxRounds = 3;
+        params.round = 3; // 末轮
+
+        const result = await executeStepLoop(params);
+
+        // 未返回 roundFailed，而是继续走完循环（交由审核链的系统覆盖判定）
+        expect(result.roundFailed).toBeFalsy();
+    });
+
+    test('非末轮：执笔不足仍判整轮失败（保留质量压力）', async () => {
+        store.getItem.mockResolvedValue({ chapterNumber: 5, content: 'C'.repeat(90) });
+        executeStep.mockResolvedValue({ result: { passed: false, feedback: { summary: '【字数严重不足】当前90字' } }, durationMs: 5 });
+        const params = baseParams();
+        params.steps = ['writer'];
+        params.startRound = 1;
+        params.effectiveMaxRounds = 3;
+        params.round = 1; // 非末轮
+
+        const result = await executeStepLoop(params);
+
+        expect(result.roundFailed).toBe(true);
+    });
 
     test('writer 未通过时设置 currentFeedback 并返回 roundFailed', async () => {
         executeStep.mockResolvedValue({

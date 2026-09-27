@@ -10,7 +10,7 @@ const path = require('path');
 process.chdir(path.resolve(__dirname, '..'));
 
 // 加载 .env 环境变量，确保脚本使用与 server 相同的 backend (PostgreSQL)
-require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env'), override: true });
 
 const store = require('../server/store');
 const { extractCharacterStateFromContent } = require('../server/services/pipeline/characterStateExtractor');

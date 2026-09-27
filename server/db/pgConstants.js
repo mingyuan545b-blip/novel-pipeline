@@ -7,7 +7,8 @@ const DEDICATED_TABLES = new Set([
     'entity_relations', 'entity_binds', 'foreshadow_ledger', 'knowledge_facts',
     'narrative_state', 'consistency_checks', 'craft_materials', 'timeline',
     'character_chronicle', 'knowledge_access', 'memory_layers',
-    'world_scopes', 'world_factions', 'cross_world_traces'
+    'world_scopes', 'world_factions', 'cross_world_traces',
+    'library_techniques'
 ]);
 
 const TABLE_ALIASES = {
@@ -38,7 +39,8 @@ const TABLE_ALIASES = {
     'infinite-pipeline-state': 'infinite_pipeline_state',
     'world-scopes': 'world_scopes',
     'world-factions': 'world_factions',
-    'cross-world-traces': 'cross_world_traces'
+    'cross-world-traces': 'cross_world_traces',
+    'library-techniques': 'library_techniques'
 };
 
 module.exports = { DEDICATED_TABLES, TABLE_ALIASES };

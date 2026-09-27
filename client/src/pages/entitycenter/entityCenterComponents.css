@@ -1,3 +1,4 @@
 /* EntityCenter components - composed from sub-modules */
 @import './entityCenterBase.css';
 @import './entityCenterDetail.css';
+@import './characterList.css';

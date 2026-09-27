@@ -1,7 +1,17 @@
-const fs = require('fs');
-const path = require('path');
+/**
+ * validationEngine — 平台合规校验 + 技法可用性校验
+ *
+ * 2026-09-21：技法数据源由JSON文件改为 techIndex（PG表 library_techniques 的内存视图），
+ *   统计元数据写回走 libraryStore.updateMeta（PG）。原来直接读写 data/library/*.json 的
+ *   三处缓存逻辑已删除（那会导致与PG不一致）。
+ * 文件位置：server/services/validationEngine.js
+ */
+const techIndex = require('./techIndex');
+const libraryStore = require('./libraryStore');
+const logger = require('../shared/logger');
 
-const LIBRARY_DIR = path.join(__dirname, '..', 'data', 'library');
+const AUTO_DISABLE_MIN_ATTEMPTS = 5;
+const AUTO_DISABLE_RATE = 20;
 
 const PLATFORM_RULES = {
     fanqie: {
@@ -23,31 +33,6 @@ const PLATFORM_RULES = {
 };
 
 class ValidationEngine {
-    constructor() {
-        this._indexCache = null;
-        this._metaCache = null;
-    }
-
-    _loadIndex() {
-        if (this._indexCache) return this._indexCache;
-        const idxPath = path.join(LIBRARY_DIR, 'index.json');
-        if (!fs.existsSync(idxPath)) return { entries: [], total_entries: 0 };
-        this._indexCache = JSON.parse(fs.readFileSync(idxPath, 'utf-8').replace(/^\uFEFF/, ''));
-        return this._indexCache;
-    }
-
-    _loadMeta(techId) {
-        const metaPath = path.join(LIBRARY_DIR, 'metadata', `${techId}.json`);
-        if (!fs.existsSync(metaPath)) return { id: techId, success_rate: 50, attempts: 0, auto_disabled: false };
-        return JSON.parse(fs.readFileSync(metaPath, 'utf-8').replace(/^\uFEFF/, ''));
-    }
-
-    _saveMeta(techId, meta) {
-        const metaDir = path.join(LIBRARY_DIR, 'metadata');
-        if (!fs.existsSync(metaDir)) fs.mkdirSync(metaDir, { recursive: true });
-        fs.writeFileSync(path.join(metaDir, `${techId}.json`), JSON.stringify(meta, null, 2), 'utf-8');
-    }
-
     validateCharacter(characterData) {
         const errors = [];
         const warnings = [];
@@ -63,19 +48,16 @@ class ValidationEngine {
         return { valid: errors.length === 0, errors, warnings };
     }
 
+    /** 技法是否可用于当前模式（数据源：techIndex 内存视图） */
     validateTechnique(techId, mode) {
-        const index = this._loadIndex();
-        const entry = index.entries.find(e => e.id === techId);
-        if (!entry) return { valid: false, error: `技法 ${techId} 不存在于索引中` };
-
-        const meta = this._loadMeta(techId);
-        if (meta.auto_disabled) return { valid: false, error: `技法 ${techId} 已被自动禁用（成功率过低）` };
-
-        if (mode && !entry.modes.includes(mode)) {
-            return { valid: false, error: `技法 ${techId} 不适用于模式 ${mode}（适用: ${entry.modes.join(',')}）` };
+        const leaf = techIndex.getTechnique(techId);
+        if (!leaf) return { valid: false, error: `技法 ${techId} 不存在` };
+        if (leaf.auto_disabled) return { valid: false, error: `技法 ${techId} 已被自动禁用（成功率过低）` };
+        const modes = leaf.applicable_modes || [];
+        if (mode && !modes.includes(mode)) {
+            return { valid: false, error: `技法 ${techId} 不适用于模式 ${mode}（适用: ${modes.join(',')}）` };
         }
-
-        return { valid: true, entry, meta };
+        return { valid: true, entry: leaf, meta: { success_rate: leaf.success_rate, attempts: leaf.attempts, auto_disabled: leaf.auto_disabled } };
     }
 
     validatePlatformCompliance(content, platform) {
@@ -102,42 +84,36 @@ class ValidationEngine {
         return { valid: errors.length === 0, errors, warnings, wordCount, dialogueRatio };
     }
 
-    recordTechniqueResult(techId, success) {
-        const meta = this._loadMeta(techId);
-        meta.attempts = (meta.attempts || 0) + 1;
-        if (success) {
-            meta.success_rate = Math.round(((meta.success_rate || 50) * (meta.attempts - 1) + 100) / meta.attempts);
-        } else {
-            meta.success_rate = Math.round(((meta.success_rate || 50) * (meta.attempts - 1) + 0) / meta.attempts);
-        }
-        if (meta.attempts >= 5 && meta.success_rate < 20) {
-            meta.auto_disabled = true;
-        }
-        this._saveMeta(techId, meta);
+    /** 记录技法使用结果并回写PG（成功率滑动平均；连续低效自动禁用） */
+    async recordTechniqueResult(techId, success) {
+        const leaf = techIndex.getTechnique(techId);
+        if (!leaf) { logger.warn('validationEngine', `recordTechniqueResult: 技法不存在 ${techId}`); return null; }
+        const attempts = (leaf.attempts || 0) + 1;
+        const prevRate = leaf.success_rate ?? 50;
+        const meta = {
+            attempts,
+            success_rate: Math.round((prevRate * (attempts - 1) + (success ? 100 : 0)) / attempts),
+        };
+        meta.auto_disabled = attempts >= AUTO_DISABLE_MIN_ATTEMPTS && meta.success_rate < AUTO_DISABLE_RATE;
+        const saved = await libraryStore.updateMeta(techId, meta);
+        if (saved) await techIndex.reload();
         return meta;
     }
 
     getEnabledTechniques(mode, injectionPoint) {
-        const index = this._loadIndex();
-        return index.entries.filter(e => {
-            if (mode && !e.modes.includes(mode)) return false;
-            if (injectionPoint && e.injection_point !== injectionPoint) return false;
-            const meta = this._loadMeta(e.id);
-            return !meta.auto_disabled;
+        return techIndex.getAll().filter(t => {
+            if (mode && !(t.applicable_modes || []).includes(mode)) return false;
+            if (injectionPoint && t.injection_point !== injectionPoint) return false;
+            return !t.auto_disabled;
         });
     }
 
     getValidationReport(projectId, mode, platform) {
-        const index = this._loadIndex();
-        const enabled = this.getEnabledTechniques(mode);
-        const disabled = index.entries.filter(e => {
-            const meta = this._loadMeta(e.id);
-            return meta.auto_disabled;
-        });
+        const all = techIndex.getAll();
         return {
-            totalTechniques: index.total_entries,
-            enabledForMode: enabled.length,
-            disabledCount: disabled.length,
+            totalTechniques: all.length,
+            enabledForMode: this.getEnabledTechniques(mode).length,
+            disabledCount: all.filter(t => t.auto_disabled).length,
             platform: platform ? PLATFORM_RULES[platform]?.name || platform : 'N/A',
             mode: mode || 'N/A'
         };

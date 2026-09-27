@@ -16,12 +16,14 @@ function checkStorageSafety() {
         } else {
             fail('jsonStore.js 缺少ID验证！路径穿越风险');
         }
-        if (jsonStore.includes('.tmp.') && jsonStore.includes('renameSync')) {
+        // 原子写：tmp 文件 + 重命名（实现用 renameWithRetry 包装 renameSync，探针需同时认这两种）
+        if (jsonStore.includes('.tmp.') && (jsonStore.includes('renameSync') || jsonStore.includes('renameWithRetry'))) {
             pass('jsonStore.js 使用原子写入 (tmp+rename)');
         } else {
             warn('jsonStore.js 未使用原子写入模式');
         }
-        if (jsonStore.includes('JSON.parse(verifyContent)')) {
+        // 写后验证：写 tmp 后立刻回读 JSON.parse（实现形如 JSON.parse(fs.readFileSync(tmpPath, ...))）
+        if (/JSON\.parse\(\s*fs\.readFileSync\(/.test(jsonStore) || jsonStore.includes('JSON.parse(verifyContent)')) {
             pass('jsonStore.js 写后验证JSON完整性');
         } else {
             fail('jsonStore.js 缺少写后验证！可能写入损坏的JSON');
@@ -85,7 +87,10 @@ function checkSecurityConfig() {
     if (indexJs) {
         if (indexJs.includes('ENCRYPTION_SECRET') && indexJs.includes('REQUEST_SECRET')) { pass('入口文件检查ENCRYPTION_SECRET和REQUEST_SECRET'); }
         else { fail('入口文件缺少安全配置检查'); }
-        if (indexJs.includes('cors') && indexJs.includes('allowedOrigins')) { pass('CORS配置存在'); }
+        // 中间件已从 index.js 拆分到 bootstrap/middlewareSetup.js，探针需覆盖两个入口
+        const middlewareSetup = readFile('server/bootstrap/middlewareSetup.js') || '';
+        const corsSource = indexJs + middlewareSetup;
+        if (corsSource.includes('cors') && corsSource.includes('allowedOrigins')) { pass('CORS配置存在'); }
         else { fail('CORS配置缺失'); }
         if (indexJs.includes('express.json') && indexJs.includes('limit')) { pass('请求体大小限制存在'); }
         else { warn('请求体大小限制可能缺失'); }

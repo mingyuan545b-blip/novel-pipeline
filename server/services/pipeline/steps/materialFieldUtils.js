@@ -25,7 +25,19 @@ function extractFieldFromContent(content, label) {
     return match ? match[1].trim() : '';
 }
 
-function extractRoleLevelFromContent(content, protagonistName) {
+/**
+ * 从素材内容推断角色等级
+ * @param {string} content 素材正文
+ * @param {string} protagonistName 项目主角名
+ * @param {string} characterName 该素材对应的角色名（可选，但强烈建议传）
+ *
+ * 回归背景（2026-09-21 20章E2E）：原第 39 行是 `content.includes(protagonistName)`，
+ * 意味着"描述里提到了主角"就被判定为主角 —— 实测 陈默/顾长风/保管员(第五人) 三个配角
+ * 的素材全被标成 protagonist，素材表出现 4 个主角（实体表只有 1 个），
+ * 而素材 roleLevel 直接决定上下文注入等级与素材深度要求。
+ * 修正为：只有"角色名 == 主角名"才算主角；未传角色名时退化为不判定（交由调用方兜底）。
+ */
+function extractRoleLevelFromContent(content, protagonistName, characterName) {
     if (!content || typeof content !== 'string') return '';
     const tagMatch = content.match(/【角色等级】\s*(.+)/);
     if (tagMatch) {
@@ -36,7 +48,8 @@ function extractRoleLevelFromContent(content, protagonistName) {
         if (/龙套|路人|背景|npc/i.test(val)) return 'npc';
         return val.toLowerCase();
     }
-    if (protagonistName && content.includes(protagonistName)) return 'protagonist';
+    // 仅"角色名就是主角名"才判主角（原 content.includes 会把所有提到主角的配角误判为主角）
+    if (protagonistName && characterName && String(characterName).trim() === String(protagonistName).trim()) return 'protagonist';
     return '';
 }
 

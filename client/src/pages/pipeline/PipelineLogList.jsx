@@ -72,9 +72,12 @@ export default function PipelineLogList({ pipelineState, pipelineSteps, reviewLo
                                 </div>
                             );
                         })}
-                        {reviewLogs.map(review => (
-                            <ReviewLogItem key={review.id} review={review} />
-                        ))}
+                        {/* 审查日志按时间正序拼接，避免与上方 pipeline 日志时间线交错 */}
+                        {[...reviewLogs]
+                            .sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0))
+                            .map(review => (
+                                <ReviewLogItem key={review.id} review={review} />
+                            ))}
                     </>
                 )}
             </div>
@@ -90,6 +93,11 @@ function ReviewLogItem({ review }) {
     const summary = review.result?.summary || review.content || '';
     const styleScore = review.result?.styleScore;
     const round = review.round || 1;
+    const runRound = review.runRound || review.result?.runRound;
+    // 与 pipeline 日志口径一致：runRound=本次运行第几轮，round=跨运行累计轮次
+    const roundLabel = runRound
+        ? (runRound === round ? `第${runRound}轮` : `第${runRound}轮(累计${round})`)
+        : `累计R${round}`;
 
     return (
         <div className={s.reviewRow}>
@@ -100,7 +108,7 @@ function ReviewLogItem({ review }) {
                         {isPassed ? '通过' : '未通过'}
                     </span>
                     {styleScore && <span className="cyber-badge cyber-badge-blue">风格{styleScore}/10</span>}
-                    <span className={s.reviewMetaMuted}>R{round}</span>
+                    <span className={s.reviewMetaMuted}>{roundLabel}</span>
                 </div>
                 <span className={s.reviewTimeMuted}>{review.createdAt}</span>
             </div>

@@ -8,6 +8,7 @@ const { normalizeMessageContent } = require('./llmResponseParser');
 const { waitForRetry } = require('./llmRetryUtils');
 const { buildRequestPayload, buildRequestHeaders, classifyAndHandleError } = require('./llmRequestBuilder');
 const llmMetrics = require('./llmMetrics');
+const llmTimeoutTracker = require('./llmTimeoutTracker');
 const { LLM_DEFAULTS } = require('../config/systemConfig');
 
 function getProviders() {
@@ -27,6 +28,7 @@ async function resolveConfig(apiConfig) {
 async function chat(messages, options = {}) {
     const config = await resolveConfig(options.apiConfig);
     if (!config.apiKey) throw new Error('API Key not configured');
+    llmTimeoutTracker.recordRequest();
 
     const limiter = getRateLimiter(config.provider, { rpm: options.rpm, burst: options.burst });
     await limiter.acquire();
@@ -49,8 +51,10 @@ async function chat(messages, options = {}) {
     }
     // 超时优先级：调用方显式指定 > 供应商级覆盖（本地慢速模型放宽）> 全局默认
     const providerTimeout = providerRegistry.PROVIDERS?.[config.provider]?.requestTimeoutMs;
-    const timeoutId = setTimeout(() => abortController.abort(), options.timeout || providerTimeout || LLM_DEFAULTS?.REQUEST_TIMEOUT_MS || 600000);
-    if (externalSignal?.aborted) { clearTimeout(timeoutId); throw new Error('LLM request aborted before start'); }
+    const requestTimeoutMs = options.timeout || providerTimeout || LLM_DEFAULTS?.REQUEST_TIMEOUT_MS || 600000;
+    // 慢请求预警阈值（默认取超时的 1/3，至少 60s）：超过就打 WARN，便于在真正超时前定位网关卡顿
+    const slowWarnMs = options.slowWarnMs || Math.max(60000, Math.round(requestTimeoutMs / 3));
+    if (externalSignal?.aborted) throw new Error('LLM request aborted before start');
 
     const payload = buildRequestPayload(config, messages, options);
     const headers = buildRequestHeaders(config);
@@ -58,9 +62,21 @@ async function chat(messages, options = {}) {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         const attemptStart = Date.now();
+        // 修复：原实现只在进入循环前武装一次超时，重试前 clearTimeout 后不再武装 →
+        // 重试请求可以无限挂起（实测一次 final-editor 调用挂 13 分钟，任务永远 running）。
+        // 现在每次尝试都独立武装超时 + 慢请求预警。
+        let timedOut = false;
+        const timeoutId = setTimeout(() => { timedOut = true; abortController.abort(); }, requestTimeoutMs);
+        const slowTimerId = setTimeout(() => {
+            logger.warn('llm', `[LLM] 慢请求预警：已等待 ${Math.round(slowWarnMs / 1000)}s（供应商 ${config.provider}/${config.model}，超时阈值 ${Math.round(requestTimeoutMs / 1000)}s）`, {
+                provider: config.provider, model: config.model, elapsedMs: slowWarnMs,
+                timeoutMs: requestTimeoutMs, attempt, slowRequest: true
+            });
+        }, slowWarnMs);
         try {
             const response = await axios.post(url, payload, { headers, signal: abortController.signal });
             clearTimeout(timeoutId);
+            clearTimeout(slowTimerId);
             const data = response.data;
             const choice = data.choices?.[0];
             const msg = choice?.message;
@@ -85,12 +101,24 @@ async function chat(messages, options = {}) {
             }
 
             normalizeMessageContent(msg);
+            llmTimeoutTracker.recordSuccess();
 
             llmMetrics.recordTokenUsage(config.provider, data.model || config.model, data.usage, true, durationMs);
             return data;
         } catch (error) {
             clearTimeout(timeoutId);
+            clearTimeout(slowTimerId);
             const durationMs = Date.now() - attemptStart;
+            if (timedOut) {
+                // 明确区分"超时"与其他网络错误，便于健康检查/看门狗统计与定位
+                llmTimeoutTracker.record(config.provider, config.model, durationMs, requestTimeoutMs);
+                logger.error('llm', `[LLM] 请求超时：${Math.round(durationMs / 1000)}s ≥ 阈值 ${Math.round(requestTimeoutMs / 1000)}s（${config.provider}/${config.model}，第 ${attempt}/${maxRetries} 次）`, {
+                    provider: config.provider, model: config.model, durationMs,
+                    timeoutMs: requestTimeoutMs, attempt, errorCode: 'LLM_TIMEOUT'
+                });
+            } else if (durationMs >= slowWarnMs) {
+                llmTimeoutTracker.recordSlow(config.provider, config.model, durationMs);
+            }
             const result = classifyAndHandleError(error, config, maxRetries, attempt, retryDelay, externalSignal);
             if (result.shouldRetry) {
                 llmMetrics.recordTokenUsage(config.provider, config.model, null, false, durationMs);

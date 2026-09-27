@@ -354,7 +354,8 @@ review的prompt注入守卫检查结果：
 
 | 文件 | 内容 |
 |------|------|
-| `server/db/pgSchema.js` | 业务表DDL（20张） |
+| `server/db/pgSchema.js` | 业务表DDL（20张，聚合 Core + Entity + Library） |
+| `server/db/pgSchemaLibrary.js` | 藏经阁表DDL（library_techniques） |
 | `server/db/knowledgeSchema.js` | 知识库表DDL（9张） |
 | `server/db/database-pg.js` | DEDICATED_TABLES + TABLE_ALIASES + 初始化 |
 
@@ -379,6 +380,22 @@ review的prompt注入守卫检查结果：
 ---
 
 ## 九、API路由
+
+
+### 库维护与运行时观测 API（`server/routes/maintenanceRoutes.js`，2026-09-21 新增）
+
+| 路由 | 说明 |
+|------|------|
+| `GET /api/maintenance/orphans` | 孤儿数据扫描（projectId 已不存在的历史行，只读） |
+| `POST /api/maintenance/orphans/clean` | 孤儿数据清理（可传 keepProjectIds 白名单） |
+| `GET /api/maintenance/runtime` | 运行时预警快照：LLM 超时/慢请求/连续超时 + 卡死任务 |
+
+配套模块：
+- `server/services/orphanCleanup.js` — 扫描/清理实现（表清单由 information_schema 动态发现，避免硬编码漂移）
+- `server/services/llmTimeoutTracker.js` — LLM 超时与慢请求计数（health 暴露为 `llm-latency`）
+- `server/routes/pipeline/asyncTaskManager.js` — 任务看门狗，终止态统一由 `isTerminal()` 判定（health 暴露为 `pipeline-tasks`）
+- `server/shared/runContext.js` — 流水线运行上下文（AsyncLocalStorage），承载 `startRound`/`isLastRound`，
+  供 reviews 单点补 `runRound` 与审核链做"末轮宽限"判定
 
 ### 知识库API（`server/routes/knowledge.js`）
 
@@ -441,6 +458,9 @@ review的prompt注入守卫检查结果：
 | `server/services/characterArcGuard.js` | 角色弧线守卫 |
 | `server/services/consistencyAuditService.js` | 长线一致性审计 |
 | `server/services/materialLifecycleService.js` | 素材库长线管理 |
+| `server/services/libraryStore.js` | 藏经阁技法库数据访问层（PG单一数据源） |
+| `server/services/techIndex.js` | 藏经阁检索门面（PG→内存，同步API） |
+| `server/services/techniqueExtraction.js` | 技法一键提取编排（采样→LLM→去重→落库） |
 | `server/services/genreConfig.js` | 题材检测与注册 |
 | `server/services/prompts/styleInjector.js` | 风格注入 |
 | `server/config/genreEntitySchemas.js` | 题材实体Schema（动态生成） |
@@ -612,3 +632,66 @@ materialUpdateProcessor.js:
 4. **验收脚本必须通过**，修改后运行对应的verify-tX.js
 5. **store-pg.js的knowledge表handler**需要同步更新DDL和handler条件
 6. **不硬编码**：所有阈值提取到CONFIG常量，所有题材特定逻辑放genre插件
+
+---
+
+## 十五、藏经阁（写作技法库）
+
+> 2026-09-21 重构：数据源由 JSON 文件迁移到 PG，并新增「一键提取」能力。
+> 历史形态：`server/data/library/*.json`（index.json + leaf/*.json + metadata/*.json）。
+
+### 15.1 存储与访问
+
+| 层 | 文件 | 说明 |
+|----|------|------|
+| 表 | `server/db/pgSchemaLibrary.js` | `library_techniques`（21列 + 6索引），一条记录=一个技法全文 |
+| 写handler | `server/db/store-pg-writer-library.js` | 必须存在，否则写kv_store读专表（陷阱#31） |
+| 数据访问 | `server/services/libraryStore.js` | CRUD/统计/导入/元数据，store类型 `library-techniques` |
+| 检索门面 | `server/services/techIndex.js` | PG → 内存视图（启动预热），对外**同步**API |
+| BM25 | `server/services/techIndexSearch.js` | 纯函数检索（中文双字切分 + IDF） |
+| JSON兜底 | `server/services/techIndexJsonSeed.js` | PG不可用/为空时兜底，保证注入链不断 |
+| 迁移 | `scripts/migrateLibraryToPg.js` | JSON → PG（幂等） |
+
+**为什么内存视图**：注入链 `techniqueScheduler.scheduleTechniques()` 是同步调用，
+而 PG 是异步IO。技法总量仅百级，启动时全量载入内存（`server/index.js` 在 `runStartupChecks` 后
+调用 `techIndex.initFromPg()`），对外保持同步；提取/编辑后由 `techIndex.reload()` 刷新。
+
+### 15.2 注入链（未变更）
+
+```
+techIndex.getTechniquesByInjectionPoint(agentType, mode)
+  → techniqueScheduler 按 sceneTypes/phase/knowledgeContext/genre/feedbackRates 打分取Top5
+  → formatTechniquesForPrompt() 拼进 writer/polisher prompt
+  → 审核结果经 techniqueFeedback 回写 → validationEngine.recordTechniqueResult 更新成功率
+```
+
+### 15.3 一键提取（2026-09-21 新增）
+
+**目标**：从任意小说文本提取**跨作品通用**的写作技法并直接入库（不是某一本书的专有设定）。
+
+| 环节 | 文件 | 说明 |
+|------|------|------|
+| 维度定义（SSOT） | `server/config/libraryExtractDimensions.js` | 10个通用维度（节奏/宏大/压力/危机/人物/弧光/对白/世界观/情感/语言）× 部门白名单 |
+| 提示词 | `server/services/libraryExtractPrompt.js` | 三重约束：技法名必须是"做法"、禁作品专有名词、规则必须可执行 |
+| 解析规范化 | `server/services/libraryExtractParse.js` | 剥离think/代码块 → 字段裁剪 → 部门子类校验 → 生成ID |
+| 编排 | `server/services/techniqueExtraction.js` | 章节切块 → 全书**等距采样**（必含首尾块）→ 逐维调用LLM → 去重 → 落库 → reload |
+| 路由 | `server/routes/libraryExtractRoutes.js` | POST /extract（异步任务）、GET /extract/:taskId、GET /extract-dimensions、POST /techniques、DELETE /technique/:id |
+| 前端 | `client/src/pages/library/ExtractDialog.jsx` + `useExtractState.js` | 藏经阁页「⬆ 一键提取」按钮：上传txt/粘贴 → 选维度 → 进度 → 结果 |
+
+**端点**：
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/library/extract` | POST | 提交提取（body: text/novelName/dimensions），返回 taskId |
+| `/api/library/extract/:taskId` | GET | 轮询进度（status/progress/step/terminal/result） |
+| `/api/library/extract-dimensions` | GET | 维度清单（前端勾选） |
+| `/api/library/techniques` | POST | 手动新增技法 |
+| `/api/library/technique/:id` | DELETE | 删除技法 |
+
+**关键约束与坑**：
+- 长文本接口：`/api/library/extract` 的 `text` 字段走 `LIBRARY_EXTRACT.MAX_TEXT_CHARS`(300万字符)，
+  否则被 inputSanitizer 默认上限静默截断（陷阱#115）。
+- 任务超时：异步任务表看门狗 30 分钟（`routes/pipeline/asyncTaskManager.js`），
+  单次LLM超时 `LIBRARY_EXTRACT.REQUEST_TIMEOUT_MS`(10分钟)。
+- 去重：库内已有技法名 + 本批已产出名，包含关系即判重，避免换后缀重复入库。
+- 产出必须通用：技法名含书名号/引号等专有名词特征直接判废（`libraryExtractParse`）。

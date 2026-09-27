@@ -47,7 +47,8 @@ router.get('/consistency/:projectId/reports', async (req, res) => {
 router.get('/power-guard/:projectId/check', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const result = await powerGuard.check(projectId);
+        // 修复：服务方法名是 checkPowerConsistency（原调用 check 不存在 → 500）
+        const result = await powerGuard.checkPowerConsistency(projectId, Number(req.query.currentChapter) || undefined);
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -63,7 +64,8 @@ router.get('/power-guard/:projectId/curve/:entityId', async (req, res) => {
 router.get('/foreshadow-guard/:projectId/overdue', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const result = await foreshadowGuard.getOverdue(projectId);
+        // 修复：服务方法名是 getOverdueForeshadows（原调用 getOverdue 不存在 → 500）
+        const result = await foreshadowGuard.getOverdueForeshadows(projectId, Number(req.query.currentChapter) || undefined);
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -79,7 +81,8 @@ router.get('/foreshadow-guard/:projectId/stats', async (req, res) => {
 router.get('/character-arc-guard/:projectId/check', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const result = await characterArcGuard.check(projectId);
+        // 修复：服务方法名是 checkCharacterArcs（原调用 check 不存在 → 500）
+        const result = await characterArcGuard.checkCharacterArcs(projectId, Number(req.query.currentChapter) || undefined);
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -87,7 +90,8 @@ router.get('/character-arc-guard/:projectId/check', async (req, res) => {
 router.get('/character-arc-guard/:projectId/activity', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const result = await characterArcGuard.getActivity(projectId);
+        // 修复：服务方法名是 getCharacterActivityStats（原调用 getActivity 不存在 → 500）
+        const result = await characterArcGuard.getCharacterActivityStats(projectId, Number(req.query.currentChapter) || undefined);
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -103,7 +107,8 @@ router.post('/consistency-audit/:projectId/run', async (req, res) => {
 router.get('/consistency-audit/:projectId/history', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const history = await consistencyAuditService.getHistory(projectId);
+        // 修复：服务方法名是 getAuditHistory（原调用 getHistory 不存在 → 500）
+        const history = await consistencyAuditService.getAuditHistory(projectId, Number(req.query.limit) || 10);
         res.json({ history });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });

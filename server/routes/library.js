@@ -1,45 +1,60 @@
+/**
+ * libraryRoutes — 藏经阁（写作技法库）路由
+ *
+ * 数据源：PG表 library_techniques（经 libraryStore / techIndex 访问）
+ *   2026-09-21 前为 server/data/library/*.json，迁移脚本 scripts/migrateLibraryToPg.js
+ * 子路由：libraryMetaRoutes（元数据/反馈）、libraryExtractRoutes（一键提取/写操作）
+ * 文件位置：server/routes/library.js
+ */
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
 const techIndex = require('../services/techIndex');
+const libraryStore = require('../services/libraryStore');
 const { ValidationEngine } = require('../services/validationEngine');
-const { getBatchSuccessRates, deleteFeedbackByProject } = require('../services/pipeline/techniqueFeedback');
-const store = require('../store');
 const { ERROR_CODES } = require('../shared/errorCodes');
 
 const { VALIDATION_ERROR, NOT_FOUND, INTERNAL_ERROR } = ERROR_CODES;
-
-const LIBRARY_DIR = path.join(__dirname, '..', 'data', 'library');
-const LEAF_DIR = path.join(LIBRARY_DIR, 'leaf');
-const META_DIR = path.join(LIBRARY_DIR, 'metadata');
 const ve = new ValidationEngine();
 
-function readJson(fp) { if (!fs.existsSync(fp)) return null; return JSON.parse(fs.readFileSync(fp, 'utf-8').replace(/^\uFEFF/, '')); }
-function writeJson(fp, data) { const d = path.dirname(fp); if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(fp, JSON.stringify(data, null, 2), 'utf-8'); }
+/** 索引条目（供前端树/筛选，字段与历史JSON结构兼容） */
+function toEntry(t) {
+    return {
+        id: t.id,
+        display_name: t.display_name,
+        tags: t.retrieval_tags || [],
+        modes: t.applicable_modes || [],
+        department: t.department,
+        subcategory: t.subcategory,
+        context_slot: t.context_slot,
+        injection_point: t.injection_point,
+        worldviewDepth: t.worldviewDepth,
+    };
+}
 
-router.get('/index', (req, res) => {
+router.get('/index', async (req, res) => {
     try {
-        const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
-        if (!index) return res.json({ entries: [], total_entries: 0 });
         const { mode, injection_point, department, worldviewDepth } = req.query;
-        let entries = index.entries;
+        let entries = techIndex.getAll().map(toEntry);
         if (mode) entries = entries.filter(e => e.modes.includes(mode));
         if (injection_point) entries = entries.filter(e => e.injection_point === injection_point);
         if (department) entries = entries.filter(e => e.department === department);
         if (worldviewDepth) entries = entries.filter(e => e.worldviewDepth === worldviewDepth);
-        res.json({ ...index, entries, filtered_count: entries.length });
+        res.json({
+            entries,
+            total_entries: entries.length,
+            source: techIndex.getSource(),
+            last_sync: techIndex.getLoadedAt(),
+            filtered_count: entries.length,
+        });
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.get('/departments', (req, res) => {
+router.get('/departments', async (req, res) => {
     try {
-        const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
-        if (!index) return res.json([]);
         const depts = {};
-        for (const e of index.entries) {
+        for (const e of techIndex.getAll()) {
             if (!depts[e.department]) depts[e.department] = { name: e.department, subcategories: {}, count: 0 };
             depts[e.department].count++;
             const sub = e.subcategory || e.department;
@@ -52,111 +67,62 @@ router.get('/departments', (req, res) => {
     }
 });
 
-router.get('/technique/:id', (req, res) => {
+router.get('/technique/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
-        const entry = index?.entries?.find(e => e.id === id);
-        if (!entry) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
-
-        const leaf = readJson(path.join(LIBRARY_DIR, entry.path));
-        const meta = readJson(path.join(META_DIR, `${id}.json`));
-        res.json({ ...leaf, _meta: meta || { id, success_rate: 50, attempts: 0, auto_disabled: false } });
+        const leaf = techIndex.getTechnique(req.params.id);
+        if (!leaf) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
+        res.json({ ...leaf, _meta: { success_rate: leaf.success_rate, attempts: leaf.attempts, auto_disabled: leaf.auto_disabled } });
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.put('/technique/:id', (req, res) => {
+/** 编辑技法（前端就地编辑：实施规则/反模式/检索标签） */
+router.put('/technique/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
-        const entry = index?.entries?.find(e => e.id === id);
-        if (!entry) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
-
-        const leafPath = path.join(LIBRARY_DIR, entry.path);
-        const existing = readJson(leafPath) || {};
-        const updates = req.body;
-
-        const allowed = ['display_name', 'implementation_rules', 'anti_patterns', 'trigger_condition', 'retrieval_tags', 'word_count_impact'];
-        for (const key of allowed) {
-            if (updates[key] !== undefined) existing[key] = updates[key];
+        const allowed = ['implementation_rules', 'anti_patterns', 'retrieval_tags', 'description', 'display_name', 'word_count_impact'];
+        const patch = {};
+        for (const k of allowed) if (req.body?.[k] !== undefined) patch[k] = req.body[k];
+        if (Object.keys(patch).length === 0) {
+            return res.apiError(VALIDATION_ERROR.statusCode, '无可更新字段', VALIDATION_ERROR.code);
         }
-        existing.last_updated = new Date().toISOString();
-
-        writeJson(leafPath, existing);
-        techIndex.refreshIndex();
-        res.json({ success: true, technique: existing });
+        const existing = await libraryStore.getTechnique(req.params.id);
+        if (!existing) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
+        const saved = await libraryStore.upsertTechnique({ ...existing, ...patch });
+        await techIndex.reload();
+        res.json({ success: true, data: saved });
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.get('/search', (req, res) => {
+/** 删除技法（人工清理低质/重复条目） */
+router.delete('/technique/:id', async (req, res) => {
+    try {
+        const existing = await libraryStore.getTechnique(req.params.id);
+        if (!existing) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
+        await libraryStore.deleteTechnique(req.params.id);
+        await techIndex.reload();
+        res.json({ success: true, deleted: req.params.id });
+    } catch (e) {
+        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
+    }
+});
+
+router.get('/search', async (req, res) => {
     try {
         const { q, mode, injection_point, topK } = req.query;
         if (!q) return res.json([]);
-        const results = techIndex.search(q, {
-            mode: mode || undefined,
-            injectionPoint: injection_point || undefined,
-            topK: parseInt(topK) || 10
-        });
-        res.json(results);
+        res.json(techIndex.search(q, { mode, injectionPoint: injection_point, topK: Number(topK) || 10 }));
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.put('/meta/:id', (req, res) => {
+router.get('/stats', async (req, res) => {
     try {
-        const { id } = req.params;
-        const metaPath = path.join(META_DIR, `${id}.json`);
-        const existing = readJson(metaPath) || { id, success_rate: 50, attempts: 0, auto_disabled: false };
-        const updates = req.body;
-
-        if (updates.auto_disabled !== undefined) existing.auto_disabled = updates.auto_disabled;
-        if (updates.success_rate !== undefined) existing.success_rate = updates.success_rate;
-        if (updates.applicable_modes !== undefined) existing.applicable_modes = updates.applicable_modes;
-
-        writeJson(metaPath, existing);
-        res.json({ success: true, meta: existing });
-    } catch (e) {
-        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
-    }
-});
-
-router.post('/meta/:id/reset', (req, res) => {
-    try {
-        const { id } = req.params;
-        const metaPath = path.join(META_DIR, `${id}.json`);
-        const reset = { id, success_rate: 50, attempts: 0, auto_disabled: false };
-        writeJson(metaPath, reset);
-        res.json({ success: true, meta: reset });
-    } catch (e) {
-        return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
-    }
-});
-
-router.get('/stats', (req, res) => {
-    try {
-        const index = readJson(path.join(LIBRARY_DIR, 'index.json'));
-        if (!index) return res.json({ total: 0, departments: 0, disabled: 0 });
-
-        let disabled = 0;
-        const byDept = {};
-        for (const e of index.entries) {
-            const meta = readJson(path.join(META_DIR, `${e.id}.json`));
-            if (meta?.auto_disabled) disabled++;
-            if (!byDept[e.department]) byDept[e.department] = 0;
-            byDept[e.department]++;
-        }
-
-        res.json({
-            total: index.total_entries,
-            departments: Object.keys(byDept).length,
-            disabled,
-            byDepartment: byDept
-        });
+        const stats = await libraryStore.getStats();
+        res.json({ ...stats, source: techIndex.getSource(), loadedAt: techIndex.getLoadedAt() });
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
@@ -166,31 +132,13 @@ router.post('/validate/platform', (req, res) => {
     try {
         const { content, platform } = req.body;
         if (!content || !platform) return res.apiError(VALIDATION_ERROR.statusCode, 'content and platform required', VALIDATION_ERROR.code);
-        const result = ve.validatePlatformCompliance(content, platform);
-        res.json(result);
+        res.json(ve.validatePlatformCompliance(content, platform));
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }
 });
 
-router.get('/technique-feedback/:projectId', async (req, res) => {
-    try {
-        const items = await store.queryItems('technique-feedback', { projectId: req.params.projectId });
-        const rates = {};
-        for (const item of items) {
-            if (!rates[item.techniqueId]) rates[item.techniqueId] = { passed: 0, failed: 0, total: 0 };
-            rates[item.techniqueId].total++;
-            item.passed ? rates[item.techniqueId].passed++ : rates[item.techniqueId].failed++;
-        }
-        const summary = Object.entries(rates).map(([id, r]) => ({ techniqueId: id, ...r, successRate: r.total > 0 ? (r.passed / r.total * 100).toFixed(1) : '0.0' }));
-        summary.sort((a, b) => parseFloat(b.successRate) - parseFloat(a.successRate));
-        res.json({ projectId: req.params.projectId, totalRecords: items.length, techniques: summary });
-    } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
-});
-
-router.delete('/technique-feedback/:projectId', async (req, res) => {
-    try { const count = await deleteFeedbackByProject(req.params.projectId); res.json({ success: true, deletedCount: count }); }
-    catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
-});
+router.use('/', require('./libraryMetaRoutes'));
+router.use('/', require('./libraryExtractRoutes'));
 
 module.exports = router;

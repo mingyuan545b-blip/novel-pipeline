@@ -1,7 +1,7 @@
 /**
  * 下载完整TXT小说
  */
-require('dotenv').config();
+require('dotenv').config({ override: true });
 process.env.USE_PG = 'false';
 process.env.USE_SQLITE = 'false';
 

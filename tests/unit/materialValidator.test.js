@@ -153,12 +153,25 @@ describe('MaterialValidator integration', () => {
     });
 
     test('validateHierarchy rejects character without parentFaction', async () => {
+        // 2026-09-21：改按等级判定，配角属于长线角色，仍必须有归属
         const result = await validator.validateHierarchy({
             type: 'character',
+            roleLevel: 'supporting',
             name: '测试角色',
             parentFaction: undefined
         });
         expect(result.valid).toBe(false);
+    });
+
+    test('validateHierarchy allows 一次性路人（npc）without parentFaction', async () => {
+        const result = await validator.validateHierarchy({
+            type: 'character',
+            roleLevel: 'npc',
+            name: '码头杂役',
+            currentContent: '只在第一章出现的路人',
+            parentFaction: undefined
+        });
+        expect(result.valid).toBe(true);
     });
 
     test('validateHierarchy accepts character with parentFaction', async () => {

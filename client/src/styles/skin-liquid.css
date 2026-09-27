@@ -107,6 +107,9 @@
     background: linear-gradient(135deg, rgba(100,180,255,0.25), rgba(180,120,255,0.2), rgba(255,126,179,0.15));
     backdrop-filter: blur(8px);
     border: 1px solid rgba(180,120,255,0.15);
+    /* 修复：基类 color:#000 在暗色玻璃底上不可读 */
+    color: #eaf4ff;
+    text-shadow: 0 0 8px rgba(100,180,255,0.5);
 }
 
 [data-theme="liquid"] .cyber-input,

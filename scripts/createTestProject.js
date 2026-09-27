@@ -3,7 +3,7 @@
  * 世界观框架：高武世界+小世界穿越+反套路系统+五家九境+喜剧风格
  * 重新设计：角色名、剧情、装备、功法、小世界内容
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
 

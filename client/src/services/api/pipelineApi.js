@@ -85,6 +85,10 @@ export const pipelineApi = {
         `/pipeline/context-assembly/${projectId}`,
         { params: { chapterNumber: chapterNumber || '', agentType: agentType || '' } }
     ),
+    // Token 去向面板：每章每步花了多少 token、花在哪几段提示词、哪段被截断
+    getTokenLedger: (projectId) => api.get(`/pipeline/token-ledger/${projectId}`),
+    getTokenLedgerChapter: (projectId, chapterNumber) =>
+        api.get(`/pipeline/token-ledger/${projectId}/chapter/${chapterNumber}`),
 };
 
 export const genreDebugApi = {

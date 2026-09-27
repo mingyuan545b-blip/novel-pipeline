@@ -1,7 +1,7 @@
 /**
  * 诊断脚本：查看素材content和entity数据，诊断4维度字段为空的根因
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const store = require('../server/store');
 
 const PROJECT_ID = '1397512a-9f09-41fd-ac1e-7d68dd5b722f';

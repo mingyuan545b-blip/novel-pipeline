@@ -1,0 +1,126 @@
+/* Token 去向面板 — 深色底 + 柔和卡片 + 大字号数字（可读性优先） */
+
+.page { padding: 20px 22px 40px; max-width: 1320px; margin: 0 auto; color: #e8eaf0; }
+
+.header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.title { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 0.5px; color: #f1f5f9; }
+.subtitle { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: #94a3b8; }
+.headerActions { display: flex; gap: 8px; }
+
+.btn { padding: 8px 16px; font-size: 13px; font-weight: 600; color: #cbd5e1; cursor: pointer;
+    background: #1a2233; border: 1px solid #2c3a52; border-radius: 8px; transition: all 0.15s; }
+.btn:hover:not(:disabled) { color: #fff; border-color: #3b82f6; background: #1e293b; }
+.btn:disabled { opacity: 0.55; cursor: default; }
+
+/* 场景筛选 */
+.filterBar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px;
+    background: #111a2b; border: 1px solid #1e2b40; border-radius: 12px; margin-bottom: 14px; }
+.filterLabel { font-size: 13px; font-weight: 600; color: #7c8ba1; margin-right: 4px; }
+.chip { padding: 6px 13px; font-size: 13px; font-weight: 600; color: #8fa0b8; cursor: pointer;
+    background: rgba(22, 32, 48, 0.25); border: 1px solid #263449; border-radius: 999px; transition: all 0.15s; }
+.chip:hover { color: #dbeafe; border-color: #3b82f6; }
+.chipOn { color: #0b1220; background: #60a5fa; border-color: #60a5fa; }
+
+/* 一句话结论 */
+.insight { display: flex; flex-wrap: wrap; gap: 18px; padding: 12px 16px; margin-bottom: 14px;
+    font-size: 14px; color: #dbeafe; background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25); border-left: 3px solid #3b82f6; border-radius: 10px; }
+.insightWarn { color: #fbbf24; }
+
+/* 总览卡片 */
+.statGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.statCard { padding: 16px 18px; background: linear-gradient(160deg, #141d2e, #0f1725);
+    border: 1px solid #1f2b40; border-radius: 14px; transition: transform 0.15s, border-color 0.15s; }
+.statCard:hover { transform: translateY(-2px); border-color: rgba(96, 165, 250, 0.4); }
+.statHead { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: #94a3b8; }
+.statIcon { font-size: 15px; }
+.statValue { margin: 10px 0 6px; font-size: 30px; font-weight: 700; line-height: 1.1; color: #f8fafc; }
+.statUnit { margin-left: 5px; font-size: 13px; font-weight: 500; color: #64748b; }
+.statSub { font-size: 12px; line-height: 1.5; color: #7c8ba1; }
+
+/* 面板通用 */
+.panel { padding: 16px 18px; background: #111a2b; border: 1px solid #1e2b40; border-radius: 14px; margin-bottom: 16px; }
+.twoCol { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.twoCol > .panel { margin-bottom: 0; }
+.panelHead { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.panelTitle { margin: 0; font-size: 15px; font-weight: 700; color: #e2e8f0; }
+.panelHint { font-size: 12px; color: #7c8ba1; }
+
+/* 占比条 */
+.barList { display: flex; flex-direction: column; gap: 12px; }
+.barRow { display: grid; grid-template-columns: 150px 1fr 130px; align-items: center; gap: 12px; }
+.barLabel { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #cbd5e1; }
+.barDot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.barTrunc { font-size: 11px; color: #f59e0b; }
+.barTrack { height: 10px; background: #0d1420; border-radius: 999px; overflow: hidden; }
+.barFill { height: 100%; border-radius: 999px; transition: width 0.35s ease; }
+.barValue { font-size: 13px; font-weight: 600; text-align: right; color: #e2e8f0; }
+.barPct { margin-left: 7px; font-size: 12px; font-weight: 500; color: #7c8ba1; }
+
+/* 趋势图 */
+.tabs { display: flex; gap: 6px; }
+.tab { padding: 5px 12px; font-size: 12px; font-weight: 600; color: #8fa0b8; cursor: pointer;
+    background: rgba(22, 32, 48, 0.25); border: 1px solid #263449; border-radius: 8px; }
+.tab:hover { color: #dbeafe; }
+.tabOn { color: #0b1220; background: #60a5fa; border-color: #60a5fa; }
+.chartWrap { position: relative; }
+.chartSvg { width: 100%; height: auto; display: block; }
+.chartGrid { stroke: #1e2b40; stroke-width: 1; stroke-dasharray: 4 6; }
+.chartAxis { fill: #64748b; font-size: 11px; }
+.chartPoint { cursor: pointer; transition: r 0.12s; }
+.chartTip { position: absolute; top: 8px; transform: translateX(-50%); display: flex; flex-direction: column; gap: 2px;
+    padding: 8px 12px; font-size: 12px; color: #e2e8f0; white-space: nowrap; pointer-events: none;
+    background: rgba(9, 14, 24, 0.95); border: 1px solid #2c3a52; border-radius: 8px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
+
+/* 告警 */
+.alertList { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.alertItem { display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+    background: #0f1725; border: 1px solid #1e2b40; border-radius: 9px; }
+.alertDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.alertText { flex: 1; font-size: 13px; line-height: 1.5; color: #cbd5e1; }
+.alertJump { padding: 3px 10px; font-size: 12px; color: #93c5fd; cursor: pointer;
+    background: transparent; border: 1px solid #2c3a52; border-radius: 6px; }
+.alertJump:hover { border-color: #3b82f6; color: #bfdbfe; }
+
+/* 表格 */
+.tableWrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th { padding: 10px; text-align: left; font-size: 12px; font-weight: 600; color: #7c8ba1;
+    border-bottom: 1px solid #1e2b40; white-space: nowrap; }
+.table td { padding: 10px; color: #cbd5e1; border-bottom: 1px solid #16202f; white-space: nowrap; }
+.tableRow { cursor: pointer; transition: background 0.12s; }
+.tableRow:hover { background: rgba(59, 130, 246, 0.06); }
+.tableRowOpen { background: rgba(59, 130, 246, 0.09); }
+.tdChapter { font-weight: 600; color: #93c5fd; }
+.tdStrong { font-weight: 700; color: #f1f5f9; }
+.tdCache { color: #4ade80; }
+.tdWarn { color: #fbbf24; font-weight: 600; }
+.phaseTag { padding: 2px 8px; font-size: 11px; color: #a5b4fc; background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 6px; }
+.detailRow td { padding: 0 0 12px; background: #0d1522; }
+
+/* 单章调用明细 */
+.callList { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; }
+.callCard { padding: 12px 14px; background: #111a2b; border: 1px solid #1e2b40; border-radius: 10px; }
+.callHead { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 9px; }
+.callStep { padding: 2px 9px; font-size: 12px; font-weight: 700; color: #0b1220; background: #60a5fa; border-radius: 6px; }
+.callRound { font-size: 12px; color: #94a3b8; }
+.callTotal { font-size: 14px; font-weight: 700; color: #f1f5f9; }
+.callSplit { font-size: 12px; color: #7c8ba1; }
+.callSections { display: flex; flex-wrap: wrap; gap: 7px; }
+.callSection { display: flex; align-items: center; gap: 6px; padding: 4px 9px; font-size: 12px;
+    background: #0d1420; border: 1px solid #1e2b40; border-radius: 7px; }
+.callSectionName { color: #94a3b8; }
+.callSectionTokens { font-weight: 600; color: #e2e8f0; }
+.callTrunc { font-size: 11px; font-weight: 600; color: #f59e0b; }
+.callOk { font-size: 11px; color: #4ade80; }
+.callFoot { margin-top: 8px; font-size: 12px; color: #64748b; }
+
+/* 状态 */
+.loading, .emptyState { padding: 70px 20px; text-align: center; font-size: 14px; color: #7c8ba1; }
+.emptyIcon { font-size: 40px; margin-bottom: 12px; }
+.emptyTip { margin-top: 10px; font-size: 12px; color: #64748b; }
+.emptyHint { padding: 16px; font-size: 13px; color: #7c8ba1; }
+.errorBox { display: flex; align-items: center; gap: 12px; padding: 16px; margin: 20px;
+    font-size: 13px; color: #fca5a5; background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; }

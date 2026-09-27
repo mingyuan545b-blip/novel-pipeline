@@ -3,27 +3,7 @@
  * 从AI返回的文本中提取结构化角色字段
  */
 
-/** 标签格式正则提取规则 */
-const LABELED_PATTERNS = [
-    [/【?身份[/:：】]\s*([^【。，,；\n]{2,50})/, 'position'],
-    [/【?(?:职位|身份|职务|职业特征|职业|角色定位)[/:：】]\s*([^【。，,；\n]{2,80})/, 'position'],
-    [/【?(?:阵营|派系|所属|组织)[/:：】]\s*([^【。，,；\n]{2,50})/, 'factionName'],
-    [/【?(?:性格|性格特点|性格特征)[/:：】]\s*([^【。，,；\n]{2,80})/, 'personality'],
-    [/【?(?:说话语气|语气|口吻)[/:：】]\s*([^【。，,；\n]{2,80})/, 'speakingTone'],
-    [/【?(?:标志性细节|标志性动作|标志细节)[/:：】]\s*([^【。，,；\n]{2,100})/, 'signatureDetail'],
-    [/【?(?:主角镜像|镜像对比)[/:：】]\s*([^【。，,；\n]{2,80})/, 'protagonistMirror'],
-    [/【?(?:独立立场|立场驱动)[/:：】]\s*([^【。，,；\n]{2,80})/, 'independentStance'],
-    [/【?(?:命运弧光|命运走向|弧光)[/:：】]\s*([^【。，,；\n]{2,80})/, 'fateArc'],
-    [/【?(?:内在矛盾|内心矛盾|矛盾冲突)[/:：】]\s*([^【。，,；\n]{2,80})/, 'innerConflict'],
-    [/【?(?:创作风格)[/:：】]\s*([^【。，,；\n]{2,100})/, 'craftStyle'],
-    [/【?(?:外貌|外貌描写|外貌特征)[/:：】]\s*([^【。，,；\n]{2,120})/, 'appearance'],
-    [/【?(?:背景|身世|人物背景|角色背景)[/:：】]\s*([^【。，,；\n]{2,120})/, 'background'],
-    [/【?(?:核心动机|动机|核心驱动力|驱动力)[/:：】]\s*([^【。，,；\n]{2,100})/, 'motivation'],
-    // 人物魅力系统4维度（参考蛊真人方源设计）
-    [/【?(?:人格魅力|魅力点|核心魅力)[/:：】]\s*([^【\n]{2,300})/, 'charisma'],
-    [/【?(?:哲学观|哲学理念|核心信念|价值观)[/:：】]\s*([^【\n]{2,400})/, 'philosophy'],
-    [/【?(?:出场设计|出场方式|出场场景|首次出场)[/:：】]\s*([^【\n]{2,400})/, 'entranceDesign'],
-];
+const { extractLabeledFields } = require('./characterStateLabeledFields');
 
 /**
  * 从【金句库】标签提取金句列表
@@ -64,16 +44,6 @@ function extractQuoteLibrary(content) {
         }
     }
     return quotes;
-}
-
-/** 从标签格式文本中提取字段 */
-function extractLabeledFields(content) {
-    const state = {};
-    for (const [regex, key] of LABELED_PATTERNS) {
-        const m = content.match(regex);
-        if (m) state[key] = m[2] ? m[2].trim() : m[1].trim();
-    }
-    return state;
 }
 
 /** 从非结构化文本中fallback提取personality */
@@ -125,7 +95,9 @@ function fallbackPosition(content) {
 function fallbackSignatureDetail(content) {
     const rules = [
         /【?标志性动作[/:：】]\s*([^【\n]{2,80}?(?:；|。|$))/,
-        /习惯(?:性)?([^。，,；\n]{4,40})/,
+        // 修复：原先 `习惯([^。，,；\n]{4,40})` 会把"【习惯】"的右括号一起吞进结果
+        // （实测产出 "】收殓时必与尸体低声交谈"），这里先剥掉标签分隔符再取值
+        /习惯(?:性)?[】/:：]?\s*([^。，,；\n】\[]{4,40})/,
     ];
     for (const re of rules) {
         const m = content.match(re);

@@ -52,61 +52,61 @@ describe('isFoundationMaterial', () => {
 });
 
 describe('shouldOverrideReviewRejection', () => {
-    test('overrides when word count hallucination detected', () => {
+    test('overrides when word count hallucination detected', async () => {
         const stepResult = {
             passed: false,
             feedback: { summary: '字数不足，低于最低要求', issues: [] }
         };
-        const result = shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, [], {});
+        const result = await shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, [], {});
         expect(result.override).toBe(true);
         expect(result.reason).toContain('幻觉');
     });
 
-    test('does not override when word count is actually low', () => {
+    test('does not override when word count is actually low', async () => {
         const stepResult = {
             passed: false,
             feedback: { summary: '字数不足', issues: [] }
         };
-        const result = shouldOverrideReviewRejection(stepResult, 'short', 1500, 2200, [], {});
+        const result = await shouldOverrideReviewRejection(stepResult, 'short', 1500, 2200, [], {});
         expect(result.override).toBe(false);
     });
 
-    test('overrides dialect misjudgment', () => {
+    test('overrides dialect misjudgment', async () => {
         const stepResult = {
             passed: false,
             feedback: { summary: '方言不规范', issues: [] }
         };
         const chapterContent = '俺跟你说，这事儿整得贼拉离谱';
-        const result = shouldOverrideReviewRejection(stepResult, chapterContent, 3000, 2200, [], {});
+        const result = await shouldOverrideReviewRejection(stepResult, chapterContent, 3000, 2200, [], {});
         expect(result.override).toBe(true);
     });
 
-    test('overrides style misjudgment', () => {
+    test('overrides style misjudgment', async () => {
         const stepResult = {
             passed: false,
             feedback: { summary: '说话风格不当', issues: [] }
         };
         const materials = [{ type: 'character', speechStyle: 'abstract' }];
-        const result = shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, materials, {});
+        const result = await shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, materials, {});
         expect(result.override).toBe(true);
     });
 
-    test('overrides humor misjudgment for comedy genre', () => {
+    test('overrides humor misjudgment for comedy genre', async () => {
         const stepResult = {
             passed: false,
             feedback: { summary: '幽默过度', issues: [] }
         };
         const project = { styleProfile: { genreLabel: '反套路喜剧' } };
-        const result = shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, [], project);
+        const result = await shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, [], project);
         expect(result.override).toBe(true);
     });
 
-    test('does not override for regular issues', () => {
+    test('does not override for regular issues', async () => {
         const stepResult = {
             passed: false,
             feedback: { summary: '情节不连贯', issues: [{ desc: '视角跳跃' }] }
         };
-        const result = shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, [], {});
+        const result = await shouldOverrideReviewRejection(stepResult, 'content', 3000, 2200, [], {});
         expect(result.override).toBe(false);
     });
 });

@@ -25,6 +25,8 @@ async function executeStep(projectId, chapterId, step, round, context, pipelineL
     }
     const durationMs = Date.now() - metricsToken.startTime;
     pipelineMetrics.recordStepEnd(metricsToken, stepResult.passed !== false);
+    // 落盘日志打轮次标：前端执行日志显示R{round}徽标依赖此字段（2026-09-06用户报告缺失）
+    if (stepResult && typeof stepResult === 'object' && stepResult.round === undefined) stepResult.round = round;
     pipelineLog.push(stepResult);
     if (pipelineLog.length > 200) pipelineLog.splice(0, pipelineLog.length - 200);
     if (onStep) {

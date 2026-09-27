@@ -1,7 +1,7 @@
 /**
  * 诊断脚本2：诊断装备、世界域、编年史问题
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const store = require('../server/store');
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';

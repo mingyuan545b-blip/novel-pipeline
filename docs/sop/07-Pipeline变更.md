@@ -171,3 +171,43 @@ writer: {
 - 发现Pipeline相关新陷阱 → 追加到 [00-陷阱清单.md](00-陷阱清单.md) 模块与契约类
 
 **更新后必读**：[MAINTENANCE.md](../MAINTENANCE.md) 确认是否还需更新 [reference/题材插件规范.md](../reference/题材插件规范.md)。
+
+---
+
+## 二、轮次与字数（2026-09-21 补充，改动前必读）
+
+### 轮次语义（双轨）
+- `round` = **跨运行累计轮次**（`startRound = chapter.round + 1`，`chapter.round` 由 writer/reviser/final-editor 推进）
+- `runRound` = **本次运行第几轮**（由 `server/shared/runContext.js` 的 AsyncLocalStorage 透传）
+- pipeline 日志与 reviews **都必须带两者**；reviews 的 `runRound` 由 `store.setItem` 单点注入，新增 review 写入点无需手动补
+- 前端展示：`第{runRound}轮(累计{round})`
+
+### 字数门禁（四道，必须共享同一宽限口径）
+| 顺序 | 位置 | 说明 |
+|---|---|---|
+| 1 | 执笔自检 `writerPostProcess` | 低于 rejectMin → 该轮失败 |
+| 2 | `checkWordCountHardLimit` | first/fast/second-review 前硬拦 |
+| 3 | 初审硬性检测 `checkWordCountGate` | 原为不可覆盖 hardBlock |
+| 4 | 输出契约 PO-001 | 润色后 ≥ 输入 80% |
+
+- **末轮宽限**：`LAST_ROUND_GRACE_RATIO = 0.8`（唯一定义源 `pipelineHelpers/pipelineWordCount.js`）。
+  已无重试轮次且缺口 ≤20% → 不硬拦，交由审核链"系统覆盖"判定；改阈值只改这一处。
+- **严重不足区**：`needsShortfallSalvage`（≥30% 目标下限）→ 走 reviser 结构化扩写，不再整章重生成。
+- **润色守卫**：`polisher.guardPolishedLength` —— 正文已低于下限时，润色只许持平或变长。
+- 新增任何"改写类"步骤（polisher/rewriter/...）都必须加绝对下限守卫（陷阱 #109）。
+
+### 技法注入数据源（2026-09-21 变更）
+
+- **注入链未变**：`techniqueScheduler.scheduleTechniques()` 仍按 injection_point/sceneTypes/phase/feedbackRates
+  打分取 Top5 拼进 writer/polisher prompt。
+- **数据源变了**：藏经阁技法由 JSON 文件改为 **PG 表 `library_techniques`**，通过
+  `techIndex.js` 在启动时载入**内存视图**（`server/index.js` → `techIndex.initFromPg()`），
+  对外保持**同步**API（scheduler 是同步调用，不能直接 await PG）。
+- **改技法后必须刷新**：任何写入/删除技法（提取入库、前端编辑、元数据更新）都要 `await techIndex.reload()`，
+  否则内存视图与PG不一致，注入链会用旧数据（`libraryStore`/`validationEngine` 已内置）。
+- **兜底**：PG 不可用或为空时自动回落 `server/data/library/*.json`（`techIndexJsonSeed.js`），
+  注入链不会因存储异常而断，但此时数据可能与PG不一致（日志会 WARN）。
+- 详情见 [ARCHITECTURE.md §十五](../../ARCHITECTURE.md)。
+
+### 任务终止态
+- 只认 `asyncTaskManager.isTerminal(status)`；看门狗超时写 `status='timeout'`，前端/脚本必须按终止态处理（陷阱 #107）。

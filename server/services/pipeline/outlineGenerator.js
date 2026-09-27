@@ -74,6 +74,28 @@ async function generateInitialMaterials(projectId, userPrompt) {
     }
 }
 
+
+/**
+ * 大纲生成后自动初始化主线任务/阶段任务/时间线（幂等）。
+ *
+ * 背景（2026-09-21 排查"主线任务为0"）：
+ *   autoInitProject 只在 POST /api/projects/initialize 里被调用，
+ *   而实际常用路径是 POST /api/pipeline/generate-outlines（前端与大纲页都走这条）
+ *   → 新项目永远没有主线任务，健康监控持续报"主线任务为0，陷阱#58未修复"。
+ *   这里挂在大纲保存成功之后，两条路径行为归一；失败仅告警不阻断大纲生成。
+ */
+async function ensureProjectQuests(projectId) {
+    try {
+        const { autoInitProject } = require('../../routes/questAutoInit');
+        const result = await autoInitProject(projectId);
+        logger.info('outlineGen', `任务/时间线自动初始化完成：quests=${result.created?.quests || 0}, timelines=${result.created?.timelines || 0}, main="${result.summary?.mainQuest || ''}"`);
+        return result;
+    } catch (e) {
+        logger.warn('outlineGen', `任务/时间线自动初始化失败（不阻断大纲）: ${e.message}`);
+        return null;
+    }
+}
+
 async function generateChapterOutlines(projectId, userPrompt, overrideTargetCount) {
     const ctx = await getDataContext(projectId);
     const project = await ctx.getProject();
@@ -104,6 +126,7 @@ async function generateChapterOutlines(projectId, userPrompt, overrideTargetCoun
             if (driftResult.hasDrift && attempt < DRIFT_MAX_RETRIES) { logger.warn('outlineGen', `大纲偏移检测失败 (attempt ${attempt + 1}/${DRIFT_MAX_RETRIES + 1}), 自动重试...`); continue; }
             if (driftResult.hasDrift) { logger.warn('outlineGen', `大纲偏移检测仍有${driftResult.issues.length}个问题，已达最大重试次数，保存但标记警告`); }
             const saved = await saveChapterOutlines(projectId, outlines);
+            await ensureProjectQuests(projectId);
             return { outlines: saved, created: saved, count: saved.length, driftIssues: driftResult.issues };
         } catch (e) {
             const fallbackOutlines = parseMarkdownOutlines(responseText);
@@ -138,6 +161,7 @@ async function supplementChapterOutlines(projectId, existingCount, supplementCou
             logger.info('outlineGen', formatDriftReport(driftResult));
             if (driftResult.hasDrift && attempt < DRIFT_MAX_RETRIES) { logger.warn('outlineGen', `补充大纲偏移检测失败 (attempt ${attempt + 1}/${DRIFT_MAX_RETRIES + 1}), 自动重试...`); continue; }
             const saved = await saveChapterOutlines(projectId, outlines);
+            await ensureProjectQuests(projectId);
             return { outlines: saved, created: saved, count: saved.length, driftIssues: driftResult.issues };
         } catch (e) { return { outlines: [], created: [], count: 0, error: e.message }; }
     }

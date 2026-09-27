@@ -19,7 +19,7 @@ const ENV_PATH = path.join(PROJECT_ROOT, '.env');
 
 // 1. 加载.env (如果存在)
 if (fs.existsSync(ENV_PATH)) {
-    require('dotenv').config({ path: ENV_PATH });
+    require('dotenv').config({ path: ENV_PATH, override: true });
 } else {
     console.warn('[run.js] .env not found at', ENV_PATH, '— using process.env defaults');
 }

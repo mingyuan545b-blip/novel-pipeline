@@ -42,7 +42,8 @@ const useAppStore = create((set, _get) => ({
         logs: [],
         chapterId: null
     },
-    sidebarCollapsed: false,
+    sidebarCollapsed: typeof localStorage !== 'undefined' ? localStorage.getItem('app-sidebar-collapsed') === '1' : false,
+    paletteOpen: false,
     activePage: '/',
     activeModule: 'novel',
     theme: savedTheme,
@@ -137,7 +138,13 @@ const useAppStore = create((set, _get) => ({
         loading: { ...prev.loading, [key]: value }
     })),
 
-    toggleSidebar: () => set((prev) => ({ sidebarCollapsed: !prev.sidebarCollapsed }))
+    setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
+
+    toggleSidebar: () => set((prev) => {
+        const sidebarCollapsed = !prev.sidebarCollapsed;
+        localStorage.setItem('app-sidebar-collapsed', sidebarCollapsed ? '1' : '0');
+        return { sidebarCollapsed };
+    })
 }));
 
 export default useAppStore;

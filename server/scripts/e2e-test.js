@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const store = require('../store');
 const fs = require('fs');
 const path = require('path');

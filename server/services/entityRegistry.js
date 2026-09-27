@@ -1,6 +1,9 @@
 const store = require('../store');
 const logger = require('../shared/logger');
 
+/** 合法角色等级（与前端 entitycenter/constants.js ROLE_LABELS 对齐） */
+const VALID_ROLE_LEVELS = ['protagonist', 'supporting', 'npc'];
+
 /** 已有实体更新时，从extra合并到existing的字段（仅当extra有值且existing为空时覆盖） */
 const MERGEABLE_FIELDS = [
     'position', 'personality', 'speakingTone', 'signatureDetail',
@@ -27,9 +30,10 @@ class EntityRegistry {
             } else {
                 // 没有章节信息时也不递增（避免同步操作虚增）
             }
-            // roleLevel升级
-            const roleLevelPriority = { protagonist: 3, supporting: 2, npc: 1 };
-            if ((roleLevelPriority[extra.roleLevel] || 0) > (roleLevelPriority[existing.roleLevel] || 0)) {
+            // roleLevel 以同步源为准（entities 表 / 素材解析结果），而非"只升不降"。
+            // 修复前是单向棘轮：素材与 entities 已降级为 supporting 的角色，
+            // registry 仍永久停留在 protagonist —— 实体中心因此显示多个"主角"。
+            if (VALID_ROLE_LEVELS.includes(extra.roleLevel) && extra.roleLevel !== existing.roleLevel) {
                 updates.roleLevel = extra.roleLevel;
             }
             // behaviorRules同步
@@ -95,8 +99,11 @@ class EntityRegistry {
         // 模糊匹配：去除空格/分隔符后比较
         if (name && entityType === 'character') {
             const normalized = name.toLowerCase().replace(/[\s\-_··]/g, '');
+            // 空名/单字名不参与模糊匹配（''.includes(x) 恒真 → 会误并到无名实体）
+            if (normalized.length < 2) return null;
             return active.find(e => {
                 const eName = (e.name || '').toLowerCase().replace(/[\s\-_··]/g, '');
+                if (eName.length < 2) return false;
                 return eName === normalized || eName.includes(normalized) || normalized.includes(eName);
             });
         }

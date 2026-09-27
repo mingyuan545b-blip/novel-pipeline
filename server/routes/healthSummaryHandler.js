@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { getAvailableProviders } = require('../config/providerRegistry');
 const license = require('../services/license');
+const { collectRuntimeProbes } = require('./healthRuntimeProbes');
 
 // 服务启动时间戳 — 模块加载时记录，用于版本校验
 const SERVER_STARTED_AT = new Date().toISOString();
@@ -12,6 +13,7 @@ const SERVER_PID = process.pid;
 async function handleHealthSummary(req, res) {
     const checks = {};
     const errors = [];
+    const warnings = [];
 
     // 陷阱#19修复：source 必须从 store 实际后端类型获取，不能硬编码 'pg'
     // 之前 PG 降级到 JSON 后，health 仍显示 source: 'pg'，造成"假健康"
@@ -94,6 +96,9 @@ async function handleHealthSummary(req, res) {
         errors.push('No LLM provider API key configured');
     }
 
+    // 运行时预警：LLM 超时/慢请求 + 流水线任务看门狗（探针实现见 healthRuntimeProbes）
+    collectRuntimeProbes(checks, errors, warnings);
+
     const allOk = errors.length === 0;
 
     // 陷阱#19修复：响应顶层暴露后端类型和降级状态
@@ -114,6 +119,8 @@ async function handleHealthSummary(req, res) {
         degraded: isDegraded,
         // 降级原因（仅降级时存在）
         degradedReason: isDegraded ? backendStatus.degradedReason : undefined,
+        // 运行时预警（LLM 超时/卡死任务等），非致命但需要前端/运维可见
+        warnings,
         // 配置期望的后端类型
         requestedBackend: backendStatus.requestedBackend || null,
         checks,

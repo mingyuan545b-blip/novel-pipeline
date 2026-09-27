@@ -18,13 +18,15 @@ describe('materialValidator', () => {
             expect(result.valid).toBe(true);
         });
         test('returns invalid when required parent fields missing', async () => {
-            const result = await validateHierarchy({ type: 'character' });
-            if (HIERARCHY_RULES.character?.parentRequired) {
-                expect(result.valid).toBe(false);
-                expect(result.missing.length).toBeGreaterThan(0);
-            } else {
-                expect(result.valid).toBe(true);
-            }
+            // 2026-09-21：character 改按等级判定 —— 长线角色（配角/主角/有伏笔）仍必须有归属
+            const result = await validateHierarchy({ type: 'character', roleLevel: 'supporting' });
+            expect(result.valid).toBe(false);
+            expect(result.missing.length).toBeGreaterThan(0);
+        });
+
+        test('一次性路人（npc）免归属', async () => {
+            const result = await validateHierarchy({ type: 'character', roleLevel: 'npc', currentContent: '码头杂役' });
+            expect(result.valid).toBe(true);
         });
     });
 

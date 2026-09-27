@@ -9,7 +9,7 @@
 
 | 文档 | 用途 | 维护原则 |
 |------|------|----------|
-| [ARCHITECTURE.md](../ARCHITECTURE.md) | 系统架构唯一权威参考 | 任何架构变更必须同步 |
+| [ARCHITECTURE.md](../ARCHITECTURE.md) | 系统架构唯一权威参考（§十五 藏经阁：PG存储/注入链/一键提取） | 任何架构变更必须同步 |
 | [PROJECT_STANDARDS.md](../PROJECT_STANDARDS.md) | 开发规范与交付标准（被CI引用） | 代码规范变更必须同步 |
 | [DATABASE_SCHEMA.md](../DATABASE_SCHEMA.md) | PostgreSQL 20张表Schema | 数据库变更必须同步 |
 | [AGENTS.md](../AGENTS.md) | AI Agent协作规范 | Agent行为变更必须同步 |
@@ -23,6 +23,7 @@
 
 | 序号 | 文件 | 用途 | 何时读 |
 |------|------|------|--------|
+| 0 | [AI-HANDOVER-PRD.md](AI-HANDOVER-PRD.md) | 接手AI总需求书+工作宪法（工作规范/文档分级/模块化契约/多Agent协作/调试/验收） | 新AI首次接手读§0-§3；做治理/多agent/大任务时按§0路由表选章节 |
 | 1 | [sop/00-陷阱清单.md](sop/00-陷阱清单.md) | 已知陷阱+7条核心原则 | **任何任务开始前必读** |
 | 2 | [sop/01-接手启动.md](sop/01-接手启动.md) | session启动协议+环境自检 | 新session第一次操作前 |
 | 3 | [sop/10-上下文交接规范.md](sop/10-上下文交接规范.md) | 防失忆协议：状态落盘+恢复锚点 | 长任务开始前/上下文压缩提示时 |
@@ -83,6 +84,8 @@
 | 限流/配额耗尽 | [00 限流类](sop/00-陷阱清单.md) | `services/errorRecovery.js` |
 | 本地模型(LM Studio)输出为空/思考吃光tokens | [00 #94](sop/00-陷阱清单.md) + ARCHITECTURE环境配置节 | `llmRequestBuilder.js`(noThinkMarker) / `providerDefs.js`(requestTimeoutMs) |
 | 本地模型请求超时被取消 | [00 #94](sop/00-陷阱清单.md) | `llm.js`超时链：调用方>供应商级>LLM_DEFAULTS |
+| 想知道 token 花在哪/哪一章烧钱 | [03 Token去向面板](sop/03-新功能开发.md) | `services/pipeline/tokenLedgerView.js` / 页面 `/token-ledger` |
+| 提示词/素材被预算截断（规则失效） | [00 #42](sop/00-陷阱清单.md) | `tokenLedgerAlerts.js`（截断告警）+ `contextAssemblyRecorder.js` |
 
 ### 数据/配置问题
 
@@ -92,7 +95,9 @@
 | PG降级静默失败 | [00 PG降级类](sop/00-陷阱清单.md) | `store.js`（_backendStatus） |
 | 字段缺失/默认值不一致 | [reference/项目身份与硬约束.md](reference/项目身份与硬约束.md) | `schemaIntegrityCheck.js` |
 | 配置不同步测试 | [MAINTENANCE §三.2](MAINTENANCE.md) | `scripts/audit-config-test-sync.js` |
+| 提交长正文被静默截断（提取/导入类接口） | [00 #115](sop/00-陷阱清单.md) + [03 一键提取](sop/03-新功能开发.md) | `middleware/inputSanitizer.js`（LONG_TEXT_ROUTES） |
 | 题材检测错误 | [reference/题材配置系统.md](reference/题材配置系统.md) | `services/genreDetectorHelpers.js` |
+| 功能报"需要专业版会员"但账号有权限 | [00 #116](sop/00-陷阱清单.md) | `GET /api/license/status`（看 `error: Machine mismatch` / `machineIdSource`） |
 
 ### 前端/路由问题
 
@@ -108,7 +113,10 @@
 
 | 文档 | 状态 | 最后核对 | 备注 |
 |------|------|---------|------|
-| INDEX.md（本文件） | 🟢活跃 | 2026-08-27 | 纳入sop/10，新增反向索引 |
+| INDEX.md（本文件） | 🟢活跃 | 2026-09-21 | 新增陷阱#115反向索引 + 藏经阁PG化 |
+| ARCHITECTURE.md | 🟢活跃 | 2026-09-21 | **新增§十五 藏经阁（PG存储 + 一键提取）** |
+| DATABASE_SCHEMA.md | 🟢活跃 | 2026-09-21 | **新增#31 library_techniques 表** |
+| AI-HANDOVER-PRD.md | 🟢活跃 | 2026-09-06 | **新增** 接手AI总需求书（工作宪法+文档分级+多Agent协作+方法论采纳决策） |
 | MAINTENANCE.md | 🟢活跃 | 2026-06-27 | 覆盖率基线阶段十二S5 |
 | sop/00-陷阱清单.md | 🟢活跃 | 2026-06-28 | 累计#44，含约束词失效类#42-44 |
 | sop/01-接手启动.md | 🟢活跃 | 2026-06-27 | session启动协议 |

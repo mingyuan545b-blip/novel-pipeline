@@ -21,13 +21,28 @@ function formatFeedbackText(feedback) {
     ].filter(Boolean).join('\n\n');
 }
 
-async function checkWordCountHardLimit(step, chapterId, project, mode) {
+/**
+ * 末轮宽限比例：缺口 ≤20% 且已无重试轮次时，不再硬拦，交给审核链的系统覆盖判定。
+ * 回归背景（2026-09-21 20章E2E）：ch4 三轮都停在 2198/2500 字（writer 与 reviser 都出现
+ * 长度平台期），硬门槛在 first-review 之前就把整轮掐断 → 已有的"系统覆盖通过"机制
+ * （orchestratorFinalEditorHandler）根本没机会执行 → 整章作废、正文被丢弃。
+ * 语义与 needsSalvageExpansion(0.8) 对齐：轻微不足允许带病走完审核链，严重不足仍然拦截。
+ */
+const LAST_ROUND_GRACE_RATIO = 0.8;
+
+async function checkWordCountHardLimit(step, chapterId, project, mode, roundInfo = null) {
     if (!['first-review', 'fast-review', 'second-review'].includes(step)) return { blocked: false };
     const currentChapterData = await store.getItem('chapters', chapterId);
     const currentWordCount = (currentChapterData?.content || '').replace(/\s/g, '').length;
     const genre = resolveGenreFromProject(project);
     const config = resolveConfig(genre, project);
     const currentRejectMin = config.word.rejectMin;
+
+    // 末轮宽限：没有下一轮可重试时，轻微不足不再硬拦（两侧都按去空白计数，口径一致）
+    if (roundInfo && roundInfo.isLastRound && currentWordCount >= Math.round(currentRejectMin * LAST_ROUND_GRACE_RATIO)) {
+        logger.warn('wordCount', `末轮宽限：${currentWordCount}字 < 最低${currentRejectMin}字（≥${Math.round(LAST_ROUND_GRACE_RATIO * 100)}%），放行至审核链由系统覆盖判定`);
+        return { blocked: false, lastRoundGrace: true };
+    }
     const currentMaxWords = config.word.maxChapter;
 
     if (currentWordCount < currentRejectMin) {
@@ -83,4 +98,4 @@ async function checkWordCountHardLimit(step, chapterId, project, mode) {
     return { blocked: false };
 }
 
-module.exports = { formatFeedbackText, checkWordCountHardLimit };
+module.exports = { formatFeedbackText, checkWordCountHardLimit, LAST_ROUND_GRACE_RATIO };

@@ -130,8 +130,18 @@ describe('P0回归测试 - 素材类型三处同步', () => {
 });
 
 describe('P0回归测试 - 素材层级校验', () => {
-    test('character缺少parentFaction被拒绝', async () => {
-        const result = await validateHierarchy({ type: 'character', parentFaction: undefined });
+    test('长线角色（配角）缺少parentFaction被拒绝', async () => {
+        const result = await validateHierarchy({ type: 'character', roleLevel: 'supporting', parentFaction: undefined });
+        expect(result.valid).toBe(false);
+    });
+
+    test('一次性路人（npc且无伏笔）免归属，不再被拒（2026-09-21 规则调整）', async () => {
+        const result = await validateHierarchy({ type: 'character', roleLevel: 'npc', currentContent: '码头杂役，搬货', parentFaction: undefined });
+        expect(result.valid).toBe(true);
+    });
+
+    test('npc但正文有伏笔线索 → 仍需归属', async () => {
+        const result = await validateHierarchy({ type: 'character', roleLevel: 'npc', currentContent: '此人身上埋了伏笔，后续将揭晓', parentFaction: undefined });
         expect(result.valid).toBe(false);
     });
 

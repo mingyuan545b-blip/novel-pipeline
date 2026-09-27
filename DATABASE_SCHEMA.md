@@ -1,8 +1,8 @@
 # Novel Pipeline 数据库结构说明
 
 > **维护规则**：每次修改表结构（增删列、改类型、改索引）时，必须同步更新本文档。
-> **最后更新**：2026-05-25
-> **Schema源文件**：`server/db/pgSchema.js`（业务表20张）、`server/db/knowledgeSchema.js`（知识库表9张）
+> **最后更新**：2026-09-21
+> **Schema源文件**：`server/db/pgSchema.js`（业务表20张 + 实体扩展表）、`server/db/knowledgeSchema.js`（知识库表9张）、`server/db/pgSchemaLibrary.js`（藏经阁表1张）
 > **Extract函数源文件**：`server/db/database-pg.js`
 
 ---
@@ -33,6 +33,7 @@
 | character-relations | character_relations |
 | pet-entities | pet_entities |
 | servant-entities | servant_entities |
+| library-techniques | library_techniques |
 
 未在 `DEDICATED_TABLES` 中的类型自动存入 `kv_store` 通用表。
 
@@ -920,6 +921,35 @@ timeline (per project per chapter)
 **设计说明**：TimelineService 管理此表。materialUpdateProcessor 每章自动提取时间事件写入。路由别名 `timeline-events` → `timeline`。
 
 **注意**：此表与旧版 `timelines` 表（表14）不同。旧版 timelines 是简单事件记录，新版 timeline 支持因果链、参与者、地点等结构化数据。
+
+---
+
+### 31. library_techniques — 藏经阁写作技法库（2026-09-21 由JSON迁移）
+
+藏经阁原为 `server/data/library/` 下三份JSON（index.json + leaf/*.json + metadata/*.json），
+存在三处不一致风险（index 缺 subcategory、meta 与 leaf 分离）。现收敛为单表：
+**一条记录 = 一个技法全文**（索引列用于SQL过滤 + `data` 列存完整JSON）。
+
+| 列 | 类型 | 说明 |
+|----|------|------|
+| id | TEXT PK | 技法ID：`部门_子类_序号`（如 `02_情节引擎部_02_悬念编码_05`） |
+| display_name | TEXT | 技法名（必须跨作品通用，禁止作品专有名词） |
+| department / subcategory / category_path | TEXT | 归属（7部门 × 子类），decision于注入调度 |
+| applicable_modes | TEXT(JSON) | 适用模式 novel/shuangwen/tomato-short |
+| context_slot / context_priority | TEXT/INT | L0(100) intent-planner、L2(80) writer、L3(70) polisher、L4(20) material-manager |
+| injection_point | TEXT | intent-planner / writer / polisher / material-manager |
+| worldview_depth | TEXT | macro / meso / micro |
+| word_count_impact | TEXT | 对字数的影响区间 |
+| retrieval_tags | TEXT(JSON) | BM25检索标签 |
+| source_novel / source_type | TEXT | 来源作品 / curated(人工) 或 extracted(一键提取) |
+| success_rate / attempts / auto_disabled | INT/INT/BOOL | 反馈闭环统计（<20%且≥5次自动禁用） |
+| version | TEXT | 技法版本 |
+| data | TEXT(JSON) | 完整对象（implementation_rules/anti_patterns/evidence/trigger_condition 等） |
+
+索引：department、department+subcategory、injection_point、worldview_depth、source_novel、auto_disabled
+
+写入handler：`server/db/store-pg-writer-library.js`（陷阱#31：必须有专用handler，否则写kv_store读专表）
+迁移脚本：`node scripts/migrateLibraryToPg.js`（幂等，可重复执行）
 
 ---
 

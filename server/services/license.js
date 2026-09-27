@@ -41,14 +41,9 @@ function saveLicense(license) {
     fs.writeFileSync(LICENSE_FILE, JSON.stringify(license, null, 2), 'utf-8');
 }
 
-function getMachineId() {
-    const os = require('os');
-    const hostname = os.hostname();
-    const cpus = os.cpus();
-    const cpuInfo = cpus && cpus[0] ? cpus[0].model : 'unknown';
-    const totalMem = os.totalmem();
-    return crypto.createHash('sha256').update(`${hostname}-${cpuInfo}-${totalMem}`).digest('hex').substring(0, 32);
-}
+// 机器指纹已抽到 machineFingerprint.js：
+// 原实现把 os.totalmem() 纳入哈希，内存变化即导致许可证失效（历史缺陷）。
+const { getMachineId, getMachineIdSource } = require('./machineFingerprint');
 
 function verifyLicenseKey(key) {
     if (!key || typeof key !== 'string') return { valid: false, reason: 'Key is empty' };
@@ -87,7 +82,10 @@ function deactivateLicense() {
 function checkMembership() {
     const license = getLicense();
     if (!license) return { level: 'free', ...MEMBERSHIP_LEVELS.free, licensed: false };
-    if (license.machineId && license.machineId !== getMachineId()) return { level: 'free', ...MEMBERSHIP_LEVELS.free, licensed: false, error: 'Machine mismatch' };
+    if (license.machineId && license.machineId !== getMachineId()) {
+        // 附带来源信息便于诊断（不泄露原始标识）
+        return { level: 'free', ...MEMBERSHIP_LEVELS.free, licensed: false, error: 'Machine mismatch', machineIdSource: getMachineIdSource() };
+    }
     if (license.expiresAt && new Date(license.expiresAt) < new Date()) return { level: 'free', ...MEMBERSHIP_LEVELS.free, licensed: false, error: 'License expired' };
     const level = MEMBERSHIP_LEVELS[license.level] || MEMBERSHIP_LEVELS.free;
     return { level: license.level, ...level, licensed: true, trial: license.trial, expiresAt: license.expiresAt };

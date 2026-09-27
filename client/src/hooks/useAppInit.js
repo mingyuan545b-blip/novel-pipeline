@@ -58,6 +58,11 @@ export default function useAppInit() {
                 const found = projects.find(p => p.id === savedId);
                 if (found) useAppStore.getState().setCurrentProject(found);
             }
+            // 深链接友好：新会话直接打开 /chapters 等页面时，若无记忆项目则默认选中第一个，
+            // 与仪表盘 loadProjects 的自动选中规则保持一致，避免"请先在仪表盘选择项目"空状态
+            if (!useAppStore.getState().currentProject && projects.length > 0) {
+                useAppStore.getState().setCurrentProject(projects[0]);
+            }
         }
     }, [projects]);
 

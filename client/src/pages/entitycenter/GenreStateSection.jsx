@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import { projectsApi } from '../../services/api';
 
 const GENRE_STATE_KEY_LABELS = {
     relationshipProgress: '关系进度', jobTitle: '职业', company: '公司',
@@ -25,13 +23,11 @@ function StateTag({ label, value }) {
 }
 
 export default function GenreStateSection({ adapted }) {
-    const [_genreSchema, _setGenreSchema] = useState(null);
-
-    useEffect(() => {
-        if (!adapted?.genreId) return;
-        projectsApi.getGenreConstraints(adapted.genreId).catch(() => null);
-    }, [adapted?.genreId]);
-
+    // 已移除一个无效请求（2026-09-26）：
+    // 原代码用 adapted.genreId（题材 id，如 high-martial-comedy）去调
+    // GET /api/projects/:id/genre-constraints（该接口要的是**项目 id**），必然 404；
+    // 且返回值只写进从未被读取的 _genreSchema。属于既浪费请求又污染控制台的死代码。
+    // 题材约束另由 GenreConstraintsPanel 用真正的 projectId 获取。
     const genreState = adapted?.genreState || {};
     const genreId = adapted?.genreId || '';
     const hasState = Object.entries(genreState).some(([, v]) =>

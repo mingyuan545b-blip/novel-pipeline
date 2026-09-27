@@ -2,7 +2,7 @@
  * 数据完整性验证 - 跨模块数据一致性检查
  * 用法: node scripts/data-integrity-test.js [PROJECT_ID]
  */
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const store = require('../store');
 
 const RESULTS = [];

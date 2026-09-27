@@ -1,7 +1,7 @@
 /**
  * 查询目标项目的完整settings和世界观框架
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const store = require('../server/store');
 
 const TARGET_PROJECT_ID = 'fee2bcd3-d73a-4ce9-8899-12b2e1350724';

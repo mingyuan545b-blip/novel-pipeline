@@ -93,7 +93,9 @@ module.exports = {
             id: { type: 'text', nullable: false, pk: true },
             chapterId: { type: 'text', nullable: false, indexed: true, extractorDefault: '' },
             projectId: { type: 'text', nullable: false, indexed: true, extractorDefault: '' },
-            reviewType: { type: 'text', nullable: false, indexed: true, extractorDefault: 'first-review' },
+            // extractorSource: 业务对象的字段名是 type（'first-review'/'second-review'/'final-editor'/…），
+        // 而列名是 reviewType。缺了这个映射会永远落回 extractorDefault，导致该列恒为 'first-review'
+        reviewType: { type: 'text', nullable: false, indexed: true, extractorSource: 'type', extractorDefault: 'first-review' },
             passed: { type: 'boolean', nullable: false, extractorDefault: false, extractorTransform: 'bool' },
             data: { type: 'text', nullable: false, noExtract: true },
             createdAt: { type: 'timestamptz', nullable: false, noExtract: true },

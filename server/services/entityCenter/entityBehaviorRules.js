@@ -104,8 +104,14 @@ async function mergeExistingEntity(center, existing, defaults) {
     for (const field of mergeableFields) { if (defaults[field] && defaults[field] !== existing[field]) updates[field] = defaults[field]; }
     if (defaults.genreState && typeof defaults.genreState === 'object') updates.genreState = { ...existing.genreState, ...defaults.genreState };
     if (defaults.profile && typeof defaults.profile === 'object') updates.profile = { ...existing.profile, ...defaults.profile };
+    // 角色等级：允许升级，但"升级为主角"必须过主角上限（否则大纲/素材阶段会把多个角色
+    // 都提成 protagonist，绕过 getOrCreateEntity 新建路径里的 _enforceProtagonistLimit）
     const roleLevelPriority = { protagonist: 3, supporting: 2, npc: 1 };
-    if ((roleLevelPriority[defaults.roleLevel] || 0) > (roleLevelPriority[existing.roleLevel] || 0)) updates.roleLevel = defaults.roleLevel;
+    if ((roleLevelPriority[defaults.roleLevel] || 0) > (roleLevelPriority[existing.roleLevel] || 0)) {
+        const { enforceProtagonistLimit } = require('./entityCRUD');
+        const guarded = await enforceProtagonistLimit(existing.projectId, { ...defaults }, { excludeEntityId: existing.id });
+        updates.roleLevel = guarded.roleLevel;
+    }
     const chapterSource = defaults.sourceChapter || defaults.firstAppearChapter || defaults.lastAppearChapter;
     if (chapterSource) updates.lastAppearChapter = Math.max(existing.lastAppearChapter || 0, chapterSource);
     if (Object.keys(updates).length > 0) {

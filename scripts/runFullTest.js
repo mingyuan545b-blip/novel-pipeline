@@ -5,7 +5,7 @@
  * 3. 逐章执行流水线
  * 4. 验证各模块数据
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
 const PROJECT_ID = '1397512a-9f09-41fd-ac1e-7d68dd5b722f';

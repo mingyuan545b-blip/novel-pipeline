@@ -18,6 +18,7 @@ export const NOVEL_NAV = [
     { path: '/library', icon: IconLibrary, label: '藏经阁' },
     { path: '/knowledge', icon: IconKnowledge, label: '知识库' },
     { path: '/context-assembly', icon: IconMap, label: '上下文装配图' },
+    { path: '/token-ledger', icon: IconMetrics, label: 'Token 去向' },
     { path: '/style-templates', icon: IconPalette, label: '风格模板' },
     { path: '/chapters', icon: IconChapters, label: '章节管理' },
     { path: '/publish', icon: IconPublish, label: '发布中心' }

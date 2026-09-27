@@ -103,6 +103,12 @@ export const libraryApi = {
     validatePlatform: (content, platform) => api.post('/library/validate/platform', { content, platform }),
     getFeedback: (projectId) => api.get(`/library/technique-feedback/${projectId}`),
     deleteFeedback: (projectId) => api.delete(`/library/technique-feedback/${projectId}`),
+    // 一键提取（异步长任务：提交后轮询状态）
+    getExtractDimensions: () => api.get('/library/extract-dimensions'),
+    extractTechniques: (payload) => api.post('/library/extract', payload),
+    getExtractStatus: (taskId) => api.get(`/library/extract/${taskId}`),
+    createTechnique: (data) => api.post('/library/techniques', data),
+    deleteTechnique: (id) => api.delete(`/library/technique/${id}`),
 };
 
 const EC = '/entity-center';

@@ -12,7 +12,10 @@ router.post('/sync-from-materials/:projectId', async (req, res) => {
         const entityCenter = require('../services/entityCenter');
         const materials = await store.queryItems('materials', { projectId });
         const existingEntities = await store.queryItems('entity-registry', { projectId });
-        const existingIds = new Set(existingEntities.map(e => e.id));
+        // 原实现用 existingIds.has(mat.id) 判重，但 registry 的 id 是 character-… / reg-…，
+        // 素材 id 是 uuid，两者从不相交 → 判重永远为 false，每次都全量重跑、skipped 统计失真。
+        // 改为按 实体类型+名称 判重（与 registerEntity 的去重口径一致）。
+        const existingKeys = new Set(existingEntities.map(e => `${e.entityType}|${e.name}`));
         const project = await store.getItem('projects', projectId);
         const protagonistName = project?.styleProfile?.protagonistName || '';
         let synced = 0;
@@ -21,7 +24,7 @@ router.post('/sync-from-materials/:projectId', async (req, res) => {
         for (const mat of materials) {
             if (mat.archived) { skipped++; continue; }
             if (mat.type !== 'character') { continue; }
-            if (existingIds.has(mat.id)) { skipped++; continue; }
+            if (existingKeys.has(`character|${resolveMaterialName(mat)}`)) { skipped++; continue; }
 
             let roleLevel = mat.roleLevel || 'npc';
             const isProtagonist = (protagonistName && mat.name === protagonistName)

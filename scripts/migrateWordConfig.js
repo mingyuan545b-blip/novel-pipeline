@@ -15,7 +15,7 @@
  * 验证：node scripts/migrateWordConfig.js --verify
  */
 
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');

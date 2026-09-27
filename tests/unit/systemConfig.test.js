@@ -1,6 +1,6 @@
 const { resolveConfig } = require('../../server/config/index');
 const { getDefaultsForGenre, NOVEL_DEFAULTS } = require('../../server/config/genreDefaults');
-const { getAgentConfig, resolveModelBudget, resolveModelCategory, AGENT_DEFAULTS, CONTEXT_BUDGET_MODELS, STORE_SIZE_LIMITS, PIPELINE } = require('../../server/config/systemConfig');
+const { getAgentConfig, resolveModelBudget, resolveModelCategory, AGENT_DEFAULTS, CONTEXT_BUDGET_MODELS, STORE_SIZE_LIMITS, PIPELINE, LIBRARY_EXTRACT } = require('../../server/config/systemConfig');
 
 describe('SystemConfig - Genre Defaults', () => {
     test('novel defaults have correct values', () => {
@@ -116,5 +116,31 @@ describe('SystemConfig - Pipeline Constants', () => {
 
     test('max chapter retries is reasonable', () => {
         expect(PIPELINE.MAX_CHAPTER_RETRIES).toBeGreaterThanOrEqual(3);
+    });
+});
+
+describe('SystemConfig - Library Extract（藏经阁一键提取）', () => {
+    test('提取参数为正数且量级合理', () => {
+        expect(LIBRARY_EXTRACT.CHUNK_CHARS).toBeGreaterThan(0);
+        expect(LIBRARY_EXTRACT.WINDOWS_PER_DIMENSION).toBeGreaterThanOrEqual(2);
+        expect(LIBRARY_EXTRACT.MAX_DIMENSIONS).toBeGreaterThanOrEqual(6);
+        expect(LIBRARY_EXTRACT.TECHNIQUES_PER_DIM).toBeGreaterThan(0);
+    });
+
+    test('长文本上限必须高于 inputSanitizer 默认10万（否则正文被静默截断，陷阱#115）', () => {
+        const { MAX_STRING_LENGTH } = require('../../server/middleware/inputSanitizer');
+        expect(LIBRARY_EXTRACT.MAX_TEXT_CHARS).toBeGreaterThan(MAX_STRING_LENGTH);
+    });
+
+    test('长文本白名单只放行提取接口的text字段', () => {
+        const { resolveMaxLength } = require('../../server/middleware/inputSanitizer');
+        expect(resolveMaxLength('/api/library/extract', 'text')).toBe(LIBRARY_EXTRACT.MAX_TEXT_CHARS);
+        expect(resolveMaxLength('/api/library/extract', 'novelName')).toBeLessThan(LIBRARY_EXTRACT.MAX_TEXT_CHARS);
+        expect(resolveMaxLength('/api/chapters', 'content')).toBeLessThan(LIBRARY_EXTRACT.MAX_TEXT_CHARS);
+    });
+
+    test('单次提取超时不超过异步任务看门狗(30分钟)', () => {
+        const { TASK_TIMEOUT_MS } = require('../../server/routes/pipeline/asyncTaskManager');
+        expect(LIBRARY_EXTRACT.REQUEST_TIMEOUT_MS).toBeLessThanOrEqual(TASK_TIMEOUT_MS);
     });
 });

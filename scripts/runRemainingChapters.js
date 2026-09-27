@@ -1,7 +1,7 @@
 /**
  * 执行第2、3章流水线 + 验证所有模块
  */
-require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env'), override: true });
 const http = require('http');
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
 const PROJECT_ID = '1397512a-9f09-41fd-ac1e-7d68dd5b722f';

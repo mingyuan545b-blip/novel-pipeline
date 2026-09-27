@@ -18,7 +18,7 @@
 'use strict';
 
 // 加载.env环境变量（独立脚本未走server启动流程）
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 const fs = require('fs');
 const path = require('path');

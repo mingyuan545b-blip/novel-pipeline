@@ -3,7 +3,7 @@
  * 导出完整TXT小说文件
  */
 
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 process.env.USE_PG = 'false';
 process.env.USE_SQLITE = 'false';

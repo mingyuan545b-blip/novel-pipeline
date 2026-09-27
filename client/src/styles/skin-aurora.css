@@ -202,6 +202,9 @@
     background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(178,77,255,0.08));
     border: 1px solid rgba(0,229,255,0.25);
     box-shadow: 0 0 12px rgba(0,229,255,0.08);
+    /* 修复：基类 color:#000 在暗色半透明底上不可读（启动流水线/激活态筛选按钮发灰） */
+    color: var(--neon-blue);
+    text-shadow: 0 0 8px rgba(0,229,255,0.5);
 }
 
 [data-theme="aurora"] .cyber-btn-primary:hover {

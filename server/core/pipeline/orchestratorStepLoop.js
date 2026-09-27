@@ -3,11 +3,12 @@ const { checkWordCountHardLimit } = require('../../services/pipeline/pipelineHel
 const { AGENT_ROLE_NAMES } = require('../../services/fileOutput');
 const { checkStopped, clearDownstreamOutputs, persistPipelineLog } = require('./orchestratorHelpers');
 const { executeStep, handleFinalEditorResult, handleReviewResult } = require('./orchestratorStepHandlers');
-const { handleStepError, buildRetryContext } = require('./orchestratorRoundHelpers');
+const { handleStepError, buildRetryContext, recordBlockedRound } = require('./orchestratorRoundHelpers');
+const { upsertFeedbackPart, handleWriterGateFailure } = require('./roundOutcomeHelpers');
 const { getChapterIntentPlanner } = require('../../services/chapterIntent');
 const { getHookBudgetForProject } = require('../../services/hookBudget');
 const { STATUS_VALUES } = require('../../services/chapterStatus');
-const { countWords, needsSalvageExpansion } = require('../../services/pipeline/steps/expansionInstructionBuilder');
+const { countWords, needsSalvageExpansion, needsShortfallSalvage } = require('../../services/pipeline/steps/expansionInstructionBuilder');
 const store = require('../../store');
 
 /**
@@ -38,9 +39,11 @@ async function prepareStepContext(params, stepIn, round, currentFeedback, curren
         if (currentWordCount >= config.word.rejectMin) {
             logger.info('pipeline', `Word count OK (${currentWordCount}), using reviser`);
             step = 'reviser';
-        } else if (needsSalvageExpansion(currentWordCount, config.word) && /字数/.test(currentFeedback || '')) {
-            // 抢救区（≥80%下限的字数类退回）：writer整章重生成有长度先验（实测3轮同字数死循环），
-            // 改走reviser在原稿上执行结构化扩写指令（expansionInstructionBuilder统一构建）
+        } else if ((needsSalvageExpansion(currentWordCount, config.word) || needsShortfallSalvage(currentWordCount, config.word)) && /字数/.test(currentFeedback || '')) {
+            // 抢救区：writer整章重生成有长度先验（实测3轮同字数死循环，如1615/1615/1607），
+            // 改走reviser在原稿上执行结构化扩写指令（expansionInstructionBuilder统一构建）。
+            // 2026-09-21：原条件只覆盖 ≥80% 下限，缺口更大时无恢复路径 → 整章作废（20章E2E ch3/ch4），
+            // 现放宽到 ≥30%（有足够成稿可扩写）即可走扩写，避免"重跑 writer 必然复现同样字数"。
             logger.info('pipeline', `Word count salvage (${currentWordCount}/${config.word.targetMin}), using reviser for expansion`);
             step = 'reviser';
         }
@@ -61,15 +64,6 @@ async function prepareStepContext(params, stepIn, round, currentFeedback, curren
     if (step === 'material-manager' && currentMaterialGuidance) context.materialGuidance = currentMaterialGuidance;
 
     return { step, context };
-}
-
-/**
- * 更新反馈列表：同标题已存在则覆盖，否则追加。
- */
-function upsertFeedbackPart(allFeedbackParts, header, feedback) {
-    const idx = allFeedbackParts.findIndex(p => p.startsWith(header));
-    if (idx >= 0) allFeedbackParts[idx] = header + '\n' + feedback;
-    else allFeedbackParts.push(header + '\n' + feedback);
 }
 
 /**
@@ -118,7 +112,9 @@ async function handleReviewOutcome(params, step, stepResult, round) {
  * Returns { done, result } where done=true means the pipeline should return.
  */
 async function executeStepLoop(params) {
-    const { projectId, chapterId, steps, round, project, mode, pipelineLog, onStep, runStepFn, abortController, allFeedbackParts, lastFeedback, materialGuidance, startRound } = params;
+    const { projectId, chapterId, steps, round, chapter, config, project, mode, pipelineLog, onStep, runStepFn, abortController, allFeedbackParts, lastFeedback, materialGuidance, startRound, effectiveMaxRounds } = params;
+    // 本次运行是否已无重试轮次（供字数硬门槛做末轮宽限判定）
+    const isLastRound = Boolean(startRound && effectiveMaxRounds) && round >= startRound + effectiveMaxRounds - 1;
 
     let currentFeedback = lastFeedback;
     let currentMaterialGuidance = materialGuidance;
@@ -134,9 +130,10 @@ async function executeStepLoop(params) {
             continue;
         }
 
-        const wcCheck = await checkWordCountHardLimit(step, chapterId, project, mode);
+        const wcCheck = await checkWordCountHardLimit(step, chapterId, project, mode, { round, startRound, isLastRound });
         if (wcCheck.blocked) {
             pipelineLog.push(wcCheck.stepResult);
+            await recordBlockedRound(projectId, chapterId, step, round, wcCheck.stepResult);
             if (onStep) onStep({ step, round, passed: false, roleName: AGENT_ROLE_NAMES[step] || step, feedback: wcCheck.stepResult.feedback });
             await clearDownstreamOutputs(chapterId, step);
             return { done: false, roundFailed: true, currentFeedback, currentMaterialGuidance };
@@ -155,8 +152,10 @@ async function executeStepLoop(params) {
             if (step === 'writer' && !stepResult.passed) {
                 currentFeedback = stepResult.feedback?.summary || '执笔人输出不达标';
                 upsertFeedbackPart(allFeedbackParts, '【执笔人反馈】', currentFeedback);
-                await clearDownstreamOutputs(chapterId, 'writer');
-                return { done: false, roundFailed: true, currentFeedback, currentMaterialGuidance };
+                // 执笔失败同样要留痕（实测第1轮死在执笔时执行日志整轮消失）；末轮轻微不足则宽限放行
+                await recordBlockedRound(projectId, chapterId, step, round, stepResult, 'writer-gate');
+                const wf = await handleWriterGateFailure(projectId, chapterId, config, isLastRound);
+                if (wf.roundFailed) return { done: false, roundFailed: true, currentFeedback, currentMaterialGuidance };
             }
 
             if (step === 'final-editor') {

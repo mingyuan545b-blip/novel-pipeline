@@ -1,4 +1,5 @@
-.chapter-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+.chapter-grid { display: grid; grid-template-columns: minmax(400px, 460px) 1fr; gap: 20px; align-items: start; }
+@media (max-width: 1100px) { .chapter-grid { grid-template-columns: 1fr; } }
 .chapter-list-scroll { display: flex; flex-direction: column; gap: 6px; max-height: calc(100vh - 280px); overflow: auto; }
 .filter-btn { font-size: 11px; flex: 1; }
 .collapse-btn { font-size: 10px; width: 100%; margin-bottom: 6px; opacity: 0.7; }

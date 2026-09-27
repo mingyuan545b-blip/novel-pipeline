@@ -27,8 +27,8 @@ describe('materialValidator.validateHierarchy', () => {
 
     test('detects missing required parent fields', async () => {
         const result = await mv.validateHierarchy({
-            type: 'character'
-            // missing parentFaction if required
+            type: 'character',
+            roleLevel: 'protagonist' // 长线角色：必须有 parentFaction（2026-09-21 按等级判定）
         });
         // Result depends on HIERARCHY_RULES definition
         expect(result).toBeDefined();

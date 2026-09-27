@@ -10,7 +10,7 @@ const { INTERNAL_ERROR } = ERROR_CODES;
 router.get('/material-lifecycle/:projectId/analysis', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const analysis = await materialLifecycleService.analyze(projectId);
+        const analysis = await materialLifecycleService.getMaterialActivityAnalysis(projectId, Number(req.query.currentChapter) || undefined);
         res.json({ analysis });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -19,7 +19,7 @@ router.post('/material-lifecycle/:projectId/archive', async (req, res) => {
     try {
         const { projectId } = req.params;
         const { materialIds, reason } = req.body || {};
-        const result = await materialLifecycleService.archive(projectId, materialIds, reason);
+        const result = await materialLifecycleService.archiveStaleMaterials(projectId, Number(req.body.currentChapter) || undefined);
         res.json({ success: true, result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -27,7 +27,7 @@ router.post('/material-lifecycle/:projectId/archive', async (req, res) => {
 router.get('/material-lifecycle/:projectId/duplicates', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const duplicates = await materialLifecycleService.findDuplicates(projectId);
+        const duplicates = await materialLifecycleService.detectDuplicateMaterials(projectId);
         res.json({ duplicates });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -35,7 +35,7 @@ router.get('/material-lifecycle/:projectId/duplicates', async (req, res) => {
 router.get('/material-lifecycle/:projectId/budget', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const budget = await materialLifecycleService.getBudget(projectId);
+        const budget = await materialLifecycleService.calculateTokenBudget(projectId, Number(req.query.chapterNumber) || Number(req.query.currentChapter) || undefined);
         res.json({ budget });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -43,7 +43,7 @@ router.get('/material-lifecycle/:projectId/budget', async (req, res) => {
 router.get('/material-lifecycle/:projectId/health', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const health = await materialLifecycleService.getHealth(projectId);
+        const health = await materialLifecycleService.getHealthReport(projectId, Number(req.query.currentChapter) || undefined);
         res.json({ health });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });

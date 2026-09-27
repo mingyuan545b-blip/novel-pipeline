@@ -11,7 +11,7 @@
  * - [critical] 为母报仇：追查母亲死因，对抗幕后黑手（主线，贯穿全书）
  * - [high] 拯救世界：阻止小世界崩溃引发的大灾变（主线，中后期展开）
  */
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
 const store = require('../server/store');
 const uuidv4 = () => require('crypto').randomUUID();
 

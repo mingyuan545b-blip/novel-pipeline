@@ -144,6 +144,19 @@ async function getItem(type, id) { return await (await getBackend()).getItem(typ
 const VALIDATED_TYPES = new Set(['materials']);
 const { validateRequired, fillDefaults } = require('./db/fieldValidator');
 
+/**
+ * 审查记录补 runRound（本次运行内的相对轮次）
+ * 单点收敛：reviews 有 14 处写入点，逐一改容易漏；这里统一补。
+ * 只在流水线运行上下文中生效（见 shared/runContext.js），路由/脚本手工写入不受影响。
+ */
+function _enrichReviewRunRound(type, data) {
+    if (type !== 'reviews' || !data || data.runRound !== undefined) return data;
+    const { toRunRound } = require('./shared/runContext');
+    const runRound = toRunRound(data.round);
+    if (runRound === undefined) return data;
+    return { ...data, runRound };
+}
+
 async function setItem(type, id, data) {
     if (VALIDATED_TYPES.has(type) && data) {
         const filled = fillDefaults(type, data);
@@ -151,9 +164,9 @@ async function setItem(type, id, data) {
         if (!validation.valid) {
             logger.warn('store', '[VALIDATE] {type} {id} missing required: {missing}', { type, id, missing: validation.missing.join(', ') });
         }
-        return await (await getBackend()).setItem(type, id, filled);
+        return await (await getBackend()).setItem(type, id, _enrichReviewRunRound(type, filled));
     }
-    return await (await getBackend()).setItem(type, id, data);
+    return await (await getBackend()).setItem(type, id, _enrichReviewRunRound(type, data));
 }
 async function updateItem(type, id, updateFn) { return await (await getBackend()).updateItem(type, id, updateFn); }
 async function deleteItem(type, id) { return await (await getBackend()).deleteItem(type, id); }
