@@ -3,11 +3,29 @@ const { broadcastToProject } = require("../../websocket");
 const { getState, deleteState, persistState, STATE_CLEANUP_DELAY_MS } = require("./stateManager");
 const { initializePipeline, generateInitialOutlines, setRunPipelineStepRef: initSetStepRef } = require("./pipelineInit");
 const { resetCooledChapters, fixStuckChapters, selectNextChapter } = require("./chapterScheduler");
-const { executeChapter, setRunFullPipelineRef, setRunPipelineStepRef: execSetStepRef } = require("./chapterExecutor");
+const { executeChapter, setRunFullPipelineRef, setRunPipelineStepRef: execSetStepRef, getRunPipelineStep } = require("./chapterExecutor");
+const { assertChapterReady, computeWaitMs } = require("../materialGate");
 const { supplementOutlines } = require("./outlineSupplementor");
 const { checkStopConditions } = require("./stopConditions");
 const { LLM_DEFAULTS } = require("../../../config/systemConfig");
 const logger = require("../../../shared/logger");
+const { STUCK_STATUSES, STATUS_VALUES } = require("../../chapterStatus");
+
+/** P1-4a 章节因果门槛处置：先补跑可修复缺口（approved 只差素材），仍缺则告警+广播+切片等待。
+ *  @returns {Promise<boolean>} true=可开工（含带债放行）；false=本轮应 continue 等待 */
+async function enforceChapterGate(projectId, ch, addLog, waitWithStop) {
+    const n = ch.chapterNumber;
+    const gate = await assertChapterReady({ projectId, chapterNumber: n, runPipelineStep: getRunPipelineStep() });
+    if (gate.ready) {
+        if (gate.debt) addLog(`⚠️ 第${n}章带债放行：${gate.debt.reason}（缺口 ${gate.debt.blockedChapters.join('、')} 未修复）`, { gateDebt: true, chapterNumber: n });
+        else if (gate.repaired.length > 0) addLog(`🔧 门槛补跑：${gate.repaired.map(r => `第${r.chapterNumber}章${r.ok ? '已归档' : '仍缺'}`).join('、')}`);
+        return true;
+    }
+    addLog(`🚧 第${n}章暂不开工 — ${gate.report}`, { gateBlocked: true, chapterNumber: n, blockedBy: gate.blockedBy });
+    broadcastToProject(projectId, 'pipeline:material-gate', { chapterNumber: n, blockedBy: gate.blockedBy, report: gate.report, repaired: gate.repaired, at: Date.now() });
+    await waitWithStop(computeWaitMs(gate));
+    return false;
+}
 
 async function runInfinitePipeline(projectId, options = {}) {
     const initResult = await initializePipeline(projectId, options);
@@ -73,6 +91,10 @@ async function runInfinitePipeline(projectId, options = {}) {
             }
 
             const ch = outlinedChapters[0];
+
+            // P1-4a 章节因果门槛：前序章节素材未归档（material-updated）→ 本章不开工（不跳章硬写）
+            if (!(await enforceChapterGate(projectId, ch, addLog, waitWithStop))) continue;
+
             const execResult = await executeChapter(projectId, ch, state, addLog, maxRounds, waitWithStop);
 
             if (execResult.stopped) break;
@@ -136,14 +158,13 @@ async function stopInfinitePipeline(projectId) {
         }
     } catch (persistErr) { logger.warn('infinitePipeline', 'Stop persist failed', { persistErrMessage: persistErr.message }); }
 
-    const { STUCK_STATUSES } = require("../../chapterStatus");
     const RESET_STATUSES = ['failed-skipped', 'timeout-skipped', 'context-error', 'cooldown-waiting', 'pipeline-failed'];
     try {
         const chapters = await store.queryItems('chapters', { projectId });
         for (const ch of chapters) {
             const needsReset = STUCK_STATUSES.includes(ch.status) || RESET_STATUSES.includes(ch.status);
             if (needsReset) {
-                ch.status = 'outlined';
+                ch.status = STATUS_VALUES.OUTLINED;
                 delete ch.skipUntil;
                 ch._pipelineRetries = 0;
                 ch._wordCountRetry = 0;

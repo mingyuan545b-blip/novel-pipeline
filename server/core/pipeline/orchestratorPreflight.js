@@ -5,6 +5,9 @@ const { getRuleStackForProject } = require('../../services/ruleStack');
 const logger = require('../../shared/logger');
 const { STATUS_VALUES } = require('../../services/chapterStatus');
 
+// 与 materialManagerCatchup 默认 maxRetries 对齐：超过即视为"补跑连续失败"（保持缺口 + 告警）
+const MAX_CATCHUP_RETRIES = 3;
+
 async function runPreflightChecks(projectId, chapterId, pipelineLog, onStep, runPipelineStepFn) {
     const chapter = await store.getItem('chapters', chapterId);
     if (!chapter || chapter.chapterNumber <= 1) return;
@@ -21,7 +24,7 @@ async function runPreflightChecks(projectId, chapterId, pipelineLog, onStep, run
                 prevChapter.materialManagerOutput = result?.feedback?.summary || '[补跑完成]';
                 prevChapter.materialManagerFailed = false;
                 delete prevChapter.materialManagerError;
-                prevChapter.status = 'material-updated';
+                prevChapter.status = STATUS_VALUES.MATERIAL_UPDATED;
                 prevChapter.updatedAt = new Date().toISOString();
                 await store.setItem('chapters', prevChapter.id, prevChapter);
                 pipelineLog.push({ step: 'material-manager-catchup', chapterNumber: prevChapter.chapterNumber, status: 'completed', timestamp: new Date().toISOString() });
@@ -29,9 +32,12 @@ async function runPreflightChecks(projectId, chapterId, pipelineLog, onStep, run
             } catch (err) {
                 logger.error('pipeline', `Material manager catchup failed for ch${prevChapter.chapterNumber}`, { error: err.message });
                 prevChapter._matManagerRetries = (prevChapter._matManagerRetries || 0) + 1;
-                if (prevChapter._matManagerRetries >= 3) {
-                    prevChapter.status = 'material-updated';
-                    prevChapter.materialManagerOutput = `[素材管理补跑失败${prevChapter._matManagerRetries}次，跳过]`;
+                // P1-4a：不再伪造 material-updated（缺口会静默消失）。保持缺口 + 告警，
+                // 由 materialGate 持续拦截下一章，超阈值后走显式 materialDebt 放行。
+                prevChapter.materialManagerFailed = true;
+                prevChapter.materialManagerOutput = `[素材管理补跑失败${prevChapter._matManagerRetries}次，未归档]`;
+                if (prevChapter._matManagerRetries >= MAX_CATCHUP_RETRIES) {
+                    logger.error('pipeline', `第${prevChapter.chapterNumber}章素材补跑连续失败，保持缺口（不伪造 material-updated）`, { retries: prevChapter._matManagerRetries });
                 }
                 await store.setItem('chapters', prevChapter.id, prevChapter);
             }

@@ -27,6 +27,15 @@
      → 施工顺序 **P1-4a 章节门槛 materialGate → P1-4b 远景粗纲/就近细纲 → P1-4c 单点装配
      materialStateAssembler（+provenance/gaps）→ P1-4d 密度策略 densityPolicy → P1-4e 缺口告警 UI → P1-5 体检面板**。
      开工第一条命令见该文档 §十一。
+   - **✅ P1-4a 已完成（本会话）**：新增 `server/services/pipeline/materialGate.js`（纯判定 + `assertChapterReady`
+     补跑/落盘 + 显式债务 `materialDebt`）；接入 `infinite/batchExecutor.js` 主循环（未通过则告警+等待，**不跳章硬写**）、
+     `core/pipeline/orchestrator.js` 章节入口、`pipelineStepRunner` writer 步兜底网；
+     `chapterErrorHandler` 新增门槛分支（回 outlined、**不罚本章重试/不进冷却**）；
+     收口 `materialManagerCatchup.js` / `orchestratorPreflight.js` 的**静默伪 material-updated**（改为保持缺口 + ERROR 告警）。
+     集成期顺带把所改文件的 P1-Q1 状态字面量收敛为 `STATUS_VALUES.*`。
+     测试：materialGate 16 + pipelineStepRunnerGate 2 + orchestrator/Preflight 各 +2/+1；**219 套件 / 3636 用例全绿**。
+     真实数据只读演练：7 项目"下一章"全部放行（无误阻断），模拟前章 failed-skipped → 正确拦截并给出等待原因。
+     **下一步 → P1-4b（远景粗纲 `scope:'far'` / 就近细纲 `refreshNearOutline`）。**
    - **注意**：P1-4 **不是推倒重来**——`agentDeclarations`/`contextCommander`/`agentMaterialScheduler`/
      `contextAssemblyRecorder`（装配图）是既有地基，只在其上加"顺序保证 + 缺口暴露 + 密度显式化"。
 
@@ -192,10 +201,8 @@
 ## 四、待办（按优先级）
 
 ### ⚡ 进行中（下个窗口最优先，锚点见worklog）
-- [ ] **P1-4a 章节因果门槛（最高优先）**：按 `docs/design/章节因果门槛与单点素材装配（计划书）.md` §八 开工
-      —— 新增 `server/services/pipeline/materialGate.js`，接入 `infinite/batchExecutor.js` 主循环与
-      `pipelineStepRunner`，收口 `materialManagerCatchup.js:36` / `orchestratorPreflight.js:34` 的静默伪成功；
-      测试 `tests/unit/materialGate.test.js`。**验收**：第5章 failed-skipped 时第6章不再开工。
+- [x] ~~P1-4a 章节因果门槛~~ ✅ 已完成（见 0h 节）→ **下一步 P1-4b**：`outlineGenerator` 加
+      `scope:'far'|'near'`（远景粗纲不含素材细节），新增 `chapterPlanRefresh.refreshNearOutline` 接在门槛之后。
 - [ ] **复验长度锚点效果**：本次新增"大纲四段节拍 + 执笔中途检查点"，需重跑 1~2 章看字数是否稳定 ≥2500
       （命令：`node scripts/run20ChapterE2E.js --resume 5d512269-3b0b-4e33-bb7d-ac7310bbe73d --only 4,15 --force`）
 - [ ] 剩余 7 章低于 2500 字（2,084~2,415）是否回炉重跑（末轮宽限已保住成品，非阻塞）

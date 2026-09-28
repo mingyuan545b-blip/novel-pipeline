@@ -4,7 +4,8 @@
  */
 jest.mock('../../server/store', () => ({
     getItem: jest.fn(),
-    setItem: jest.fn()
+    setItem: jest.fn(),
+    queryItems: jest.fn()
 }));
 
 jest.mock('../../server/shared/logger', () => ({
@@ -111,6 +112,8 @@ const setupDefaultMocks = () => {
     characterStateCache.endSession.mockReturnValue();
     store.getItem.mockResolvedValue({ id: 'ch-1', chapterNumber: 5, content: 'C', status: 'written', outline: 'O' });
     store.setItem.mockResolvedValue();
+    // P1-4a 门槛读取前序章节；默认空库（无前序 → 放行）
+    store.queryItems.mockResolvedValue([]);
     pipelineRegistry.getStepFn.mockReturnValue(jest.fn());
 };
 
@@ -326,5 +329,36 @@ describe('PipelineOrchestrator - run() finally 块', () => {
         await orch.run('p1', 'ch-1', 5, {});
 
         expect(drainDegradations).toHaveBeenCalled();
+    });
+});
+
+describe('PipelineOrchestrator - run() 章节因果门槛（P1-4a）', () => {
+    beforeEach(() => { jest.clearAllMocks(); setupDefaultMocks(); });
+
+    test('前序章节未归档 → 抛出门槛错误且不进入创作循环', async () => {
+        store.queryItems.mockResolvedValue([
+            { id: 'ch-4', chapterNumber: 4, status: 'failed-skipped' }
+        ]);
+
+        const orch = new PipelineOrchestrator({});
+        await expect(orch.run('p1', 'ch-1', 5, {})).rejects.toMatchObject({ code: 'MATERIAL_GATE_BLOCKED' });
+
+        expect(executeStepLoop).not.toHaveBeenCalled();
+    });
+
+    test('前序章节全部 material-updated → 正常进入创作循环', async () => {
+        store.queryItems.mockResolvedValue([
+            { id: 'ch-4', chapterNumber: 4, status: 'material-updated' }
+        ]);
+        executeStepLoop.mockResolvedValue({
+            done: true,
+            result: { success: true, rounds: 1, log: [{ step: 'x' }], message: 'approved' }
+        });
+
+        const orch = new PipelineOrchestrator({});
+        const result = await orch.run('p1', 'ch-1', 5, {});
+
+        expect(result.success).toBe(true);
+        expect(executeStepLoop).toHaveBeenCalled();
     });
 });

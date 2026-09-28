@@ -15,6 +15,7 @@ const { recordReviewFeedback } = require('./techniqueContextHelpers');
 const auditLog = require('../auditLog');
 const contractValidator = require('./contractValidator');
 const { enrichMaterialsForContract } = require('./contractMaterialEnricher');
+const { assertChapterReady, buildGateError } = require('./materialGate');
 
 const REVIEW_STEPS = new Set(['first-review', 'fast-review', 'second-review']);
 // 节点级契约校验覆盖的agent（阶段1+2：9个agent全覆盖）
@@ -29,6 +30,16 @@ async function runPipelineStep(projectId, chapterId, step, round, context = {}) 
     const { chapter, materials, project, agentContext, _legacyConfig, _legacyGenre, maxChapterWords, budget, memoryError } = await buildStepContext(projectId, chapterId, step, round, context);
 
     logger.info('pipeline', `runPipelineStep: step=${step}, chapter=${chapterId}, round=${round}, hasNewStep=${StepRegistry.hasNewStep(step)}`);
+
+    // P1-4a 章节因果门槛（兜底网）：正文创作入口步（writer）前，前序章节素材必须已归档。
+    // 只判不修不写（修复由主循环/orchestrator 负责），避免 catchup 递归与额外写盘。
+    if (step === 'writer' && chapter && chapter.chapterNumber > 1) {
+        const gate = await assertChapterReady({ projectId, chapterNumber: chapter.chapterNumber, repair: false, persist: false });
+        if (!gate.ready) {
+            logger.error('pipeline', `[materialGate] writer 被门槛拦下：${gate.report}`, { blockedBy: gate.blockedBy });
+            throw buildGateError(gate.report);
+        }
+    }
 
     try {
         preflight(step, { materials, chapter, project, config: _legacyConfig, genre: _legacyGenre, memoryError });

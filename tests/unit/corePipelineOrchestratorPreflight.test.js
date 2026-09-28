@@ -73,8 +73,26 @@ describe('orchestratorPreflight.runPreflightChecks', () => {
         });
         const runStepFn = jest.fn().mockRejectedValue(new Error('mm failed'));
         await runPreflightChecks('p1', 'ch-2', [], jest.fn(), runStepFn);
+
         expect(prevCh._matManagerRetries).toBe(1);
         expect(prevCh.status).toBe('approved');
+    });
+
+    test('P1-4a：补跑连续失败达到阈值时不伪造 material-updated（保持缺口 + 标记）', async () => {
+        store.getItem.mockResolvedValue({ id: 'ch-2', chapterNumber: 2, projectId: 'p1' });
+        const prevCh = { id: 'ch-1', chapterNumber: 1, status: 'approved', _matManagerRetries: 2 };
+        store.queryItems.mockImplementation(async (table) => {
+            if (table === 'chapters') return [prevCh];
+            return [];
+        });
+        const runStepFn = jest.fn().mockRejectedValue(new Error('mm failed'));
+        await runPreflightChecks('p1', 'ch-2', [], jest.fn(), runStepFn);
+
+        expect(prevCh._matManagerRetries).toBe(3);
+        expect(prevCh.status).toBe('approved');
+        expect(prevCh.materialManagerFailed).toBe(true);
+        expect(prevCh.status).not.toBe('material-updated');
+        expect(prevCh.materialManagerOutput).toContain('未归档');
     });
 
     test('emptyMaterials：currentContent 空且 initialContent 长时回填', async () => {

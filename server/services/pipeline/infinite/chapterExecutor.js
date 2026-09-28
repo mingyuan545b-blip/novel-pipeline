@@ -178,4 +178,4 @@ async function handleFailure(projectId, ch, result, state, addLog) {
     return { success: false, stopped: false };
 }
 
-module.exports = { executeChapter, setRunFullPipelineRef, setRunPipelineStepRef };
+module.exports = { executeChapter, setRunFullPipelineRef, setRunPipelineStepRef, getRunPipelineStep };

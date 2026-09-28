@@ -5,6 +5,8 @@ const { LLM_DEFAULTS } = require("../../../config/systemConfig");
 const { MAX_CHAPTER_RETRIES, COOLDOWN_STEPS } = require("./chapterScheduler");
 const pipelineRegistry = require("../../pipelineRegistry");
 const logger = require("../../../shared/logger");
+const { STATUS_VALUES } = require("../../chapterStatus");
+const { isGateError } = require("../materialGate");
 
 function getRunPipelineStep() {
     try { return pipelineRegistry.getStepFn(); } catch (e) { return null; }
@@ -23,7 +25,7 @@ async function forceMaterialUpdate(projectId, ch, uc) {
             return;
         }
         const savedStatus = uc.status;
-        uc.status = 'approved';
+        uc.status = STATUS_VALUES.APPROVED;
         await store.setItem('chapters', ch.id, uc);
         const runStep = getRunPipelineStep();
         if (runStep) {
@@ -42,12 +44,26 @@ async function handleException(projectId, ch, err, state, addLog, waitWithStop) 
         addLog(`第${ch.chapterNumber}章因停止信号中断，重置为outlined`);
         const uc = await store.getItem('chapters', ch.id);
         if (uc) {
-            uc.status = 'outlined';
+            uc.status = STATUS_VALUES.OUTLINED;
             delete uc.skipUntil;
             uc.updatedAt = new Date().toISOString();
             await store.setItem('chapters', ch.id, uc);
         }
         return { success: false, stopped: true };
+    }
+
+    // P1-4a 章节因果门槛：前序章节素材未归档 → 本章不开工。
+    // 不记本章重试、不进冷却（缺素材是前章的问题，不该罚本章），回到 outlined 等待缺口消解。
+    if (isGateError(err)) {
+        const gateUc = await store.getItem('chapters', ch.id);
+        if (gateUc) {
+            gateUc.status = STATUS_VALUES.OUTLINED;
+            delete gateUc.skipUntil;
+            gateUc.updatedAt = new Date().toISOString();
+            await store.setItem('chapters', ch.id, gateUc);
+        }
+        addLog(`🚧 第${ch.chapterNumber}章暂不开工 — ${err.message}`, { gateBlocked: true, chapterNumber: ch.chapterNumber, step: 'material-gate' });
+        return { success: false, stopped: false, gateBlocked: true };
     }
 
     const chNum = ch.chapterNumber;
@@ -59,17 +75,17 @@ async function handleException(projectId, ch, err, state, addLog, waitWithStop) 
 
     if (uc) {
         if (isOverloaded) {
-            uc.status = 'outlined';
+            uc.status = STATUS_VALUES.OUTLINED;
             uc.skipUntil = Date.now() + LLM_DEFAULTS.overloadedWaitMs;
         } else if (isTimeout) {
-            uc.status = 'outlined';
+            uc.status = STATUS_VALUES.OUTLINED;
             uc.skipUntil = Date.now() + LLM_DEFAULTS.timeoutWaitMs;
         } else if (isCodeBugErr) {
             logger.error('infinitePipeline', 'Code bug detected, NOT counting as pipeline retry', { errMessage: err.message });
-            uc.status = 'outlined';
+            uc.status = STATUS_VALUES.OUTLINED;
             delete uc.skipUntil;
         } else if (isRetryable) {
-            uc.status = 'outlined';
+            uc.status = STATUS_VALUES.OUTLINED;
             delete uc.skipUntil;
         } else {
             uc._pipelineRetries = (uc._pipelineRetries || 0) + 1;

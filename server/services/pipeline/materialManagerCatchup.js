@@ -19,7 +19,7 @@ async function catchupMaterialManager(projectId, chapters, runPipelineStep, opti
             ch.materialManagerOutput = result?.feedback?.summary || '[补跑完成]';
             ch.materialManagerFailed = false;
             delete ch.materialManagerError;
-            ch.status = 'material-updated';
+            ch.status = STATUS_VALUES.MATERIAL_UPDATED;
             ch.updatedAt = new Date().toISOString();
             await store.setItem('chapters', ch.id, ch);
             if (pipelineLog) {
@@ -32,9 +32,13 @@ async function catchupMaterialManager(projectId, chapters, runPipelineStep, opti
         } catch (matErr) {
             logger.error('materialManagerCatchup', '[PIPELINE] 第{chChapterNumber}章素材管理器补跑失败:', { chChapterNumber: ch.chapterNumber, matErrMessage: matErr.message });
             ch._matManagerRetries = (ch._matManagerRetries || 0) + 1;
+            // P1-4a：不再伪造 material-updated（那会让"素材缺口"静默消失）。
+            // 保持 approved + materialManagerFailed=true → 由 materialGate 持续拦截下一章并告警，
+            // 超过阈值后走**显式债务** materialDebt 放行（可见、可查），而不是假成功。
+            ch.materialManagerFailed = true;
+            ch.materialManagerOutput = `[素材管理补跑失败${ch._matManagerRetries}次，未归档]`;
             if (ch._matManagerRetries >= maxRetries) {
-                ch.status = 'material-updated';
-                ch.materialManagerOutput = `[素材管理补跑失败${ch._matManagerRetries}次，跳过]`;
+                logger.error('materialManagerCatchup', '[PIPELINE] 第{chChapterNumber}章素材补跑连续失败，保持缺口（不伪造 material-updated）', { chChapterNumber: ch.chapterNumber, retries: ch._matManagerRetries });
             }
             await store.setItem('chapters', ch.id, ch);
         }

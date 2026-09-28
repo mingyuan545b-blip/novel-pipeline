@@ -12,6 +12,7 @@ const logger = require('../../shared/logger');
 const { DomainError } = require('../../shared/errors');
 const { checkStopped, getSteps, persistPipelineLog, tagLogMeta } = require('./orchestratorHelpers');
 const { runPreflightChecks, handleChapterIntent, syncHooksAndRules } = require('./orchestratorPreflight');
+const { assertChapterReady, buildGateError } = require('../../services/pipeline/materialGate');
 const { clearRoundOutputs, checkCircuitBreaker } = require('./orchestratorRoundHelpers');
 const { executeStepLoop } = require('./orchestratorStepLoop');
 const { runWithContext } = require('../../shared/runContext');
@@ -64,6 +65,9 @@ class PipelineOrchestrator {
             let chapter = await store.getItem('chapters', chapterId);
             chapterNumber = chapter?.chapterNumber || 0;
             const chapterOutline = chapter?.outline || '';
+
+            // P1-4a 章节因果门槛：前序章节素材未归档 → 本章不开工（不罚本章重试）
+            await enforceChapterGate(projectId, chapterNumber, this._getRunPipelineStep());
 
             characterStateCache.startSession(projectId, chapterNumber);
 
@@ -152,6 +156,23 @@ class PipelineOrchestrator {
             this._activeAbortController = null;
         }
     }
+}
+
+/**
+ * P1-4a 章节因果门槛：前序章节素材未归档（material-updated）→ 本章不开工。
+ * 抛 GATE_ERROR_CODE 让 chapterErrorHandler 识别（不计重试/不进冷却），
+ * 避免把"前章缺素材"记到本章头上；带债放行则 ERROR 告警但继续。
+ */
+async function enforceChapterGate(projectId, chapterNumber, runPipelineStep) {
+    const gate = await assertChapterReady({ projectId, chapterNumber, runPipelineStep });
+    if (!gate.ready) {
+        logger.error('pipeline', `[materialGate] 第${chapterNumber}章被门槛拦下：${gate.report}`, { blockedBy: gate.blockedBy });
+        throw buildGateError(gate.report);
+    }
+    if (gate.debt) {
+        logger.error('pipeline', `[materialGate] 第${chapterNumber}章带债放行：${gate.debt.reason}`, { materialDebt: gate.debt });
+    }
+    return gate;
 }
 
 /** 把章节置回 outlined（停止/失败路径共用）：清 skipUntil 并落盘 */
