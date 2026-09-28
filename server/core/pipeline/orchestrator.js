@@ -13,6 +13,7 @@ const { DomainError } = require('../../shared/errors');
 const { checkStopped, getSteps, persistPipelineLog, tagLogMeta } = require('./orchestratorHelpers');
 const { runPreflightChecks, handleChapterIntent, syncHooksAndRules } = require('./orchestratorPreflight');
 const { assertChapterReady, buildGateError } = require('../../services/pipeline/materialGate');
+const { refreshNearOutline } = require('../../services/pipeline/chapterPlanRefresh');
 const { clearRoundOutputs, checkCircuitBreaker } = require('./orchestratorRoundHelpers');
 const { executeStepLoop } = require('./orchestratorStepLoop');
 const { runWithContext } = require('../../shared/runContext');
@@ -64,10 +65,16 @@ class PipelineOrchestrator {
 
             let chapter = await store.getItem('chapters', chapterId);
             chapterNumber = chapter?.chapterNumber || 0;
-            const chapterOutline = chapter?.outline || '';
 
             // P1-4a 章节因果门槛：前序章节素材未归档 → 本章不开工（不罚本章重试）
             await enforceChapterGate(projectId, chapterNumber, this._getRunPipelineStep());
+
+            // P1-4b 就近细纲：开写前用"此刻已归档素材"把远景粗纲细化为本章计划（幂等，失败不阻断）
+            await refreshNearOutline(projectId, chapterNumber, { chapterId, onStep });
+
+            // 细纲刷新后重读：下游（章节意图/执笔）必须用细化后的正文计划，不能用又将过期的粗纲
+            chapter = (await store.getItem('chapters', chapterId)) || chapter;
+            const chapterOutline = chapter?.outline || '';
 
             characterStateCache.startSession(projectId, chapterNumber);
 

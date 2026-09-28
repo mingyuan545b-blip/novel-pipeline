@@ -83,15 +83,51 @@ function buildMaterialUserPrompt(project, userPrompt, genre) {
     return `小说名称：${project.name}\n类型：${project.genre}\n描述：${project.description}\n\n用户需求：${userPrompt}\n\n【重要】character类型素材必须设置以下字段：\n1. isMainCharacter: 甜宠/言情/双强题材男女主都设为true（双主角），其他题材只有1个角色设为true\n2. roleLevel: 主角设为"protagonist"，重要配角设为"supporting"，其他设为"npc"。甜宠/言情题材男女主都设为"protagonist"\n3. 不同roleLevel的角色必须按照上方分级要求填写不同详细程度的内容！主角${vars.PROTAGONIST_WORD_COUNT}字+，配角${vars.SUPPORTING_WORD_COUNT}字+，NPC${vars.NPC_WORD_COUNT}字+`;
 }
 
-function buildChapterOutlineSystemPrompt(genreInjection, styleInjection, rhythmGuidance, advisoryStr, targetCount) {
+// P1-4b 远景粗纲约束：规划一次覆盖 N 章时，后续章节的素材还没长出来，
+// 写死细节必然与未来素材冲突（用户反馈的"前面设定都不同"根因之一）。
+const FAR_OUTLINE_HINT = `【远景粗纲】本批是**远景规划**：只定主线走向、核心冲突、章末钩子，以及出场实体的**名字**；
+不要写具体设定细节（数值/机制/专属道具外观/功法招式/独有名词等）——细节留待开写前按最新素材细化为"就近细纲"，以免与后续素材冲突。`;
+
+function buildChapterOutlineSystemPrompt(genreInjection, styleInjection, rhythmGuidance, advisoryStr, targetCount, scope = 'far') {
+    const scopeHint = scope === 'detail' ? '' : FAR_OUTLINE_HINT;
     return `你是一个小说章节大纲生成器。根据已有的素材库和已有章节，为小说生成章节大纲。
 ${genreInjection}
 ${styleInjection}
 ${rhythmGuidance}
 ${advisoryStr}
+${scopeHint}
 请生成第1章到第${targetCount}章的大纲。每章大纲300-500字，必须按四段节拍写：【场景1·铺垫】【场景2·核心冲突】【场景3·推进/转折】【场景4·章末钩子】；每段至少给出：地点、在场人物、关键动作或交锋、埋下/回收的伏笔。四段节拍合计要能支撑成稿2500-3000字（每段对应一个可展开的场景）。
 输出格式（JSON数组）：
 [{"chapterNumber": 1, "title": "章节标题", "outline": "章节大纲"}]`;
+}
+
+/**
+ * P1-4b 素材投放策略：远景只给"名录"（name），细节（content）留到就近细纲再喂。
+ * 规划一次覆盖 N 章时后续素材还没长出来，喂内容=逼模型把细节写死→与未来素材冲突。
+ * @param {Array} materials 素材数组
+ * @param {'far'|'detail'} scope far=名录（默认）；detail=带内容摘要（旧行为）
+ */
+function buildOutlineMaterialDigest(materials, scope = 'far') {
+    const list = materials || [];
+    if (scope === 'detail') {
+        return list.slice(0, 30).map(m => `[${m.type}] ${m.name}: ${(m.currentContent || '').substring(0, 100)}`).join('\n');
+    }
+    return list.slice(0, 40).map(m => `[${m.type}] ${m.name}`).join('\n');
+}
+
+/** P1-4b 就近细纲：开写前用"此刻已归档的素材"把本章粗纲细化为可开写的计划 */
+function buildNearOutlineSystemPrompt(genreInjection, styleInjection, chapterNumber) {
+    return `你是一个小说章节**就近细纲**细化器。任务：把第${chapterNumber}章的远景粗纲，按"此刻已归档的最新素材"细化为可直接开写的本章计划。
+${genreInjection}
+${styleInjection}
+要求：
+1.【以素材为准】已归档素材是唯一真相；粗纲与素材冲突时**以素材为准**，并在 adjust 字段说明差异。
+2.【不改主线】不得改变粗纲的主线走向与章末钩子目标，只补充具体场景与细节。
+3.【四段节拍】按【场景1·铺垫】【场景2·核心冲突】【场景3·推进/转折】【场景4·章末钩子】写，合计300-500字；
+  每段至少给出：地点、在场人物、关键动作或交锋、埋下/回收的伏笔。
+4.【不得凭空造物】只使用已归档素材中出现过的人物/道具/设定；确需新增角色时用职位或称谓描述，不要新造专有名词。
+输出格式（JSON对象）：
+{"title": "章节标题", "outline": "本章细纲", "adjust": "与粗纲的差异说明（可空）"}`;
 }
 
 function buildSupplementOutlineSystemPrompt(genreInjection, styleInjection, startChapter, endChapter) {
@@ -157,6 +193,7 @@ module.exports = {
     buildMaterialTypeList,
     buildMaterialSystemPrompt, buildMaterialSystemPromptWithProject,
     buildMaterialUserPrompt,
-    buildChapterOutlineSystemPrompt, buildSupplementOutlineSystemPrompt,
+    buildChapterOutlineSystemPrompt, buildSupplementOutlineSystemPrompt, buildNearOutlineSystemPrompt,
+    buildOutlineMaterialDigest,
     buildTemplateSystemPrompt
 };

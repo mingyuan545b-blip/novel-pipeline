@@ -78,6 +78,10 @@ jest.mock('../../server/core/pipeline/orchestratorStepLoop', () => ({
     executeStepLoop: jest.fn()
 }));
 
+jest.mock('../../server/services/pipeline/chapterPlanRefresh', () => ({
+    refreshNearOutline: jest.fn()
+}));
+
 const store = require('../../server/store');
 const { resolveConfig } = require('../../server/config');
 const { resolveGenreFromProject } = require('../../server/services/genreConfig');
@@ -90,6 +94,7 @@ const { checkStopped, getSteps, persistPipelineLog } = require('../../server/cor
 const { runPreflightChecks, handleChapterIntent, syncHooksAndRules } = require('../../server/core/pipeline/orchestratorPreflight');
 const { clearRoundOutputs, checkCircuitBreaker } = require('../../server/core/pipeline/orchestratorRoundHelpers');
 const { executeStepLoop } = require('../../server/core/pipeline/orchestratorStepLoop');
+const { refreshNearOutline } = require('../../server/services/pipeline/chapterPlanRefresh');
 const { PipelineOrchestrator } = require('../../server/core/pipeline/orchestrator');
 
 const setupDefaultMocks = () => {
@@ -114,6 +119,8 @@ const setupDefaultMocks = () => {
     store.setItem.mockResolvedValue();
     // P1-4a 门槛读取前序章节；默认空库（无前序 → 放行）
     store.queryItems.mockResolvedValue([]);
+    // P1-4b 就近细纲默认成功（细节由 chapterPlanRefresh 单测覆盖）
+    refreshNearOutline.mockResolvedValue({ ok: true });
     pipelineRegistry.getStepFn.mockReturnValue(jest.fn());
 };
 
@@ -360,5 +367,49 @@ describe('PipelineOrchestrator - run() 章节因果门槛（P1-4a）', () => {
 
         expect(result.success).toBe(true);
         expect(executeStepLoop).toHaveBeenCalled();
+    });
+});
+
+describe('PipelineOrchestrator - run() 就近细纲刷新（P1-4b）', () => {
+    beforeEach(() => { jest.clearAllMocks(); setupDefaultMocks(); });
+
+    test('门槛之后调用就近细纲，并把刷新后的细纲传给 handleChapterIntent', async () => {
+        store.getItem
+            .mockResolvedValueOnce({ id: 'ch-1', chapterNumber: 5, content: '', status: 'outlined', outline: '远景粗纲' })
+            .mockResolvedValue({ id: 'ch-1', chapterNumber: 5, content: '', status: 'outlined', outline: '就近细纲' });
+        executeStepLoop.mockResolvedValue({
+            done: true,
+            result: { success: true, rounds: 1, log: [{ step: 'x' }], message: 'approved' }
+        });
+
+        const orch = new PipelineOrchestrator({});
+        const onStep = jest.fn();
+        await orch.run('p1', 'ch-1', 5, { onStep });
+
+        expect(refreshNearOutline).toHaveBeenCalledWith('p1', 5, { chapterId: 'ch-1', onStep });
+        expect(handleChapterIntent).toHaveBeenCalledWith('p1', 'ch-1', 5, '就近细纲', expect.anything(), expect.anything(), onStep);
+    });
+
+    test('细纲刷新失败（返回 ok=false）不阻断开写，仍进入创作循环', async () => {
+        refreshNearOutline.mockResolvedValue({ ok: false, error: 'llm down', keptFar: true });
+        executeStepLoop.mockResolvedValue({
+            done: true,
+            result: { success: true, rounds: 1, log: [{ step: 'x' }], message: 'approved' }
+        });
+
+        const orch = new PipelineOrchestrator({});
+        const result = await orch.run('p1', 'ch-1', 5, {});
+
+        expect(result.success).toBe(true);
+        expect(executeStepLoop).toHaveBeenCalled();
+    });
+
+    test('门槛拦下时不刷新细纲（不浪费一次 LLM 调用）', async () => {
+        store.queryItems.mockResolvedValue([{ id: 'ch-4', chapterNumber: 4, status: 'failed-skipped' }]);
+
+        const orch = new PipelineOrchestrator({});
+        await expect(orch.run('p1', 'ch-1', 5, {})).rejects.toMatchObject({ code: 'MATERIAL_GATE_BLOCKED' });
+
+        expect(refreshNearOutline).not.toHaveBeenCalled();
     });
 });

@@ -10,7 +10,7 @@ const { buildConstraintInjection } = require('../prompts/constraintInjector');
 const { buildStyleInjection } = require('../prompts/styleInjector');
 const { resolveGenreFromProject, detectGenre } = require('../../services/genreConfig');
 const { getDataContext } = require('../dataContext');
-const { buildMaterialTypeList, buildMaterialSystemPromptWithProject, buildMaterialUserPrompt, buildChapterOutlineSystemPrompt, buildSupplementOutlineSystemPrompt } = require('./outlineTemplateBuilder');
+const { buildMaterialTypeList, buildMaterialSystemPromptWithProject, buildMaterialUserPrompt, buildChapterOutlineSystemPrompt, buildSupplementOutlineSystemPrompt, buildOutlineMaterialDigest } = require('./outlineTemplateBuilder');
 const { parseJsonResponse, parseMarkdownOutlines } = require('./outlineResponseParser');
 const { saveMaterial, findExistingCharacterMaterial, updateExistingMaterial, createCharacterRelations, createEquipmentBinds, saveChapterOutlines } = require('./outlineMaterialSaver');
 const { syncCharacterToEntityCenter, initCharacterKVState, autoSetProtagonistName } = require('./outlineEntitySync');
@@ -96,13 +96,22 @@ async function ensureProjectQuests(projectId) {
     }
 }
 
-async function generateChapterOutlines(projectId, userPrompt, overrideTargetCount) {
+/**
+ * 生成章节大纲（远景/细节两档，P1-4b）
+ * @param {string} projectId
+ * @param {string} userPrompt
+ * @param {number} overrideTargetCount
+ * @param {{scope?: 'far'|'detail'}} [options] far=远景粗纲（默认，只给素材名录、禁写设定细节）
+ *        detail=保留旧行为（带素材内容摘要），仅用于确需一次性定细节的场景
+ */
+async function generateChapterOutlines(projectId, userPrompt, overrideTargetCount, options = {}) {
     const ctx = await getDataContext(projectId);
     const project = await ctx.getProject();
     if (!project) throw new Error('Project not found');
     const config = resolveConfig(resolveGenreFromProject(project) || detectGenre(project?.styleProfile || {}), project);
     const targetCount = overrideTargetCount || config.chapter.total;
     const genre = resolveGenreFromProject(project) || detectGenre(project?.styleProfile || {});
+    const scope = options.scope === 'detail' ? 'detail' : 'far';
 
     for (let attempt = 0; attempt <= DRIFT_MAX_RETRIES; attempt++) {
         const visResult = await getVisibleMaterials(projectId, 0);
@@ -111,8 +120,9 @@ async function generateChapterOutlines(projectId, userPrompt, overrideTargetCoun
         const rhythmGuidance = await buildVolumeRhythmGuidance(projectId);
         const advisory = await getReaderAdvisory(projectId, project);
         const advisoryStr = formatAdvisoryForOutline(advisory);
-        const systemPrompt = buildChapterOutlineSystemPrompt(constraintInjection, styleInjection, rhythmGuidance, advisoryStr, targetCount);
-        const materialSummary = visResult.materials.slice(0, 30).map(m => `[${m.type}] ${m.name}: ${(m.currentContent || '').substring(0, 100)}`).join('\n');
+        const systemPrompt = buildChapterOutlineSystemPrompt(constraintInjection, styleInjection, rhythmGuidance, advisoryStr, targetCount, scope);
+        // 远景只给"名录"，不喂素材内容：避免规划超前于素材生长而写死细节
+        const materialSummary = buildOutlineMaterialDigest(visResult.materials, scope);
         const retryHint = attempt > 0 ? `\n\n【偏移修正提示】上一次生成的大纲存在题材偏移，请严格遵守题材约束重新生成。` : '';
         const userContent = `小说名称：${project.name}\n类型：${project.genre}\n描述：${project.description}\n\n已有素材：\n${materialSummary}\n\n用户需求：${userPrompt || '请生成完整大纲'}${retryHint}`;
         const messages = [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }];

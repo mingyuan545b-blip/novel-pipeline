@@ -3,8 +3,8 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-09-29（P0-1/2/3 落库 + **P1-4 计划书立项**：
-> 见 `docs/design/章节因果门槛与单点素材装配（计划书）.md`，下个窗口按该文档 §八 直接开工）
+> 最后更新：2026-09-29（P0-1/2/3 落库 + P1-4 计划书立项 + **P1-4a 章节因果门槛 / P1-4b 两档大纲 已完成**：
+> 见 `docs/design/章节因果门槛与单点素材装配（计划书）.md`，下个窗口按该文档 §八 从 P1-4c 继续）
 
 ---
 
@@ -36,6 +36,16 @@
      测试：materialGate 16 + pipelineStepRunnerGate 2 + orchestrator/Preflight 各 +2/+1；**219 套件 / 3636 用例全绿**。
      真实数据只读演练：7 项目"下一章"全部放行（无误阻断），模拟前章 failed-skipped → 正确拦截并给出等待原因。
      **下一步 → P1-4b（远景粗纲 `scope:'far'` / 就近细纲 `refreshNearOutline`）。**
+   - **✅ P1-4b 已完成（本会话）**：两档大纲落地——
+     远景侧：`outlineTemplateBuilder` 新增 `FAR_OUTLINE_HINT`（禁写设定细节）+ `buildOutlineMaterialDigest(materials, scope)`
+     （**far 只给名录**，detail 才带内容摘要；原内联逻辑抽出以便单测）；`generateChapterOutlines(..., options.scope)` 默认 `far`
+     （安全默认，所有既有调用点无需改签名）。
+     就近侧：新增 `server/services/pipeline/chapterPlanRefresh.js` → `refreshNearOutline(projectId, N, {chapterId, force, onStep})`，
+     开写前用"此刻已归档素材 + 上一章节选"把粗纲细化为 `chapter.outline`（粗纲存 `farOutline`）；
+     **幂等**（`outlineRefinedChapter`）/ **失败不阻断**（保留粗纲 + `outlineRefineFailed` 锚点）；题材偏移只 WARN 不阻断。
+     接入 `orchestrator.run()` 门槛之后、`handleChapterIntent` 之前，且**刷新后重读章节**再取大纲（否则下游仍拿到粗纲）。
+     测试：chapterPlanRefresh 13 + outlineScopePrompts 12 + orchestrator +3；**221 套件 / 3664 用例全绿**。
+     **下一步 → P1-4c（单点装配入口 `materialStateAssembler`：包 `scheduleMaterials`，加 `gaps/provenance/density`）。**
    - **注意**：P1-4 **不是推倒重来**——`agentDeclarations`/`contextCommander`/`agentMaterialScheduler`/
      `contextAssemblyRecorder`（装配图）是既有地基，只在其上加"顺序保证 + 缺口暴露 + 密度显式化"。
 
@@ -201,8 +211,11 @@
 ## 四、待办（按优先级）
 
 ### ⚡ 进行中（下个窗口最优先，锚点见worklog）
-- [x] ~~P1-4a 章节因果门槛~~ ✅ 已完成（见 0h 节）→ **下一步 P1-4b**：`outlineGenerator` 加
-      `scope:'far'|'near'`（远景粗纲不含素材细节），新增 `chapterPlanRefresh.refreshNearOutline` 接在门槛之后。
+- [x] ~~P1-4a 章节因果门槛~~ ✅ 已完成（见 0h 节）。
+- [x] ~~P1-4b 两档大纲~~ ✅ 已完成（见 0h 节）→ **下一步 P1-4c 单点装配入口**：
+      新增 `materialStateAssembler.js`（包 `scheduleMaterials`，补 `gaps/provenance/density`），
+      调用点收敛到一处；`materialUpdateProcessor`/`materialCreateAction` 补写 `lastWriter/lastUpdatedChapter`。
+      锚点：`docs/worklog/2026-09-29-章节因果门槛与素材装配计划书.md`、计划书 §八 P1-4c。
 - [ ] **复验长度锚点效果**：本次新增"大纲四段节拍 + 执笔中途检查点"，需重跑 1~2 章看字数是否稳定 ≥2500
       （命令：`node scripts/run20ChapterE2E.js --resume 5d512269-3b0b-4e33-bb7d-ac7310bbe73d --only 4,15 --force`）
 - [ ] 剩余 7 章低于 2500 字（2,084~2,415）是否回炉重跑（末轮宽限已保住成品，非阻塞）
