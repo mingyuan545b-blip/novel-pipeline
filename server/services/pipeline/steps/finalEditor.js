@@ -11,10 +11,11 @@ const reviewRemediation = require('../../reviewRemediation');
 const { getMetrics } = require('../../metricsCollector');
 const { saveAgentOutput, saveFinalContent } = require('../../fileOutput');
 const { NOVEL_DEFAULTS } = require('../../../config/genreDefaults');
-const { scheduleMaterials } = require('../agentMaterialScheduler');
+const { assembleMaterialState } = require('../materialStateAssembler');
 const { injectMaterials, buildCharacterByFormat } = require('../materialInjector');
 const { saveTimelineEvent } = require('../../timelineAdapter');
 const { mergeWithArchivedForeshadows } = require('./foreshadowArchiveLoader');
+const { STATUS_VALUES } = require('../../chapterStatus');
 const { getDataContext } = require('../../dataContext');
 
 /** 处理定稿通过：更新chapter状态、字数、quest */
@@ -28,7 +29,7 @@ async function handleApprovedChapter({ chapter, chapterId, projectId, parsed, mo
     }
     const tellCheck = detectTellVerbs(chapter.content || '');
     if (tellCheck.count > 3) logger.warn('finalEditor', `Tell-verb density high: ${tellCheck.count}`);
-    chapter.status = 'approved';
+    chapter.status = STATUS_VALUES.APPROVED;
     chapter.content = cleanFinalContent(chapter.content || '');
     chapter.wordCount = chapter.content.replace(/\s/g, '').length;
     const feProject = await ctx.getProject();
@@ -115,7 +116,7 @@ async function handleFinalEditor({ projectId, chapter, chapterId, agentContext, 
     const _feReviewInjection = reviewRemediation.getReviewPromptInjectionSync(_feProject);
 
     const genre = resolveGenreFromProject(_feProject);
-    const scheduled = await scheduleMaterials('final-editor', {
+    const scheduled = await assembleMaterialState('final-editor', {
         projectId, chapter, materials: materials || [], ctx, project: _feProject, genre
     });
     const mats = scheduled.materials;
@@ -183,7 +184,7 @@ async function handleFinalEditor({ projectId, chapter, chapterId, agentContext, 
         const revId = uuidv4();
         await store.setItem('reviews', revId, { id: revId, chapterId, projectId, step: 'final-editor', type: 'final-editor', reviewer: 'final-editor-agent', result: fallbackFeedback, passed: fallbackApproved, content: fallbackFeedback.summary, issues: fallbackFeedback.edits, suggestions: [], round, createdAt: new Date().toISOString() });
         if (fallbackApproved) {
-            chapter.status = 'approved'; chapter.content = cleanFinalContent(chapter.content || ''); chapter.wordCount = chapter.content.replace(/\s/g, '').length;
+            chapter.status = STATUS_VALUES.APPROVED; chapter.content = cleanFinalContent(chapter.content || ''); chapter.wordCount = chapter.content.replace(/\s/g, '').length;
             const fbProject = await ctx.getProject();
             const fbMaxWords = (fbProject?.wordConfig || {}).maxWords || modeConfig?.word?.maxChapter || NOVEL_DEFAULTS.maxChapterWords;
             if (chapter.wordCount > fbMaxWords) { chapter.content = truncateChapter(chapter.content, fbMaxWords).content; chapter.wordCount = chapter.content.replace(/\s/g, '').length; }

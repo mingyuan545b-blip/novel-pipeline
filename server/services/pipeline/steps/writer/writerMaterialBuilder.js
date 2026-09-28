@@ -4,7 +4,7 @@
  * 通过materialInjector统一注入层注入素材到user prompt
  */
 const { getVolumeSubplane } = require('./writerShared');
-const { scheduleMaterials } = require('../../agentMaterialScheduler');
+const { assembleMaterialState } = require('../../materialStateAssembler');
 const { injectMaterials } = require('../../materialInjector');
 const { buildCharacterSection, buildNameLockSection, buildKnowledgeAccessSection } = require('./writerCharacterFormatter');
 
@@ -21,7 +21,7 @@ async function buildMaterialSection(params) {
     const isInSubplane = chapterScene !== '主世界' && chapterScene !== '';
 
     // 通过调度器加载所有素材（声明式，不再硬编码）
-    const scheduled = await scheduleMaterials('writer', {
+    const scheduled = await assembleMaterialState('writer', {
         projectId, chapter, materials, ctx, project, genre
     });
 

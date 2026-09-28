@@ -6,7 +6,6 @@ const { resolveWorldviewLoadDepth, classifyMaterial } = require('./worldviewClas
 const { resolveDepth } = require('./contextDepthConstants');
 const { resolveMaterialIntentPriority } = require('./intentDepthResolver');
 const { _resolveEntityDepth, formatEntityByDepth, formatMaterialByDepth } = require('./agentMaterialFormatter');
-const { recordAssembly } = require('./contextAssemblyRecorder');
 const { loadRelations } = require('./relationMaterialLoader');
 const logger = require('../../shared/logger');
 
@@ -16,7 +15,8 @@ async function scheduleMaterials(agentType, params) {
     const context = await resolveContext(agentType, params);
     if (context.materialNeeds.length === 0) {
         logger.warn('materialScheduler', `No context resolved for agent: ${agentType}`);
-        return { materials: {}, constraints: '', conflicts: [], stats: { agentType, loaded: 0 } };
+        // P1-4c：把 context/chapterNumber 一并带回给装配入口 —— 否则这种"无数据"状态无法记账、无法报警
+        return { materials: {}, constraints: '', conflicts: [], stats: { agentType, loaded: 0 }, context, chapterNumber };
     }
 
     const outlineText = (chapter?.outline || '').substring(0, 2000).toLowerCase();
@@ -49,10 +49,9 @@ async function scheduleMaterials(agentType, params) {
         contextMeta: context.meta,
     };
 
-    const scheduled = { materials: loadedMaterials, constraints, conflicts: constraints.conflicts, stats };
-    await recordAssembly({ projectId, agentType, chapterNumber, context, scheduled });
-
-    return scheduled;
+    // P1-4c：这里只负责"装载"，记账（含 gaps/provenance/density）统一由 materialStateAssembler 落盘，
+    // 保证装配记录只有一处写入口（口径唯一）。
+    return { materials: loadedMaterials, constraints, conflicts: constraints.conflicts, stats, context, chapterNumber };
 }
 
 /** 意图中提到的角色名集合（用于关系相关性排序） */
@@ -105,6 +104,10 @@ async function _loadFromEntityCenter(need, ctx, chapter, projectId, agentType, o
                 parentPlane: entity.profile?.parentPlane || entity.parentPlane || null,
                 source: 'entity-center',
                 depth,
+                // P1-4c 来源追溯：实体回指素材 + 最后写入者/章（谁改的、哪一章改的一眼可查）
+                materialId: entity.materialId || entity.profile?.materialId || null,
+                lastWriter: entity.lastWriter || null,
+                lastUpdatedChapter: entity.lastUpdatedChapter ?? entity.lastAppearChapter ?? null,
             });
         }
         return { items: selectItems(items, need, budget) };
@@ -145,6 +148,10 @@ async function _loadFromMaterials(need, activeMats, outlineText, intentResult) {
             position: m.position || null,
             parentPlane: m.parentPlane, parentFaction: m.parentFaction,
             source: 'materials', depth,
+            // P1-4c 来源追溯：素材ID + 最后写入者/章（写入者由 material-manager 链落库时打标）
+            materialId: m.id || null,
+            lastWriter: m.lastWriter || null,
+            lastUpdatedChapter: m.lastUpdatedChapter ?? m.sourceChapter ?? null,
         });
     }
     return { items: selectItems(items, need, budget) };

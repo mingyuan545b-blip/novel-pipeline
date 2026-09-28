@@ -22,7 +22,7 @@ const TYPE_STATUS = Object.freeze({
 });
 
 /** 单个素材类型的装配明细 */
-function _buildTypeEntry(need, items) {
+function _buildTypeEntry(need, items, density) {
     const chars = items.reduce((sum, it) => sum + (it.content?.length || 0), 0);
     let status;
     if (need.dropped) status = TYPE_STATUS.DROPPED;
@@ -35,6 +35,9 @@ function _buildTypeEntry(need, items) {
         dropReason: need.dropReason || null,
         plannedDepth: need.detail || null,
         actualDepth: need.resolvedDepth || null,
+        // P1-4c/P1-4d 密度事实：实际注入的深度与原因（省 token 与专注力的依据）
+        densityReason: density?.reason || null,
+        injectedDepth: density?.actualDepth || null,
         degraded: Boolean(need.degraded),
         itemCount: items.length,
         chars,
@@ -46,10 +49,11 @@ function _buildTypeEntry(need, items) {
  * 从调度结果构建装配记录
  * @returns {object} assembly
  */
-function buildAssembly({ agentType, chapterNumber, context, scheduled }) {
+function buildAssembly({ agentType, chapterNumber, context, scheduled, report }) {
     const needs = context.materialNeeds || [];
     const materials = scheduled?.materials || {};
-    const types = needs.map(need => _buildTypeEntry(need, materials[need.type] || []));
+    const densityByType = new Map((report?.density || []).map(d => [d.type, d]));
+    const types = needs.map(need => _buildTypeEntry(need, materials[need.type] || [], densityByType.get(need.type)));
 
     const actualChars = types.reduce((sum, t) => sum + t.chars, 0);
     const injected = types.filter(t => t.status === TYPE_STATUS.INJECTED);
@@ -77,10 +81,18 @@ function buildAssembly({ agentType, chapterNumber, context, scheduled }) {
             droppedTypes: dropped.length,
             emptyTypes: empty.length,
             missingTypes: missing.length,
+            gapBlocked: report?.summary?.gapBlocked ?? 0,
+            gapWarn: report?.summary?.gapWarn ?? 0,
+            gapInfo: report?.summary?.gapInfo ?? 0,
+            provenanceCount: report?.summary?.provenanceCount ?? 0,
             actualChars,
             estTokens: estimateTokens(types.map(t => t.type).join('')) + injected.reduce((s, t) => s + t.estTokens, 0),
         },
         sources: buildSourceFlow(context, scheduled),
+        // P1-4c 记账三件：缺口（该有没有）/ 来源追溯（谁写在哪章）/ 密度事实（为什么这个深度）
+        gaps: report?.gaps || [],
+        provenance: report?.provenance || [],
+        density: report?.density || [],
         types,
     };
 }

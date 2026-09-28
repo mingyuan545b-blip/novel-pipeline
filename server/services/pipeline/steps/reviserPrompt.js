@@ -5,7 +5,7 @@
 const store = require('../../../store');
 const { resolveGenreFromProject, getGenreReviewRules } = require('../../genreConfig');
 const { buildRelationshipStageGuard } = require('../relationshipStageGuard');
-const { scheduleMaterials } = require('../agentMaterialScheduler');
+const { assembleMaterialState } = require('../materialStateAssembler');
 const { injectMaterials, buildCharacterByFormat } = require('../materialInjector');
 const { buildNameLockSection } = require('./writer/writerCharacterFormatter');
 const { getDataContext } = require('../../dataContext');
@@ -24,7 +24,7 @@ async function buildReviserContext({ projectId, chapter, materials, agentContext
 
     const relationshipGuard = await buildRelationshipStageGuard(projectId, chapter.chapterNumber);
     const genre = resolveGenreFromProject(project);
-    const scheduled = await scheduleMaterials('reviser', { projectId, chapter, materials, ctx: {}, project, genre });
+    const scheduled = await assembleMaterialState('reviser', { projectId, chapter, materials, ctx: {}, project, genre });
     const constraintsText = scheduled.constraints?.text || '';
 
     // 角色段：通过声明式配置（characterFormat='brief'）自动选择buildCharacterSection

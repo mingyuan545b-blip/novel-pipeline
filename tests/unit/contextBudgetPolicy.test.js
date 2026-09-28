@@ -214,6 +214,28 @@ describe('上下文装配记录（持久化与状态判定）', () => {
         const { getCascadableStoreTypes } = require('../../server/config/dataStoreRegistry');
         expect(getCascadableStoreTypes()).toContain('context-assemblies');
     });
+
+    test('装配记录携带 gaps/provenance/density（P1-4c 记账三件）', () => {
+        const { buildAssemblyReport } = require('../../server/services/pipeline/materialAssemblyReport');
+        const report = buildAssemblyReport({ context, scheduled });
+        const a = buildAssembly({ agentType: 'writer', chapterNumber: 3, context, scheduled, report });
+
+        expect(a.gaps.map(g => g.type).sort()).toEqual(['catchphrase', 'foreshadowing']);
+        expect(a.gaps.find(g => g.type === 'catchphrase').level).toBe('info');
+        expect(a.gaps.find(g => g.type === 'foreshadowing').level).toBe('warn');
+        expect(a.provenance[0]).toMatchObject({ type: 'character', source: 'materials' });
+        expect(a.density.map(d => d.type)).toEqual(['character', 'catchphrase', 'foreshadowing']);
+        expect(a.summary).toMatchObject({ gapBlocked: 0, gapWarn: 1, gapInfo: 1, provenanceCount: 1 });
+        expect(a.types.find(t => t.type === 'character').densityReason).toBeTruthy();
+    });
+
+    test('不传 report 时字段为空但结构不变（向后兼容旧记录）', () => {
+        const a = buildAssembly({ agentType: 'writer', chapterNumber: 3, context, scheduled });
+        expect(a.gaps).toEqual([]);
+        expect(a.provenance).toEqual([]);
+        expect(a.summary.gapBlocked).toBe(0);
+        expect(a.types.every(t => t.densityReason === null)).toBe(true);
+    });
 });
 
 describe('素材归档保护（语义判定，非名字匹配）', () => {

@@ -8,6 +8,7 @@ const { validateMaterial } = require('../../materialValidator');
 const { validateNewMaterial } = require('../../genreConfig');
 const { parseFlavorTag } = require('./materialFieldUtils');
 const { ensureOutputDir } = require('./materialUpdateHelpers');
+const { buildWriteStamp } = require('../../../config/materialWriteOwnership');
 const { populateCharacterFields, populateTypeSpecificFields, syncToRegistries } = require('./materialCreateHelpers');
 
 function applyFlavorTags(material, content) {
@@ -36,7 +37,9 @@ async function handleCreateAction(update, chapter, projectId, styleProfile) {
         changeLog: [{ action: 'created', reason: update.reason || 'auto-created', at: new Date().toISOString() }],
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
         parentPlane: update.parentPlane || null, parentFaction: update.parentFaction || null,
-        isLocked: false
+        isLocked: false,
+        // P1-4c 写入留痕：谁写的、哪一章写的（materials 只有 material-manager 链可写）
+        ...buildWriteStamp(chapter.chapterNumber),
     };
 
     if (materialType === 'character') await populateCharacterFields(newMaterial, update, chapter, projectId, protagonistName, genreId);

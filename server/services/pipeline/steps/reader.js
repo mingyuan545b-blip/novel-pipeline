@@ -1,6 +1,6 @@
 const store = require('../../../store');
 const { saveAgentOutput } = require('../../fileOutput');
-const { scheduleMaterials } = require('../agentMaterialScheduler');
+const { assembleMaterialState } = require('../materialStateAssembler');
 const { injectMaterials, buildCharacterByFormat } = require('../materialInjector');
 const { resolveGenreFromProject } = require('../../genreConfig');
 const { getDataContext } = require('../../dataContext');
@@ -35,7 +35,7 @@ async function handleReader({ projectId, chapter, materials, agentContext, runAg
         const ctx = await getDataContext(projectId);
         const project = await ctx.getProject();
         const genre = resolveGenreFromProject(project);
-        const scheduled = await scheduleMaterials('reader', {
+        const scheduled = await assembleMaterialState('reader', {
             projectId, chapter, materials, ctx, project, genre
         });
         // 角色段通过声明式配置自动选择buildCharacterReaderSection（name:content极简格式）

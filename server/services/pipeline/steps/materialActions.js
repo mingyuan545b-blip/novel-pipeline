@@ -8,6 +8,7 @@ const store = require('../../../store');
 const entityCenter = require('../../entityCenter');
 const { extractRoleLevelFromContent, extractGenreStateFromContent } = require('./materialFieldUtils');
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
+const { buildWriteStamp } = require('../../../config/materialWriteOwnership');
 const { handleCreateAction } = require('./materialCreateAction');
 
 /**
@@ -38,6 +39,7 @@ async function handleUpdateAction(update, existing, chapter, projectId, stylePro
         sourceChapter: chapter.chapterNumber || existing.sourceChapter,
         lastAppearChapter: chapter.chapterNumber || existing.lastAppearChapter,
         version: (existing.version || 1) + 1,
+        ...buildWriteStamp(chapter.chapterNumber || existing.lastUpdatedChapter),
         updatedAt: new Date().toISOString()
     };
 
@@ -86,7 +88,9 @@ async function handleArchiveAction(update, existing, chapter, projectId) {
     const archived = {
         ...existing, archived: true, archivedAt: new Date().toISOString(),
         archivedReason: update.reason || 'auto-archived',
-        version: (existing.version || 1) + 1, updatedAt: new Date().toISOString()
+        version: (existing.version || 1) + 1,
+        ...buildWriteStamp(chapter.chapterNumber || existing.lastUpdatedChapter),
+        updatedAt: new Date().toISOString()
     };
     await store.setItem('materials', existing.id, archived);
     return true;

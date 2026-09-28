@@ -1,7 +1,7 @@
 const { cleanChapterContent } = require('../../contentUtils');
 const { saveAgentOutput } = require('../../fileOutput');
 const { resolveGenreFromProject } = require('../../genreConfig');
-const { scheduleMaterials } = require('../agentMaterialScheduler');
+const { assembleMaterialState } = require('../materialStateAssembler');
 const { injectMaterials, buildCharacterByFormat } = require('../materialInjector');
 const { resolveConfig } = require('../../../config');
 const logger = require('../../../shared/logger');
@@ -30,7 +30,7 @@ function guardPolishedLength(polished, original, project, genre) {
 
 async function handlePolisher({ projectId, chapter, agentContext, runAgent, materials, project }) {
     const genre = resolveGenreFromProject(project);
-    const scheduled = await scheduleMaterials('polisher', {
+    const scheduled = await assembleMaterialState('polisher', {
         projectId, chapter, materials: materials || [], ctx: {}, project, genre
     });
     const mats = scheduled.materials;

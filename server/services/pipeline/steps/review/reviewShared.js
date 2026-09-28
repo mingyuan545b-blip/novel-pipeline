@@ -11,7 +11,7 @@ const { ValidationEngine } = require('../../../validationEngine');
 const { getDataContext } = require('../../../dataContext');
 const { truncateForReview, truncateReviewOutput } = require('../../../contextTruncator');
 const { checkWordCountGate } = require('./wordCountGate');
-const { scheduleMaterials } = require('../../agentMaterialScheduler');
+const { assembleMaterialState } = require('../../materialStateAssembler');
 const { buildCharacterByFormat, buildKnowledgeAccessSection, SECTION_BUILDERS } = require('../../materialInjector');
 const { mergeWithArchivedForeshadows } = require('../foreshadowArchiveLoader');
 
@@ -35,7 +35,7 @@ async function loadReviewEntityData(agentType, projectId, chapter, ctx, project)
     const genre = resolveGenreFromProject(project);
     let materials = [];
     try { materials = await ctx.getMaterials(); } catch (_) { /* fallback: empty */ }
-    const scheduled = await scheduleMaterials(agentType, {
+    const scheduled = await assembleMaterialState(agentType, {
         projectId, chapter, materials, ctx, project, genre
     });
     const scheduledChars = scheduled.materials.character || [];

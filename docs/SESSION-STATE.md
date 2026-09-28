@@ -3,8 +3,8 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-09-29（P0-1/2/3 落库 + P1-4 计划书立项 + **P1-4a 章节因果门槛 / P1-4b 两档大纲 已完成**：
-> 见 `docs/design/章节因果门槛与单点素材装配（计划书）.md`，下个窗口按该文档 §八 从 P1-4c 继续）
+> 最后更新：2026-09-29（P0-1/2/3 落库 + P1-4 计划书立项 + **P1-4a 章节因果门槛 / P1-4b 两档大纲 / P1-4c 单点装配入口 已完成**：
+> 见 `docs/design/章节因果门槛与单点素材装配（计划书）.md`，下个窗口按该文档 §八 从 P1-4d 继续）
 
 ---
 
@@ -46,6 +46,18 @@
      接入 `orchestrator.run()` 门槛之后、`handleChapterIntent` 之前，且**刷新后重读章节**再取大纲（否则下游仍拿到粗纲）。
      测试：chapterPlanRefresh 13 + outlineScopePrompts 12 + orchestrator +3；**221 套件 / 3664 用例全绿**。
      **下一步 → P1-4c（单点装配入口 `materialStateAssembler`：包 `scheduleMaterials`，加 `gaps/provenance/density`）。**
+   - **✅ P1-4c 已完成（本会话）**：单点装配入口落地——
+     新增 `materialStateAssembler.js`（装配+记账+落盘一处完成，blocked 缺口 ERROR 报警）+ `materialAssemblyReport.js`
+     （**纯函数**：`gaps` 三级 blocked/warn/info、`provenance` 来源追溯、`density` 密度事实、`summary` 供门槛/UI 消费；
+     `materialNeeds` 解析为空 → 记 `context-unresolved` blocked，**不再静默返回空素材**）；
+     调度器不再自己记账（只装载 + 回传 `context`）；**6 个 agent 步 + 3 个核查脚本全部改走装配入口**，
+     新增只读审计 `scripts/verifyMaterialAssemblyEntry.js`（0 绕过）；`materialCreateAction`/`materialActions`
+     统一写 `lastWriter/lastUpdatedChapter`（口径见 `config/materialWriteOwnership.js`）；
+     装配记录扩展 `gaps/provenance/density`（不新增表）。
+     测试：+33（report 16 / assembler 8 / writeStamp 7 / recorder 2）；**224 套件 / 3697 用例全绿**。
+     真实数据只读实测：脱口秀 ch7 `blocked=1(relationship:relations-empty)`、键盘飞剑 ch7 `blocked=0`，provenance 带素材ID与写入章。
+     **遗留（未做，已记入计划书）**：blocked 的处置（补跑/往 prompt 注入【素材缺失声明】）、素材写入权全仓审计（~60 处，P2）。
+     **下一步 → P1-4d（密度策略 `config/densityPolicy.js` + `densityResolver.js`，装配记录写 `densityReason`）。**
    - **注意**：P1-4 **不是推倒重来**——`agentDeclarations`/`contextCommander`/`agentMaterialScheduler`/
      `contextAssemblyRecorder`（装配图）是既有地基，只在其上加"顺序保证 + 缺口暴露 + 密度显式化"。
 
@@ -212,10 +224,11 @@
 
 ### ⚡ 进行中（下个窗口最优先，锚点见worklog）
 - [x] ~~P1-4a 章节因果门槛~~ ✅ 已完成（见 0h 节）。
-- [x] ~~P1-4b 两档大纲~~ ✅ 已完成（见 0h 节）→ **下一步 P1-4c 单点装配入口**：
-      新增 `materialStateAssembler.js`（包 `scheduleMaterials`，补 `gaps/provenance/density`），
-      调用点收敛到一处；`materialUpdateProcessor`/`materialCreateAction` 补写 `lastWriter/lastUpdatedChapter`。
-      锚点：`docs/worklog/2026-09-29-章节因果门槛与素材装配计划书.md`、计划书 §八 P1-4c。
+- [x] ~~P1-4b 两档大纲~~ ✅ 已完成（见 0h 节）。
+- [x] ~~P1-4c 单点装配入口~~ ✅ 已完成（见 0h 节）→ **下一步 P1-4d 密度策略**：
+      新增 `config/densityPolicy.js` + `densityResolver.js`（优先级：点名>区间命中>同场>题材字段>默认），
+      装配记录写 `densityReason`（字段已由 P1-4c 铺好）；验收：改前/改后对比 token 面板"素材占比"与 `actualDepth` 分布。
+      锚点：`docs/worklog/2026-09-29-章节因果门槛与素材装配计划书.md`、计划书 §八 P1-4d。
 - [ ] **复验长度锚点效果**：本次新增"大纲四段节拍 + 执笔中途检查点"，需重跑 1~2 章看字数是否稳定 ≥2500
       （命令：`node scripts/run20ChapterE2E.js --resume 5d512269-3b0b-4e33-bb7d-ac7310bbe73d --only 4,15 --force`）
 - [ ] 剩余 7 章低于 2500 字（2,084~2,415）是否回炉重跑（末轮宽限已保住成品，非阻塞）

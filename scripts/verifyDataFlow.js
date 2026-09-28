@@ -46,7 +46,7 @@ async function checkStorage() {
 
 async function checkDecisionAndScheduling() {
     const { resolveContext } = require('../server/services/pipeline/contextCommander');
-    const { scheduleMaterials } = require('../server/services/pipeline/agentMaterialScheduler');
+    const { assembleMaterialState } = require('../server/services/pipeline/materialStateAssembler');
     const { getDataContext } = require('../server/services/dataContext');
     const ctx = await getDataContext(PROJECT_ID);
     const project = await ctx.getProject();
@@ -67,11 +67,18 @@ async function checkDecisionAndScheduling() {
     record('上下文决策', '预算评估', bs.status ? 'ok' : 'bad',
         (bs.status ? bs.status.label : '-') + ' ratio=' + Number(bs.ratio).toFixed(2));
 
-    const scheduled = await scheduleMaterials('writer', { projectId: PROJECT_ID, chapter, materials, ctx, project, genre });
+    const scheduled = await assembleMaterialState('writer', { projectId: PROJECT_ID, chapter, materials, ctx, project, genre });
     record('素材调度', '实际装载', scheduled.stats.loaded > 0 ? 'ok' : 'bad',
         scheduled.stats.loaded + ' 条 / ' + scheduled.stats.actualChars + ' 字');
     record('素材调度', '约束注入', scheduled.constraints && scheduled.constraints.text ? 'ok' : 'bad',
         ((scheduled.constraints && scheduled.constraints.text) ? scheduled.constraints.text.length : 0) + ' 字');
+    const rep = scheduled.report || { summary: {}, gaps: [], provenance: [] };
+    const blocked = rep.gaps.filter((g) => g.level === 'blocked');
+    record('装配记账(P1-4c)', '缺口分级', blocked.length === 0 ? 'ok' : 'warn',
+        'blocked ' + blocked.length + ' / warn ' + (rep.summary.gapWarn || 0) + (blocked.length ? ' → ' + blocked.map((g) => g.type + ':' + g.reason).join(',') : ''));
+    const traced = rep.provenance.filter((x) => x.lastWriter).length;
+    record('装配记账(P1-4c)', '来源追溯', rep.provenance.length > 0 ? 'ok' : 'warn',
+        rep.provenance.length + ' 条，留痕 ' + traced + ' 条');
 }
 
 async function checkPromptAssembly() {

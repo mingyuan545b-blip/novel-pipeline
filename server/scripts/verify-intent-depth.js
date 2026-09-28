@@ -7,7 +7,7 @@ process.env.USE_PG = 'true';
 const store = require('../store');
 const { resolveIntentDepth, applyIntentDepthOverride, extractCharacterNamesFromIntent, resolveEntityIntentDepth } = require('../services/pipeline/intentDepthResolver');
 const { resolveContext } = require('../services/pipeline/contextCommander');
-const { scheduleMaterials } = require('../services/pipeline/agentMaterialScheduler');
+const { assembleMaterialState } = require('../services/pipeline/materialStateAssembler');
 const { resolveGenreFromProject } = require('../services/genreConfig');
 
 async function main() {
@@ -75,7 +75,7 @@ async function main() {
     console.log('\n--- 5. 端到端测试：writer素材深度 ---');
     const genre = resolveGenreFromProject(project);
     const chapter = { chapterNumber: 1, outline: '温以宁和薄寒第一次相遇', scene: '主世界' };
-    const scheduled = await scheduleMaterials('writer', {
+    const scheduled = await assembleMaterialState('writer', {
         projectId, chapter, materials: activeMats, ctx: {}, project, genre
     });
     const charItems = scheduled.materials.character || [];

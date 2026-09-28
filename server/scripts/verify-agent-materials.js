@@ -5,7 +5,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
 process.env.USE_PG = 'true';
 const store = require('../store');
-const { scheduleMaterials } = require('../services/pipeline/agentMaterialScheduler');
+const { assembleMaterialState } = require('../services/pipeline/materialStateAssembler');
 const { resolveGenreFromProject } = require('../services/genreConfig');
 const { AGENT_DECLARATIONS } = require('../services/pipeline/agentDeclarations');
 
@@ -53,7 +53,7 @@ async function main() {
 
         const declaredTypes = decl.materialNeeds.map(n => n.type);
         try {
-            const scheduled = await scheduleMaterials(agentType, {
+            const scheduled = await assembleMaterialState(agentType, {
                 projectId, chapter, materials, ctx: {}, project, genre
             });
 
