@@ -3,12 +3,32 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-09-27（积压批次落库 + 实体中心 UX 重构 P1–P5：
-> 详细恢复锚点见 docs/worklog/2026-09-27-实体中心UX重构.md）
+> 最后更新：2026-09-29（P0-1/2/3 落库 + **P1-4 计划书立项**：
+> 见 `docs/design/章节因果门槛与单点素材装配（计划书）.md`，下个窗口按该文档 §八 直接开工）
 
 ---
 
 ## 一、当前结论（重要）
+
+0h. **（2026-09-29 本会话）素材单一源 P0-1/2/3 落库 + P1-4 计划书立项**（新窗口优先读本节）
+   - **P0-1** `5a4763a`：与题材无关字段源头过滤（`stateKVHelpers` 兜底改题材中性字段，去掉 hp/combatPower）。
+   - **P0-2** `7f6d0a7`：素材生命周期 `materialLifecycle.js`（`state/archived/activeFromChapter/activeToChapter`）
+     + 加载链按章过滤（`materialIndex`/`materialBudgetCalc`）+ 迁移脚本 + 实体中心卡片归档/区间 UI。
+   - **P0-3** `63e45a0`：双存止血——`item-definitions` 不再复制素材内容（只留身份+`materialId`）、
+     按 name 幂等复用；世界观主题归一 `worldviewTopics.js`；`scripts/verifySourceUniqueness.js`（体检）
+     + `scripts/migrateDefinitionContent.js`（干跑/--apply）。实测：定义含内容 27→9、已回指素材 18。
+     单测 **217 套件/3615 用例全绿**。
+   - **⚠ P1-4 计划书已立项（用户本轮诉求，下个窗口直接开工）**：
+     `docs/design/章节因果门槛与单点素材装配（计划书）.md`。核心判断：**"agent 各自拼素材"不是根因，
+     根因是章节因果顺序被破坏**——① 规划超前（一次规划 20 章/补 2–5 章，
+     `pipelineInit.js:114`、`outlineSupplementor.js:12`）；② 跳章执行（冷却/失败章不阻塞后续章，
+     `chapterScheduler.js:75`、`batchExecutor.js:75`）；③ 补跑只认 approved（`orchestratorPreflight.js:17`）；
+     ④ 兜底静默（补跑失败直接伪 `material-updated`，`materialManagerCatchup.js:36`、`orchestratorPreflight.js:34`）。
+     → 施工顺序 **P1-4a 章节门槛 materialGate → P1-4b 远景粗纲/就近细纲 → P1-4c 单点装配
+     materialStateAssembler（+provenance/gaps）→ P1-4d 密度策略 densityPolicy → P1-4e 缺口告警 UI → P1-5 体检面板**。
+     开工第一条命令见该文档 §十一。
+   - **注意**：P1-4 **不是推倒重来**——`agentDeclarations`/`contextCommander`/`agentMaterialScheduler`/
+     `contextAssemblyRecorder`（装配图）是既有地基，只在其上加"顺序保证 + 缺口暴露 + 密度显式化"。
 
 0g. **（2026-09-27 本会话）积压批次落库 + 实体中心 UX 重构（P1–P5）**（新窗口优先读本节）
    - **积压落库**：跨三批会话的未提交改动走五关门禁提交为 `f3e001d`（207 文件；含藏经阁PG化/
@@ -172,6 +192,10 @@
 ## 四、待办（按优先级）
 
 ### ⚡ 进行中（下个窗口最优先，锚点见worklog）
+- [ ] **P1-4a 章节因果门槛（最高优先）**：按 `docs/design/章节因果门槛与单点素材装配（计划书）.md` §八 开工
+      —— 新增 `server/services/pipeline/materialGate.js`，接入 `infinite/batchExecutor.js` 主循环与
+      `pipelineStepRunner`，收口 `materialManagerCatchup.js:36` / `orchestratorPreflight.js:34` 的静默伪成功；
+      测试 `tests/unit/materialGate.test.js`。**验收**：第5章 failed-skipped 时第6章不再开工。
 - [ ] **复验长度锚点效果**：本次新增"大纲四段节拍 + 执笔中途检查点"，需重跑 1~2 章看字数是否稳定 ≥2500
       （命令：`node scripts/run20ChapterE2E.js --resume 5d512269-3b0b-4e33-bb7d-ac7310bbe73d --only 4,15 --force`）
 - [ ] 剩余 7 章低于 2500 字（2,084~2,415）是否回炉重跑（末轮宽限已保住成品，非阻塞）
