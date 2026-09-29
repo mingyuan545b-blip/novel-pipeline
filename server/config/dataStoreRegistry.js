@@ -60,6 +60,8 @@ const DATA_STORE_REGISTRY = {
     'knowledge-access':      { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'context-assemblies':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'token-ledger':          { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: ['token_ledger'] },
+    // 项目级累计消耗账（每项目一条，锁保护自增；预算熔断的唯一数据源，见 services/pipeline/projectBudget.js）
+    'project-spend':         { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: ['project_spend'] },
     'technique-feedback':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'world-scope-events':    { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },
     'timelines':             { dedicated: false, syncable: false, cascadable: true,  hasProjectId: true,  aliases: [] },

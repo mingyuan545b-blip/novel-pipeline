@@ -1,9 +1,15 @@
 /**
- * run20ChapterE2E.js — 新项目 20 章端到端验证（含功能探针）
+ * run20ChapterE2E.js — 新项目端到端验证（含功能探针），默认 20 章，可扩展至长程
  *
  * 用法:
- *   node scripts/run20ChapterE2E.js                 # 全流程
- *   node scripts/run20ChapterE2E.js --resume <pid>  # 断点续跑
+ *   node scripts/run20ChapterE2E.js                    # 默认 20 章全流程
+ *   node scripts/run20ChapterE2E.js --chapters 100     # 长程验证（100 章）
+ *   node scripts/run20ChapterE2E.js --resume <pid>     # 断点续跑
+ *   node scripts/run20ChapterE2E.js --chapters 100 --dry-run   # 只算代价，不跑
+ *   node scripts/run20ChapterE2E.js --chapters 100 --yes       # 跳过成本闸门确认
+ *
+ * 成本闸门（2026-09-30 新增）：单章约 10 万 tokens（实测 1.80M/18章）。
+ *   预估消耗超过 GATE_TOKENS 时必须显式 --yes，避免误触把额度烧光。
  *
  * 目标：跑通全链路的同时，把每一处异常（HTTP 非 200、字段缺失、轮次缺档、
  *       实体标签漂移、素材未更新、字数不达标…）如实记录下来，不掩盖。
@@ -13,19 +19,30 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { STATUS_VALUES } = require('../server/services/chapterStatus');
+const { PROJECT_BUDGET } = require('../server/config/systemConfig');
 
 const REQUEST_SECRET = process.env.REQUEST_SECRET || '';
-const CHAPTERS = 20;
-const MAX_ROUNDS = 3;
-const OUT_DIR = path.resolve(__dirname, '..', 'output', 'e2e-20ch');
+const argv = process.argv.slice(2);
+const argOf = (name, fallback) => {
+    const i = argv.indexOf(name);
+    return i >= 0 && argv[i + 1] && argv[i + 1].indexOf('--') !== 0 ? argv[i + 1] : fallback;
+};
+
+const CHAPTERS = Math.max(1, Number(argOf('--chapters', 20)) || 20);
+const MAX_ROUNDS = Number(argOf('--rounds', 3)) || 3;
+// 单章 token 经验值（SESSION-STATE 实测 1.80M tokens / 18 章）
+const TOKENS_PER_CHAPTER_EST = 100000;
+const GATE_TOKENS = 2000000;   // 超过此预估量需 --yes 才放行（约 20 章）
+const OUT_DIR = path.resolve(__dirname, '..', 'output', 'e2e-' + CHAPTERS + 'ch');
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-const argv = process.argv.slice(2);
-const RESUME_ID = argv.includes('--resume') ? argv[argv.indexOf('--resume') + 1] : null;
+const RESUME_ID = argOf('--resume', null);
 const FORCE = argv.includes('--force');
+const DRY_RUN = argv.includes('--dry-run');
+const CONFIRMED = argv.includes('--yes');
 // --only 3 或 --only 3,4,15：只跑指定章节（用于定向复验）
 const ONLY = argv.includes('--only')
-    ? String(argv[argv.indexOf('--only') + 1] || '').split(',').map(s => Number(s.trim())).filter(n => n > 0)
+    ? String(argOf('--only', '')).split(',').map(s => Number(s.trim())).filter(n => n > 0)
     : null;
 
 const anomalies = [];
@@ -70,11 +87,58 @@ function fetchApi(method, p, body, timeoutMs = 2400000) {
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * 成本闸门：跑之前先算清代价。长程验证一次 100 章 ≈ 1000 万 tokens，
+ * 误触的代价是真实额度，因此超过阈值必须显式 --yes。
+ * @returns {boolean} true=可以继续
+ */
+function costGate() {
+    const estTokens = CHAPTERS * TOKENS_PER_CHAPTER_EST;
+    const estCost = Number((estTokens / 1e6 * PROJECT_BUDGET.DEFAULT_PRICE_PER_MTOK_CNY).toFixed(2));
+    log('');
+    log('=== 成本闸门 ===');
+    log('章节数=' + CHAPTERS + '  预估 tokens≈' + estTokens.toLocaleString() +
+        '  预估费用≈¥' + estCost + '（单价 ¥' + PROJECT_BUDGET.DEFAULT_PRICE_PER_MTOK_CNY + '/百万token，仅估算）');
+    log('按单章约 2 分钟估算，预计耗时约 ' + Math.round(CHAPTERS * 2 / 60 * 10) / 10 + ' 小时');
+    if (DRY_RUN) { log('--dry-run：仅计算代价，未启动验证'); return false; }
+    if (estTokens > GATE_TOKENS && !CONFIRMED) {
+        log('预估消耗超过闸门 ' + GATE_TOKENS.toLocaleString() + ' tokens，已中止。');
+        log('确认开销后请加 --yes 重新执行，例如：node scripts/run20ChapterE2E.js --chapters ' + CHAPTERS + ' --yes');
+        return false;
+    }
+    return true;
+}
+
+/** 收尾：从服务端读取该项目真实累计消耗（project-spend），闭合"预估 vs 实付" */
+async function reportActualSpend(pid) {
+    try {
+        const r = await fetchApi('GET', '/api/maintenance/budget/' + pid, null, 30000);
+        const d = r.data && r.data.data;
+        if (!d) { anomaly('budget.noData', { status: r.status }); return; }
+        summary.spend = {
+            tokens: d.spentTokens, costCny: d.spentCostCny, calls: d.calls,
+            byStep: d.byStep, status: d.status,
+        };
+        log('');
+        log('=== 实测成本 ===');
+        log('累计 tokens=' + d.spentTokens + '  预估费用≈¥' + d.spentCostCny + '  调用次数=' + d.calls);
+        const steps = Object.entries(d.byStep || {}).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        log('Top 消耗步骤: ' + steps.map(([k, v]) => k + '=' + v).join(', '));
+        const perChapter = d.spentTokens / Math.max(1, CHAPTERS);
+        log('单章均值=' + Math.round(perChapter) + ' tokens（经验值 ' + TOKENS_PER_CHAPTER_EST + '）');
+        if (perChapter > TOKENS_PER_CHAPTER_EST * 1.5) {
+            anomaly('budget.perChapterHigh', { perChapter: Math.round(perChapter), baseline: TOKENS_PER_CHAPTER_EST });
+        }
+    } catch (e) {
+        anomaly('budget.fetchFailed', { message: e.message });
+    }
+}
+
 async function step1_createProject(desc) {
     log('');
     log('=== 步骤1: 创建项目 ===');
     const body = {
-        name: '逆江湖_苍生为局_20章_' + Date.now(),
+        name: '逆江湖_苍生为局_' + CHAPTERS + '章_' + Date.now(),
         description: desc,
         genre: '高武',
         subGenre: 'high-martial-comedy',
@@ -211,6 +275,8 @@ async function runChapter(pid, chapter) {
     const desc = require('./inverseJianghuProjectDesc');
     let pid = RESUME_ID;
     try {
+        // 成本闸门：--dry-run 或超阈值未 --yes 时直接退出（此时尚未创建项目、未调任何 LLM）
+        if (!costGate()) { saveReport(); return; }
         if (!pid) pid = await step1_createProject(desc);
         else log('续跑项目: ' + pid);
         summary.projectId = pid;
@@ -253,6 +319,7 @@ async function runChapter(pid, chapter) {
         log('');
         log('=== 完成: ' + ok + '/' + summary.chapters.length + ' 章通过 ===');
         log('异常总数: ' + anomalies.length);
+        await reportActualSpend(pid);
         summary.finishedAt = new Date().toISOString();
         saveReport();
         console.log('PROJECT_ID=' + pid);

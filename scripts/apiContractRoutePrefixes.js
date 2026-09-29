@@ -79,6 +79,8 @@ const ROUTE_PREFIXES = {
     'server/routes/map.js': '/api/map',
     'server/routes/worldview-profiles.js': '/api/worldview-profiles',
     'server/routes/library.js': '/api/library',
+    // 库维护：孤儿扫描/清理、运行时预警快照、项目预算体检与设置
+    'server/routes/maintenanceRoutes.js': '/api/maintenance',
     'server/routes/prompt-config.js': '/api/prompt-config',
     'server/routes/promptStyleRoutes.js': '/api/prompt-config',
     'server/routes/promptTemplateRoutes.js': '/api/prompt-config',

@@ -20,6 +20,7 @@ function getProviderConfig(providerKey) {
 }
 
 const llmConfig = require('./llmConfig');
+const llmBudgetGuard = require('./pipeline/llmBudgetGuard');
 
 async function resolveConfig(apiConfig) {
     return await llmConfig.resolveConfig(apiConfig);
@@ -28,6 +29,8 @@ async function resolveConfig(apiConfig) {
 async function chat(messages, options = {}) {
     const config = await resolveConfig(options.apiConfig);
     if (!config.apiKey) throw new Error('API Key not configured');
+    // 项目预算闸门：超限即抛（所有 LLM 调用共用这一道闸，防绕过，见 llmBudgetGuard.js）
+    const budgetProjectId = await llmBudgetGuard.begin(options);
     llmTimeoutTracker.recordRequest();
 
     const limiter = getRateLimiter(config.provider, { rpm: options.rpm, burst: options.burst });
@@ -104,6 +107,8 @@ async function chat(messages, options = {}) {
             llmTimeoutTracker.recordSuccess();
 
             llmMetrics.recordTokenUsage(config.provider, data.model || config.model, data.usage, true, durationMs);
+            // 项目账：llm.chat 是 usage 的唯一真实来源，一次调用只记一笔
+            await llmBudgetGuard.record(budgetProjectId, { model: data.model || config.model, usage: data.usage, step: options.usageStep });
             return data;
         } catch (error) {
             clearTimeout(timeoutId);
@@ -159,7 +164,7 @@ async function testConnection(apiConfig) {
         const result = await chat(
             [{ role: 'system', content: '你必须严格按照指定格式回复，不要添加任何额外内容。' },
              { role: 'user', content: `严格按此格式回复，不要添加其他内容：我是${agentName}，我使用的是${modelName}模型` }],
-            { maxTokens: 500, temperature: 0.01, apiConfig: resolved }
+            { maxTokens: 500, temperature: 0.01, apiConfig: resolved, skipBudgetGuard: true }
         );
         const content = result.choices?.[0]?.message?.content || '(empty response)';
         const actualModel = result.model || modelName;

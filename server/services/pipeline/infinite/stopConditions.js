@@ -6,6 +6,14 @@ const { STATUS_VALUES } = require("../../chapterStatus");
 async function checkStopConditions(projectId, chapters, state, addLog, options) {
     const { effectiveStopChapter, targetWordCount, maxChapters } = options;
 
+    // 项目预算熔断：agentRunner 侧已硬停，这里让流水线整体收敛并留下可读日志
+    const budget = await checkBudget(projectId);
+    if (budget && budget.status === 'exceeded') {
+        addLog(`⛔ 项目预算已超限（已用 ${budget.spentTokens} tokens / ¥${budget.spentCostCny}，` +
+            `上限 ${budget.tokenLimit} tokens / ¥${budget.costLimitCny}），停止流水线`);
+        return { shouldStop: true };
+    }
+
     if (effectiveStopChapter && state.completedChapters >= effectiveStopChapter) {
         const hookResult = await checkForeshadowing(projectId, chapters, state, addLog, effectiveStopChapter);
         if (hookResult.shouldStop) return { shouldStop: true };
@@ -37,6 +45,17 @@ async function checkStopConditions(projectId, chapters, state, addLog, options) 
     }
 
     return { shouldStop: false };
+}
+
+/** 预算检查包一层：查询失败不得阻断流水线（记账/预算异常不能变成生成事故） */
+async function checkBudget(projectId) {
+    try {
+        const { checkProjectBudget } = require('../projectBudget');
+        return await checkProjectBudget(projectId);
+    } catch (e) {
+        logger.warn('infinitePipeline', '预算检查失败（忽略）', { eMessage: e.message });
+        return null;
+    }
 }
 
 async function checkForeshadowing(projectId, chapters, state, addLog, effectiveStopChapter) {

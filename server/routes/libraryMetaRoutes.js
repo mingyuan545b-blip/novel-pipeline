@@ -56,7 +56,18 @@ router.get('/technique-feedback/:projectId', async (req, res) => {
             rates[item.techniqueId].total++;
             item.passed ? rates[item.techniqueId].passed++ : rates[item.techniqueId].failed++;
         }
-        const summary = Object.entries(rates).map(([id, r]) => ({ techniqueId: id, ...r, successRate: r.total > 0 ? (r.passed / r.total * 100).toFixed(1) : '0.0' }));
+        const summary = Object.entries(rates).map(([id, r]) => {
+            // 回填技法名/部门：前端此前只能显示裸ID，用户无法阅读（见 worklog 2026-09-30）
+            const tech = techIndex.getTechnique(id);
+            return {
+                techniqueId: id,
+                name: tech?.display_name || '',
+                department: tech?.department || '',
+                subcategory: tech?.subcategory || '',
+                ...r,
+                successRate: r.total > 0 ? (r.passed / r.total * 100).toFixed(1) : '0.0',
+            };
+        });
         summary.sort((a, b) => parseFloat(b.successRate) - parseFloat(a.successRate));
         res.json({ projectId: req.params.projectId, totalRecords: items.length, techniques: summary });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }

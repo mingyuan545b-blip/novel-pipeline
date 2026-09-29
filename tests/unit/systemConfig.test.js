@@ -1,6 +1,6 @@
 const { resolveConfig } = require('../../server/config/index');
 const { getDefaultsForGenre, NOVEL_DEFAULTS } = require('../../server/config/genreDefaults');
-const { getAgentConfig, resolveModelBudget, resolveModelCategory, AGENT_DEFAULTS, CONTEXT_BUDGET_MODELS, STORE_SIZE_LIMITS, PIPELINE, LIBRARY_EXTRACT } = require('../../server/config/systemConfig');
+const { getAgentConfig, resolveModelBudget, resolveModelCategory, AGENT_DEFAULTS, CONTEXT_BUDGET_MODELS, STORE_SIZE_LIMITS, PIPELINE, LIBRARY_EXTRACT, PROJECT_BUDGET } = require('../../server/config/systemConfig');
 
 describe('SystemConfig - Genre Defaults', () => {
     test('novel defaults have correct values', () => {
@@ -142,5 +142,32 @@ describe('SystemConfig - Library Extract（藏经阁一键提取）', () => {
     test('单次提取超时不超过异步任务看门狗(30分钟)', () => {
         const { TASK_TIMEOUT_MS } = require('../../server/routes/pipeline/asyncTaskManager');
         expect(LIBRARY_EXTRACT.REQUEST_TIMEOUT_MS).toBeLessThanOrEqual(TASK_TIMEOUT_MS);
+    });
+});
+
+describe('SystemConfig - Project Budget（项目级预算熔断）', () => {
+    test('开关与告警比例取值合法', () => {
+        expect(typeof PROJECT_BUDGET.ENABLED).toBe('boolean');
+        expect(typeof PROJECT_BUDGET.HARD_STOP).toBe('boolean');
+        expect(PROJECT_BUDGET.WARN_RATIO).toBeGreaterThan(0);
+        expect(PROJECT_BUDGET.WARN_RATIO).toBeLessThanOrEqual(1);
+    });
+
+    test('默认不设上限（0=不限制），避免新项目一开就被拦住', () => {
+        expect(PROJECT_BUDGET.DEFAULT_TOKEN_LIMIT).toBe(0);
+        expect(PROJECT_BUDGET.DEFAULT_COST_LIMIT_CNY).toBe(0);
+    });
+
+    test('兜底单价为正数（宁可高估成本，不可低估）', () => {
+        expect(PROJECT_BUDGET.DEFAULT_PRICE_PER_MTOK_CNY).toBeGreaterThan(0);
+        for (const price of Object.values(PROJECT_BUDGET.MODEL_PRICES_PER_MTOK_CNY)) {
+            expect(price).toBeGreaterThan(0);
+        }
+    });
+
+    test('成本估算与配置表一致（防单价表被误改）', () => {
+        const { estimateCostCny } = require('../../server/services/pipeline/projectBudget');
+        expect(estimateCostCny('qwen3.8-flash', 1000000)).toBe(PROJECT_BUDGET.MODEL_PRICES_PER_MTOK_CNY['qwen3.8']);
+        expect(estimateCostCny('unknown-model', 1000000)).toBe(PROJECT_BUDGET.DEFAULT_PRICE_PER_MTOK_CNY);
     });
 });

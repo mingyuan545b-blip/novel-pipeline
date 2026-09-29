@@ -41,7 +41,7 @@ async function generateInitialMaterials(projectId, userPrompt) {
     const userContent = buildMaterialUserPrompt(project, userPrompt, genre);
 
     const messages = [{ role: 'system', content: systemContent }, { role: 'user', content: userContent }];
-    const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, enableThinking: false, apiConfig: await getOutlineApiConfig() });
+    const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, enableThinking: false, apiConfig: await getOutlineApiConfig(), projectId, usageStep: 'material-generator' });
     const responseText = result.choices?.[0]?.message?.content || '';
     logger.info('outlineGen', `generateInitialMaterials response length: ${responseText.length}`);
 
@@ -126,7 +126,7 @@ async function generateChapterOutlines(projectId, userPrompt, overrideTargetCoun
         const retryHint = attempt > 0 ? `\n\n【偏移修正提示】上一次生成的大纲存在题材偏移，请严格遵守题材约束重新生成。` : '';
         const userContent = `小说名称：${project.name}\n类型：${project.genre}\n描述：${project.description}\n\n已有素材：\n${materialSummary}\n\n用户需求：${userPrompt || '请生成完整大纲'}${retryHint}`;
         const messages = [{ role: 'system', content: systemPrompt }, { role: 'user', content: userContent }];
-        const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, apiConfig: await getOutlineApiConfig() });
+        const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, apiConfig: await getOutlineApiConfig(), projectId, usageStep: 'outline-generator' });
         const responseText = result.choices?.[0]?.message?.content || '';
         try {
             const outlines = parseJsonResponse(responseText);
@@ -162,7 +162,7 @@ async function supplementChapterOutlines(projectId, existingCount, supplementCou
         const systemPrompt = buildSupplementOutlineSystemPrompt(constraintInjection, styleInjection, startChapter, endChapter);
         const driftRetryHint = attempt > 0 ? '\n【偏移修正提示】上一次生成的大纲存在题材偏移，请严格遵守题材约束重新生成。' : '';
         const messages = [{ role: 'system', content: systemPrompt }, { role: 'user', content: `小说：${project.name}\n已有素材：\n${materialSummary}\n${retryHint}${driftRetryHint}` }];
-        const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, apiConfig: await getOutlineApiConfig() });
+        const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, apiConfig: await getOutlineApiConfig(), projectId, usageStep: 'outline-generator' });
         const responseText = result.choices?.[0]?.message?.content || '';
         try {
             const outlines = parseJsonResponse(responseText);

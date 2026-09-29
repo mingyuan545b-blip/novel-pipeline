@@ -43,6 +43,7 @@
 | 约束系统变更 | [sop/08-约束执行规范.md](sop/08-约束执行规范.md) | 约束词/审核/override/hardBlock/元约束M1-M5 |
 | 新项目约束词设计 | [sop/09-新项目约束词设计SOP.md](sop/09-新项目约束词设计SOP.md) | 新建项目/更换题材/新增约束词（4步闭环：题材选择→约束词配置→冲突预检→端到端验证） |
 | 长任务/上下文将压缩 | [sop/10-上下文交接规范.md](sop/10-上下文交接规范.md) | **任何预计超长的任务开始前必读**；收到上下文压缩提示时立即执行落盘 |
+| 备份/恢复/灾备 | [sop/11-数据备份与恢复.md](sop/11-数据备份与恢复.md) | 备份计划任务、校验、恢复演练；**长篇项目开工前必读**（一失全失风险） |
 
 ---
 
@@ -102,6 +103,7 @@
 |------|---------|---------|
 | 项目删除后数据残留 | [00 #32 孤儿数据](sop/00-陷阱清单.md) | `scripts/audit-cascade-delete.js` |
 | PG降级静默失败 | [00 PG降级类](sop/00-陷阱清单.md) | `store.js`（_backendStatus） |
+| 数据库损坏/误删项目/需要灾备 | [11 备份与恢复](sop/11-数据备份与恢复.md) | `scripts/pgBackup.js --verify` / `--restore-test` |
 | 字段缺失/默认值不一致 | [reference/项目身份与硬约束.md](reference/项目身份与硬约束.md) | `schemaIntegrityCheck.js` |
 | 配置不同步测试 | [MAINTENANCE §三.2](MAINTENANCE.md) | `scripts/audit-config-test-sync.js` |
 | 提交长正文被静默截断（提取/导入类接口） | [00 #115](sop/00-陷阱清单.md) + [03 一键提取](sop/03-新功能开发.md) | `middleware/inputSanitizer.js`（LONG_TEXT_ROUTES） |

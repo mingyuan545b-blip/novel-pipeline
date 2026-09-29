@@ -15,7 +15,28 @@ export const SLOT_LABELS = { L0: '核心层', L1: '活跃层', L2: '近期层', 
 export const INJECTION_LABELS = { 'intent-planner': '意图规划', writer: '执笔人', polisher: '润色师', 'material-manager': '素材管理' };
 export const DEPTH_LABELS = { macro: '宏观·叙事骨架', meso: '中观·情节肌理', micro: '微观·文笔细节' };
 export const DEPTH_COLORS = { macro: '#9b59b6', meso: '#3498db', micro: '#1abc9c' };
-export const cleanName = (s) => (s || '').replace(/^\d+_/, '');
+
+/**
+ * 部门 → 世界观深度兜底映射（带数字前缀，与树节点 key 一致）。
+ * SSOT 在服务端 server/services/pipeline/techniqueScheduler.js 的 TECH_WORLDVIEW_DEPTH（同名去前缀），
+ * 此处仅用于服务端 worldviewDepth 字段缺失时的兜底（历史数据/新增题材）。
+ */
+export const DEPT_DEPTH = {
+    '00_叙事之魂部': 'macro', '01_顶层设计部': 'macro', '06_世界构建部': 'macro',
+    '02_情节引擎部': 'meso', '03_人物熔炉部': 'meso', '04_对白艺术部': 'meso',
+    '05_文笔滤镜部': 'micro',
+};
+
+/**
+ * 解析技法条目的深度：优先用服务端 worldviewDepth（library_techniques.worldview_depth 列），
+ * 缺失再按部门兜底，最后回落 meso。
+ * 修复点：原实现用 `DEPTH_COLORS` 的十六进制色值与部门名比较，恒不相等 → micro 分支永不成立，
+ * 文笔滤镜部被错分到 meso（"按深度"视图失真）。
+ */
+export const resolveDepth = (entry) =>
+    entry?.worldviewDepth || DEPT_DEPTH[entry?.department] || 'meso';
+
+export const cleanName = (name) => (name || '').replace(/^\d+_/, '');
 
 export default function useLibraryState() {
     const { currentProject } = useAppStore();
@@ -31,6 +52,7 @@ export default function useLibraryState() {
     const [editValue, setEditValue] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [viewMode, setViewMode] = useState('department');
+    const [depthTree, setDepthTree] = useState({});
     const [feedbackData, setFeedbackData] = useState(null);
 
     const mode = currentProject?.mode || 'novel';
@@ -48,14 +70,23 @@ export default function useLibraryState() {
             const res = await libraryApi.getIndex({ mode: modeFilter || undefined });
             const entries = (res.data || res).entries || [];
             const tree = {};
+            const byDepth = {};
             for (const e of entries) {
                 const dept = e.department;
                 const sub = e.subcategory || '其他';
                 if (!tree[dept]) tree[dept] = {};
                 if (!tree[dept][sub]) tree[dept][sub] = [];
                 tree[dept][sub].push(e);
+
+                // 深度树与部门树同源构建：深度取服务端字段，避免前端按部门名猜测（原 Bug）
+                const depth = resolveDepth(e);
+                if (!byDepth[depth]) byDepth[depth] = {};
+                if (!byDepth[depth][dept]) byDepth[depth][dept] = {};
+                if (!byDepth[depth][dept][sub]) byDepth[depth][dept][sub] = [];
+                byDepth[depth][dept][sub].push(e);
             }
             setTreeData(tree);
+            setDepthTree(byDepth);
         } catch (e) { logger.warn('Library', 'Tree load failed:', e.message); }
     }, [modeFilter]);
 
@@ -114,18 +145,18 @@ export default function useLibraryState() {
     const expandAll = () => {
         const all = new Set();
         for (const [dept, subs] of Object.entries(treeData)) { all.add(dept); for (const sub of Object.keys(subs)) all.add(`${dept}/${sub}`); }
+        // 深度视图的三级 key 与部门视图不同，需一并展开，否则切到"按深度"后仍全是折叠态
+        for (const [depth, depts] of Object.entries(depthTree)) {
+            all.add(depth);
+            for (const [dept, subs] of Object.entries(depts)) {
+                all.add(`${depth}/${dept}`);
+                for (const sub of Object.keys(subs)) all.add(`${depth}/${dept}/${sub}`);
+            }
+        }
         setExpandedNodes(all);
     };
     const collapseAll = () => setExpandedNodes(new Set());
     const closeSearch = () => { setShowSearch(false); setSearchResults([]); };
-
-    const depthTree = Object.entries(treeData).reduce((acc, [dept, subs]) => {
-        const depth = Object.entries(DEPTH_COLORS).find(([_, depts]) => depts === dept) ? 'micro' :
-            ['00_叙事之魂部', '01_顶层设计部', '06_世界构建部'].includes(dept) ? 'macro' : 'meso';
-        if (!acc[depth]) acc[depth] = {};
-        acc[depth][dept] = subs;
-        return acc;
-    }, {});
 
     return {
         currentProject, treeData, stats, expandedNodes, selectedTech, techDetail,

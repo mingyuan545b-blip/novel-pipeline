@@ -211,3 +211,24 @@ writer: {
 
 ### 任务终止态
 - 只认 `asyncTaskManager.isTerminal(status)`；看门狗超时写 `status='timeout'`，前端/脚本必须按终止态处理（陷阱 #107）。
+
+### 项目预算熔断接入 llm.chat（2026-09-30）
+
+**改 Pipeline 时必须知道**：所有 LLM 调用（含 agentRunner 之外的材料/大纲生成）都经过
+`services/llm.js` 的 `chat()`，那里有一道项目预算闸门：
+
+```
+llm.chat → llmBudgetGuard.begin(options)
+              ├─ resolveProjectId：options.projectId > runContext(ALS).projectId
+              └─ assertProjectBudget：超限抛 BudgetExceededError（code=BUDGET_EXCEEDED）
+         → 请求成功 → llmBudgetGuard.record(...) 累加到 project-spend
+```
+
+改动须知：
+- **新增 Agent/调用方要传 `projectId`**（或确保在 `runWithContext({projectId})` 内），
+  否则该调用不受预算约束、也不计入累计消耗（静默漏账比报错更危险）。
+- **不要把预算断言搬回 agentRunner**：那样会重新漏掉 `outlineGenerator` 这类直连 llm.chat 的调用方
+  （2026-09-30 实测：限额 1 token 时 generate-materials 仍跑通）。
+- `BudgetExceededError` **不应重试**（不是网络抖动）。上游若做重试，必须先判 `err.isBudgetExceeded`。
+- 流水线停机：`infinite/stopConditions.js` 在章节边界查预算，超限时优雅停机并写日志。
+- `usageStep` 用于把消耗归属到具体步骤（预算报表的 byStep），agentRunner 已自动带上。

@@ -3,12 +3,38 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-09-29（P0-1/2/3 落库 + P1-4 计划书立项 + **P1-4a 章节因果门槛 / P1-4b 两档大纲 / P1-4c 单点装配入口 已完成**：
-> 见 `docs/design/章节因果门槛与单点素材装配（计划书）.md`，下个窗口按该文档 §八 从 P1-4d 继续）
+> 最后更新：2026-09-30（**外部评审 P0 兜底四件套已落库**：数据灾备 / 项目预算熔断 / 长程验证闸门 / 藏经阁修复，见 §一 0i）
+> 上一轮：P1-4a/b/c 已完成，P1-4d 密度策略待做，见 `docs/design/章节因果门槛与单点素材装配（计划书）.md` §八
 
 ---
 
 ## 一、当前结论（重要）
+
+0i. **（2026-09-30 本会话）外部评审 P0 兜底四件套：备份 / 预算熔断 / 长程闸门 / 藏经阁修复**（新窗口优先读本节）
+   - **P0-1 数据灾备（此前为零）**：`scripts/pgBackup.js` + `lib/pgBackupCore.js` + `tests/unit/pgBackup.test.js`(18)。
+     支持 `--dry-run/--list/--verify/--restore-test/--keep/--out`；产物 `backups/pg/`（已 gitignore）。
+     **实测：备份 5.87MB/40表 → sha256 校验 → 恢复演练临时库 40 表行数完全一致 → 临时库已清理**。
+     计划任务外壳 `pgBackupTask.bat` + `registerBackupTask.ps1`（**需用户显式注册**，未自动安装）。
+     新增 [docs/sop/11-数据备份与恢复.md](sop/11-数据备份与恢复.md)。
+   - **P0-2 项目预算熔断**：`config/systemConfigBudget.js`(PROJECT_BUDGET) + `services/pipeline/projectBudget.js`
+     + `llmBudgetGuard.js` + kv `project-spend`（锁保护自增）+ `stopConditions.js` 优雅停机
+     + `GET|PUT /api/maintenance/budget/:projectId` + `scripts/backfillProjectSpend.js`。
+     **闸门下沉到 `services/llm.js` 的 `chat()`**——实测只在 agentRunner 拦会漏：
+     限额设 1 token 时 `generate-materials`（outlineGenerator 直连 llm.chat）仍跑通；下沉后同一请求被拦且**零 token 消耗**。
+     回填实测：20章项目累计 **1,799,517 tokens / ¥3.60**（与交接卡"1.80M/18章"吻合）。
+   - **P0-3 长程验证闸门**：`scripts/run20ChapterE2E.js` 支持 `--chapters N`（默认 20，可跑 100 章）
+     + **成本闸门**（预估超 2M tokens 必须 `--yes`）+ `--dry-run` + 收尾自动拉取真实消耗闭环。
+     **未执行 50~100 章实跑**：100 章 ≈ 1000 万 tokens ≈ ¥20 / 3.3 小时，需用户确认后执行：
+     `node scripts/run20ChapterE2E.js --chapters 100 --yes`
+   - **P0-4 藏经阁修复**：`useLibraryState` 深度分类 Bug（原按色值比部门名，恒不相等 → micro 永久失效）改为
+     用服务端 `worldviewDepth`（SSOT），部门映射仅兜底；`expandAll` 覆盖深度视图 key；
+     反馈接口回填技法名/部门（此前前端只显示裸 ID）；Top/Bottom 不再重复；新增回归测试。
+   - **回归基线**：后端单测 **227 套件 / 3744 用例全绿**；铁律自检无互斥；硬编码 0 issue/0 超行；
+     级联 0 CRITICAL；apiRegistry / 数据源一致性 / 项目标准 0 error；文档新鲜度 18→13（余为历史记录误报）。
+   - **存量问题（非本次引入，已核实）**：前端 vitest 有 **17 个失败**（全在 `pages/entitycenter/*`，
+     与本次改动零重叠）；`verifyApiContract` 35 errors（改动前后一致）；13 条文档新鲜度误报（历史 worklog/陷阱清单）。
+   - **测试项目已清理**：本次建的 2 个一次性项目已删（含级联 `project-spend`），`scanOrphans` 0 孤儿；
+     验证项目 `5d512269` 的预算限额已重置为不限制。
 
 0h. **（2026-09-29 本会话）素材单一源 P0-1/2/3 落库 + P1-4 计划书立项**（新窗口优先读本节）
    - **P0-1** `5a4763a`：与题材无关字段源头过滤（`stateKVHelpers` 兜底改题材中性字段，去掉 hp/combatPower）。
@@ -50,7 +76,7 @@
      新增 `materialStateAssembler.js`（装配+记账+落盘一处完成，blocked 缺口 ERROR 报警）+ `materialAssemblyReport.js`
      （**纯函数**：`gaps` 三级 blocked/warn/info、`provenance` 来源追溯、`density` 密度事实、`summary` 供门槛/UI 消费；
      `materialNeeds` 解析为空 → 记 `context-unresolved` blocked，**不再静默返回空素材**）；
-     调度器不再自己记账（只装载 + 回传 `context`）；**6 个 agent 步 + 3 个核查脚本全部改走装配入口**，
+     调度器不再自己记账（只装载 + 回传 `context`）；**装配入口已收敛：Agent 步 6 个 + 核查脚本 3 个全部改走同一入口**，
      新增只读审计 `scripts/verifyMaterialAssemblyEntry.js`（0 绕过）；`materialCreateAction`/`materialActions`
      统一写 `lastWriter/lastUpdatedChapter`（口径见 `config/materialWriteOwnership.js`）；
      装配记录扩展 `gaps/provenance/density`（不新增表）。
@@ -236,6 +262,12 @@
 - [ ] genre命名混乱（目录 `high-martial-crossplane` / 插件id `high-martial-comedy` / label "万界debug·反套路喜剧"）统一评估
 
 ### 🔴 需用户本人操作
+- [ ] **注册每日数据库备份**（2026-09-30 新增能力，尚未启用）：
+      `powershell -ExecutionPolicy Bypass -File scriptsegisterBackupTask.ps1`
+      建议加 `--out D:/pgbak` 指到另一块盘（同盘坏则备份与数据一起没）；季度跑一次 `npm run backup:restore-test`
+- [ ] **确认后跑 100 章长程验证**（唯一能暴露摘要漂移/伏笔账本膨胀/实体状态爆炸的手段）：
+      `node scripts/run20ChapterE2E.js --chapters 100 --yes`（≈1000万tokens ≈¥20 ≈3.3小时）
+- [ ] 给新项目设预算上限（默认不限）：`PUT /api/maintenance/budget/:projectId`
 - [ ] **删除 Windows User 级 `ALIYUN_CODING_API_KEY`（38字符旧key，已失效）**：
       `[Environment]::SetEnvironmentVariable('ALIYUN_CODING_API_KEY',$null,'User')`（或 `reg delete "HKCU\Environment" /v ALIYUN_CODING_API_KEY /f`）
       位置：注册表 `HKCU:\Environment`。项目侧已全量 override 加固，不删也不再影响本仓库，但会污染其它工具

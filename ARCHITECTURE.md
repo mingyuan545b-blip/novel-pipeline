@@ -28,27 +28,30 @@ Novel-Pipeline 是一个AI驱动的长篇小说自动化创作系统，目标支
 
 **后端.env关键变量**：
 ```
-LLM_PROVIDER=lmstudio              # 全局回退供应商（步骤级路由见下方说明）
-ALIYUN_CODING_API_KEY=sk-xxx       # 阿里云API密钥
-ALIYUN_CODING_MODEL=qwen3.6-plus   # 阿里云模型
-DEEPSEEK_API_KEY=sk-xxx            # DeepSeek API密钥
+LLM_PROVIDER=aliyunCoding          # 全局回退供应商（步骤级路由见下方说明）
+ALIYUN_CODING_API_KEY=sk-sp-xxx    # 阿里云 Token Plan 网关密钥
+ALIYUN_CODING_MODEL=qwen3.8-flash  # 阿里云模型
+ALIYUN_CODING_BASE_URL=https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+DEEPSEEK_API_KEY=sk-xxx            # DeepSeek API密钥（备用通道；当前为占位符，实测401）
 DEEPSEEK_BASE_URL=https://xxx/v1   # DeepSeek API地址
 DEEPSEEK_MODEL=deepseek-v4-pro     # DeepSeek模型
-LMSTUDIO_API_KEY=lm-studio         # LM Studio本地：占位密钥（必须非空）
-LMSTUDIO_BASE_URL=http://192.168.1.102:1234/v1  # 本地推理服务地址（/v1结尾）
-LMSTUDIO_MODEL=qwen3.8-27b         # LM Studio中加载的模型ID
-REQUEST_SECRET=novel-pipeline-2024-secure  # 认证密钥
+USE_PG=true                        # 使用 PostgreSQL 后端
+DATABASE_URL=postgresql://postgres@localhost:5432/novel_pipeline
+REQUEST_SECRET=xxx                 # 认证密钥（必须与 client/.env.local 的 VITE_REQUEST_SECRET 一致）
 PORT=3001                          # 后端端口
+PG_DUMP_PATH=                      # 可选：pg_dump 绝对路径（不在PATH时用，见 sop/11）
 ```
 
 **LLM步骤路由规则**（`server/config/providerDefs.js` 的 `DEFAULT_STEP_ASSIGNMENTS`）：
 1. 项目级 `agentModelConfig`（每步指定 keyId/provider）优先
-2. 步骤分配表按键顺序匹配：`lmstudio` 在前 → 配置了 `LMSTUDIO_API_KEY` 时全部11个步骤走本地模型；未配置自动回落 `aliyunCoding` 云端
+2. 步骤分配表按键顺序匹配（只匹配当前有效供应商；已弃用的 provider 不参与）
 3. 都没有才用 `LLM_PROVIDER` 全局回退
 
-**本地思考模型治理**：llama.cpp系服务（LM Studio）不认API层 `enable_thinking` 参数，
-思考会吃光 `max_tokens` 导致正文为空。对策：provider声明 `noThinkMarker`（lmstudio为 ` /no_think`），
-`llmRequestBuilder.buildRequestPayload` 统一在末条user消息追加。详见陷阱#94。
+**本地思考模型治理（历史记录：该方案已弃用停用）**：曾接入 llama.cpp 系本地服务。
+这类服务不认 API 层 `enable_thinking` 参数，思考会吃光 `max_tokens` 导致正文为空。
+当时的对策是 provider 声明 `noThinkMarker`（` /no_think`），由 `llmRequestBuilder.buildRequestPayload`
+统一在末条 user 消息追加，详见陷阱 #94。因本地 27B 生成速度过慢（约 6 tok/s，单章 20-40 分钟），
+已弃用为主力方案，当前全部走云端网关。
 
 **前端.env关键变量**：
 ```
@@ -695,3 +698,54 @@ techIndex.getTechniquesByInjectionPoint(agentType, mode)
   单次LLM超时 `LIBRARY_EXTRACT.REQUEST_TIMEOUT_MS`(10分钟)。
 - 去重：库内已有技法名 + 本批已产出名，包含关系即判重，避免换后缀重复入库。
 - 产出必须通用：技法名含书名号/引号等专有名词特征直接判废（`libraryExtractParse`）。
+
+---
+
+## 十六、成本总闸与数据灾备（2026-09-30 新增）
+
+> 背景：外部评审指出"单个四五百万字项目 ≈ 1700 章 / 1.7 亿 tokens"，而系统此前
+> **数据库零备份**、**无项目级费用上限**，且所有长程机制只在 20 章尺度验证过。
+
+### 16.1 项目预算熔断
+
+| 层 | 文件 | 说明 |
+|----|------|------|
+| 配置（SSOT） | `server/config/systemConfigBudget.js` | `PROJECT_BUDGET`：开关/硬停/告警比例/默认上限/单价表 |
+| 累计账 | kv `project-spend`（`dataStoreRegistry` 已注册） | 每项目一条；`store.updateItem` 进程内写锁自增（并发章节不丢更新） |
+| 实现 | `server/services/pipeline/projectBudget.js` | 记账/体检/断言；`BudgetExceededError`（`code=BUDGET_EXCEEDED`） |
+| 闸门 | `server/services/pipeline/llmBudgetGuard.js` | 接入 `services/llm.js` 的 `chat()`，**所有 LLM 调用必经** |
+| 停机 | `server/services/pipeline/infinite/stopConditions.js` | 章节边界查预算，超限优雅停机并写日志 |
+| 端点 | `routes/maintenanceRoutes.js` | GET/PUT `/api/maintenance/budget/:projectId` |
+| 回填 | `scripts/backfillProjectSpend.js` | 从 token-ledger 补历史累计（默认干跑） |
+
+```
+llm.chat → llmBudgetGuard.begin(options)
+             ├─ resolveProjectId：options.projectId > runContext(ALS).projectId
+             └─ assertProjectBudget：超限抛 BudgetExceededError
+         → 成功 → llmBudgetGuard.record(...) → project-spend 累加
+```
+
+**为什么闸门在 llm.chat 而不是 agentRunner**：实测把限额设为 1 token 后
+`POST /api/pipeline/generate-materials` 仍跑通——`outlineGenerator` 直连 `llm.chat`，绕过 agentRunner。
+单点出口才能覆盖全部调用方。
+
+**为什么不复用 token-ledger 求和**：`tokenLedger.pruneOldLedger` 只保留最近 200 章，
+求和会随项目推进越来越低估；故另开 `project-spend`（永不过期、锁保护自增）。
+
+**预算与上下文预算的分工**：`config/budgetPolicy.js` 管单次调用的上下文怎么分（微观）；
+`systemConfigBudget` 管项目累计到多少就熔断（宏观）。
+
+### 16.2 数据备份与恢复
+
+| 文件 | 作用 |
+|------|------|
+| `scripts/pgBackup.js` | 备份 / 校验（sha256）/ 恢复演练 / 保留策略 |
+| `scripts/lib/pgBackupCore.js` | 核心逻辑（pg_dump 自动发现、导出、manifest、保留、恢复） |
+| `scripts/pgBackupTask.bat` + `registerBackupTask.ps1` | Windows 计划任务外壳（需用户显式注册） |
+| `backups/pg/backup-<时间戳>/` | `dump.pgc`（-Fc 自定义格式）+ `manifest.json`（sha256 + 各表行数基线） |
+
+- **只备份不演练 = 没备份**：`--restore-test` 真建临时库恢复并逐表比对行数。
+- 口令只经 `PGPASSWORD` 传递，绝不进命令行；一律 `-w` 避免卡在交互式口令提示。
+- pg_dump 不在 PATH 时自动扫描标准安装目录（实测本机 `C:/Program Files/PostgreSQL/17/bin`），
+  可用 `PG_DUMP_PATH` / `PG_RESTORE_PATH` 显式指定。
+- 完整说明见 [docs/sop/11-数据备份与恢复.md](docs/sop/11-数据备份与恢复.md)。

@@ -9,7 +9,7 @@ const { ContextBudget, estimateTokens, truncateToTokens } = require('../contextB
 const promptAuditor = require('../promptAuditor');
 const { getBeatAllocator } = require('../beatAllocator');
 const { getMetrics } = require('../metricsCollector');
-const tokenLedger = require('./tokenLedger');
+const { reportAgentUsage } = require('./agentUsageReporter');
 const { resolveGenreFromProject } = require('../genreConfig');
 const { getDataContext } = require('../dataContext');
 const { classifyMaterials, allocateMaterialsToBudget, buildUserContent, truncateUserContent, getMaterialAccessConfig } = require('./unifiedBudgetPool');
@@ -19,6 +19,8 @@ const { buildKnowledgeContext, resolveGenre, buildFeedbackRates, cacheSelectedTe
 
 async function runAgent(agentType, context) {
     const mode = context.mode || 'novel';
+    // 预算熔断不在此处断言：统一在 llm.chat 出口拦截，覆盖绕过 agentRunner 的调用方
+    // （实测 generate-materials 直连 llm.chat，若只在 agentRunner 拦会漏）
     const projectId = context.projectId || null;
 
     const agentCfg = AGENT_DEFAULTS[agentType] || { maxTokens: 8192 };
@@ -86,14 +88,11 @@ async function runAgent(agentType, context) {
 
     const responseText = result.choices?.[0]?.message?.content || '';
     if (projectId) try { getMetrics(projectId).recordAgentTiming(agentType, Date.now() - (context._startTime || Date.now()), result.usage?.total_tokens || 0); } catch(_) { logger.warn('agentRunner', _.message || _); }
-    // Token 账本：单点上报"这一步花了多少、花在哪几段提示词上、哪段被截断"
-    if (projectId) try {
-        await tokenLedger.recordTokenLedger({
-            projectId, chapterNumber: context.chapterNumber, step: agentType,
-            model, usage: result.usage, contextReport: report, outputChars: responseText.length,
-        });
-        await tokenLedger.pruneOldLedger(projectId, context.chapterNumber || 0);
-    } catch(_) { logger.warn('agentRunner', 'tokenLedger: ' + (_.message || _)); }
+    // 单点上报：token 账本（花在哪几段提示词上） + 项目账（预算熔断）
+    await reportAgentUsage({
+        projectId, chapterNumber: context.chapterNumber, step: agentType,
+        model, usage: result.usage, contextReport: report, outputChars: responseText.length,
+    });
 
     return { agent: agentType, role: assembled.role, response: responseText, usage: result.usage, contextReport: report, promptAudit: auditResult, timestamp: new Date().toISOString() };
 }
@@ -138,6 +137,8 @@ async function _injectTechniquesAndBeats(budget, context, agentType, mode) {
 
 function _buildChatOptions(context, agentType, maxTokens) {
     const chatOptions = { temperature: context.temperature || 0.7, maxTokens };
+    // 供 llm.chat 记账时标记消耗归属步骤（预算报表按步骤拆分用）
+    chatOptions.usageStep = agentType;
     const agentDefaults = AGENT_DEFAULTS[agentType];
     if (agentDefaults?.timeoutMs) chatOptions.timeout = agentDefaults.timeoutMs;
     if (context.apiConfig) chatOptions.apiConfig = context.apiConfig;
