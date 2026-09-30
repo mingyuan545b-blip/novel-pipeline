@@ -1,7 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import useAppStore from '../../store/useAppStore';
 import { libraryApi } from '../../services/api';
 import logger from '../../shared/logger';
+import {
+    DEPT_DEPTH, resolveDepth, buildTrees, countByCompleteness, filterEntries, collectExpandKeys,
+} from './libraryTreeBuild';
 
 export const DEPT_ICONS = {
     '00_叙事之魂部': '🔮', '01_顶层设计部': '🏗️', '02_情节引擎部': '⚙️',
@@ -15,80 +18,56 @@ export const SLOT_LABELS = { L0: '核心层', L1: '活跃层', L2: '近期层', 
 export const INJECTION_LABELS = { 'intent-planner': '意图规划', writer: '执笔人', polisher: '润色师', 'material-manager': '素材管理' };
 export const DEPTH_LABELS = { macro: '宏观·叙事骨架', meso: '中观·情节肌理', micro: '微观·文笔细节' };
 export const DEPTH_COLORS = { macro: '#9b59b6', meso: '#3498db', micro: '#1abc9c' };
-
-/**
- * 部门 → 世界观深度兜底映射（带数字前缀，与树节点 key 一致）。
- * SSOT 在服务端 server/services/pipeline/techniqueScheduler.js 的 TECH_WORLDVIEW_DEPTH（同名去前缀），
- * 此处仅用于服务端 worldviewDepth 字段缺失时的兜底（历史数据/新增题材）。
- */
-export const DEPT_DEPTH = {
-    '00_叙事之魂部': 'macro', '01_顶层设计部': 'macro', '06_世界构建部': 'macro',
-    '02_情节引擎部': 'meso', '03_人物熔炉部': 'meso', '04_对白艺术部': 'meso',
-    '05_文笔滤镜部': 'micro',
-};
-
-/**
- * 解析技法条目的深度：优先用服务端 worldviewDepth（library_techniques.worldview_depth 列），
- * 缺失再按部门兜底，最后回落 meso。
- * 修复点：原实现用 `DEPTH_COLORS` 的十六进制色值与部门名比较，恒不相等 → micro 分支永不成立，
- * 文笔滤镜部被错分到 meso（"按深度"视图失真）。
- */
-export const resolveDepth = (entry) =>
-    entry?.worldviewDepth || DEPT_DEPTH[entry?.department] || 'meso';
-
 export const cleanName = (name) => (name || '').replace(/^\d+_/, '');
+// 兼容旧引用：深度判定已抽到 libraryTreeBuild（纯函数可测），此处透传
+export { DEPT_DEPTH, resolveDepth };
 
+/**
+ * useLibraryState — 藏经阁状态与数据
+ *
+ * 2026-10-01 重构：一次拉全量条目，筛选/分组改在客户端（useMemo），
+ * 原因是需要"完整度计数"和"按来源筛选"——每次切筛都打服务端既慢又会让计数抖动。
+ */
 export default function useLibraryState() {
     const { currentProject } = useAppStore();
-    const [treeData, setTreeData] = useState({});
+    const [entries, setEntries] = useState([]);
+    const [sources, setSources] = useState([]);
+    const [sourcesLoading, setSourcesLoading] = useState(false);
     const [stats, setStats] = useState(null);
     const [expandedNodes, setExpandedNodes] = useState(new Set());
     const [selectedTech, setSelectedTech] = useState(null);
     const [techDetail, setTechDetail] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
-    const [modeFilter, setModeFilter] = useState('');
+    const [showSearch, setShowSearch] = useState(false);
     const [editingField, setEditingField] = useState(null);
     const [editValue, setEditValue] = useState('');
-    const [showSearch, setShowSearch] = useState(false);
-    const [viewMode, setViewMode] = useState('department');
-    const [depthTree, setDepthTree] = useState({});
+    const [filters, setFilters] = useState({ completeness: '', source: '', mode: '' });
+    const [viewMode, setViewMode] = useState('source');
     const [feedbackData, setFeedbackData] = useState(null);
 
     const mode = currentProject?.mode || 'novel';
 
-    const toggleNode = (key) => {
-        setExpandedNodes(prev => {
-            const next = new Set(prev);
-            next.has(key) ? next.delete(key) : next.add(key);
-            return next;
-        });
-    };
+    const filtered = useMemo(() => filterEntries(entries, filters), [entries, filters]);
+    const { tree: treeData, byDepth: depthTree } = useMemo(() => buildTrees(filtered), [filtered]);
+    const counts = useMemo(() => countByCompleteness(entries, filters.completeness), [entries, filters.completeness]);
 
-    const loadTree = useCallback(async () => {
+    const loadEntries = useCallback(async () => {
         try {
-            const res = await libraryApi.getIndex({ mode: modeFilter || undefined });
-            const entries = (res.data || res).entries || [];
-            const tree = {};
-            const byDepth = {};
-            for (const e of entries) {
-                const dept = e.department;
-                const sub = e.subcategory || '其他';
-                if (!tree[dept]) tree[dept] = {};
-                if (!tree[dept][sub]) tree[dept][sub] = [];
-                tree[dept][sub].push(e);
+            // 不带 mode 参数：全量取回，模式筛选在客户端做（保证完整度计数稳定）
+            const res = await libraryApi.getIndex();
+            setEntries((res.data || res).entries || []);
+        } catch (e) { logger.warn('Library', 'Index load failed:', e.message); }
+    }, []);
 
-                // 深度树与部门树同源构建：深度取服务端字段，避免前端按部门名猜测（原 Bug）
-                const depth = resolveDepth(e);
-                if (!byDepth[depth]) byDepth[depth] = {};
-                if (!byDepth[depth][dept]) byDepth[depth][dept] = {};
-                if (!byDepth[depth][dept][sub]) byDepth[depth][dept][sub] = [];
-                byDepth[depth][dept][sub].push(e);
-            }
-            setTreeData(tree);
-            setDepthTree(byDepth);
-        } catch (e) { logger.warn('Library', 'Tree load failed:', e.message); }
-    }, [modeFilter]);
+    const loadSources = useCallback(async () => {
+        setSourcesLoading(true);
+        try {
+            const res = await libraryApi.getSources();
+            setSources((res.data || res).sources || []);
+        } catch (e) { logger.warn('Library', 'Sources load failed:', e.message); }
+        finally { setSourcesLoading(false); }
+    }, []);
 
     const loadStats = useCallback(async () => {
         try { const res = await libraryApi.getStats(); setStats(res.data || res); }
@@ -100,70 +79,60 @@ export default function useLibraryState() {
         catch (e) { logger.warn('Library', 'Technique load failed:', e.message); }
     }, []);
 
-    const doSearch = useCallback(async () => {
-        if (!searchQuery.trim()) { setSearchResults([]); return; }
-        try {
-            const res = await libraryApi.search({ q: searchQuery, mode: modeFilter || undefined, topK: 30 });
-            setSearchResults(res.data || res || []); setShowSearch(true);
-        } catch (e) { logger.warn('Library', 'Search failed:', e.message); }
-    }, [searchQuery, modeFilter]);
-
     const loadFeedback = useCallback(async () => {
         if (!currentProject?.id) return;
-        try {
-            const res = await libraryApi.getFeedback(currentProject.id);
-            setFeedbackData(res.data || res);
-        } catch (e) { logger.warn('Library', 'Feedback load failed:', e.message); }
+        try { const res = await libraryApi.getFeedback(currentProject.id); setFeedbackData(res.data || res); }
+        catch (e) { logger.warn('Library', 'Feedback load failed:', e.message); }
     }, [currentProject?.id]);
 
-    useEffect(() => { loadTree(); loadStats(); loadFeedback(); }, [loadTree, loadStats, loadFeedback]);
+    useEffect(() => { loadEntries(); loadSources(); loadStats(); loadFeedback(); }, [loadEntries, loadSources, loadStats, loadFeedback]);
 
-    /** 提取入库/编辑后刷新技法树与统计 */
-    const reload = useCallback(async () => {
-        await loadTree();
-        await loadStats();
-    }, [loadTree, loadStats]);
+    /** 提取入库/编辑后刷新 */
+    const reload = useCallback(async () => { await Promise.all([loadEntries(), loadSources(), loadStats()]); },
+        [loadEntries, loadSources, loadStats]);
 
-    const handleSelectTech = async (id) => { setSelectedTech(id); await loadTechnique(id); };
+    const doSearch = useCallback(async () => {
+        if (!searchQuery.trim()) { setSearchResults([]); setShowSearch(false); return; }
+        try {
+            const res = await libraryApi.search({ q: searchQuery, mode: filters.mode || undefined, topK: 30 });
+            setSearchResults(res.data || res || []); setShowSearch(true);
+        } catch (e) { logger.warn('Library', 'Search failed:', e.message); }
+    }, [searchQuery, filters.mode]);
 
-    const handleSaveField = async (field, value) => {
-        if (!selectedTech) return;
-        try { await libraryApi.updateTechnique(selectedTech, { [field]: Array.isArray(value) ? value : value }); await loadTechnique(selectedTech); setEditingField(null); }
-        catch (e) { logger.warn('Library', 'Save failed:', e.message); }
-    };
-
-    const handleToggleDisabled = async (id, current) => {
-        try { await libraryApi.updateMeta(id, { auto_disabled: !current }); await loadTechnique(id); loadStats(); loadTree(); }
-        catch (e) { logger.warn('Library', 'Toggle failed:', e.message); }
-    };
-
-    const handleResetMeta = async (id) => {
-        try { await libraryApi.resetMeta(id); await loadTechnique(id); loadStats(); }
-        catch (e) { logger.warn('Library', 'Reset failed:', e.message); }
-    };
-
-    const expandAll = () => {
-        const all = new Set();
-        for (const [dept, subs] of Object.entries(treeData)) { all.add(dept); for (const sub of Object.keys(subs)) all.add(`${dept}/${sub}`); }
-        // 深度视图的三级 key 与部门视图不同，需一并展开，否则切到"按深度"后仍全是折叠态
-        for (const [depth, depts] of Object.entries(depthTree)) {
-            all.add(depth);
-            for (const [dept, subs] of Object.entries(depts)) {
-                all.add(`${depth}/${dept}`);
-                for (const sub of Object.keys(subs)) all.add(`${depth}/${dept}/${sub}`);
-            }
-        }
-        setExpandedNodes(all);
-    };
+    const toggleNode = (key) => setExpandedNodes(prev => {
+        const next = new Set(prev);
+        if (next.has(key)) next.delete(key); else next.add(key);
+        return next;
+    });
+    const expandAll = () => setExpandedNodes(collectExpandKeys(treeData, depthTree));
     const collapseAll = () => setExpandedNodes(new Set());
     const closeSearch = () => { setShowSearch(false); setSearchResults([]); };
 
+    const handleSelectTech = async (id) => { setSelectedTech(id); await loadTechnique(id); };
+    const handleSaveField = async (field, value) => {
+        if (!selectedTech) return;
+        try {
+            await libraryApi.updateTechnique(selectedTech, { [field]: value });
+            await loadTechnique(selectedTech); setEditingField(null); await loadEntries();
+        } catch (e) { logger.warn('Library', 'Save failed:', e.message); }
+    };
+    const handleToggleDisabled = async (id, current) => {
+        try { await libraryApi.updateMeta(id, { auto_disabled: !current }); await loadTechnique(id); await reload(); }
+        catch (e) { logger.warn('Library', 'Toggle failed:', e.message); }
+    };
+    const handleResetMeta = async (id) => {
+        try { await libraryApi.resetMeta(id); await loadTechnique(id); await loadStats(); }
+        catch (e) { logger.warn('Library', 'Reset failed:', e.message); }
+    };
+    const setFilter = (key, value) => setFilters(prev => ({ ...prev, [key]: value }));
+
     return {
-        currentProject, treeData, stats, expandedNodes, selectedTech, techDetail,
-        searchQuery, setSearchQuery, searchResults, modeFilter, setModeFilter,
-        editingField, setEditingField, editValue, setEditValue, showSearch,
-        mode, viewMode, setViewMode, depthTree, feedbackData, loadFeedback,
-        toggleNode, loadTree, handleSelectTech, handleSaveField,
-        handleToggleDisabled, handleResetMeta, expandAll, collapseAll, doSearch, closeSearch, reload,
+        currentProject, mode, entries, sources, sourcesLoading, stats, counts, treeData, depthTree,
+        expandedNodes, selectedTech, techDetail, searchQuery, setSearchQuery, searchResults, showSearch,
+        editingField, setEditingField, editValue, setEditValue, filters, setFilter, viewMode, setViewMode,
+        // 兼容别名：模式筛选并入 filters 后，保留旧接口名（既有调用点与测试依赖）
+        modeFilter: filters.mode, setModeFilter: (v) => setFilter('mode', v),
+        feedbackData, loadFeedback, toggleNode, handleSelectTech, handleSaveField, handleToggleDisabled,
+        handleResetMeta, expandAll, collapseAll, doSearch, closeSearch, reload,
     };
 }

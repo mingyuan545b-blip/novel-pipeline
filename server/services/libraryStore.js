@@ -47,6 +47,19 @@ async function listTechniques() {
     return items.map(normalize);
 }
 
+/**
+ * 列表 + 时间戳（只读场景：来源面板/新鲜度展示）。
+ * 单独一个函数而不改 normalize：normalize 同时用于写入路径，
+ * 携带 createdAt/updatedAt 会影响 INSERT 的字段取值，风险不值得。
+ */
+async function listTechniquesWithTimestamps() {
+    const items = await store.listItems(STORE_TYPE);
+    return items.map(t => Object.assign(normalize(t), {
+        createdAt: t.createdAt || null,
+        updatedAt: t.updatedAt || null,
+    }));
+}
+
 async function getTechnique(id) {
     const item = await store.getItem(STORE_TYPE, id);
     return item ? normalize(item) : null;
@@ -115,6 +128,6 @@ async function listNamesWithDept() {
 
 module.exports = {
     STORE_TYPE, normalize,
-    listTechniques, getTechnique, upsertTechnique, deleteTechnique,
+    listTechniques, listTechniquesWithTimestamps, getTechnique, upsertTechnique, deleteTechnique,
     importTechniques, updateMeta, getStats, listNamesWithDept,
 };

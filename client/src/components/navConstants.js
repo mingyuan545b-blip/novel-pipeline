@@ -12,6 +12,8 @@ import {
 export const NOVEL_NAV = [
     { path: '/', icon: IconDashboard, label: '仪表盘' },
     { path: '/pipeline', icon: IconPipeline, label: '流水线' },
+    { path: '/progress', icon: IconMetrics, label: '运行看板' },
+    { path: '/story-bible', icon: IconSliders, label: '全书设定' },
     { path: '/workshop', icon: IconWorkshop, label: '创作工坊' },
     { path: '/materials', icon: IconMaterials, label: '素材库' },
     { path: '/entity-center', icon: IconEntity, label: '实体中心' },

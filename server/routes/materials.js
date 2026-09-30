@@ -183,6 +183,7 @@ router.put('/:id', updateMaterial, async (req, res) => {
     }
     await store.setItem('materials', material.id, updated);
     memory.invalidateCache(material.projectId);
+    require('../services/dataContext').resetDataContext(material.projectId); // DataContext 的素材缓存不受 memory 失效影响，必须单独清（实测）
     res.json(updated);
 });
 

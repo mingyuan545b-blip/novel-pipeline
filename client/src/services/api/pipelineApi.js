@@ -11,6 +11,8 @@ export const pipelineApi = {
     stopInfinite: (data) => longApi.post('/pipeline/infinite/stop', data),
     resetInfinite: (data) => api.post('/pipeline/infinite/reset', data),
     getInfiniteStatus: (projectId) => longApi.get(`/pipeline/infinite/status/${projectId}`),
+    // 运行看板：进度/当前步骤/Agent 耗时（一个端点取齐，避免多请求时序不一致）
+    getProgress: (projectId) => api.get(`/pipeline/progress/${projectId}`),
     resetChapterContent: (data) => api.post('/pipeline/reset-chapter-content', data),
     resetChaptersBulk: (data) => api.post('/pipeline/reset-chapters-bulk', data),
     supplementOutlines: (data) => longApi.post('/pipeline/supplement-outlines', data),

@@ -28,6 +28,7 @@ const ROUTE_PREFIXES = {
     'server/routes/pipeline/pipelineDiagnosticRoutes.js': '/api/pipeline',
     'server/routes/pipeline/pipelineOutputRoutes.js': '/api/pipeline',
     'server/routes/pipeline/contextCommanderRoutes.js': '/api/pipeline',
+    'server/routes/pipeline/progressRoutes.js': '/api/pipeline',
     'server/routes/worldscopeRoutes.js': '',
     'server/routes/workshop.js': '/api/workshop',
     'server/routes/publish.js': '/api/publish',

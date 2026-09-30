@@ -111,6 +111,8 @@ function registerCrudRoutes(router) {
         if (!project) return res.apiError(NOT_FOUND.statusCode, 'Project not found', NOT_FOUND.code);
         const updated = { ...project, ...req.body, id: project.id, updatedAt: new Date().toISOString() };
         await store.setItem('projects', project.id, updated);
+        // 失效 DataContext 单例缓存：否则正在跑的 Agent 仍读到旧设定（缓存无 TTL，实测）
+        require('../../services/dataContext').resetDataContext(project.id);
         res.json(updated);
     });
 

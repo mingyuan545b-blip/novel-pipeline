@@ -11,13 +11,19 @@ const router = express.Router();
 const techIndex = require('../services/techIndex');
 const libraryStore = require('../services/libraryStore');
 const { ValidationEngine } = require('../services/validationEngine');
+const { assessCompleteness } = require('../services/libraryCompleteness');
 const { ERROR_CODES } = require('../shared/errorCodes');
 
 const { VALIDATION_ERROR, NOT_FOUND, INTERNAL_ERROR } = ERROR_CODES;
 const ve = new ValidationEngine();
 
-/** 索引条目（供前端树/筛选，字段与历史JSON结构兼容） */
+/**
+ * 索引条目（供前端树/筛选，字段与历史JSON结构兼容）
+ * 增补：内容完整度（空壳/部分/完整）+ 来源作品 —— 让前端能"优先展示有数据的"，
+ * 用户不必逐条点进去才发现是空壳（2026-10-01 需求，见 services/libraryCompleteness.js）。
+ */
 function toEntry(t) {
+    const c = assessCompleteness(t);
     return {
         id: t.id,
         display_name: t.display_name,
@@ -28,17 +34,27 @@ function toEntry(t) {
         context_slot: t.context_slot,
         injection_point: t.injection_point,
         worldviewDepth: t.worldviewDepth,
+        completeness: c.level,        // full | partial | empty
+        rulesCount: c.rulesCount,
+        antiCount: c.antiCount,
+        contentScore: c.score,        // 前端"有内容优先"排序权重
+        sourceNovel: t.source_novel || '',
+        sourceType: t.source_type || 'curated',
     };
 }
 
 router.get('/index', async (req, res) => {
     try {
-        const { mode, injection_point, department, worldviewDepth } = req.query;
+        const { mode, injection_point, department, worldviewDepth, completeness } = req.query;
         let entries = techIndex.getAll().map(toEntry);
         if (mode) entries = entries.filter(e => e.modes.includes(mode));
         if (injection_point) entries = entries.filter(e => e.injection_point === injection_point);
         if (department) entries = entries.filter(e => e.department === department);
         if (worldviewDepth) entries = entries.filter(e => e.worldviewDepth === worldviewDepth);
+        if (completeness) entries = entries.filter(e => e.completeness === completeness);
+        // 默认"有内容优先"：同部门/子类内先展示可真正注入的技法，空壳沉底（前端仍可自行重排）
+        entries.sort((a, b) => b.contentScore - a.contentScore ||
+            String(a.display_name).localeCompare(String(b.display_name), 'zh'));
         res.json({
             entries,
             total_entries: entries.length,
@@ -113,7 +129,9 @@ router.get('/search', async (req, res) => {
     try {
         const { q, mode, injection_point, topK } = req.query;
         if (!q) return res.json([]);
-        res.json(techIndex.search(q, { mode, injectionPoint: injection_point, topK: Number(topK) || 10 }));
+        const hits = techIndex.search(q, { mode, injectionPoint: injection_point, topK: Number(topK) || 10 });
+        // 搜索结果补完整度：轻量索引条目不含规则，需按 id 回查全文（topK≤30，成本可忽略）
+        res.json(hits.map(h => Object.assign({}, h, toEntry(techIndex.getTechnique(h.id) || h))));
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }

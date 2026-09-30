@@ -23,7 +23,7 @@ const ROUTES = [
     '/', '/pipeline', '/materials', '/chapters', '/agents', '/settings',
     '/guide', '/workshop', '/publish', '/knowledge', '/library',
     '/entity-center', '/style-templates', '/context-assembly', '/metrics',
-    '/genre-debug', '/debug-logs',
+    '/genre-debug', '/debug-logs', '/token-ledger', '/progress', '/story-bible',
     '/comic/config', '/comic/workflows', '/comic/storyboard', '/comic/render', '/comic/export'
 ];
 

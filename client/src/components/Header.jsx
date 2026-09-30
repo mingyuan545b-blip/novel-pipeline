@@ -23,6 +23,8 @@ const PAGE_TITLES = {
     '/style-templates': '风格模板',
     '/knowledge': '知识库',
     '/library': '藏经阁',
+    '/progress': '运行看板',
+    '/story-bible': '全书设定',
     '/entity-center': '实体中心',
     '/genre-debug': '题材调试',
     '/metrics': '系统监控',

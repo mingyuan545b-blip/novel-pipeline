@@ -107,6 +107,8 @@ export const libraryApi = {
     getExtractDimensions: () => api.get('/library/extract-dimensions'),
     extractTechniques: (payload) => api.post('/library/extract', payload),
     getExtractStatus: (taskId) => api.get(`/library/extract/${taskId}`),
+    // 提取来源清单：按"从哪本书提的"聚合（回答"前面那本提取过什么"）
+    getSources: () => api.get('/library/sources'),
     createTechnique: (data) => api.post('/library/techniques', data),
     deleteTechnique: (id) => api.delete(`/library/technique/${id}`),
 };

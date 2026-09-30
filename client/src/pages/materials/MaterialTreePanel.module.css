@@ -1,7 +1,7 @@
 /* MaterialTreePanel - 素材树面板样式 */
 
 .panel {
-    background: var(--card-bg);
+    background: var(--bg-card);
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
     padding: 12px;
@@ -68,8 +68,8 @@
 }
 
 .treeRowSelected {
-    background: var(--accent-primary)22;
-    border-left-color: var(--accent-primary);
+    background: var(--text-accent)22;
+    border-left-color: var(--text-accent);
 }
 
 .treeRowSubPlane {
@@ -151,8 +151,8 @@
 }
 
 .materialRowSelected {
-    background: var(--accent-primary)22;
-    border-left-color: var(--accent-primary);
+    background: var(--text-accent)22;
+    border-left-color: var(--text-accent);
 }
 
 .materialIcon {

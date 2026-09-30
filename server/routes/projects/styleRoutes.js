@@ -33,6 +33,7 @@ function registerStyleRoutes(router) {
         project.styleGuidance = styleGuidance;
         project.styleGuidanceUpdatedAt = new Date().toISOString();
         await store.setItem('projects', id, project);
+        require('../../services/dataContext').resetDataContext(id);
         res.json({ success: true, styleGuidance });
     });
 

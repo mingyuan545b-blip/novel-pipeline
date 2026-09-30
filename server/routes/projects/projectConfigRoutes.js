@@ -33,6 +33,8 @@ function registerProjectConfigRoutes(router) {
         }
         const updated = { ...project, ...updates };
         await store.setItem('projects', project.id, updated);
+        // 改目标章数会直接影响章节门槛/停机条件，必须让运行中的 Agent 立刻看到
+        require('../../services/dataContext').resetDataContext(project.id);
         res.json({ success: true, targetChapters: updated[TARGET_CHAPTERS_FIELD], targetWordCount: updated.targetWordCount });
     });
 

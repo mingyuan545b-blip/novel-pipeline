@@ -3,12 +3,31 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-09-30（**外部评审 P0 兜底四件套已落库**：数据灾备 / 项目预算熔断 / 长程验证闸门 / 藏经阁修复，见 §一 0i）
+> 最后更新：2026-10-01（**藏经阁重设计 / 运行看板 / 全书设定 三个前端交付 + DataContext 缓存失效与主题变量两处真实缺陷修复**，见 §一 0j）
 > 上一轮：P1-4a/b/c 已完成，P1-4d 密度策略待做，见 `docs/design/章节因果门槛与单点素材装配（计划书）.md` §八
 
 ---
 
 ## 一、当前结论（重要）
+
+0j. **（2026-10-01 本会话）藏经阁重设计 + 运行看板 + 全书设定（3 个前端交付 + 2 个真实缺陷修复）**（新窗口优先读本节）
+   - **藏经阁重设计**：新增 `services/libraryCompleteness.js`（完整度判定）+ `GET /api/library/sources`（提取来源）
+     + `/index` 增补 completeness/sourceNovel 并**默认"有内容优先"排序**；前端拆出
+     `libraryTreeBuild.js`(纯函数)/`LibraryStatsBar`/`LibraryFilters`/`SourceList`/`TechListItem`/`LibraryTree`/`LibraryDetail`，
+     默认视图改「按来源」。**实测：207 条技法中 184 条是全空壳**，现在一眼可辨、可筛选、可降权。
+   - **运行看板（新页 `/progress`）**：`services/pipeline/progressView.js`(纯函数) + `GET /api/pipeline/progress/:projectId`
+     （一个端点取齐进度/当前步骤/轮次/耗时/时间线/Agent 统计）。诚实标注：日志在步骤结束时写入 → 耗时为近似值；
+     实测部分步骤 totalMs=0 → 显示"未计时"而非 0。
+   - **全书设定（新页 `/story-bible`）**：类型(只读)/子类型/题材画像/走向/风格画像/目标章数字数 +
+     角色方言/语体/位面势力/性格背景编辑；方言语体下拉复用 `/api/flavors/dialects|speech-styles`。
+   - **修掉的真实缺陷 ①**：`DataContext` 单例缓存**无 TTL 且写入口从不失效** → 改项目/素材后运行中的 agent 读到旧值。
+     实测三步复现（不失效缓存读到旧值，失效后读到新值）；已在 4 个写入口补 `resetDataContext`。
+   - **修掉的真实缺陷 ②**：`--accent-primary`/`--card-bg`/`--input-bg` **全站未定义**（真实名 `--text-accent`/`--bg-card`/`--bg-input`）
+     → 大量 `background` 声明整条失效（实测进度条 `backgroundImage:"none"`）。本轮 5 个文件纠正 65 处。
+   - **回归基线**：后端 **229 套件/3763 用例全绿**；UI 巡检 25 页，新增/重设计页 **0 问题**；
+     铁律/硬编码/级联/项目标准/apiRegistry/数据源一致性 0 error；前端复杂度 0 error。
+   - **观察项**：后端曾一次异常退出（0xC0000409）**未复现**（同路径反复压测正常），建议单独立项；
+     Vite dev server 长时间运行会缓存污染（返回空模块），重启即恢复。
 
 0i. **（2026-09-30 本会话）外部评审 P0 兜底四件套：备份 / 预算熔断 / 长程闸门 / 藏经阁修复**（新窗口优先读本节）
    - **P0-1 数据灾备（此前为零）**：`scripts/pgBackup.js` + `lib/pgBackupCore.js` + `tests/unit/pgBackup.test.js`(18)。
@@ -263,7 +282,8 @@
 
 ### 🔴 需用户本人操作
 - [ ] **注册每日数据库备份**（2026-09-30 新增能力，尚未启用）：
-      `powershell -ExecutionPolicy Bypass -File scriptsegisterBackupTask.ps1`
+      `powershell -ExecutionPolicy Bypass -File scripts
+egisterBackupTask.ps1`
       建议加 `--out D:/pgbak` 指到另一块盘（同盘坏则备份与数据一起没）；季度跑一次 `npm run backup:restore-test`
 - [ ] **确认后跑 100 章长程验证**（唯一能暴露摘要漂移/伏笔账本膨胀/实体状态爆炸的手段）：
       `node scripts/run20ChapterE2E.js --chapters 100 --yes`（≈1000万tokens ≈¥20 ≈3.3小时）

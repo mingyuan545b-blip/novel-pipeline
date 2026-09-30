@@ -8,10 +8,10 @@ export default function TemplatesPanel({
         <>
             <div className="cyber-section-title">Agent模板列表 ({templates.length})</div>
             <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 16 }}>
-                <div style={{ background: 'var(--card-bg)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', padding: 12, maxHeight: 'calc(100vh - 320px)', overflow: 'auto' }}>
+                <div style={{ background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)', padding: 12, maxHeight: 'calc(100vh - 320px)', overflow: 'auto' }}>
                     {templates.map(tpl => (
                         <div key={tpl.id} onClick={() => selectTemplate(tpl)} className="cursor-pointer rounded mb-4"
-                            style={{ padding: '8px 10px', background: selectedTemplate?.id === tpl.id ? 'var(--accent-primary)22' : 'transparent', borderLeft: selectedTemplate?.id === tpl.id ? '3px solid var(--accent-primary)' : '3px solid transparent' }}
+                            style={{ padding: '8px 10px', background: selectedTemplate?.id === tpl.id ? 'var(--text-accent)22' : 'transparent', borderLeft: selectedTemplate?.id === tpl.id ? '3px solid var(--text-accent)' : '3px solid transparent' }}
                             onMouseEnter={e => { if (selectedTemplate?.id !== tpl.id) e.currentTarget.style.background = 'var(--bg-secondary)'; }}
                             onMouseLeave={e => { if (selectedTemplate?.id !== tpl.id) e.currentTarget.style.background = 'transparent'; }}>
                             <div className="flex items-center gap-8">

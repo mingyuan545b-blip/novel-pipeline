@@ -749,3 +749,39 @@ llm.chat → llmBudgetGuard.begin(options)
 - pg_dump 不在 PATH 时自动扫描标准安装目录（实测本机 `C:/Program Files/PostgreSQL/17/bin`），
   可用 `PG_DUMP_PATH` / `PG_RESTORE_PATH` 显式指定。
 - 完整说明见 [docs/sop/11-数据备份与恢复.md](docs/sop/11-数据备份与恢复.md)。
+
+---
+
+## 十七、前端新增页面与两处必修约束（2026-10-01）
+
+### 17.1 新增页面
+
+| 路由 | 页面 | 数据来源 | 说明 |
+|------|------|----------|------|
+| `/progress` | 运行看板 | `GET /api/pipeline/progress/:projectId` | 第几章/当前步骤/轮次/耗时/时间线/Agent 统计，一个端点取齐 |
+| `/story-bible` | 全书设定 | `GET/PUT /api/projects/:id`、`PUT /:id/targets`、`GET/PUT /api/materials/:id` | 类型走向 + 角色方言/性格/背景 |
+
+藏经阁（`/library`）改为：顶部完整度数据条 + 完整度/来源筛选 + **按来源视图** + 条目完整度徽标。
+完整度判定唯一来源：`server/services/libraryCompleteness.js`（`full`=规则≥2 / `partial` / `empty`）。
+
+### 17.2 ⚠️ 主题变量名（踩过的坑，必须遵守）
+
+**运行时实测**：`--accent-primary`、`--card-bg`、`--input-bg` **在本项目中从未被定义**。
+
+| ❌ 不存在 | ✅ 真实变量 |
+|---|---|
+| `--accent-primary` | `--text-accent`（另有 `--neon-*` / `--gradient-accent`） |
+| `--card-bg` | `--bg-card`（`--bg-card-hover` 悬停态） |
+| `--input-bg` | `--bg-input` |
+
+定义了的是：`--bg-primary/secondary/tertiary/card/input`、`--text-primary/secondary/muted/accent`、`--border-color`、`--gradient-*`、`--neon-*`、`--glow-*`、`--font-*`、`--radius-*`。
+用错名字**不报错**——`var()` 解析为空会让整条 `background` / `border` 声明失效（实测进度条 `backgroundImage:"none"`），排查代价极高。
+皮肤切换时这些变量由 `client/src/styles/skin-*.css` 覆盖，所以**必须用变量、不要写死颜色**。
+
+### 17.3 ⚠️ DataContext 缓存失效（写库即须调用）
+
+`getDataContext(projectId)` 是**进程内单例**，`_cached()` **无 TTL**。任何直接写库的入口，
+若不调用 `resetDataContext(projectId)`，**运行中的 Agent 会一直读到旧值**（用户表现为"改了没用"）。
+已接线：`routes/materials.js`(PUT)、`routes/projects/crudRoutes.js`(PUT)、
+`routes/projects/projectConfigRoutes.js`(targets)、`routes/projects/styleRoutes.js`(style-guidance)。
+**新增任何"用户可编辑且 Agent 要读"的写入端点，必须一并调用。**

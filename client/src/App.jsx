@@ -28,6 +28,8 @@ import ComicExportPage from './pages/ComicExportPage';
 import StyleTemplatesPage from './pages/StyleTemplatesPage';
 import KnowledgePage from './pages/KnowledgePage';
 import LibraryPage from './pages/LibraryPage';
+import ProgressPage from './pages/ProgressPage';
+import StoryBiblePage from './pages/StoryBiblePage';
 import CharacterStatePage from './pages/CharacterStatePage';
 import EntityCenterPage from './pages/EntityCenterPage';
 import GenreDebugPage from './pages/GenreDebugPage';
@@ -113,6 +115,8 @@ function App() {
                             <Route path="/style-templates" element={<StyleTemplatesPage />} />
                             <Route path="/knowledge" element={<ErrorBoundary><KnowledgePage /></ErrorBoundary>} />
                             <Route path="/library" element={<LibraryPage />} />
+                            <Route path="/progress" element={<ErrorBoundary><ProgressPage /></ErrorBoundary>} />
+                            <Route path="/story-bible" element={<ErrorBoundary><StoryBiblePage /></ErrorBoundary>} />
                             <Route path="/map" element={<Navigate to="/context-assembly" replace />} />
                             <Route path="/character-states" element={<Navigate to="/entity-center?tab=state-tracking" replace />} />
                             <Route path="/entity-center" element={<EntityCenterPage />} />

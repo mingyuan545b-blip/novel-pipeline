@@ -232,3 +232,15 @@ llm.chat → llmBudgetGuard.begin(options)
 - `BudgetExceededError` **不应重试**（不是网络抖动）。上游若做重试，必须先判 `err.isBudgetExceeded`。
 - 流水线停机：`infinite/stopConditions.js` 在章节边界查预算，超限时优雅停机并写日志。
 - `usageStep` 用于把消耗归属到具体步骤（预算报表的 byStep），agentRunner 已自动带上。
+
+### 运行看板接入与 DataContext 缓存失效（2026-10-01）
+
+- **新端点** `GET /api/pipeline/progress/:projectId`（`routes/pipeline/progressRoutes.js`，
+  经 `routes/pipeline/index.js` 挂载，随流水线限流器生效）。
+  组装逻辑在 `services/pipeline/progressView.js`（纯函数），改口径先改这里并跑 `tests/unit/progressView.test.js`。
+- **改 Pipeline 时新增"用户可编辑的写入端点"必须失效 DataContext 缓存**：
+  `getDataContext(projectId)` 是进程内单例、缓存**无 TTL**，不调用 `resetDataContext(projectId)`
+  会导致运行中的 Agent 读到旧值（用户表现为"改了没用"）。
+  已接线：materials PUT / projects PUT / targets / style-guidance。
+- **前端页面 → 数据源**：`/progress` → progressRoutes；`/story-bible` → projects + materials；
+  改这些页面的数据契约时，同步更新 `client/src/pages/*/use*.js` 与本节。

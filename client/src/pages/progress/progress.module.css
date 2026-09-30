@@ -1,0 +1,75 @@
+/* ===== 运行看板样式 ===== */
+.page { padding: 24px; max-width: 1400px; margin: 0 auto; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.title { margin: 0; font-size: 24px; font-weight: 700; color: var(--text-primary); }
+.sub { margin: 4px 0 0; font-size: 13px; color: var(--text-secondary); }
+.refresh-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
+.refresh-btn:disabled { opacity: .6; cursor: default; }
+.empty { padding: 60px 20px; text-align: center; color: var(--text-secondary); }
+.error-box { padding: 10px 14px; border-radius: 8px; background: rgba(255,71,87,.1); border: 1px solid rgba(255,71,87,.3); color: #ff4757; font-size: 13px; margin-bottom: 14px; }
+
+/* 总览 */
+.overview { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+.ov-run { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); margin-bottom: 10px; flex-wrap: wrap; }
+.dot-running { width: 9px; height: 9px; border-radius: 50%; background: #2ed573; box-shadow: 0 0 8px #2ed573; }
+.dot-idle { width: 9px; height: 9px; border-radius: 50%; background: #8d99ae; }
+.ov-phase { font-size: 12px; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 8px; border-radius: 10px; }
+.ov-chapter { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
+.ov-big { font-size: 34px; font-weight: 800; color: var(--text-accent); font-variant-numeric: tabular-nums; line-height: 1; }
+.ov-slash { font-size: 18px; color: var(--text-secondary); }
+.ov-total { font-size: 20px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.ov-unit { font-size: 13px; color: var(--text-secondary); margin-left: 4px; }
+.ov-now { font-size: 12px; color: var(--text-accent); margin-left: 10px; }
+.ov-bar { height: 8px; border-radius: 4px; background: var(--bg-secondary); overflow: hidden; margin-bottom: 10px; }
+.ov-bar-fill { display: block; height: 100%; background: var(--gradient-accent); transition: width .4s ease; }
+.ov-meta { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: var(--text-secondary); }
+.ov-stat-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+.ov-states { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.ov-state-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); background: var(--bg-secondary); padding: 3px 9px; border-radius: 10px; }
+.ov-state-dot { width: 7px; height: 7px; border-radius: 50%; }
+.ov-right .error-box { margin: 8px 0 0; }
+
+/* 卡片 */
+.grid2 { display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; margin-bottom: 16px; }
+.card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
+.grid2 .card { margin-bottom: 0; }
+.card-title { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.muted { color: var(--text-secondary); font-size: 12px; }
+.legend { margin: 10px 0 0; font-size: 11px; color: var(--text-secondary); }
+.legend-time, .legend-token { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; }
+.legend-time { background: var(--text-accent); }
+.legend-token { background: #ffa502; }
+
+/* 当前步骤 */
+.step-main { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.step-name { font-size: 20px; font-weight: 700; color: var(--text-accent); }
+.step-key { font-size: 11px; color: var(--text-secondary); background: var(--bg-secondary); padding: 2px 7px; border-radius: 5px; }
+.step-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.step-cell { background: var(--bg-secondary); border-radius: 8px; padding: 8px 10px; }
+.cell-key { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 3px; }
+.cell-val { display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.anomaly-box { margin-top: 12px; padding: 8px 10px; border-radius: 8px; background: rgba(255,165,2,.08); border: 1px solid rgba(255,165,2,.3); }
+.anomaly-line { font-size: 12px; color: #ffa502; line-height: 1.7; }
+
+/* Agent 表 */
+.table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.table th { text-align: left; font-weight: 600; color: var(--text-secondary); padding: 4px 8px; border-bottom: 1px solid var(--border-color); font-size: 11px; }
+.table td { padding: 5px 8px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+.td-name { font-weight: 600; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-num { font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.col-bar { width: 90px; }
+.bar-time { display: block; height: 7px; border-radius: 3px; background: var(--text-accent); }
+.bar-token { display: block; height: 7px; border-radius: 3px; background: #ffa502; }
+
+/* 时间线 */
+.timeline { list-style: none; margin: 0; padding: 0; max-height: 420px; overflow: auto; }
+.tl-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border-color); font-size: 12px; }
+.tl-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.tl-step { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 600; }
+.tl-ch { color: var(--text-secondary); width: 62px; flex-shrink: 0; }
+.tl-pass { color: #2ed573; width: 40px; flex-shrink: 0; font-size: 11px; }
+.tl-fail { color: #ff4757; width: 40px; flex-shrink: 0; font-size: 11px; font-weight: 600; }
+.tl-round { color: var(--text-secondary); width: 92px; flex-shrink: 0; }
+.tl-dur { color: var(--text-primary); width: 74px; flex-shrink: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.tl-at { color: var(--text-muted); width: 118px; flex-shrink: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.tl-running { font-size: 10px; color: #2ed573; border: 1px solid #2ed573; border-radius: 4px; padding: 0 5px; }
