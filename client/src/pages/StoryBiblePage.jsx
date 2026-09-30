@@ -40,7 +40,7 @@ export default function StoryBiblePage() {
             </div>
 
             <ProjectSettingForm st={st} />
-            <CharacterSettingPanel cs={cs} />
+            <CharacterSettingPanel cs={cs} dialects={st.dialects} speechStyles={st.speechStyles} />
         </div>
     );
 }

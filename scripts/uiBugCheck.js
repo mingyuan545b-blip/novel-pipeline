@@ -27,6 +27,14 @@ const ROUTES = [
     '/comic/config', '/comic/workflows', '/comic/storyboard', '/comic/render', '/comic/export'
 ];
 
+// 交互探针：有些页面的主要内容"点一下才渲染"，纯访问测不到。
+// 2026-10-01 教训：全书设定的角色表单要点选角色才出现，此前只访问页面 → 漏检了一个
+// "点击后必崩"的缺陷（PresetSelect 的 options 为 undefined）。这里补上点击步骤。
+const INTERACTIONS = {
+    '/story-bible': ['[class*="char-item"]'],
+    '/library': ['[class*="src-card"]', '[class*="tech-item"]']
+};
+
 function shotName(route) {
     return (route === '/' ? 'home' : route.slice(1).replace(/\//g, '-')) + '.png';
 }
@@ -79,6 +87,15 @@ async function main() {
                 const t = document.body ? document.body.innerText : '';
                 return /出错了|加载失败|Error Boundary|系统错误/.test(t);
             }).catch(() => false);
+            // 交互探针：点第一个可点元素，让"点后才渲染"的内容也进入检查范围
+            for (const sel of (INTERACTIONS[route] || [])) {
+                try {
+                    const el = await page.$(sel);
+                    if (!el) { entry.interactionMiss = sel; continue; }
+                    await el.click();
+                    await page.waitForTimeout(1500);
+                } catch (e) { entry.interactionError = String(e.message || e).slice(0, 120); }
+            }
             entry.screenshot = 'output/ui-bugcheck/' + shotName(route);
             await page.screenshot({ path: path.join(shotDir, shotName(route)) });
         } catch (e) {

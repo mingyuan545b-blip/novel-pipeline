@@ -3,7 +3,7 @@
  *
  * 类型(genre)只读：它驱动题材插件、约束链与实体 schema，施工中改动会让既有章节失配。
  */
-import { STYLE_FIELDS, WORD_FIELDS } from './storyBibleConstants';
+import { STYLE_FIELDS, WORD_FIELDS, asText } from './storyBibleConstants';
 import s from './storyBible.module.css';
 
 function Row({ label, hint, children }) {
@@ -23,27 +23,27 @@ export default function ProjectSettingForm({ st }) {
         <section className={s.card}>
             <h3 className={s.cardTitle}>全书设定（类型 / 走向 / 风格）</h3>
 
-            <Row label="作品名"><input className={s.input} value={d.name} onChange={e => st.setField('name', e.target.value)} /></Row>
+            <Row label="作品名"><input className={s.input} value={asText(d.name)} onChange={e => st.setField('name', e.target.value)} /></Row>
 
             <Row label="类型" hint="题材插件决定约束与实体结构，施工中不可改">
                 <span className={s.readonly}>{p.genre || '—'}</span>
                 <span className={s.readonlySub}>子类型（分支）</span>
-                <input className={s.input} value={d.subGenre} onChange={e => st.setField('subGenre', e.target.value)} />
+                <input className={s.input} value={asText(d.subGenre)} onChange={e => st.setField('subGenre', e.target.value)} />
             </Row>
 
             <Row label="题材画像" hint="如 武侠 / 都市 / 科幻，影响素材与风格模板">
-                <input className={s.input} value={d.genreProfile} onChange={e => st.setField('genreProfile', e.target.value)} />
+                <input className={s.input} value={asText(d.genreProfile)} onChange={e => st.setField('genreProfile', e.target.value)} />
             </Row>
 
             <Row label="目标章数 / 目标字数" hint="影响停机条件；改后对后续生效">
-                <input className={s.inputSm} type="number" value={d.targetChapters} onChange={e => st.setField('targetChapters', e.target.value)} />
+                <input className={s.inputSm} type="number" value={asText(d.targetChapters)} onChange={e => st.setField('targetChapters', e.target.value)} />
                 <span className={s.unit}>章</span>
-                <input className={s.inputSm} type="number" value={d.targetWordCount} onChange={e => st.setField('targetWordCount', e.target.value)} />
+                <input className={s.inputSm} type="number" value={asText(d.targetWordCount)} onChange={e => st.setField('targetWordCount', e.target.value)} />
                 <span className={s.unit}>字</span>
             </Row>
 
             <Row label="走向 / 剧情主线" hint="世界观、力量体系、人物关系与分章规划都写这里；后续章节的规划会读它">
-                <textarea className={s.textareaLg} rows={12} value={d.description} onChange={e => st.setField('description', e.target.value)} />
+                <textarea className={s.textareaLg} rows={12} value={asText(d.description)} onChange={e => st.setField('description', e.target.value)} />
                 <p className={s.counter}>{d.description.length} / 10000 字</p>
             </Row>
 
@@ -51,7 +51,7 @@ export default function ProjectSettingForm({ st }) {
             {STYLE_FIELDS.map(f => (
                 <Row key={f.key} label={f.label} hint={f.hint}>
                     {f.long
-                        ? <textarea className={s.textarea} rows={3} value={d.style[f.key] || ''} onChange={e => st.setStyle(f.key, e.target.value)} />
+                        ? <textarea className={s.textarea} rows={3} value={asText(d.style[f.key])} onChange={e => st.setStyle(f.key, e.target.value)} />
                         : <input className={s.input} value={d.style[f.key] || ''} onChange={e => st.setStyle(f.key, e.target.value)} />}
                 </Row>
             ))}
@@ -61,7 +61,7 @@ export default function ProjectSettingForm({ st }) {
                 {WORD_FIELDS.map(f => (
                     <div key={f.key} className={s.wordCell}>
                         <span className={s.cellKey}>{f.label}</span>
-                        <input className={s.inputSm} type="number" value={d.word[f.key] || 0} onChange={e => st.setWord(f.key, e.target.value)} />
+                        <input className={s.inputSm} type="number" value={asText(d.word[f.key])} onChange={e => st.setWord(f.key, e.target.value)} />
                     </div>
                 ))}
             </div>

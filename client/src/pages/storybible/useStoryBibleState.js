@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 import useAppStore from '../../store/useAppStore';
 import { projectsApi, flavorsApi } from '../../services/api';
 import logger from '../../shared/logger';
+import { asText } from './storyBibleConstants';
 
 export default function useStoryBibleState() {
     const { currentProject } = useAppStore();
@@ -26,12 +27,17 @@ export default function useStoryBibleState() {
             const res = await projectsApi.get(projectId);
             const p = res.project || res.data || res;
             setProject(p);
+            // 一律转字符串/数字：styleProfile 与引用型字段可能是 null 或对象
+            const style = {};
+            for (const [k, v] of Object.entries(p.styleProfile || {})) style[k] = asText(v);
+            const word = {};
+            for (const [k, v] of Object.entries(p.wordConfig || {})) word[k] = Number(v) || 0;
             setDraft({
-                name: p.name || '', subGenre: p.subGenre || '', genreProfile: p.genreProfile || '',
-                description: p.description || '', targetChapters: p.targetChapters || 0,
-                targetWordCount: p.targetWordCount || 0,
-                style: { ...(p.styleProfile || {}) },
-                word: { ...(p.wordConfig || {}) },
+                name: asText(p.name), subGenre: asText(p.subGenre), genreProfile: asText(p.genreProfile),
+                description: asText(p.description),
+                targetChapters: Number(p.targetChapters) || 0,
+                targetWordCount: Number(p.targetWordCount) || 0,
+                style, word,
             });
         } catch (e) { logger.warn('StoryBible', 'load project failed:', e.message); }
     }, [projectId]);

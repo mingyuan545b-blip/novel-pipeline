@@ -8,12 +8,8 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { materialsApi } from '../../services/api';
+import { asText, asIntensity } from './storyBibleConstants';
 import logger from '../../shared/logger';
-
-const EDITABLE = {
-    dialectRegion: '', dialectIntensity: 'medium', speechStyle: '', speechStyleIntensity: 'medium',
-    parentPlane: '', parentFaction: '', description: '', currentContent: '',
-};
 
 export default function useCharacterSettings(projectId) {
     const [characters, setCharacters] = useState([]);
@@ -37,8 +33,17 @@ export default function useCharacterSettings(projectId) {
     const open = (m) => {
         setSelectedId(m.id);
         setNotice('');
-        const next = {};
-        for (const k of Object.keys(EDITABLE)) next[k] = m[k] ?? EDITABLE[k];
+        // 一律转成字符串：后端这些字段可能是 null / 对象（引用型），直接放进受控 input 会渲染成 [object Object]
+        const next = {
+            dialectRegion: asText(m.dialectRegion),
+            dialectIntensity: asIntensity(m.dialectIntensity),
+            speechStyle: asText(m.speechStyle),
+            speechStyleIntensity: asIntensity(m.speechStyleIntensity),
+            parentPlane: asText(m.parentPlane),
+            parentFaction: asText(m.parentFaction),
+            description: asText(m.description),
+            currentContent: asText(m.currentContent),
+        };
         setDraft(next);
     };
 

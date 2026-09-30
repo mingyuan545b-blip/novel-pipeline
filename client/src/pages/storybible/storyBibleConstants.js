@@ -47,3 +47,26 @@ export function charSummary(m) {
 
 /** 有没有设过方言/语体（列表上打标记，一眼看出哪些角色还没配语言特征） */
 export const hasLanguageProfile = (m) => Boolean(m.dialectRegion || m.speechStyle);
+
+/**
+ * 把任意后端值安全转成可放进 <input> 的字符串。
+ *
+ * 实测坑（2026-10-01）：受控输入的 value 若是对象，React 会渲染成 "[object Object]"
+ * 并对 value 赋对象报 warning；parentPlane/parentFaction 这类"引用型"字段
+ * 在写入路径会被 normalizeMaterial 处理，历史上出现过非字符串形态。
+ * 引用型字段优先取 name/label/id 作为可读文本。
+ */
+export function asText(v) {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'string') return v;
+    if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+    if (Array.isArray(v)) return v.map(asText).filter(Boolean).join('、');
+    if (typeof v === 'object') return v.name || v.label || v.title || v.id || '';
+    return String(v);
+}
+
+/** 强度字段只能取 light/medium/heavy（后端 isIn 校验），非法值回落 medium，避免保存 400 */
+export function asIntensity(v) {
+    const t = asText(v);
+    return INTENSITY_OPTIONS.some(o => o.value === t) ? t : 'medium';
+}
