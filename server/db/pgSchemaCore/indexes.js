@@ -70,6 +70,11 @@ CREATE INDEX IF NOT EXISTS idx_quests_status ON quests(status);
 
 CREATE INDEX IF NOT EXISTS idx_timelines_project ON timelines(projectId);
 CREATE INDEX IF NOT EXISTS idx_timelines_type ON timelines(eventType);
+
+-- 审计日志查询索引（auditLogStore.queryArchived 按 action/project_id/timestamp 过滤并倒序）
+CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_project ON audit_logs(project_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp DESC);
 `;
 
 module.exports = { INDEXES_SQL };

@@ -4,7 +4,13 @@
  * Logger 注入链初始化
  *
  * 职责：注入 logStore/aggregator/persister/fallbackWriter/alertEngine/auditLogStore
- * 返回 alertEngine/fallbackWriter/fallbackCleanupTimer 供后续 shutdown 使用
+ * 返回 alertEngine/fallbackWriter/fallbackCleanupTimer/debugPersister 供后续 shutdown 使用。
+ *
+ * ⚠️ 返回对象必须含 debugPersister：server/index.js 依赖它做 attachPool/start 与
+ * registerShutdownHooks。曾漏返回该键 → index.js 解构得到 undefined →
+ *   `debugPersister.attachPool(pgPool)` 抛 "Cannot read properties of undefined" 被 catch 吞掉，
+ *   于是 DEBUG-PERSIST 与随后同一 try 块里的 AUDIT-PERSIST 双双被跳过：
+ *   调试日志只写 fallback 文件不入库、告警不入库、审计日志不入库，且关闭时 flush 步骤抛错。
  * 文件位置：server/bootstrap/loggerSetup.js
  */
 
@@ -48,7 +54,7 @@ function setupLoggerChain() {
     alertEngine.attachPersister(debugPersister);
     alertEngine.start();
 
-    return { alertEngine, fallbackWriter, fallbackCleanupTimer };
+    return { alertEngine, fallbackWriter, fallbackCleanupTimer, debugPersister };
 }
 
 module.exports = { setupLoggerChain };

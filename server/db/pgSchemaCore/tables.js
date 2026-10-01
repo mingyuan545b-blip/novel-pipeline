@@ -149,6 +149,21 @@ CREATE TABLE IF NOT EXISTS memory_layers (
     createdAt TIMESTAMPTZ DEFAULT NOW(),
     updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 审计日志（shared/auditLogStore.js 的写入目标）
+-- 修复背景：v0003 迁移建的是单数表 audit_log（resourceType/resourceId/createdAt），
+-- 而代码写的是复数表 audit_logs（action/project_id/user_id/timestamp/summary/metadata），
+-- 且该单数表在 PG 中根本不存在 → 审计日志入库路径一直是死的（每次写入都落到 fallback 文件）。
+-- 列名以 auditLogStore 的 INSERT/SELECT 为准（ON CONFLICT (id) 依赖 id 主键）。
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id TEXT PRIMARY KEY,
+    action TEXT NOT NULL DEFAULT '',
+    project_id TEXT,
+    user_id TEXT,
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    summary TEXT,
+    metadata JSONB
+);
 `;
 
 module.exports = { TABLES_SQL };
