@@ -11,7 +11,8 @@ import s from './library.module.css';
 
 export default function TechListItem({ tech, selected, onClick }) {
     const meta = COMPLETENESS[tech.completeness] || COMPLETENESS.empty;
-    const disabled = tech.auto_disabled;
+    // 索引条目带 autoDisabled，搜索结果/详情是 snake_case —— 两者都认，否则"禁用"角标永远不显示
+    const disabled = tech.autoDisabled ?? tech.auto_disabled;
     const badge = completenessBadge(tech);
     return (
         <button type="button" onClick={onClick}

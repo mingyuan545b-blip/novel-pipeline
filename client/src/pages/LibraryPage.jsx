@@ -48,7 +48,7 @@ export default function LibraryPage() {
 
             <LibraryFilters
                 completeness={filters.completeness} onCompleteness={(v) => setFilter('completeness', v)}
-                sourceFilter={filters.source} onSource={(v) => setFilter('source', v)} sources={st.sources}
+                sourceFilter={filters.source} onSource={st.handlePickSource} sources={st.sources}
                 modeFilter={filters.mode} onMode={(v) => setFilter('mode', v)}
                 keyword={st.searchQuery} onKeyword={st.setSearchQuery} onSearch={st.doSearch} />
 
@@ -81,7 +81,8 @@ export default function LibraryPage() {
                         </div>
                     ) : st.viewMode === 'source' ? (
                         <SourceList sources={st.sources} active={filters.source} loading={st.sourcesLoading}
-                            onPick={(v) => setFilter('source', v)} />
+                            onPick={st.handlePickSource} sourceEntries={st.sourceEntries}
+                            selectedTech={st.selectedTech} onSelect={st.handleSelectTech} />
                     ) : (
                         <LibraryTree viewMode={st.viewMode} treeData={st.treeData} depthTree={st.depthTree}
                             expandedNodes={st.expandedNodes} toggleNode={st.toggleNode}

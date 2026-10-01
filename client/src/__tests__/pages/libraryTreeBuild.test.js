@@ -5,6 +5,7 @@
 import { describe, test, expect } from 'vitest';
 import {
     DEPT_DEPTH, resolveDepth, buildTrees, countByCompleteness, filterEntries, collectExpandKeys,
+    groupBySource, sourceOf, UNKNOWN_SOURCE,
 } from '../../pages/library/libraryTreeBuild';
 
 const E = (over = {}) => ({
@@ -68,6 +69,42 @@ describe('filterEntries', () => {
     });
     test('空条件返回全部', () => {
         expect(filterEntries(entries, {})).toHaveLength(3);
+    });
+});
+
+/**
+ * groupBySource —— 回归：用户点「按来源」里的《全球死考》后"什么东西都没变化"。
+ * 根因是来源视图只设筛选条件、没有渲染该来源的条目列表；分组函数是列表的数据来源，
+ * 因此必须保证"点哪本书 → 拿到那本书的全部条目"，且分组键与服务端 /sources 一致。
+ */
+describe('groupBySource', () => {
+    const entries = [
+        E({ id: '1', sourceNovel: '全球死考' }),
+        E({ id: '2', sourceNovel: '全球死考' }),
+        E({ id: '3', sourceNovel: '' }),
+        E({ id: '4', sourceNovel: '另一本' }),
+    ];
+
+    test('按 sourceNovel 分组，顺序与入参一致（服务端已按有内容优先排序）', () => {
+        const g = groupBySource(entries);
+        expect(g['全球死考'].map(e => e.id)).toEqual(['1', '2']);
+        expect(g['另一本'].map(e => e.id)).toEqual(['4']);
+    });
+
+    test('无来源条目归入 UNKNOWN_SOURCE（与 /api/library/sources 的分组键必须一致）', () => {
+        expect(UNKNOWN_SOURCE).toBe('（未标注来源）');
+        expect(groupBySource(entries)[UNKNOWN_SOURCE].map(e => e.id)).toEqual(['3']);
+        expect(sourceOf(E({ sourceNovel: '' }))).toBe(UNKNOWN_SOURCE);
+    });
+
+    test('分组结果可直接喂给 filterEntries —— 组内每条都命中该来源筛选', () => {
+        const list = groupBySource(entries)['全球死考'];
+        expect(filterEntries(entries, { source: '全球死考' }).map(e => e.id)).toEqual(list.map(e => e.id));
+    });
+
+    test('空输入不抛错', () => {
+        expect(groupBySource(undefined)).toEqual({});
+        expect(groupBySource([])).toEqual({});
     });
 });
 

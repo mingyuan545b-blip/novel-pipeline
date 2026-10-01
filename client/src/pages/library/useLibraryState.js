@@ -3,7 +3,7 @@ import useAppStore from '../../store/useAppStore';
 import { libraryApi } from '../../services/api';
 import logger from '../../shared/logger';
 import {
-    DEPT_DEPTH, resolveDepth, buildTrees, countByCompleteness, filterEntries, collectExpandKeys,
+    DEPT_DEPTH, resolveDepth, buildTrees, countByCompleteness, filterEntries, collectExpandKeys, groupBySource,
 } from './libraryTreeBuild';
 
 export const DEPT_ICONS = {
@@ -51,6 +51,8 @@ export default function useLibraryState() {
     const filtered = useMemo(() => filterEntries(entries, filters), [entries, filters]);
     const { tree: treeData, byDepth: depthTree } = useMemo(() => buildTrees(filtered), [filtered]);
     const counts = useMemo(() => countByCompleteness(entries, filters.completeness), [entries, filters.completeness]);
+    // 「按来源」视图展开某本书时列出的条目（跟随完整度/模式筛选，与卡片计数可能不等，UI 会标注）
+    const sourceEntries = useMemo(() => groupBySource(filtered), [filtered]);
 
     const loadEntries = useCallback(async () => {
         try {
@@ -108,7 +110,31 @@ export default function useLibraryState() {
     const collapseAll = () => setExpandedNodes(new Set());
     const closeSearch = () => { setShowSearch(false); setSearchResults([]); };
 
-    const handleSelectTech = async (id) => { setSelectedTech(id); await loadTechnique(id); };
+    /**
+     * 选中技法（id 为 null = 返回列表）。
+     * 修复：此前 id=null 时仍去请求 /technique/null，404 被 catch 吞掉 →
+     * techDetail 保留上一条，点「返回」右侧画面纹丝不动。
+     */
+    const handleSelectTech = async (id) => {
+        setSelectedTech(id);
+        setEditingField(null);
+        if (!id) { setTechDetail(null); return; }
+        await loadTechnique(id);
+    };
+
+    /**
+     * 「按来源」点书卡：再点一次收起；展开时自动选中该书第一条技法
+     * （服务端已按内容量优先排序）—— 让右侧立刻有内容可看，而不只是高亮一个边框。
+     */
+    const handlePickSource = useCallback((novel) => {
+        const next = filters.source === novel ? '' : novel;
+        setFilter('source', next);
+        if (!next) return;
+        const list = groupBySource(filterEntries(entries, { ...filters, source: next }))[next] || [];
+        handleSelectTech(list.length ? list[0].id : null);
+        // handleSelectTech 每次渲染重建，纳入依赖只会导致回调抖动，故此处有意省略
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filters, entries]);
     const handleSaveField = async (field, value) => {
         if (!selectedTech) return;
         try {
@@ -132,7 +158,8 @@ export default function useLibraryState() {
         editingField, setEditingField, editValue, setEditValue, filters, setFilter, viewMode, setViewMode,
         // 兼容别名：模式筛选并入 filters 后，保留旧接口名（既有调用点与测试依赖）
         modeFilter: filters.mode, setModeFilter: (v) => setFilter('mode', v),
-        feedbackData, loadFeedback, toggleNode, handleSelectTech, handleSaveField, handleToggleDisabled,
-        handleResetMeta, expandAll, collapseAll, doSearch, closeSearch, reload,
+        sourceEntries, activeSource: filters.source,
+        feedbackData, loadFeedback, toggleNode, handleSelectTech, handlePickSource, handleSaveField,
+        handleToggleDisabled, handleResetMeta, expandAll, collapseAll, doSearch, closeSearch, reload,
     };
 }

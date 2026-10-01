@@ -31,6 +31,9 @@ export default function LibraryDetail({ detail: t, editing, setEditing, value, s
     }
     const meta = COMPLETENESS[t.completeness] || COMPLETENESS.empty;
     const disabled = t._meta && t._meta.auto_disabled;
+    // 详情来自 GET /technique/:id（techIndex 里是 snake_case），索引里才是 sourceNovel。
+    // 此前只读 sourceNovel → 「提取自《…》」永远是死代码。
+    const srcName = t.sourceNovel || t.source_novel || '';
 
     const info = [
         { k: '上下文层级', v: SLOT_LABELS[t.context_slot] || t.context_slot },
@@ -38,7 +41,7 @@ export default function LibraryDetail({ detail: t, editing, setEditing, value, s
         { k: '适用模式', v: (t.applicable_modes || []).join('、') || '—' },
         { k: '成功率', v: `${(t._meta && t._meta.success_rate) ?? 50}%`, warn: ((t._meta && t._meta.success_rate) ?? 50) < 40 },
         { k: '使用次数', v: `${(t._meta && t._meta.attempts) || 0} 次` },
-        { k: '来源', v: t.source_novel || '—' },
+        { k: '来源', v: srcName || '—' },
     ];
 
     return (
@@ -57,7 +60,7 @@ export default function LibraryDetail({ detail: t, editing, setEditing, value, s
                 <h3 className={s.detailName}>{t.display_name}</h3>
                 <p className={s.detailPath}>
                     {cleanName(t.department)} / {cleanName(t.subcategory)}
-                    {t.sourceNovel ? ` · 提取自《${t.sourceNovel}》` : ''}
+                    {srcName ? ` · 提取自《${srcName}》` : ''}
                 </p>
                 <div className={s.completenessBanner} style={{ borderColor: meta.color }}>
                     <span className={s.completenessDot} style={{ background: meta.color }} />

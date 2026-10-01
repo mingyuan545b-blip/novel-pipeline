@@ -40,6 +40,7 @@ function toEntry(t) {
         contentScore: c.score,        // 前端"有内容优先"排序权重
         sourceNovel: t.source_novel || '',
         sourceType: t.source_type || 'curated',
+        autoDisabled: Boolean(t.auto_disabled),   // 列表要显示"禁用"角标（此前索引不带该字段，角标永不出现）
     };
 }
 
@@ -87,7 +88,15 @@ router.get('/technique/:id', async (req, res) => {
     try {
         const leaf = techIndex.getTechnique(req.params.id);
         if (!leaf) return res.apiError(NOT_FOUND.statusCode, 'Technique not found', NOT_FOUND.code);
-        res.json({ ...leaf, _meta: { success_rate: leaf.success_rate, attempts: leaf.attempts, auto_disabled: leaf.auto_disabled } });
+        // 详情必须自带完整度：前端不做判定（SSOT 在 services/libraryCompleteness.js）。
+        // 此前详情不返回 completeness，前端回落 empty → 一条 5 条规则的技法被标成"空壳条目"
+        // （用户看藏经阁详情时一眼可见的错误信息）。
+        const c = assessCompleteness(leaf);
+        res.json({
+            ...leaf,
+            completeness: c.level, rulesCount: c.rulesCount, antiCount: c.antiCount,
+            _meta: { success_rate: leaf.success_rate, attempts: leaf.attempts, auto_disabled: leaf.auto_disabled },
+        });
     } catch (e) {
         return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code);
     }

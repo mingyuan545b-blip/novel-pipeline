@@ -78,7 +78,8 @@ button.stat-card:hover { border-color: var(--text-accent); }
 .src-card:hover { border-color: var(--text-accent); }
 .src-card-on { border-color: var(--text-accent); }
 .src-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.src-title { font-size: 13px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.src-title { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.src-caret { font-size: 9px; color: var(--text-secondary); flex-shrink: 0; }
 .src-total { font-size: 11px; color: var(--text-secondary); flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .src-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: var(--bg-card); }
 .src-bar-seg { display: block; height: 100%; }
@@ -86,6 +87,14 @@ button.stat-card:hover { border-color: var(--text-accent); }
 .src-time { margin-left: auto; }
 .src-depts { display: flex; flex-wrap: wrap; gap: 4px; }
 .src-dept { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--bg-card); color: var(--text-secondary); }
+
+/* 展开后的技法清单（点击书卡才出现） */
+.src-block { border-radius: 10px; }
+.src-block-on { background: var(--bg-card); box-shadow: 0 0 0 1px var(--text-accent); }
+.src-block-on .src-card { background: var(--bg-card); border-color: transparent; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.src-techs { display: flex; flex-direction: column; gap: 1px; padding: 6px 4px 8px; }
+.src-tech-head { padding: 4px 10px 6px; font-size: 11px; color: var(--text-accent); border-top: 1px dashed var(--border-color); }
+.src-tech-filter { color: var(--text-secondary); }
 
 /* ---------- 详情面板 ---------- */
 .detail-wrap { display: flex; flex-direction: column; }

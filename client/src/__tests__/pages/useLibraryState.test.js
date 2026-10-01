@@ -124,3 +124,72 @@ describe('useLibraryState', () => {
         expect(result.current.depthTree.meso).toBeUndefined();
     });
 });
+
+/**
+ * 回归：用户「按来源」点了《全球死考》后"什么东西都没变化，右侧什么变化都没有"。
+ * 根因：点击只写了 filters.source，来源视图不渲染条目列表，右侧也无选中 → 只有边框变色。
+ * 现在要求：展开该书条目 + 自动选中第一条（右侧立即有内容）+ 再点收起 + 返回能清空详情。
+ */
+describe('useLibraryState · 按来源展开', () => {
+    const SRC_ENTRIES = [
+        { id: 'a1', display_name: 'A', sourceNovel: '全球死考', completeness: 'full', department: '02_情节引擎部', subcategory: 's', modes: ['novel'] },
+        { id: 'a2', display_name: 'B', sourceNovel: '全球死考', completeness: 'empty', department: '02_情节引擎部', subcategory: 's', modes: ['novel'] },
+        { id: 'b1', display_name: 'C', sourceNovel: '别的书', completeness: 'full', department: '05_文笔滤镜部', subcategory: 's', modes: ['novel'] },
+    ];
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+        libraryApi.getIndex.mockResolvedValue({ data: { entries: SRC_ENTRIES } });
+        act(() => { useAppStore.setState({ currentProject: { id: 'p1', name: 'Test' } }); });
+    });
+
+    test('点书卡：展开该来源条目并自动选中第一条（右侧不再无反应）', async () => {
+        const { result } = renderHook(() => useLibraryState(), { wrapper: createWrapper() });
+        await waitFor(() => expect(result.current.entries).toHaveLength(3));
+
+        libraryApi.getTechnique.mockResolvedValueOnce({ data: { id: 'a1', display_name: 'A' } });
+        await act(async () => { result.current.handlePickSource('全球死考'); });
+
+        expect(result.current.filters.source).toBe('全球死考');
+        expect(result.current.activeSource).toBe('全球死考');
+        expect(result.current.sourceEntries['全球死考'].map(e => e.id)).toEqual(['a1', 'a2']);
+        expect(result.current.selectedTech).toBe('a1');
+        expect(result.current.techDetail.display_name).toBe('A');
+    });
+
+    test('再点同一本书 = 收起（清筛选），不请求技法', async () => {
+        const { result } = renderHook(() => useLibraryState(), { wrapper: createWrapper() });
+        await waitFor(() => expect(result.current.entries).toHaveLength(3));
+
+        await act(async () => { result.current.handlePickSource('全球死考'); });
+        libraryApi.getTechnique.mockClear();
+        await act(async () => { result.current.handlePickSource('全球死考'); });
+
+        expect(result.current.filters.source).toBe('');
+        expect(libraryApi.getTechnique).not.toHaveBeenCalled();
+    });
+
+    test('来源分组跟随完整度筛选（列表与筛选条件一致，不串味）', async () => {
+        const { result } = renderHook(() => useLibraryState(), { wrapper: createWrapper() });
+        await waitFor(() => expect(result.current.entries).toHaveLength(3));
+
+        act(() => { result.current.setFilter('completeness', 'full'); });
+        await waitFor(() => expect(result.current.sourceEntries['全球死考'].map(e => e.id)).toEqual(['a1']));
+        expect(result.current.sourceEntries['别的书'].map(e => e.id)).toEqual(['b1']);
+    });
+
+    test('返回：handleSelectTech(null) 清空详情且不再打接口（此前 404 被吞、右侧仍是上一条）', async () => {
+        const { result } = renderHook(() => useLibraryState(), { wrapper: createWrapper() });
+        await waitFor(() => expect(result.current.entries).toHaveLength(3));
+
+        libraryApi.getTechnique.mockResolvedValueOnce({ data: { id: 'a1', display_name: 'A' } });
+        await act(async () => { await result.current.handleSelectTech('a1'); });
+        expect(result.current.techDetail.display_name).toBe('A');
+
+        libraryApi.getTechnique.mockClear();
+        await act(async () => { await result.current.handleSelectTech(null); });
+        expect(result.current.selectedTech).toBeNull();
+        expect(result.current.techDetail).toBeNull();
+        expect(libraryApi.getTechnique).not.toHaveBeenCalled();
+    });
+});

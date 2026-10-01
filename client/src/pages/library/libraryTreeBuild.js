@@ -56,14 +56,39 @@ export function countByCompleteness(entries, active = '') {
     return counts;
 }
 
+/**
+ * 无来源条目归入的展示名。必须与服务端 /api/library/sources 的分组键
+ * (server/routes/libraryMetaRoutes.js 的 `t.source_novel || '（未标注来源）'`) 完全一致，
+ * 否则「按来源」点开某本书会一条都列不出来。
+ */
+export const UNKNOWN_SOURCE = '（未标注来源）';
+
+/** 条目的来源名（索引条目上是 sourceNovel） */
+export const sourceOf = (entry) => entry?.sourceNovel || UNKNOWN_SOURCE;
+
 /** 按完整度/来源/模式筛选（客户端筛选，避免每次切筛都打服务端） */
 export function filterEntries(entries, { completeness = '', source = '', mode = '' } = {}) {
     return (entries || []).filter(e => {
         if (completeness && e.completeness !== completeness) return false;
-        if (source && (e.sourceNovel || '（未标注来源）') !== source) return false;
+        if (source && sourceOf(e) !== source) return false;
         if (mode && !(e.modes || []).includes(mode)) return false;
         return true;
     });
+}
+
+/**
+ * 按来源分组：source → 条目[]（顺序沿用入参，服务端已按"有内容优先"排序）。
+ * 「按来源」视图点开一本书时用它列出该书贡献的技法 —— 此前只设了筛选条件却没有
+ * 渲染任何列表，点了跟没点一样（用户 2026-10-01 反馈）。
+ */
+export function groupBySource(entries) {
+    const map = {};
+    for (const e of (entries || [])) {
+        const k = sourceOf(e);
+        if (!map[k]) map[k] = [];
+        map[k].push(e);
+    }
+    return map;
 }
 
 /** 展开全部时需要的 key 集合（部门视图与深度视图的 key 不同，必须都覆盖） */
