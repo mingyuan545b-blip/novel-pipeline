@@ -16,19 +16,34 @@ const CREATION_STANDARDS_TEMPLATE = `【素材创作标准（新建素材必须�
 {{FLAVOR_TEMPLATE}}
 {{SUPPORTING_WRITER_PRINCIPLES}}`;
 
+/**
+ * R1：把注册表要求的字段标签并入题材标签，保证"校验端要什么、生成端 prompt 就说什么"。
+ * 此前题材 tags 缺【标志性细节/人格魅力/…】→ 校验端永远判缺失（P0-B）。
+ */
+function mergeRequiredTags(existingTags, requiredTags) {
+    const out = [...(existingTags || [])];
+    const seen = new Set(out.map(t => (String(t).match(/【([^】]+)】/) || [])[1]).filter(Boolean));
+    for (const t of requiredTags || []) {
+        const label = (String(t).match(/【([^】]+)】/) || [])[1];
+        if (label && !seen.has(label)) { out.push(t); seen.add(label); }
+    }
+    return out;
+}
+
 function resolve(genreId) {
     const genre = getGenreById(genreId);
     const cp = genre?.characterProfile || {};
     const mr = genre?.materialRules || {};
+    const { promptFieldTags } = require('./fieldRegistry');
 
     return {
-        PROTAGONIST_TAGS: (cp.protagonistTags || []).join('\n'),
+        PROTAGONIST_TAGS: mergeRequiredTags(cp.protagonistTags, promptFieldTags('protagonist')).join('\n'),
         PROTAGONIST_WORD_COUNT: cp.protagonistWordCount || 400,
         PROTAGONIST_EXAMPLE: cp.protagonistExample || '',
-        SUPPORTING_TAGS: (cp.supportingTags || []).join('\n'),
+        SUPPORTING_TAGS: mergeRequiredTags(cp.supportingTags, promptFieldTags('supporting')).join('\n'),
         SUPPORTING_WORD_COUNT: cp.supportingWordCount || 250,
         SUPPORTING_EXAMPLE: cp.supportingExample || '',
-        NPC_TAGS: (cp.npcTags || []).join('\n'),
+        NPC_TAGS: mergeRequiredTags(cp.npcTags, promptFieldTags('npc')).join('\n'),
         NPC_WORD_COUNT: cp.npcWordCount || 80,
         NPC_EXAMPLE: cp.npcExample || '',
         WORLDVIEW_RULE: mr.worldview || '必须包含 边界条件 + 违反后果',

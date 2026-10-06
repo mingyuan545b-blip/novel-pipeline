@@ -50,12 +50,14 @@ describe('promptFragments.resolve', () => {
     test('resolves all variables from genre with full profile', () => {
         getGenreById.mockReturnValue(MOCK_GENRE);
         const vars = pf.resolve('test-genre');
-        expect(vars.PROTAGONIST_TAGS).toBe('姓名\n年龄');
+        // R1：题材 tags 会被并上注册表要求的必填标签（保证校验端要什么、prompt 就说什么）
+        expect(vars.PROTAGONIST_TAGS.split('\n')).toEqual(expect.arrayContaining(['姓名', '年龄']));
+        expect(vars.PROTAGONIST_TAGS).toContain('【身份/职位】');
         expect(vars.PROTAGONIST_WORD_COUNT).toBe(500);
         expect(vars.PROTAGONIST_EXAMPLE).toBe('主角示例文本');
-        expect(vars.SUPPORTING_TAGS).toBe('姓名');
+        expect(vars.SUPPORTING_TAGS).toContain('姓名');
         expect(vars.SUPPORTING_WORD_COUNT).toBe(300);
-        expect(vars.NPC_TAGS).toBe('姓名');
+        expect(vars.NPC_TAGS).toContain('姓名');
         expect(vars.NPC_WORD_COUNT).toBe(100);
         expect(vars.WORLDVIEW_RULE).toBe('必须包含世界边界');
         expect(vars.POWER_SYSTEM_RULE).toBe('必须包含升级条件');
@@ -69,7 +71,8 @@ describe('promptFragments.resolve', () => {
     test('uses defaults for genre without profile', () => {
         getGenreById.mockReturnValue(MINIMAL_GENRE);
         const vars = pf.resolve('minimal-genre');
-        expect(vars.PROTAGONIST_TAGS).toBe('');
+        // 无题材画像时，tags 仍由注册表必填标签兜底（不再是空串）
+        expect(vars.PROTAGONIST_TAGS).toContain('【身份/职位】');
         expect(vars.PROTAGONIST_WORD_COUNT).toBe(400);
         expect(vars.SUPPORTING_WORD_COUNT).toBe(250);
         expect(vars.NPC_WORD_COUNT).toBe(80);
@@ -81,7 +84,7 @@ describe('promptFragments.resolve', () => {
         getGenreById.mockReturnValue(null);
         const vars = pf.resolve('nonexistent');
         expect(vars.PROTAGONIST_WORD_COUNT).toBe(400);
-        expect(vars.PROTAGONIST_TAGS).toBe('');
+        expect(vars.PROTAGONIST_TAGS).toContain('【身份/职位】');
     });
 });
 
@@ -134,7 +137,9 @@ describe('promptFragments.render', () => {
         getGenreById.mockReturnValue(MOCK_GENRE);
         const template = '{{PROTAGONIST_TAGS}}-{{PROTAGONIST_WORD_COUNT}}';
         const result = pf.render(template, 'test-genre');
-        expect(result).toBe('姓名\n年龄-500');
+        expect(result).toContain('姓名');
+        expect(result).toContain('【身份/职位】');
+        expect(result).toContain('-500');
     });
 
     test('leaves unknown variables as-is', () => {

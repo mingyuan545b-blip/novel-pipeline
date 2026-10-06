@@ -141,7 +141,68 @@ function checkContractRefs() {
     return v;
 }
 
-const CHECKS = [checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs];
+// ========== R1 字段词汇表（生成端/校验端/提取端/落点 对齐） ==========
+
+// ---- 1: 校验端 requiredFields 必须被生成端 prompt tags 覆盖 ----
+function checkPromptCoverage() {
+    const v = [];
+    const registry = require('../server/config/fieldRegistry');
+    for (const [role, depth] of Object.entries(registry.ROLE_LEVEL_TO_DEPTH)) {
+        const required = registry.requiredLabels('character', depth);
+        const advertised = new Set(registry.promptFieldTags(role).map(t => (t.match(/【([^】]+)】/) || [])[1]));
+        for (const label of required) {
+            if (!advertised.has(label)) v.push({ check: '1', file: 'server/config/fieldRegistry.js', detail: `角色${role}(${depth}) 必填【${label}】未进入生成端 prompt tags` });
+        }
+    }
+    // 非角色类型：必填标签必须已在 FIELD_SPECS 注册（词汇表已知）
+    for (const [type, depths] of Object.entries(registry.DEPTH_REQUIREMENTS)) {
+        for (const [depth, req] of Object.entries(depths)) {
+            for (const label of req.requiredFields || []) {
+                if (!registry.FIELD_SPECS[label]) v.push({ check: '1', file: 'server/config/materialDepthSpec.js', detail: `${type}/${depth} 必填【${label}】未在 FIELD_SPECS 注册` });
+            }
+        }
+    }
+    return v;
+}
+
+// ---- 2: 校验标签必须能被提取正则命中（读写同口径） ----
+// 金句库由 characterStateExtractor 单独提取（多句多场景），不在单行 LABELED_PATTERNS 内
+const EXTRACT_ELSEWHERE = new Set(['金句库']);
+function checkExtractionCoverage() {
+    const v = [];
+    const registry = require('../server/config/fieldRegistry');
+    const { extractLabeledFields } = require('../server/services/pipeline/characterStateLabeledFields');
+    for (const [label] of Object.entries(registry.FIELD_MAPPINGS)) {
+        const probe = `【${label}】示例内容文本若干`;
+        const extracted = Object.keys(extractLabeledFields(probe)).length > 0;
+        if (!extracted && !EXTRACT_ELSEWHERE.has(label)) {
+            v.push({ check: '2', file: 'server/services/pipeline/characterStateLabeledFields.js', detail: `校验标签【${label}】无法被提取正则命中` });
+        }
+        // 别名也必须可提取（否则校验认、提取不认）
+        if (EXTRACT_ELSEWHERE.has(label)) continue;
+        for (const alias of registry.FIELD_ALIASES[label] || []) {
+            if (Object.keys(extractLabeledFields(`【${alias}】示例内容文本若干`)).length === 0) {
+                v.push({ check: '2', file: 'server/services/pipeline/characterStateLabeledFields.js', detail: `字段【${label}】别名「${alias}」无法被提取正则命中` });
+            }
+        }
+    }
+    return v;
+}
+
+// ---- 3: 落点映射三方齐全（entityKey/stateJsonKey；pgColumn 若给出必须是真实列） ----
+function checkFieldMappings() {
+    const v = [];
+    const registry = require('../server/config/fieldRegistry');
+    const entitySchema = require('../server/db/fieldRegistryEntity');
+    const entityColumns = new Set(Object.keys(entitySchema.entities.columns));
+    for (const [label, map] of Object.entries(registry.FIELD_MAPPINGS)) {
+        if (!map.entityKey || !map.stateJsonKey) v.push({ check: '3', file: 'server/config/fieldRegistry.js', detail: `字段【${label}】缺少 entityKey/stateJsonKey` });
+        if (map.pgColumn && !entityColumns.has(map.pgColumn)) v.push({ check: '3', file: 'server/db/fieldRegistryEntity.js', detail: `字段【${label}】pgColumn "${map.pgColumn}" 不是 entities 表真实列` });
+    }
+    return v;
+}
+
+const CHECKS = [checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs, checkPromptCoverage, checkExtractionCoverage, checkFieldMappings];
 
 function main() {
     const json = process.argv.includes('--json');

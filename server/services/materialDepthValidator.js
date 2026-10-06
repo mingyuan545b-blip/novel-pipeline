@@ -8,8 +8,10 @@
 const logger = require('../shared/logger');
 const {
     DEPTH_LEVELS, FIELD_SPECS, DEPTH_REQUIREMENTS, ROLE_LEVEL_TO_DEPTH,
-    extractFieldValue, countContentChars
+    countContentChars
 } = require('../config/materialDepthSpec');
+// R1：别名感知提取（读写同口径，避免"要【标志性细节】、产出写【标志性动作】"误判缺失）
+const { extractFieldWithAliases } = require('../config/fieldRegistry');
 
 /**
  * 解析素材的深度等级
@@ -43,7 +45,7 @@ function validateField(content, fieldLabel) {
 
     if (!spec) {
         // 未在 FIELD_SPECS 注册的字段，只检查存在性
-        const value = extractFieldValue(content, fieldLabel);
+        const value = extractFieldWithAliases(content, fieldLabel);
         return {
             exists: !!value,
             value,
@@ -53,7 +55,7 @@ function validateField(content, fieldLabel) {
         };
     }
 
-    const value = extractFieldValue(content, fieldLabel);
+    const value = extractFieldWithAliases(content, fieldLabel);
 
     // 1. 存在性检查
     if (!value) {
