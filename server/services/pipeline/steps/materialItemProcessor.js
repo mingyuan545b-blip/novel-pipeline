@@ -9,6 +9,7 @@ const { resolveTopicKey } = require('../../worldviewTopics');
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
 const { v4: uuidv4 } = require('uuid');
 const { findMaterialByName: _findMat, findForeshadowByName: _findForeshadow } = require('./materialFinder');
+const { buildCharacterEntityPatch } = require('../entityProjection');
 const { VALID_MATERIAL_TYPES } = require('../../../config/materialTypes');
 
 function findMaterialByName(projectId, materials, name, type) {
@@ -93,12 +94,12 @@ async function processNewMaterials(organizingPlan, chapter, projectId, materials
                 try {
                     const content = newMat.description || newMat.detail || '';
                     const parsed = extractCharacterStateFromContent(content, {});
-                    await entityCenter.getOrCreateEntity(projectId, 'character', newMat.name, {
-                        roleLevel: newMat.roleLevel || 'npc', sourceChapter: chapter.chapterNumber || 0,
-                        position: newMat.position || parsed.position || '', personality: newMat.personality || parsed.personality || '',
-                        speakingTone: newMat.speakingTone || parsed.speakingTone || '', signatureDetail: newMat.signatureDetail || parsed.signatureDetail || '',
-                        sourceContent: content.substring(0, 2000)
-                    });
+                    // 单一投影：字段清单集中在 entityProjection（占位/空值不覆盖）
+                    const patch = buildCharacterEntityPatch(newMat, parsed);
+                    patch.roleLevel = newMat.roleLevel || 'npc';
+                    patch.sourceChapter = chapter.chapterNumber || 0;
+                    patch.sourceContent = content.substring(0, 2000);
+                    await entityCenter.getOrCreateEntity(projectId, 'character', newMat.name, patch);
                 } catch (regErr) { logger.warn('materialItem', 'EntityCenter create failed for', newMat.name, ':', regErr.message); }
             }
             operations.push({ type: 'createMaterial', scope: 'material', entityKey: matId, data: { type: newMat.type, name: newMat.name, depthLevel: depthResult.depthLevel, depthValid: depthResult.valid }, status: 'success' });

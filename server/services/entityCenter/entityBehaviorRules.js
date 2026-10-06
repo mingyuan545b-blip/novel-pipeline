@@ -8,6 +8,7 @@ const logger = require('../../shared/logger');
 const { _recomputePromptTexts } = require('./formatters');
 
 const ENTITY_TYPE = 'entities';
+const { hasMeaningfulValue } = require('../../shared/fieldValueGuards');
 
 /** 同步到entity-registry的完整字段列表——前端展示所需的所有字段 */
 const REGISTRY_SYNC_FIELDS = [
@@ -99,13 +100,21 @@ async function syncToRegistry(entity, force = false) {
     } catch (_) { logger.warn('entityBehaviorRules', '[entity-crud]', _.message || _); }
 }
 
-/** 合并已有实体的字段（不覆盖已有值，只填充空字段） */
+/** 合并已有实体的字段（占位/空值不覆盖已有好数据） */
 async function mergeExistingEntity(center, existing, defaults) {
     const updates = {};
     const mergeableFields = ['position', 'scopeWorldId', 'locationSlot', 'bindMedium', 'personality', 'speakingTone', 'signatureDetail', 'craftStyle', 'sourceContent', 'behaviorRules', 'charisma', 'philosophy', 'quoteLibrary', 'highlightScenes', 'entranceDesign'];
-    for (const field of mergeableFields) { if (defaults[field] && defaults[field] !== existing[field]) updates[field] = defaults[field]; }
+    // P1-D：默认值必须"有意义"才写入；"无 | 无" 等占位词不得覆盖已有好值
+    for (const field of mergeableFields) { if (hasMeaningfulValue(defaults[field]) && defaults[field] !== existing[field]) updates[field] = defaults[field]; }
     if (defaults.genreState && typeof defaults.genreState === 'object') updates.genreState = { ...existing.genreState, ...defaults.genreState };
-    if (defaults.profile && typeof defaults.profile === 'object') updates.profile = { ...existing.profile, ...defaults.profile };
+    if (defaults.profile && typeof defaults.profile === 'object') {
+        const merged = { ...(existing.profile || {}) };
+        let changed = false;
+        for (const [k, v] of Object.entries(defaults.profile)) {
+            if (hasMeaningfulValue(v) && v !== merged[k]) { merged[k] = v; changed = true; }
+        }
+        if (changed) updates.profile = merged;
+    }
     // 角色等级：允许升级，但"升级为主角"必须过主角上限（否则大纲/素材阶段会把多个角色
     // 都提成 protagonist，绕过 getOrCreateEntity 新建路径里的 _enforceProtagonistLimit）
     const roleLevelPriority = { protagonist: 3, supporting: 2, npc: 1 };

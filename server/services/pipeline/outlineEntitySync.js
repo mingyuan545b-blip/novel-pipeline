@@ -12,6 +12,7 @@ const { resolveGenreFromProject } = require('../../services/genreConfig');
 const { getDataContext } = require('../dataContext');
 const { extractCharacterStateFromContent } = require('./outlineResponseParser');
 const { resolveMaterialName } = require('./materialNameResolver');
+const { buildCharacterEntityPatch } = require('./entityProjection');
 
 async function syncCharacterToEntityCenter(projectId, mat, materialId) {
     try {
@@ -27,39 +28,15 @@ async function syncCharacterToEntityCenter(projectId, mat, materialId) {
         const content = mat.content || mat.currentContent || mat.initialContent || '';
         const parsed = extractCharacterStateFromContent(content, {});
 
-        // 人物工艺字段：素材正文里已有【人格魅力】【哲学观】【金句库】【出场设计】【高光场景】
-        // 等标签，旧代码只映射 3 个浅字段 → 全部丢失。此处统一映射，空值不覆盖已有数据。
-        const craft = {
-            charisma: mat.charisma || parsed.charisma || '',
-            philosophy: mat.philosophy || parsed.philosophy || '',
-            entranceDesign: mat.entranceDesign || parsed.entranceDesign || '',
-            highlightScenes: mat.highlightScenes || parsed.highlightScenes || [],
-            craftStyle: mat.craftStyle || parsed.craftStyle || '',
-            quoteLibrary: mat.quoteLibrary || parsed.quoteLibrary || [],
-        };
+        // 单一投影（P1-D）：字段清单集中在 entityProjection，占位/空值不覆盖已有好数据。
+        // 人物工艺字段/深层字段此前各写一份清单，任一漏项 → 实体字段空。
+        const patch = buildCharacterEntityPatch(mat, parsed);
+        patch.roleLevel = roleLevel;
+        patch.sourceChapter = null;
+        patch.sourceContent = content.substring(0, 2000);
+        if (Array.isArray(mat.tags)) patch.tags = mat.tags;
 
-        const entity = await entityCenter.getOrCreateEntity(projectId, 'character', resolveMaterialName(mat), {
-            roleLevel, sourceChapter: null,
-            position: mat.position || parsed.position || '',
-            factionName: mat.factionName || parsed.factionName || '',
-            personality: mat.personality || parsed.personality || '',
-            speakingTone: mat.speakingTone || parsed.speakingTone || '',
-            signatureDetail: mat.signatureDetail || parsed.signatureDetail || '',
-            ...craft,
-            tags: Array.isArray(mat.tags) ? mat.tags : undefined,
-            sourceContent: content.substring(0, 2000),
-            profile: {
-                appearance: mat.appearance || parsed.appearance || '',
-                background: mat.background || parsed.background || '',
-                motivation: mat.motivation || parsed.motivation || '',
-                desire: parsed.desire || '',
-                fear: parsed.fear || '',
-                lie: parsed.lie || '',
-                trauma: parsed.trauma || '',
-                innerConflict: parsed.innerConflict || '',
-                fateArc: parsed.fateArc || '',
-            }
-        });
+        const entity = await entityCenter.getOrCreateEntity(projectId, 'character', resolveMaterialName(mat), patch);
         // 返回实体 id：KV 状态（含深度字段）统一以实体 id 为键，与全部读取路径一致
         return entity?.id || null;
     } catch (err) {

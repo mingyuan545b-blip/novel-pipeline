@@ -4,6 +4,7 @@ const stateKVIndex = require('../../stateKVIndex');
 const entityCenter = require('../../entityCenter');
 const { normalizeDeltaKeys, getFieldsForRoleLevel } = require('../../../config/characterStateSchemas');
 const { processRelationshipChanges } = require('./materialRelationProcessor');
+const { buildCharacterEntityPatch } = require('../entityProjection');
 const { processBindChanges } = require('./materialBindProcessor');
 
 async function processCharacterUpdates(organizingPlan, chapter, projectId, materials, schema, operations, errors, warnings = []) {
@@ -12,9 +13,7 @@ async function processCharacterUpdates(organizingPlan, chapter, projectId, mater
     for (const charUpdate of organizingPlan.characters) {
         if (!charUpdate.name) continue;
 
-        // 陷阱#79修复：findCharacterMaterial此前只查materials表，但material-registrar创建角色到entityCenter
-        // 导致existingMat=null，processTraitNotes的if(!existingMat) return跳过深度字段写入
-        // 改为优先查materials表，fallback查entityCenter，确保charId能拿到
+        // 陷阱#79：优先查materials表，fallback查entityCenter，确保 charId 能拿到
         let existingMat = findCharacterMaterial(projectId, materials, charUpdate.name);
         if (!existingMat) {
             try {
@@ -138,6 +137,9 @@ async function processStateChanges(charUpdate, existingMat, chapter, projectId, 
             const entity = await entityCenter.findEntityByName(projectId, 'character', charUpdate.name);
             if (entity) {
                 await entityCenter.recordAppearance(entity.id, chapter.chapterNumber);
+                // P1-D：状态增量同步投影到实体中心（已知字段；题材专属 KV 字段忽略）
+                const patch = buildCharacterEntityPatch(filteredDelta);
+                if (Object.keys(patch).length > 0) await entityCenter.updateEntity(entity.id, patch);
             }
         } catch (appearErr) {
             logger.warn('materialCharProc', 'EntityCenter appear count update failed for', charUpdate.name, ':', appearErr.message);
@@ -148,8 +150,7 @@ async function processStateChanges(charUpdate, existingMat, chapter, projectId, 
 }
 
 async function processTraitNotes(charUpdate, existingMat, chapter, projectId, schema, operations, errors) {
-    // 陷阱#79修复：条件此前只检查4个字段，但delta映射了8个字段
-    // 如果只传innerConflictNote/independentStanceNote/fateArcNote/protagonistMirrorNote而没有前4个，会误return
+    // 陷阱#79：delta 映射 8 个字段，任一非空即可（曾只查前 4 个 → Note-only 误 return）
     const hasAnyTraitNote = charUpdate.personalityNote || charUpdate.speakingToneNote ||
         charUpdate.signatureDetailNote || charUpdate.catchphraseNote ||
         charUpdate.protagonistMirrorNote || charUpdate.independentStanceNote ||
@@ -180,6 +181,12 @@ async function processTraitNotes(charUpdate, existingMat, chapter, projectId, sc
             data: delta,
             status: 'success'
         });
+        // P1-D：特质更新同时回写实体中心（此前只写 KV → 实体永远是大纲时的快照）
+        const traitPatch = buildCharacterEntityPatch(delta);
+        if (Object.keys(traitPatch).length > 0) {
+            const updated = await entityCenter.updateEntity(charId, traitPatch);
+            if (updated) operations.push({ type: 'projectEntityFields', scope: 'character', entityKey: charId, data: Object.keys(traitPatch), status: 'success' });
+        }
     } catch (e) {
         errors.push(`Failed to update traits for ${charUpdate.name}: ${e.message}`);
     }
