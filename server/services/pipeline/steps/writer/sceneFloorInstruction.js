@@ -5,6 +5,7 @@
  * 由 wordConfig 派生场景下限（禁止硬编码），并强制"四场景合计≥硬性最低"。
  */
 const { SCENE_FLOOR_RATIOS, SCENE_LABELS, FLOOR_ROUNDING } = require('../../../../config/writerLengthPolicy');
+const { EXPANSION_METHODS } = require('../expansionInstructionBuilder');
 
 /** 按硬性最低字数派生各场景下限 */
 function resolveSceneFloors(wordConfig) {
@@ -40,6 +41,9 @@ function buildLengthInstruction(wordConfig) {
         `禁止"先写简版、结尾再补"：结尾钩子场景同样要写满${floors[3]}字，不得用总结句草草收束。`,
         `每个场景都要写足：动作+对话+叙事推进三层俱全，环境描写最多2句带过。`,
         `成稿前自检：估算总字数是否≥${rejectMin}字（对照检查点 ${mid1}/${mid2}/${floorSum}）；不足则补写细节与对话，不要靠精简收尾。`,
+        // S7：首轮即下发结构化写满手法（此前只在 round>1 的扩写指令里出现 → 首轮普遍偏短）
+        '首轮就按下列手法一次写满（不要留到被退回后再补）：',
+        ...EXPANSION_METHODS,
     ].join('\n');
 }
 

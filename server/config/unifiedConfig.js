@@ -9,6 +9,7 @@
 const { getDefaultsForGenre } = require('./genreDefaults');
 const { normalizeWordConfig } = require('./wordConfigNormalizer');
 const { normalizeTargetChapters } = require('./targetChaptersNormalizer');
+const { ensureSalvageBand } = require('./writerLengthPolicy');
 
 function resolveConfig(genre, project) {
     const defaults = getDefaultsForGenre(genre, project);
@@ -16,12 +17,15 @@ function resolveConfig(genre, project) {
     // 归一化project.wordConfig：兼容历史变体{targetMin,targetMax,rejectMin,maxWords}、{target,rejectMin}等
     const pwc = normalizeWordConfig(project?.wordConfig) || {};
 
+    const targetMin = pwc.minWords || gpc.targetMinWords || defaults.targetMinWords;
+    const rejectMinRaw = pwc.rejectMin || gpc.rejectMinWords || defaults.rejectMinWords;
     return {
         word: {
             // 统一从归一化后的标准字段名读取
-            targetMin: pwc.minWords || gpc.targetMinWords || defaults.targetMinWords,
+            targetMin,
             targetMax: pwc.targetWords || gpc.targetMaxWords || defaults.targetMaxWords,
-            rejectMin: pwc.rejectMin || gpc.rejectMinWords || defaults.rejectMinWords,
+            // S7：保证可救区宽度 > 0（rejectMin 至少比 targetMin 低 10%），避免"永远整章重生成"
+            rejectMin: ensureSalvageBand(targetMin, rejectMinRaw),
             maxChapter: pwc.maxWords || gpc.maxChapterWords || defaults.maxChapterWords
         },
         chapter: {

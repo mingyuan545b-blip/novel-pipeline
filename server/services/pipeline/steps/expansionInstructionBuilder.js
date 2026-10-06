@@ -16,6 +16,13 @@ function countWords(text) {
     return (text || '').replace(/\s/g, '').length;
 }
 
+// 结构化扩写手法（唯一源）：首轮指令与扩写指令共用，保证"第1轮就按可救区的结构写满"
+const EXPANSION_METHODS = Object.freeze([
+    '1. 对话扩写：选正文中2处关键对话，各增加1-2轮往返，配动作、表情与符合人设的内心活动',
+    '2. 感官补全：每个主要场景至少补2处感官细节（视觉/听觉/嗅觉/触觉）',
+    '3. 情节利用：使用本章大纲中尚未写透的细节，补1个动作小节或环境反应，不得引入大纲外的新设定',
+]);
+
 /** 是否需要扩写：有正文且低于目标下限 */
 function needsExpansion(wordCount, wordConfig) {
     return wordCount > 0 && wordCount < wordConfig.targetMin;
@@ -74,9 +81,7 @@ function buildExpansionInstruction(wordCount, wordConfig, opts = {}) {
         header,
         `当前正文${wordCount}字，审核下限${wordConfig.targetMin}字（目标区间${wordConfig.targetMin}-${wordConfig.targetMax}字），缺口${gap}字。`,
         `本轮必须新增至少${addTarget}字的有效正文内容。逐项执行以下扩写手法（每项都要落实为实际文字）：`,
-        '1. 对话扩写：选正文中2处关键对话，各增加1-2轮往返，配动作、表情与符合人设的内心活动',
-        '2. 感官补全：每个主要场景至少补2处感官细节（视觉/听觉/嗅觉/触觉）',
-        '3. 情节利用：使用本章大纲中尚未写透的细节，补1个动作小节或环境反应，不得引入大纲外的新设定',
+        ...EXPANSION_METHODS,
         modeRule,
         `输出前自查：统计总字数，低于${wordConfig.targetMin}字必须继续扩写，达标后才允许输出完整正文。`,
         escalation
@@ -98,4 +103,4 @@ function buildEscalationNote(wordCount, targetMin) {
     return `\n\n【上轮扩写未生效·步内最后重试】你上轮输出仅${wordCount}字，距下限${targetMin}字仍差${gap}字，扩写任务未被执行。本轮输出必须比上轮至少多${addMin}字：给2处对话各补1-2轮往返、每个场景补2处感官细节、用大纲补1个情节小节。禁止删除现有正文，禁止复述上轮输出。本轮仍不达标将整章作废重生成。`;
 }
 
-module.exports = { countWords, needsExpansion, needsSalvageExpansion, needsShortfallSalvage, buildExpansionInstruction, needsExpansionRetry, buildEscalationNote, SALVAGE_RATIO, SALVAGE_FLOOR_RATIO };
+module.exports = { countWords, EXPANSION_METHODS, needsExpansion, needsSalvageExpansion, needsShortfallSalvage, buildExpansionInstruction, needsExpansionRetry, buildEscalationNote, SALVAGE_RATIO, SALVAGE_FLOOR_RATIO };

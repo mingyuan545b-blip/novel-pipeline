@@ -17,4 +17,22 @@ const SCENE_LABELS = Object.freeze(['场景1(铺垫)', '场景2(核心)', '场�
 /** 下限取整粒度（便于模型记忆与对齐） */
 const FLOOR_ROUNDING = 50;
 
-module.exports = { SCENE_FLOOR_RATIOS, SCENE_LABELS, FLOOR_ROUNDING };
+/**
+ * 可救区（salvage band）策略（S7/P1-F）：
+ * 项目 wordConfig 常见 rejectMin == targetMin → 可救区宽度为 0，
+ * 低于目标的章节只能整章重生成，而重生成有"长度先验"（flash 实测 3 轮字数不变）。
+ * 这里保证 rejectMin 至少比 targetMin 低 SALVAGE_BAND_RATIO，让
+ * [rejectMin, targetMin) 的成稿走"结构化疗写"而非作废重写。
+ */
+const SALVAGE_BAND_RATIO = 0.1;
+const SALVAGE_BAND_MIN = 50;
+
+/** 收紧 rejectMin 至 targetMin 之下（只在过窄时下压，不抬高已有配置） */
+function ensureSalvageBand(targetMin, rejectMin) {
+    if (!Number.isFinite(targetMin) || targetMin <= 0) return rejectMin;
+    if (!Number.isFinite(rejectMin) || rejectMin <= 0) return rejectMin;
+    const band = Math.max(SALVAGE_BAND_MIN, Math.round(targetMin * SALVAGE_BAND_RATIO));
+    return Math.min(rejectMin, targetMin - band);
+}
+
+module.exports = { SCENE_FLOOR_RATIOS, SCENE_LABELS, FLOOR_ROUNDING, SALVAGE_BAND_RATIO, SALVAGE_BAND_MIN, ensureSalvageBand };
