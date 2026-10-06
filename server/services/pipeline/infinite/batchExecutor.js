@@ -11,9 +11,9 @@ const { LLM_DEFAULTS } = require("../../../config/systemConfig");
 const logger = require("../../../shared/logger");
 const { STUCK_STATUSES, STATUS_VALUES } = require("../../chapterStatus");
 
-/** P1-4a 章节因果门槛处置：先补跑可修复缺口（approved 只差素材），仍缺则告警+广播+切片等待。
- *  @returns {Promise<boolean>} true=可开工（含带债放行）；false=本轮应 continue 等待 */
-async function enforceChapterGate(projectId, ch, addLog, waitWithStop) {
+/** P1-4a/P1-E 门槛处置：先补跑可修复缺口；仍缺则给本章打 skipUntil 后跳过并推进（杜绝活锁）。
+ *  @returns {Promise<boolean>} true=可开工（含带债放行）；false=本章本轮跳过 */
+async function enforceChapterGate(projectId, ch, addLog) {
     const n = ch.chapterNumber;
     const gate = await assertChapterReady({ projectId, chapterNumber: n, runPipelineStep: getRunPipelineStep() });
     if (gate.ready) {
@@ -23,7 +23,10 @@ async function enforceChapterGate(projectId, ch, addLog, waitWithStop) {
     }
     addLog(`🚧 第${n}章暂不开工 — ${gate.report}`, { gateBlocked: true, chapterNumber: n, blockedBy: gate.blockedBy });
     broadcastToProject(projectId, 'pipeline:material-gate', { chapterNumber: n, blockedBy: gate.blockedBy, report: gate.report, repaired: gate.repaired, at: Date.now() });
-    await waitWithStop(computeWaitMs(gate));
+    // P1-E：标记本章暂缓，调度器本轮跳过它；杜绝同章活锁
+    ch.skipUntil = Date.now() + computeWaitMs(gate);
+    ch.updatedAt = new Date().toISOString();
+    await store.setItem('chapters', ch.id, ch);
     return false;
 }
 
@@ -35,16 +38,12 @@ async function runInfinitePipeline(projectId, options = {}) {
     const { maxChapters = 999, stopAfterChapter = null } = options;
 
     const project = await (await require("../../dataContext").getDataContext(projectId)).getProject();
-    // Schema-First：通过归一化函数读取targetChapters，兼容targetChapterCount历史字段名
+    // Schema-First：归一化读取targetChapters，兼容targetChapterCount历史字段名
     const { normalizeTargetChapters } = require("../../../config/targetChaptersNormalizer");
     const targetChapterCount = normalizeTargetChapters(project);
     const targetWordCount = project?.targetWordCount || null;
     const effectiveStopChapter = stopAfterChapter || targetChapterCount || null;
-
-    broadcastToProject(projectId, 'pipeline:status', {
-        running: true, stopped: false,
-        completedChapters: state.completedChapters, phase: 'init'
-    });
+    broadcastToProject(projectId, 'pipeline:status', { running: true, stopped: false, completedChapters: state.completedChapters, phase: 'init' });
 
     try {
         const outlineResult = await generateInitialOutlines(projectId, addLog);
@@ -78,6 +77,14 @@ async function runInfinitePipeline(projectId, options = {}) {
                 if (supplementResult.shouldStop) break;
                 if (supplementResult.newChapterCount > 0) continue;
 
+                // P1-E：可开工章节全被门槛暂缓 → 等到最早可重试时间（不空转、不误判"完成"）
+                const gateBlocked = chapters.filter(c => c.status === STATUS_VALUES.OUTLINED && c.skipUntil && c.skipUntil > Date.now());
+                if (gateBlocked.length > 0) {
+                    const waitMs = Math.min(Math.max(Math.min(...gateBlocked.map(c => c.skipUntil)) - Date.now(), 5000), 120000);
+                    addLog(`🚧 全部可开工章节被素材门槛暂缓（${gateBlocked.map(c => `第${c.chapterNumber}章`).join('、')}），等待${Math.round(waitMs / 1000)}秒后重试`);
+                    await waitWithStop(waitMs); continue;
+                }
+
                 if (failedSkippedChapters.length > 0) {
                     const earliestCoolEnd = Math.min(...failedSkippedChapters.map(c => c.skipUntil));
                     const waitMs = Math.max(earliestCoolEnd - Date.now(), 5000);
@@ -92,8 +99,8 @@ async function runInfinitePipeline(projectId, options = {}) {
 
             const ch = outlinedChapters[0];
 
-            // P1-4a 章节因果门槛：前序章节素材未归档（material-updated）→ 本章不开工（不跳章硬写）
-            if (!(await enforceChapterGate(projectId, ch, addLog, waitWithStop))) continue;
+            // P1-4a 门槛：前序章节素材未归档 → 本章不开工
+            if (!(await enforceChapterGate(projectId, ch, addLog))) continue;
 
             const execResult = await executeChapter(projectId, ch, state, addLog, maxRounds, waitWithStop);
 
