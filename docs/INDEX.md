@@ -55,7 +55,8 @@
 |------|------|------|
 | [design/实体中心-重规划（素材单一源与生命周期）.md](design/实体中心-重规划（素材单一源与生命周期）.md) | 实体中心定位=素材管理与预加载；素材**单一源**、单点预处理入口、生命周期/章节区间、与题材无关字段过滤 | 动素材/状态加载链、清理重复源、治理 token 黑洞时**先读** |
 | [design/章节因果门槛与单点素材装配（计划书）.md](design/章节因果门槛与单点素材装配（计划书）.md) | **P1-4 施工图**：断档失忆根因取证（规划超前/跳章执行/补跑只认approved/兜底静默）、章节门槛 materialGate、远景粗纲+就近细纲、单点装配入口 materialStateAssembler、密度策略、缺口兜底与追溯、分批实施与验收 | 改管线顺序/装配/兜底告警时**先读**；新窗口接手 P1-4 直接按 §八 开工 |
-| [design/字段单一源与Agent协作闭环（体检+计划书）.md](design/字段单一源与Agent协作闭环（体检+计划书）.md) | **字段/类型/状态/契约 词汇表漂移的体检与根治计划**：10 套词汇表无单一源、无一致性闸门；非法状态 `second-reviewed` 致死锁（P0-A）；契约 WARN 当致命+深度键产不出（P0-C）；registrar 告警当失败（P1-C）；实体快照（P1-D）；第一轮字数（P1-F）。含 R1-R4 注册表 + CI 闸门 + S1-S8 施工序 | 遇"字段缺失/登记未通过/agent 契约失败/第一轮字数少/章节卡住"**先读**；新窗口接手直接按 §四 施工 |
+| [design/字段单一源与Agent协作闭环（体检+计划书）.md](design/字段单一源与Agent协作闭环（体检+计划书）.md) | **字段/类型/状态/契约 词汇表漂移的体检与根治计划**：10 套词汇表无单一源、无一致性闸门；非法状态 `second-reviewed` 致死锁（P0-A）；契约 WARN 当致命+深度键产不出（P0-C）；registrar 告警当失败（P1-C）；实体快照（P1-D）；第一轮字数（P1-F）。含 R1-R4 注册表 + CI 闸门 + S1-S8 施工序 | 遇"字段缺失/登记未通过/agent 契约失败/第一轮字数少/章节卡住"**先读**；**S1-S8 已于 2026-10-07 施工完成**（见 worklog），遗留项见该 worklog 末节 |
+| [worklog/2026-10-07-S1至S8-字段单一源与契约闭环施工.md](worklog/2026-10-07-S1至S8-字段单一源与契约闭环施工.md) | **S1-S8 施工记录**：状态机单一源 / 契约 severity+深度键生产端 / 登记分诊 / 实体投影 / 字段注册表 R1 / 装配审计+门槛活锁 / 首轮字数+可救区 / dataFlowSpec 同步；含回归基线与遗留 | 接手该主线时**先读**；闸门 `audit-vocabulary-consistency.js` 是防复发核心 |
 | [design/主位面高武·反套路喜剧-拆解与藏经阁入库.md](design/主位面高武·反套路喜剧-拆解与藏经阁入库.md) | 参考作拆解：吸引点6条、世界观骨架、17条通用技法入库清单、与《逆江湖》对照 | 设计题材元素/反套路喜剧/规则怪谈副本时**先读** |
 | [design/实体中心-副本归属与带出机制.md](design/实体中心-副本归属与带出机制.md) | 副本模式归属三件套：实体**归属**（scopeWorldId/locationSlot）、世界**通行契约**（exitMethod/carryOutPolicy/channelTag）、跨世界**带出证据链**（cross-world-traces 扩 character/pet/servant + channel/medium + carried-out）；带出门禁 carryOutGate | 设计副本归属/宠物NPC道具带出/渠道标签/串台检测时**先读** |
 | [design/角色编年史升级-多维分层与素材质检.md](design/角色编年史升级-多维分层与素材质检.md) | 编年史 4→**8 维**（日常/心理/立场/立场变化/高光/名言/事迹/关系）；台词**四要素**质检（speaker/scene/quote/why + 原文回查 + 语义查重）；Agent 决策=不新增 runtime Agent（离线人物工艺设计器 + 扩 material-manager/chronicleExtractor）；新篇流程与质量下限 | 改编年史/台词库/人物高光/开新篇质量门禁时**先读** |
@@ -110,6 +111,11 @@
 | 本地模型请求超时被取消 | [00 #94](sop/00-陷阱清单.md) | `llm.js`超时链：调用方>供应商级>LLM_DEFAULTS |
 | 想知道 token 花在哪/哪一章烧钱 | [03 Token去向面板](sop/03-新功能开发.md) | `services/pipeline/tokenLedgerView.js` / 页面 `/token-ledger` |
 | 提示词/素材被预算截断（规则失效） | [00 #42](sop/00-陷阱清单.md) | `tokenLedgerAlerts.js`（截断告警）+ `contextAssemblyRecorder.js` |
+| 章节卡住/永久半成品（状态 `first/second-reviewed`） | [字段单一源计划书 §附录A](design/字段单一源与Agent协作闭环（体检+计划书）.md) | `scripts/audit-vocabulary-consistency.js`（statusMap/迁移表） |
+| 素材登记"未通过"但内容齐全 | [字段单一源计划书 P1-C](design/字段单一源与Agent协作闭环（体检+计划书）.md) | `materialRegistrar.js`（errors/warnings 分诊） |
+| agent 契约失败（RV/FR/PO-IN-003 深度键） | [字段单一源计划书 P0-C](design/字段单一源与Agent协作闭环（体检+计划书）.md) | `agentMaterialHelpers.buildStateJson` + `contracts/_registry.js` |
+| 实体中心角色字段缺失（多为旧快照） | [字段单一源计划书 P1-D](design/字段单一源与Agent协作闭环（体检+计划书）.md) | `entityProjection.buildCharacterEntityPatch` |
+| 深度校验总缺【标志性细节】等标签 | [字段单一源计划书 P0-B](design/字段单一源与Agent协作闭环（体检+计划书）.md) | `server/config/fieldRegistry.js` + `promptFragments.resolve` |
 
 ### 数据/配置问题
 

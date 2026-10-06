@@ -114,7 +114,7 @@ const DATA_FLOW_SPEC = {
         label: '阅读者', description: '跨章节阅读，发现前后矛盾/重复/设定冲突',
         inputs: [{ name: 'recentChapters', source: 'PULL', from: 'store.queryItems("chapters")', required: true, format: 'array' }],
         outputs: [{ name: 'chapter.readerOutput', format: 'string', description: '阅读者评审(JSON)' }],
-        downstream: ['reviser'], pollutionRisk: '幻觉出跨章节矛盾', missingDataAction: '无已完成章节时CRITICAL阻断'
+        downstream: ['reviser', 'final-editor', 'material-manager'], pollutionRisk: '幻觉出跨章节矛盾', missingDataAction: '无已完成章节时CRITICAL阻断'
     },
     'material-manager': {
         label: '素材管理', description: '管理素材生命周期（创建/更新/归档）',
@@ -123,18 +123,50 @@ const DATA_FLOW_SPEC = {
             { name: 'chapter', source: 'PUSH', from: 'store.getItem("chapters")', required: true, format: 'object' },
         ],
         outputs: [{ name: 'materialUpdates', format: 'array', description: '素材更新操作列表' }],
-        downstream: ['writer'], pollutionRisk: '创建重复素材、归档错误素材', missingDataAction: 'materials为空时HIGH警告'
+        // 拆分模式：material-manager → organizer（整理计划）→ registrar（落地）
+        downstream: ['material-organizer', 'material-registrar'], pollutionRisk: '创建重复素材、归档错误素材', missingDataAction: 'materials为空时HIGH警告'
+    },
+    'material-organizer': {
+        label: '素材整理', description: '从本章正文整理出角色状态/新素材/归档候选（organizingPlan）',
+        inputs: [
+            { name: 'chapter.content', source: 'PUSH', from: 'approved 正文', required: true, format: 'string' },
+            { name: 'materials', source: 'PUSH', from: 'materialIndex', required: true, format: 'array' },
+            { name: 'kvSummary', source: 'PULL', from: 'stateKVIndex.generateBriefSummary()', required: false, format: 'string' },
+        ],
+        outputs: [{ name: 'organizingPlan', format: 'object', description: '整理计划（characters/newMaterials/archiveCandidates）' }],
+        downstream: ['material-registrar'], pollutionRisk: '把正文里的一次性路人当成长期角色登记', missingDataAction: 'chapter.content为空时跳过整理'
     },
     'material-registrar': {
         label: '素材注册', description: '执行素材的创建/更新/归档操作',
         inputs: [
             { name: 'materials', source: 'PUSH', from: 'materialIndex', required: true, format: 'array' },
             { name: 'chapter', source: 'PUSH', from: 'store.getItem("chapters")', required: true, format: 'object' },
+            { name: 'organizingPlan', source: 'PUSH', from: 'material-organizer输出', required: true, format: 'object' },
         ],
-        outputs: [{ name: 'operations', format: 'array', description: '执行的操作列表' }],
-        downstream: ['writer'], pollutionRisk: '创建同名素材、角色状态KV冲突', missingDataAction: 'organizingPlan为空时跳过注册'
+        outputs: [
+            { name: 'operations', format: 'array', description: '执行的操作列表' },
+            { name: 'errors', format: 'array', description: '致命错误（真·写库失败/结构非法）' },
+            { name: 'warnings', format: 'array', description: '告警（内容缺口/降级保留，不判失败）' },
+        ],
+        downstream: ['knowledge-extractor', 'writer'], pollutionRisk: '创建同名素材、角色状态KV冲突', missingDataAction: 'organizingPlan为空时跳过注册'
+    },
+    'knowledge-extractor': {
+        label: '知识提取', description: '把本章事实/时间线同步进知识库（facts + timeline）',
+        inputs: [
+            { name: 'chapter', source: 'PUSH', from: 'store.getItem("chapters")', required: true, format: 'object' },
+            { name: 'materials', source: 'PUSH', from: 'materialIndex', required: true, format: 'array' },
+        ],
+        outputs: [{ name: 'syncedFacts', format: 'number', description: '同步的事实数' }],
+        downstream: ['writer'], pollutionRisk: '把未发生的事写成已知事实', missingDataAction: '正文为空时跳过同步'
     }
 };
+
+// 真实步骤清单（用于 dataFlowSpec 一致性闸门：规范不得漂移到不存在的步骤）
+const KNOWN_STEP_KEYS = Object.freeze([
+    'outline-generator', 'intent-planner', 'writer', 'fast-review', 'first-review', 'second-review',
+    'reviser', 'final-editor', 'polisher', 'reader', 'material-manager', 'material-organizer',
+    'material-registrar', 'knowledge-extractor', 'consistency-constraint'
+]);
 
 function getDataFlowSpec(step) {
     return DATA_FLOW_SPEC[step] || null;
@@ -155,4 +187,4 @@ function getDataFlowGraph() {
     return graph;
 }
 
-module.exports = { DATA_FLOW_SPEC, getDataFlowSpec, getDataFlowGraph };
+module.exports = { DATA_FLOW_SPEC, KNOWN_STEP_KEYS, getDataFlowSpec, getDataFlowGraph };

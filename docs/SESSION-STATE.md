@@ -3,12 +3,32 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-10-07（**字段单一源 & Agent 协作完整性体检（只读）**，见 §一 0n；**下个窗口按该体检的计划书 S1→S8 施工**）
-> 上一轮：勘定交接问题修复 + 同规模复建压测（2026-10-06，见 0m）
+> 最后更新：2026-10-07（**字段单一源与 Agent 协作闭环 S1→S8 施工完成**，见 §一 0o）
+> 上一轮：字段单一源 & Agent 协作完整性体检（只读，产出计划书）（2026-10-07，见 0n）
 
 ---
 
 ## 一、当前结论（重要）
+
+0o. **（2026-10-07 本会话）S1→S8 施工完成：字段单一源与 Agent 协作闭环**（详见 `docs/worklog/2026-10-07-S1至S8-字段单一源与契约闭环施工.md`）
+   - **用户拍板三项**：① first/second-reviewed **补进**状态机；② 字段注册表**一次性覆盖全部类型**；③ 契约深度键**真正生产**。
+   - **S1 状态机单一源**（P0-A）：`first/second-reviewed` 补入 `ALL_STATUSES`（此前是"幽灵态"→门槛活锁/永久砖）；
+     `chapterStatus.js` 升为真相源（标签/颜色/顺序/迁移表），`chapterStateMachine` 薄封装，前端常量改为生成器产物。
+     新增闸门 `scripts/audit-vocabulary-consistency.js`（接入 ci:check）。
+   - **S2 契约**（P0-C）：WARN/HIGH 不再阻断（仅 CRITICAL）；7 份 anyOf 收敛为 `@characterDepthKeys`；
+     `buildStateJson` 真正产出深度键；**修复 KV 键不一致根因**（写素材 id / 读实体 id）→ 写入端统一实体 id
+     + 迁移脚本 `migrateCharacterKVKeys.js`。
+   - **S3 登记分诊**（P1-C）：registrar 拆 errors/warnings，`passed` 只看致命；新建未过类型校验降级 `unvalidated` 落库。
+   - **S4 实体投影**（P1-D）：`entityProjection.buildCharacterEntityPatch` 单一投影；`hasMeaningfulValue` 防占位词覆盖；
+     章节级更新回写实体中心（不再是大纲快照）。
+   - **S5 字段注册表 R1**（P0-B）：`server/config/fieldRegistry.js` 聚合字段约束+深度要求+**别名**+**落点映射**（全类型）；
+     校验用别名提取；生成端 prompt 并入必填标签；闸门加 check#1/2/3。
+   - **S6 装配/门槛**（P1-A/E）：装配审计按 agent 名单逐一断言（去假阳性）；门槛拦截改"打 skipUntil 跳过并推进"（消活锁）。
+   - **S7 字数**（P1-F）：首轮即下发结构化写满手法；`ensureSalvageBand` 保证 rejectMin ≤ targetMin−10%（可救区>0）。
+   - **S8**：dataFlowSpec 补 organizer/knowledge-extractor、修 downstream；闸门加 check#6（与 StepRegistry 比对）；本 worklog 落盘。
+   - **回归**：后端 **247 套件/3877 用例全绿**；词汇表闸门 **0 违规**；iron-law/项目标准/eslint 全通过。**已分 10 个 commit 提交**。
+   - **遗留**：① reader 返修仍走旁路（未接主循环，改动面大）；② 存量项目需跑 `migrateCharacterKVKeys.js --apply`；
+     ③ 计划书 §4.6 的真项目验收断言待实跑。
 
 0n. **（2026-10-07 本会话）字段单一源 & Agent 协作完整性体检（只读，未改代码）**
    - **产物（下个窗口施工总图）**：`docs/design/字段单一源与Agent协作闭环（体检+计划书）.md`；会话记录 `docs/worklog/2026-10-07-字段与Agent协作完整性体检.md`。

@@ -202,7 +202,27 @@ function checkFieldMappings() {
     return v;
 }
 
-const CHECKS = [checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs, checkPromptCoverage, checkExtractionCoverage, checkFieldMappings];
+// ---- 6: dataFlowSpec 与真实步骤比对（规范不得漂移） ----
+function checkDataFlowSpec() {
+    const v = [];
+    const { DATA_FLOW_SPEC, KNOWN_STEP_KEYS } = require('../server/services/pipeline/dataFlowSpec');
+    const known = new Set(KNOWN_STEP_KEYS);
+    let registered = [];
+    try { registered = require('../server/core/pipeline/steps/StepRegistry').getMigratedSteps(); } catch (_) { registered = []; }
+    for (const step of registered) {
+        if (!known.has(step)) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `StepRegistry 步骤 "${step}" 未登记 KNOWN_STEP_KEYS` });
+        if (!DATA_FLOW_SPEC[step]) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `StepRegistry 步骤 "${step}" 缺少数据流规范条目` });
+    }
+    for (const [step, spec] of Object.entries(DATA_FLOW_SPEC)) {
+        if (!known.has(step)) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `规范含未知步骤 "${step}"` });
+        for (const d of spec.downstream || []) {
+            if (!known.has(d)) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `${step}.downstream 指向未知步骤 "${d}"` });
+        }
+    }
+    return v;
+}
+
+const CHECKS = [checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs, checkPromptCoverage, checkExtractionCoverage, checkFieldMappings, checkDataFlowSpec];
 
 function main() {
     const json = process.argv.includes('--json');
@@ -219,4 +239,8 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { extractStatusMapValues, checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs };
+module.exports = {
+    extractStatusMapValues, checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs,
+    checkClientConstantsSync, checkClientStatusMaps, checkContractRefs,
+    checkPromptCoverage, checkExtractionCoverage, checkFieldMappings, checkDataFlowSpec, CHECKS
+};

@@ -53,6 +53,11 @@ describe('S1 章节状态单一源 + 词汇表闸门', () => {
             expect(v).toEqual([]);
         });
 
+        test('全部词汇表闸门（含字段/契约/数据流）0 违规', () => {
+            const v = gate.CHECKS.reduce((acc, c) => acc.concat(c()), []);
+            expect(v).toEqual([]);
+        });
+
         test('前端生成常量与后端单一源一致', () => {
             expect(gate.checkClientConstantsSync()).toEqual([]);
         });
