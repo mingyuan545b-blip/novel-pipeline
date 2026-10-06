@@ -38,7 +38,7 @@ async function syncCharacterToEntityCenter(projectId, mat, materialId) {
             quoteLibrary: mat.quoteLibrary || parsed.quoteLibrary || [],
         };
 
-        await entityCenter.getOrCreateEntity(projectId, 'character', resolveMaterialName(mat), {
+        const entity = await entityCenter.getOrCreateEntity(projectId, 'character', resolveMaterialName(mat), {
             roleLevel, sourceChapter: null,
             position: mat.position || parsed.position || '',
             factionName: mat.factionName || parsed.factionName || '',
@@ -60,12 +60,15 @@ async function syncCharacterToEntityCenter(projectId, mat, materialId) {
                 fateArc: parsed.fateArc || '',
             }
         });
+        // 返回实体 id：KV 状态（含深度字段）统一以实体 id 为键，与全部读取路径一致
+        return entity?.id || null;
     } catch (err) {
         logger.warn('outlineEntitySync', '[OUTLINE] EntityCenter sync failed for', mat.name, ':', err.message);
+        return null;
     }
 }
 
-async function initCharacterKVState(projectId, materialId, mat) {
+async function initCharacterKVState(projectId, entityId, mat) {
     try {
         const ctx = await getDataContext(projectId);
         const proj = await ctx.getProject();
@@ -77,9 +80,9 @@ async function initCharacterKVState(projectId, materialId, mat) {
         const initialState = { name: resolveMaterialName(mat), roleLevel, ...extractCharacterStateFromContent(mat.content || '', schema) };
         for (const [key, value] of Object.entries(initialState)) {
             if (key === 'stateChangedFields' || key === '_lastStateId') continue;
-            await stateKVIndex.set(projectId, 'character', materialId, key, value, 0);
+            await stateKVIndex.set(projectId, 'character', entityId, key, value, 0);
         }
-        await stateKVIndex.set(projectId, 'character', materialId, '_lastStateId', `cs-${materialId}-ch0`, 0);
+        await stateKVIndex.set(projectId, 'character', entityId, '_lastStateId', `cs-${entityId}-ch0`, 0);
         logger.info('outlineEntitySync', `[OUTLINE] Initialized KV state for "${mat.name}" (${Object.keys(initialState).length} fields)`);
     } catch (err) {
         logger.warn('outlineEntitySync', '[OUTLINE] KV state init failed for', mat.name, ':', err.message);

@@ -37,10 +37,7 @@ input:
         exceptFirstChapter: true
 
       stateJson:
-        anyOf:
-          - innerConflict
-          - independentStance
-          - fateArc
+        anyOf: "@characterDepthKeys"
         severity: CRITICAL
         errorCode: SR-IN-004
         message: 二审缺少角色深度字段，无法判断工具人化（陷阱#79断链）

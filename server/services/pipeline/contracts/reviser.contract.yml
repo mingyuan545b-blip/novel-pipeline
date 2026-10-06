@@ -30,11 +30,7 @@ input:
         exceptFirstChapter: true
 
       stateJson:
-        anyOf:
-          - innerConflict
-          - independentStance
-          - fateArc
-          - protagonistMirror
+        anyOf: "@characterDepthKeys"
         severity: CRITICAL
         errorCode: RV-IN-003
         message: 返修员缺少角色深度字段，返修后可能工具人化（陷阱#79断链）

@@ -45,7 +45,10 @@ async function _saveOneMaterial(projectId, mat, created, allMaterials) {
     }
     const item = await saveMaterial(projectId, mat);
     created.push(item); allMaterials.push(mat);
-    if (mat.type === 'character') { await syncCharacterToEntityCenter(projectId, mat, item.id); await initCharacterKVState(projectId, item.id, mat); }
+    if (mat.type === 'character') {
+        const entityId = await syncCharacterToEntityCenter(projectId, mat, item.id);
+        if (entityId) await initCharacterKVState(projectId, entityId, mat);
+    }
 }
 
 async function generateInitialMaterials(projectId, userPrompt) {

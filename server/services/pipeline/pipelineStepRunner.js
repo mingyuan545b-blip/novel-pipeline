@@ -52,6 +52,9 @@ async function runPipelineStep(projectId, chapterId, step, round, context = {}) 
         };
     }
 
+    // S2：severity 分级生效——仅 CRITICAL(errors) 阻断；HIGH/WARN 记日志 + 回传，不再把软规则当致命
+    let contractWarnings = [];
+
     // 陷阱#79防护：节点级输入素材契约校验（pre-execution）
     if (CONTRACT_AGENTS.has(step) && chapter?.chapterNumber) {
         // 陷阱#79根因修复：契约校验数据源统一
@@ -70,14 +73,9 @@ async function runPipelineStep(projectId, chapterId, step, round, context = {}) 
             };
         }
         if (inputCheck.warnings.length > 0) {
-            // WARN也阻断（用户要求）
+            contractWarnings = inputCheck.warnings;
             const warnSummary = inputCheck.warnings.map(w => `[${w.errorCode}]${w.message}`).join('; ');
-            logger.warn('pipeline', `[trap#79] 节点级契约校验WARN阻断(pre): step=${step} ${warnSummary}`);
-            return {
-                step, passed: false,
-                feedback: { summary: `节点级契约校验WARN: ${warnSummary}`, issues: inputCheck.warnings.map(w => ({ code: w.errorCode, severity: w.severity, description: w.message })) },
-                contractError: { code: 'NODE_CONTRACT_PRE_WARN', message: warnSummary }
-            };
+            logger.warn('pipeline', `[trap#79] 节点级契约校验WARN(不阻断): step=${step} ${warnSummary}`);
         }
     }
 
@@ -97,6 +95,10 @@ async function runPipelineStep(projectId, chapterId, step, round, context = {}) 
                     feedback: { summary: `输出契约校验失败: ${errSummary}`, issues: outputCheck.errors.map(e => ({ code: e.errorCode, severity: e.severity, description: e.message })) },
                     contractError: { code: 'NODE_CONTRACT_POST_FAIL', message: errSummary }
                 };
+            }
+            if (outputCheck.warnings.length > 0) {
+                contractWarnings = contractWarnings.concat(outputCheck.warnings);
+                logger.warn('pipeline', `[trap#79] 输出契约WARN(不阻断): step=${step} ${outputCheck.warnings.map(w => `[${w.errorCode}]${w.message}`).join('; ')}`);
             }
         }
 
@@ -131,7 +133,8 @@ async function runPipelineStep(projectId, chapterId, step, round, context = {}) 
 
         return {
             step: stepResult.step, result: stepResult.result, passed: stepResult.passed,
-            feedback: stepResult.feedback, materialGuidance: stepResult.materialGuidance || ''
+            feedback: stepResult.feedback, materialGuidance: stepResult.materialGuidance || '',
+            contractWarnings
         };
     }
 

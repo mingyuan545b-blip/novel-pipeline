@@ -116,7 +116,32 @@ function checkClientStatusMaps() {
     return v;
 }
 
-const CHECKS = [checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps];
+// ---- 5: 契约 @ref 引用可解析（深度键单一源，防 7 份手抄漂移） ----
+function walkYamlStrings(node, cb) {
+    if (typeof node === 'string') return cb(node);
+    if (Array.isArray(node)) return node.forEach(n => walkYamlStrings(n, cb));
+    if (node && typeof node === 'object') return Object.values(node).forEach(v => walkYamlStrings(v, cb));
+}
+function checkContractRefs() {
+    const v = [];
+    const yaml = require('js-yaml');
+    const { resolveRef } = require('../server/services/pipeline/contracts/_registry');
+    const dir = path.join(ROOT, 'server', 'services', 'pipeline', 'contracts');
+    for (const f of fs.readdirSync(dir).filter(x => x.endsWith('.contract.yml'))) {
+        let doc;
+        try { doc = yaml.load(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { v.push({ check: '5', file: f, detail: `YAML 解析失败: ${e.message}` }); continue; }
+        walkYamlStrings(doc, (s) => {
+            if (s.startsWith('@')) {
+                const resolved = resolveRef(s);
+                if (!Array.isArray(resolved) || resolved.length === 0) v.push({ check: '5', file: f, detail: `引用 "${s}" 无法解析` });
+            }
+            if (s === 'innerConflict') v.push({ check: '5', file: f, detail: '深度键应引用 "@characterDepthKeys"，禁止手写字面量' });
+        });
+    }
+    return v;
+}
+
+const CHECKS = [checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs];
 
 function main() {
     const json = process.argv.includes('--json');
@@ -133,4 +158,4 @@ function main() {
 }
 
 if (require.main === module) main();
-module.exports = { extractStatusMapValues, checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps };
+module.exports = { extractStatusMapValues, checkStatusMap, checkChapterStatusAssignments, checkStateMachineRefs, checkClientConstantsSync, checkClientStatusMaps, checkContractRefs };

@@ -30,10 +30,7 @@ input:
         exceptFirstChapter: true
 
       stateJson:
-        anyOf:
-          - innerConflict
-          - independentStance
-          - fateArc
+        anyOf: "@characterDepthKeys"
         severity: CRITICAL
         errorCode: FA-IN-003
         message: 快审缺少角色深度字段，无法判断工具人化（陷阱#79断链）

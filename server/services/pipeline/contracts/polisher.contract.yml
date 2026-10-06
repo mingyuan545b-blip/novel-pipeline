@@ -30,10 +30,7 @@ input:
         exceptFirstChapter: true
 
       stateJson:
-        anyOf:
-          - innerConflict
-          - independentStance
-          - fateArc
+        anyOf: "@characterDepthKeys"
         severity: CRITICAL
         errorCode: PO-IN-003
         message: 润色缺少角色深度字段，润色时可能抹平角色深度（陷阱#79断链）

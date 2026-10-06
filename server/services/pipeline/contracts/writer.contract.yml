@@ -40,12 +40,7 @@ input:
       # 角色stateJson必须包含深度字段（至少1个）
       # 陷阱#79：深度字段断链会导致工具人化
       stateJson:
-        anyOf:
-          - innerConflict
-          - independentStance
-          - fateArc
-          - protagonistMirror
-          - personality
+        anyOf: "@characterDepthKeys"
         severity: CRITICAL
         errorCode: WR-IN-004
         message: 角色素材stateJson缺少所有深度字段，writer无法体现角色深度（陷阱#79断链）

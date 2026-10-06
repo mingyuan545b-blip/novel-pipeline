@@ -85,12 +85,20 @@ async function processLifecycleTransition(charUpdate, existingMat, chapter, proj
     }
 }
 
+// S2：KV 状态键统一为实体 id（此前写 material id、读 entity id → 深度字段永远读不到）
+async function resolveCharacterEntityId(projectId, name) {
+    try {
+        const e = await entityCenter.findEntityByName(projectId, 'character', name);
+        return e ? e.id : null;
+    } catch (_) { return null; }
+}
+
 async function processStateChanges(charUpdate, existingMat, chapter, projectId, schema, operations, errors) {
     if (!charUpdate.stateChanges || Object.keys(charUpdate.stateChanges).length === 0) return;
 
-    const charId = existingMat ? existingMat.id : `char-${charUpdate.name}`;
+    const charId = (await resolveCharacterEntityId(projectId, charUpdate.name)) || (existingMat ? existingMat.id : null);
 
-    if (!existingMat && charUpdate.newMaterials) {
+    if (!charId && charUpdate.newMaterials) {
         errors.push(`Character ${charUpdate.name} not found in materials, skipping state update`);
         return;
     }
@@ -158,8 +166,8 @@ async function processTraitNotes(charUpdate, existingMat, chapter, projectId, sc
     if (charUpdate.fateArcNote) delta.fateArc = charUpdate.fateArcNote;
     if (charUpdate.innerConflictNote) delta.innerConflict = charUpdate.innerConflictNote;
 
-    const charId = existingMat ? existingMat.id : `char-${charUpdate.name}`;
-    if (!existingMat || Object.keys(delta).length === 0) return;
+    const charId = (await resolveCharacterEntityId(projectId, charUpdate.name)) || (existingMat ? existingMat.id : null);
+    if (!charId || Object.keys(delta).length === 0) return;
 
     try {
         await stateKVIndex.updateCharacterState(

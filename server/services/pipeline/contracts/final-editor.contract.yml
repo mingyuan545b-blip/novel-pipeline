@@ -37,10 +37,7 @@ input:
         exceptFirstChapter: true
 
       stateJson:
-        anyOf:
-          - innerConflict
-          - independentStance
-          - fateArc
+        anyOf: "@characterDepthKeys"
         severity: CRITICAL
         errorCode: FE-IN-004
         message: 终审缺少角色深度字段，定稿后可能工具人化（陷阱#79断链）

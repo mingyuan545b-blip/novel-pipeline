@@ -15,6 +15,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 const logger = require('../../shared/logger');
 const { getByPath, validateField, isExceptFirstChapter, routeBySeverity } = require('./contractFieldChecker');
+const { resolveRef } = require('./contracts/_registry');
 const { validatePostMaterial: _validatePostMaterial } = require('./contractPostMaterialValidator');
 
 const CONTRACTS_DIR = path.join(__dirname, 'contracts');
@@ -64,7 +65,8 @@ function validateCharacterMaterialRules(charRule, materials, isFirstChapter, err
     // stateJson.anyOf：角色stateJson必须含任一深度字段
     const stateRule = charRule.stateJson;
     if (stateRule && !isExceptFirstChapter(stateRule, isFirstChapter) && charMats.length > 0) {
-        const anyOfFields = stateRule.anyOf || [];
+        // YAML 支持 anyOf: "@characterDepthKeys"（共享注册表，避免 7 份手抄漂移）
+        const anyOfFields = resolveRef(stateRule.anyOf) || [];
         const hasDepth = charMats.some(m => {
             const sj = m.stateJson || {};
             return anyOfFields.some(f => sj[f] !== undefined && sj[f] !== null && sj[f] !== '');

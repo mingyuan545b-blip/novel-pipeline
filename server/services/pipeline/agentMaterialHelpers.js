@@ -59,6 +59,16 @@ async function buildStateJson(entity, projectId) {
     if (entity.position) state.position = entity.position;
     if (entity.personality) state.personality = entity.personality;
     if (entity.speakingTone) state.speakingTone = entity.speakingTone;
+    // S2 深度键生产端：真实产出契约依赖的 innerConflict/independentStance/fateArc/protagonistMirror
+    // （此前只映射浅字段 + KV，且 KV 读取键与写入键不一致 → 契约全链路判定为缺深度）
+    const profile = entity.profile || {};
+    const deep = {
+        innerConflict: entity.innerConflict || profile.innerConflict,
+        independentStance: entity.independentStance || profile.independentStance,
+        fateArc: entity.fateArc || profile.fateArc,
+        protagonistMirror: entity.protagonistMirror || profile.protagonistMirror,
+    };
+    for (const [k, v] of Object.entries(deep)) if (v) state[k] = v;
     if (entity.genreState && typeof entity.genreState === 'object') Object.assign(state, entity.genreState);
 
     // 读取KV索引中的动态状态（石化进度/HP/战力等题材特有字段）
