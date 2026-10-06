@@ -49,3 +49,21 @@ v8-engine.html
 
 # 系统
 .DS_Store
+
+# 运行时项目数据（e5d616d 起 runtime data 不再入库；随项目/压测生成，禁止提交）
+data/materials/
+data/material-index/
+data/version-snapshots/
+data/quests/
+data/comic-config/
+data/consistency-checks/
+data/context-assemblies/
+data/infinite-pipeline-state/
+data/library-imports/
+data/metrics-snapshots/
+data/state-meta/
+data/timeline-events/
+data/genre-profiles/_imported*/
+
+# 临时截图/调试图（根目录 _ 前缀）
+/_*.png
