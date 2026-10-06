@@ -33,7 +33,7 @@ function findForeshadowByName(projectId, materials, name) {
     );
 }
 
-async function processNewMaterials(organizingPlan, chapter, projectId, materials, schema, operations, errors) {
+async function processNewMaterials(organizingPlan, chapter, projectId, materials, schema, operations, errors, warnings = []) {
     if (!organizingPlan.newMaterials) return;
     for (const newMat of organizingPlan.newMaterials) {
         if (!newMat.name || !newMat.type) continue;
@@ -53,7 +53,7 @@ async function processNewMaterials(organizingPlan, chapter, projectId, materials
             const { inferTypeFromContent } = require('../../../config/materialTypes');
             const inferred = inferTypeFromContent(newMat.name || '', newMat.description || newMat.detail || '');
             const fallback = inferred || 'other';
-            errors.push(`素材类型未知，已降级保留：${newMat.name} "${newMat.type}" -> "${fallback}"`);
+            warnings.push(`素材类型未知，已降级保留：${newMat.name} "${newMat.type}" -> "${fallback}"`);
             resolvedType = fallback;
         }
         const material = { id: matId, projectId, type: resolvedType, name: newMat.name, currentContent: newMat.description || newMat.detail || '', initialContent: newMat.description || newMat.detail || '', sourceChapter: chapter.chapterNumber, createdAt: new Date().toISOString(), archived: false };
@@ -64,18 +64,12 @@ async function processNewMaterials(organizingPlan, chapter, projectId, materials
         if (newMat.depthLevel) material.depthLevel = newMat.depthLevel;
         const validation = await validateMaterial(material);
         if (!validation.valid) {
-            errors.push(`New material ${newMat.name} validation failed: ${validation.message || (validation.missing || []).join(', ')}`);
-            // 一致性告警：实体/关系可能已在上游步骤建好（material-manager 先于 registrar），
-            // 这里丢掉素材会造成"实体中心有角色、素材库没有"的不一致，必须显式暴露
-            try {
-                const existingEntity = await entityCenter.findEntityByName(projectId, 'character', newMat.name);
-                if (existingEntity) {
-                    logger.error('materialRegistrar', `[一致性风险] 素材"${newMat.name}"被拒但实体已存在(id=${existingEntity.id})：实体中心与素材库将不一致，请补齐归属字段或调整素材内容`, {
-                        projectId, materialName: newMat.name, entityId: existingEntity.id, errorCode: 'MATERIAL_ENTITY_MISMATCH'
-                    });
-                }
-            } catch (_) { /* 一致性检查失败不影响主流程 */ }
-            continue;
+            // P1-B：章节级新建未过类型校验不再丢弃（否则"实体中心有角色、素材库没有"→数据不一致）。
+            // 降级为 warning + unvalidated 标记落库，缺口在实体中心/体检面板可见。
+            material.unvalidated = true;
+            material.validationIssues = validation.missing || [];
+            warnings.push(`New material ${newMat.name} 未过类型校验，降级落库(unvalidated)：${validation.message || (validation.missing || []).join(', ')}`);
+            logger.warn('materialRegistrar', `[unvalidated] 素材"${newMat.name}"未过类型校验，已保留并标记`, { projectId, missing: material.validationIssues });
         }
 
         // 陷阱#22修复：深度校验（字段齐全+字数+质量），告警不阻断
@@ -89,7 +83,7 @@ async function processNewMaterials(organizingPlan, chapter, projectId, materials
                 checkedAt: new Date().toISOString()
             };
             if (!depthResult.valid) {
-                errors.push(`Material ${newMat.name} depth validation failed: missing ${depthResult.missing.join(', ')}`);
+                warnings.push(`Material ${newMat.name} depth validation failed: missing ${depthResult.missing.join(', ')}`);
             }
         }
 

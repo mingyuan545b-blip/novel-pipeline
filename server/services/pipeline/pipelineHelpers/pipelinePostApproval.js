@@ -131,7 +131,7 @@ async function _runMaterialRegistrar(projectId, chapterId, chapterNumber, round,
             organizingPlan = _convertMmOutputToOrganizingPlan(mmOutput);
         }
         const registrarResult = await handleMaterialRegistrar({ projectId, chapter: registrarChapter, materials: materials.materials || [], organizingPlan });
-        pipelineLog.push({ step: 'material-registrar', status: 'completed', passed: registrarResult.passed !== false, operations: registrarResult.operations || [], errors: registrarResult.errors || [], stateSummary: registrarResult.stateSummary || '', timestamp: new Date().toISOString() });
+        pipelineLog.push({ step: 'material-registrar', status: 'completed', passed: registrarResult.passed !== false, operations: registrarResult.operations || [], errors: registrarResult.errors || [], warnings: registrarResult.warnings || [], stateSummary: registrarResult.stateSummary || '', timestamp: new Date().toISOString() });
         if (onStep) onStep({ step: 'material-registrar', round, passed: registrarResult.passed !== false, roleName: '素材登记', feedback: { summary: `登记完成: ${registrarResult.operations?.length || 0} 项操作` } });
     } catch (regErr) {
         logger.warn('postApproval', `Material-registrar failed for chapter ${chapterNumber}:`, regErr.message);

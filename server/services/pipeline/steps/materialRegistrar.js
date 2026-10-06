@@ -28,7 +28,8 @@ async function handleMaterialRegistrar(params) {
             step: 'material-registrar',
             passed: true,
             operations: [],
-            errors: ['无整理计划（organizer 未输出有效JSON）'],
+            errors: [],
+            warnings: ['无整理计划（organizer 未输出有效JSON）'],
             stateSummary: ''
         };
     }
@@ -40,16 +41,19 @@ async function handleMaterialRegistrar(params) {
             passed: false,
             operations: [],
             errors: validation.errors,
+            warnings: [],
             stateSummary: ''
         };
     }
 
     const operations = [];
     const errors = [];
+    // S3：errors=致命（真·写库失败/结构非法）；warnings=告警（内容缺口/降级保留）→ passed 只看 errors
+    const warnings = [];
 
     try {
-        await processCharacterUpdates(organizingPlan, chapter, projectId, materials, schema, operations, errors);
-        await processNewMaterials(organizingPlan, chapter, projectId, materials, schema, operations, errors);
+        await processCharacterUpdates(organizingPlan, chapter, projectId, materials, schema, operations, errors, warnings);
+        await processNewMaterials(organizingPlan, chapter, projectId, materials, schema, operations, errors, warnings);
         await processArchiveCandidates(organizingPlan, chapter, projectId, materials, operations, errors);
         await processForeshadowProgress(organizingPlan, chapter, projectId, materials, operations, errors);
         await processWorldviewChanges(organizingPlan, chapter, projectId, operations, errors);
@@ -86,6 +90,7 @@ async function handleMaterialRegistrar(params) {
             passed: errors.length === 0,
             operations,
             errors,
+            warnings,
             stateSummary
         };
     } catch (e) {
@@ -94,6 +99,7 @@ async function handleMaterialRegistrar(params) {
             passed: false,
             operations,
             errors: [...errors, `Registrar execution error: ${e.message}`],
+            warnings,
             stateSummary: ''
         };
     }

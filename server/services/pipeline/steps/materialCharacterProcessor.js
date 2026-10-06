@@ -6,7 +6,7 @@ const { normalizeDeltaKeys, getFieldsForRoleLevel } = require('../../../config/c
 const { processRelationshipChanges } = require('./materialRelationProcessor');
 const { processBindChanges } = require('./materialBindProcessor');
 
-async function processCharacterUpdates(organizingPlan, chapter, projectId, materials, schema, operations, errors) {
+async function processCharacterUpdates(organizingPlan, chapter, projectId, materials, schema, operations, errors, warnings = []) {
     if (!organizingPlan.characters) return;
 
     for (const charUpdate of organizingPlan.characters) {
@@ -29,11 +29,11 @@ async function processCharacterUpdates(organizingPlan, chapter, projectId, mater
         // 导致主角被标npc。material-organizer已输出roleLevel=protagonist/supporting/npc，需透传到实体。
         await processRoleLevelUpdate(charUpdate, chapter, projectId, operations, errors);
 
-        await processStateChanges(charUpdate, existingMat, chapter, projectId, schema, operations, errors);
+        await processStateChanges(charUpdate, existingMat, chapter, projectId, schema, operations, errors, warnings);
         await processTraitNotes(charUpdate, existingMat, chapter, projectId, schema, operations, errors);
         await processBindChanges(charUpdate, existingMat, chapter, projectId, operations, errors);
         await processRelationshipChanges(charUpdate, existingMat, chapter, projectId, materials, operations, errors);
-        await processLifecycleTransition(charUpdate, existingMat, chapter, projectId, operations, errors);
+        await processLifecycleTransition(charUpdate, existingMat, chapter, projectId, operations, errors, warnings);
     }
 }
 
@@ -56,7 +56,7 @@ async function processRoleLevelUpdate(charUpdate, chapter, projectId, operations
     }
 }
 
-async function processLifecycleTransition(charUpdate, existingMat, chapter, projectId, operations, errors) {
+async function processLifecycleTransition(charUpdate, existingMat, chapter, projectId, operations, errors, warnings = []) {
     if (!charUpdate.lifecycleTransition) return;
 
     const { toState, reason } = charUpdate.lifecycleTransition;
@@ -65,7 +65,7 @@ async function processLifecycleTransition(charUpdate, existingMat, chapter, proj
     try {
         const entity = await entityCenter.findEntityByName(projectId, 'character', charUpdate.name);
         if (!entity) {
-            errors.push(`Lifecycle: entity not found for "${charUpdate.name}"`);
+            warnings.push(`Lifecycle: entity not found for "${charUpdate.name}"`);
             return;
         }
         const { transitionLifecycle } = require('../../entityCenter/entityCRUD');
@@ -78,7 +78,7 @@ async function processLifecycleTransition(charUpdate, existingMat, chapter, proj
                 status: 'success'
             });
         } else {
-            errors.push(`Lifecycle: invalid transition "${charUpdate.name}" → ${toState}`);
+            warnings.push(`Lifecycle: invalid transition "${charUpdate.name}" → ${toState}`);
         }
     } catch (e) {
         errors.push(`Lifecycle transition failed for ${charUpdate.name}: ${e.message}`);
@@ -93,13 +93,13 @@ async function resolveCharacterEntityId(projectId, name) {
     } catch (_) { return null; }
 }
 
-async function processStateChanges(charUpdate, existingMat, chapter, projectId, schema, operations, errors) {
+async function processStateChanges(charUpdate, existingMat, chapter, projectId, schema, operations, errors, warnings = []) {
     if (!charUpdate.stateChanges || Object.keys(charUpdate.stateChanges).length === 0) return;
 
     const charId = (await resolveCharacterEntityId(projectId, charUpdate.name)) || (existingMat ? existingMat.id : null);
 
     if (!charId && charUpdate.newMaterials) {
-        errors.push(`Character ${charUpdate.name} not found in materials, skipping state update`);
+        warnings.push(`Character ${charUpdate.name} not found in materials, skipping state update`);
         return;
     }
 

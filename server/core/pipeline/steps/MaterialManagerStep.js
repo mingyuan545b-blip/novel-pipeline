@@ -33,9 +33,10 @@ class MaterialManagerStep extends BaseStep {
         const registrarResult = await handleMaterialRegistrar({ projectId, chapter, materials, agentContext, context, organizingPlan: organizerResult.organizingPlan });
 
         const result = { response: organizerResult.response || '' };
+        const warnCount = (registrarResult.warnings || []).length;
         const feedback = registrarResult.errors.length > 0
             ? { summary: `素材管理完成(拆分模式), ${registrarResult.errors.length} 个错误`, updates: registrarResult.operations }
-            : { summary: `素材管理完成(拆分模式): ${registrarResult.operations.length} 项操作`, updates: registrarResult.operations };
+            : { summary: `素材管理完成(拆分模式): ${registrarResult.operations.length} 项操作${warnCount > 0 ? `, ${warnCount} 个告警` : ''}`, updates: registrarResult.operations };
 
         return StepResult.pass(this.name, {
             result,

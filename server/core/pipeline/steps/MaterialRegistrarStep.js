@@ -22,7 +22,7 @@ class MaterialRegistrarStep extends BaseStep {
             : `material-registrar失败: ${(regResult.errors || []).join('; ')}`;
 
         return (passed ? StepResult.pass : StepResult.fail)(this.name, {
-            result: { response: '', operations: regResult.operations || [], errors: regResult.errors || [], stateSummary: regResult.stateSummary || '' },
+            result: { response: '', operations: regResult.operations || [], errors: regResult.errors || [], warnings: regResult.warnings || [], stateSummary: regResult.stateSummary || '' },
             chapter: params.chapter,
             feedback: { summary: feedbackSummary, issues: regResult.errors || [], suggestions: [] }
         });
