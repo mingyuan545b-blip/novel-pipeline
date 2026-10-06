@@ -11,7 +11,23 @@ const { clearDownstreamOutputs, generateOverrideOutput, persistPipelineLog } = r
 const { onPostApproval } = require('../../services/pipelineModuleRegistry');
 const pipelineMetrics = require('../../services/pipelineMetrics');
 const logger = require('../../shared/logger');
+const { STATUS_VALUES } = require('../../services/chapterStatus');
 const { handleFinalEditorResult } = require('./orchestratorFinalEditorHandler');
+
+// 审核通过后的状态推进（单一源：不再手写 first-reviewed/second-reviewed 字面量）
+const REVIEWED_MAP = { 'first-review': STATUS_VALUES.FIRST_REVIEWED, 'second-review': STATUS_VALUES.SECOND_REVIEWED };
+const REVIEWING_MAP = { 'first-review': STATUS_VALUES.FIRST_REVIEWING, 'second-review': STATUS_VALUES.SECOND_REVIEWING };
+
+async function markReviewPassed(step, chapterId) {
+    const next = REVIEWED_MAP[step];
+    if (!next) return;
+    const ch = await store.getItem('chapters', chapterId);
+    if (ch && ch.status === REVIEWING_MAP[step]) {
+        ch.status = next;
+        ch.updatedAt = new Date().toISOString();
+        await store.setItem('chapters', chapterId, ch);
+    }
+}
 
 async function executeStep(projectId, chapterId, step, round, context, pipelineLog, onStep, runPipelineStepFn, abortController) {
     const metricsToken = pipelineMetrics.recordStepStart(step, projectId);
@@ -66,16 +82,7 @@ async function handleReviewOverride(step, stepResult, chapterId, projectId, chap
 
 async function handleReviewResult(step, stepResult, chapterId, projectId, chapter, round, config, project, pipelineLog, rejectionTracker, circuitBreaker) {
     if (stepResult.passed) {
-        const statusMap = { 'first-review': 'first-reviewed', 'second-review': 'second-reviewed' };
-        if (statusMap[step]) {
-            const ch = await store.getItem('chapters', chapterId);
-            const reviewingStatus = step === 'first-review' ? 'first-reviewing' : 'second-reviewing';
-            if (ch && ch.status === reviewingStatus) {
-                ch.status = statusMap[step];
-                ch.updatedAt = new Date().toISOString();
-                await store.setItem('chapters', chapterId, ch);
-            }
-        }
+        await markReviewPassed(step, chapterId);
         return { passed: true };
     }
 
@@ -89,16 +96,7 @@ async function handleReviewResult(step, stepResult, chapterId, projectId, chapte
         await handleReviewOverride(step, stepResult, chapterId, projectId, currentContent, sysWc, config.word.rejectMin, materials, project);
 
         if (stepResult.passed) {
-            const statusMap = { 'first-review': 'first-reviewed', 'second-review': 'second-reviewed' };
-            if (statusMap[step]) {
-                const ch = await store.getItem('chapters', chapterId);
-                const reviewingStatus = step === 'first-review' ? 'first-reviewing' : 'second-reviewing';
-                if (ch && ch.status === reviewingStatus) {
-                    ch.status = statusMap[step];
-                    ch.updatedAt = new Date().toISOString();
-                    await store.setItem('chapters', chapterId, ch);
-                }
-            }
+            await markReviewPassed(step, chapterId);
             return { passed: true };
         }
 
@@ -126,16 +124,7 @@ async function handleReviewResult(step, stepResult, chapterId, projectId, chapte
             ch[outputField] = generateOverrideOutput(overrideReason, step === 'first-review' ? '初审' : '复审', stepResult.feedback);
             await store.setItem('chapters', chapterId, ch);
         }
-        const statusMap = { 'first-review': 'first-reviewed', 'second-review': 'second-reviewed' };
-        if (statusMap[step]) {
-            const ch2 = await store.getItem('chapters', chapterId);
-            const reviewingStatus = step === 'first-review' ? 'first-reviewing' : 'second-reviewing';
-            if (ch2 && ch2.status === reviewingStatus) {
-                ch2.status = statusMap[step];
-                ch2.updatedAt = new Date().toISOString();
-                await store.setItem('chapters', chapterId, ch2);
-            }
-        }
+        await markReviewPassed(step, chapterId);
         return { passed: true };
     }
 

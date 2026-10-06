@@ -64,8 +64,16 @@ describe('chapterStateMachine', () => {
             assert.equal(getNextState('outlined', 'write-complete'), 'written');
         });
 
-        test('first-review-pass from first-reviewing → second-reviewing', () => {
-            assert.equal(getNextState('first-reviewing', 'first-review-pass'), 'second-reviewing');
+        test('first-review-pass from first-reviewing → first-reviewed', () => {
+            assert.equal(getNextState('first-reviewing', 'first-review-pass'), 'first-reviewed');
+        });
+
+        test('second-review-start from first-reviewed → second-reviewing', () => {
+            assert.equal(getNextState('first-reviewed', 'second-review-start'), 'second-reviewing');
+        });
+
+        test('second-review-pass from second-reviewing → second-reviewed', () => {
+            assert.equal(getNextState('second-reviewing', 'second-review-pass'), 'second-reviewed');
         });
 
         test('first-review-fail from first-reviewing → written', () => {

@@ -1,30 +1,7 @@
-const VALID_TRANSITIONS = {
-    'outlined': ['written', 'failed-skipped'],
-    'written': ['first-reviewing', 'failed-skipped'],
-    'first-reviewing': ['second-reviewing', 'written', 'timeout-skipped', 'cooldown-waiting'],
-    'second-reviewing': ['final-editing', 'written', 'timeout-skipped', 'cooldown-waiting'],
-    'final-editing': ['approved', 'written', 'timeout-skipped', 'cooldown-waiting'],
-    'approved': ['material-updated', 'outlined'],
-    'material-updated': ['outlined'],
-    'failed-skipped': ['outlined'],
-    'timeout-skipped': ['outlined'],
-    'cooldown-waiting': ['outlined']
-};
+// 词汇表 / 迁移表来自唯一真相源 chapterStatus.js（本文件仅保留迁移判定行为）
+const { VALID_TRANSITIONS, STATUS_LABELS: STATE_LABELS } = require('./chapterStatus');
 
-const STATE_LABELS = {
-    'outlined': '大纲',
-    'written': '已写',
-    'first-reviewing': '初审中',
-    'second-reviewing': '复审中',
-    'final-editing': '定稿中',
-    'approved': '已通过',
-    'material-updated': '素材已更新',
-    'failed-skipped': '失败跳过',
-    'timeout-skipped': '超时跳过',
-    'cooldown-waiting': '冷却等待'
-};
-
-const PIPELINE_STATES = ['first-reviewing', 'second-reviewing', 'final-editing'];
+const PIPELINE_STATES = ['first-reviewing', 'first-reviewed', 'second-reviewing', 'second-reviewed', 'final-editing'];
 const TERMINAL_STATES = ['approved', 'material-updated', 'failed-skipped', 'timeout-skipped', 'cooldown-waiting'];
 const RESETTABLE_STATES = ['failed-skipped', 'timeout-skipped', 'cooldown-waiting'];
 
@@ -47,17 +24,19 @@ function getNextState(currentState, event) {
     const EVENT_MAP = {
         'write-complete': { from: 'outlined', to: 'written' },
         'review-start': { from: 'written', to: 'first-reviewing' },
-        'first-review-pass': { from: 'first-reviewing', to: 'second-reviewing' },
+        'first-review-pass': { from: 'first-reviewing', to: 'first-reviewed' },
         'first-review-fail': { from: 'first-reviewing', to: 'written' },
-        'second-review-pass': { from: 'second-reviewing', to: 'final-editing' },
+        'second-review-start': { from: 'first-reviewed', to: 'second-reviewing' },
+        'second-review-pass': { from: 'second-reviewing', to: 'second-reviewed' },
         'second-review-fail': { from: 'second-reviewing', to: 'written' },
+        'final-edit-start': { from: 'second-reviewed', to: 'final-editing' },
         'edit-complete': { from: 'final-editing', to: 'approved' },
         'edit-fail': { from: 'final-editing', to: 'written' },
         'material-update': { from: 'approved', to: 'material-updated' },
         'timeout': { from: PIPELINE_STATES, to: 'timeout-skipped' },
         'fail-skip': { from: ['outlined', 'written'], to: 'failed-skipped' },
         'cooldown-wait': { from: PIPELINE_STATES, to: 'cooldown-waiting' },
-        'reset': { from: [...TERMINAL_STATES, ...RESETTABLE_STATES, 'material-updated'], to: 'outlined' }
+        'reset': { from: [...TERMINAL_STATES, ...RESETTABLE_STATES, 'material-updated', ...PIPELINE_STATES, 'approved'], to: 'outlined' }
     };
     const mapping = EVENT_MAP[event];
     if (!mapping) return null;

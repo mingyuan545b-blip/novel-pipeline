@@ -1,4 +1,6 @@
 import logger from '../../shared/logger';
+// 状态顺序单一源：由后端 chapterStatus 生成，禁止手抄（闸门 gen:chapter-status --check 拦截漂移）
+import { STATUS_ORDER as SHARED_STATUS_ORDER } from '../../shared/chapterStatusConstants';
 
 export const PIPELINE_STEPS = {
     novel: [
@@ -104,7 +106,7 @@ export const STATUS_VALUES = {
     WRITTEN: 'written'
 };
 
-export const STATUS_ORDER = ['outlined', 'written', 'first-reviewing', 'first-reviewed', 'second-reviewing', 'second-reviewed', 'final-editing', 'approved', 'material-updated', 'cooldown-waiting'];
+export const STATUS_ORDER = SHARED_STATUS_ORDER;
 
 export const safeStr = (v) => {
     if (v == null) return '';

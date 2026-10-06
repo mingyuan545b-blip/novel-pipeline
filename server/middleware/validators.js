@@ -1,5 +1,6 @@
 const { body, param, query, validationResult } = require('express-validator');
 const { ERROR_CODES } = require('../shared/errorCodes');
+const { ALL_STATUSES } = require('../services/chapterStatus');
 
 const { VALIDATION_ERROR } = ERROR_CODES;
 
@@ -88,11 +89,7 @@ const createChapter = [
 const updateChapter = [
     param('id').isString().trim().isLength({ min: 1, max: 100 }).withMessage('章节id必填'),
     body('content').optional().isString().isLength({ max: 500000 }).withMessage('章节内容过长'),
-    body('status').optional().isString().isIn([
-        'outlined', 'written', 'first-reviewing', 'second-reviewing',
-        'final-editing', 'approved', 'material-updated',
-        'failed-skipped', 'timeout-skipped', 'cooldown-waiting'
-    ]).withMessage('无效的章节状态'),
+    body('status').optional().isString().isIn(ALL_STATUSES).withMessage('无效的章节状态'),
     body('chapterNumber').optional().isInt({ min: 1, max: 99999 }),
     handleValidation
 ];
