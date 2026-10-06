@@ -14,6 +14,11 @@ const { detectConflictPatternRepeat } = require('./detectors/detectConflictPatte
 const { detectChapterCoherence } = require('./detectors/detectChapterCoherence');
 const { detectAbstractSentiment } = require('./detectors/detectAbstractSentiment');
 const { detectToolCharacter } = require('./detectors/detectToolCharacter');
+const { detectBanterDeflation } = require('./detectors/detectBanterDeflation');
+const { detectAbstractEnding } = require('./detectors/detectAbstractEnding');
+const { detectEmotionalContinuity } = require('./detectors/detectEmotionalContinuity');
+const { detectMotifReuse } = require('./detectors/detectMotifReuse');
+const { detectHookMonotony } = require('./detectors/detectHookMonotony');
 const { getMetaConstraintDetectionSpec } = require('./constraintMetaSpec');
 const logger = require('../../shared/logger');
 
@@ -23,6 +28,12 @@ const DETECTION_REGISTRY = Object.freeze({
     M3: { fn: detectChapterCoherence, source: 'meta' },
     M4: { fn: detectAbstractSentiment, source: 'meta' },
     M5: { fn: detectToolCharacter, source: 'meta' },
+    // 12-创作工艺 新增
+    M6: { fn: detectBanterDeflation, source: 'meta' },
+    M7: { fn: detectAbstractEnding, source: 'meta' },
+    M8: { fn: detectEmotionalContinuity, source: 'meta' },
+    M9: { fn: detectMotifReuse, source: 'meta' },
+    M10: { fn: detectHookMonotony, source: 'meta' },
 });
 
 async function runConstraintDetection(constraintId, params) {

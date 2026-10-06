@@ -27,11 +27,19 @@ async function backfillProject(projectId) {
         (e.roleLevel === 'protagonist' || e.roleLevel === 'supporting') &&
         e.lifecycleState !== 'archived' && !e.archived
     );
+    // 兜底内容源：实体 sourceContent 常被截断（如仅 219 字），回落同名角色素材正文
+    const mats = await store.queryItems('materials', { projectId, type: 'character' });
+    const matByName = new Map(mats.filter(m => !m.archived).map(m => [m.name, m]));
 
     let updated = 0;
     let skipped = 0;
     for (const entity of targets) {
-        const content = entity.sourceContent || '';
+        const mat = matByName.get(entity.name);
+        const matContent = mat ? (mat.currentContent || mat.initialContent || '') : '';
+        // 优先取更完整的来源：素材正文通常比实体 sourceContent（截断 2000 字）更全
+        const content = (matContent.length > (entity.sourceContent || '').length)
+            ? matContent
+            : (entity.sourceContent || matContent || '');
         if (!content || content.length < 20) { skipped++; continue; }
 
         const parsed = extractCharacterStateFromContent(content, {});
@@ -39,10 +47,23 @@ async function backfillProject(projectId) {
         if (parsed.charisma && !entity.charisma) updates.charisma = parsed.charisma;
         if (parsed.philosophy && !entity.philosophy) updates.philosophy = parsed.philosophy;
         if (parsed.entranceDesign && !entity.entranceDesign) updates.entranceDesign = parsed.entranceDesign;
+        if (parsed.craftStyle && !entity.craftStyle) updates.craftStyle = parsed.craftStyle;
+        if (parsed.speakingTone && !entity.speakingTone) updates.speakingTone = parsed.speakingTone;
+        if (parsed.factionName && !entity.factionName) updates.factionName = parsed.factionName;
+        if (Array.isArray(parsed.highlightScenes) && parsed.highlightScenes.length > 0 &&
+            (!Array.isArray(entity.highlightScenes) || entity.highlightScenes.length === 0)) {
+            updates.highlightScenes = parsed.highlightScenes;
+        }
         if (Array.isArray(parsed.quoteLibrary) && parsed.quoteLibrary.length > 0 &&
             (!Array.isArray(entity.quoteLibrary) || entity.quoteLibrary.length === 0)) {
             updates.quoteLibrary = parsed.quoteLibrary;
         }
+        // 人物四件套 → profile
+        const prof = {};
+        for (const k of ['desire', 'fear', 'lie', 'trauma']) {
+            if (parsed[k] && !(entity.profile || {})[k]) prof[k] = parsed[k];
+        }
+        if (Object.keys(prof).length > 0) updates.profile = { ...(entity.profile || {}), ...prof };
 
         if (Object.keys(updates).length === 0) {
             skipped++;

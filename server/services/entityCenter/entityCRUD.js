@@ -40,12 +40,16 @@ async function getOrCreateEntity(center, projectId, entityType, name, defaults =
         appearCount: 1, parentEntityId: defaults.parentEntityId || null,
         tags: defaults.tags || [], hp: defaults.hp ?? 100, combatPower: defaults.combatPower ?? 0,
         position: defaults.position || '', factionName: defaults.factionName || '',
+        // 副本归属（见 docs/design/实体中心-副本归属与带出机制.md）：属于哪个世界/副本 + 特定位置 + 绑定媒介
+        scopeWorldId: defaults.scopeWorldId || 'main-world', locationSlot: defaults.locationSlot || '',
+        bindMedium: defaults.bindMedium || '',
         personality: defaults.personality || '', speakingTone: defaults.speakingTone || '',
         signatureDetail: defaults.signatureDetail || '', craftStyle: defaults.craftStyle || '',
         // 人物魅力系统4维度（参考蛊真人方源设计）
         charisma: defaults.charisma || '',           // 人格魅力：核心魅力特质
         philosophy: defaults.philosophy || '',       // 哲学观：核心信念和价值观
         quoteLibrary: defaults.quoteLibrary || [],   // 金句库：预设代表性金句+适用场景
+        highlightScenes: defaults.highlightScenes || [], // 高光时刻：名场面/高光场景（运行期由编年史回流）
         entranceDesign: defaults.entranceDesign || '', // 出场设计：出场方式和标志性场景
         genreState: defaults.genreState || (genreId ? buildGenreStateDefaults(genreId) : {}),
         profile: defaults.profile || {}, bindsSummary: [], relationsSummary: [],

@@ -3,6 +3,7 @@ import { ROLE_COLORS } from './constants';
 const TRAIT_FIELDS = [
     { key: 'position', label: '身份', icon: '💼' },
     { key: 'factionName', label: '阵营', icon: '🏛' },
+    { key: 'locationSlot', label: '所在位置', icon: '📍' },
     { key: 'personality', label: '性格', icon: '🎭' },
     { key: 'speakingTone', label: '语气', icon: '💬' },
     { key: 'signatureDetail', label: '标志', icon: '✨' },
@@ -28,6 +29,23 @@ function TraitTag({ label, value, color }) {
     );
 }
 
+function QuotesList({ quotes }) {
+    return (
+        <ul className="ec-quote-list">
+            {quotes.map((q, idx) => {
+                const qq = typeof q === 'string' ? { quote: q } : q;
+                return (
+                    <li key={idx} className="ec-quote-item">
+                        <span className="ec-quote-scene">【{qq.scene || '通用场景'}】</span>
+                        <span className="ec-quote-text">{qq.quote}</span>
+                        {qq.why && <span className="ec-quote-why">↳ {qq.why}</span>}
+                    </li>
+                );
+            })}
+        </ul>
+    );
+}
+
 function QuoteLibrarySection({ quotes, roleColor }) {
     if (!Array.isArray(quotes) || quotes.length === 0) return null;
     return (
@@ -35,11 +53,24 @@ function QuoteLibrarySection({ quotes, roleColor }) {
             <div className="ec-quote-title" style={{ color: roleColor }}>
                 <span aria-hidden="true">💬</span> 金句库 ({quotes.length})
             </div>
+            <QuotesList quotes={quotes} />
+        </div>
+    );
+}
+
+function HighlightScenesSection({ highlights, roleColor }) {
+    if (!Array.isArray(highlights) || highlights.length === 0) return null;
+    return (
+        <div className="ec-quote-section">
+            <div className="ec-quote-title" style={{ color: roleColor }}>
+                <span aria-hidden="true">✨</span> 高光时刻 ({highlights.length})
+            </div>
             <ul className="ec-quote-list">
-                {quotes.map((q, idx) => (
+                {highlights.map((h, idx) => (
                     <li key={idx} className="ec-quote-item">
-                        <span className="ec-quote-scene">【{q.scene || '通用场景'}】</span>
-                        <span className="ec-quote-text">{q.quote}</span>
+                        <span className="ec-quote-scene">【{h.scene || '名场面'}】</span>
+                        <span className="ec-quote-text">{h.what}</span>
+                        {h.why && <span className="ec-quote-why">↳ {h.why}</span>}
                     </li>
                 ))}
             </ul>
@@ -55,9 +86,10 @@ export default function CharacterTraits({ adapted }) {
     const profile = adapted.profile || {};
     const hasProfile = PROFILE_FIELDS.some(f => profile[f.key]);
     const hasQuotes = Array.isArray(adapted.quoteLibrary) && adapted.quoteLibrary.length > 0;
+    const hasHighlights = Array.isArray(adapted.highlightScenes) && adapted.highlightScenes.length > 0;
     const hasSource = adapted.sourceContent && adapted.sourceContent.length > 10;
 
-    if (!hasTraits && !hasProfile && !hasQuotes && !hasSource) {
+    if (!hasTraits && !hasProfile && !hasQuotes && !hasHighlights && !hasSource) {
         return (
             <div className="cyber-card ec-border-purple">
                 <h4 className="ec-section-title ec-color-purple">
@@ -91,6 +123,7 @@ export default function CharacterTraits({ adapted }) {
                 </div>
             )}
             {hasQuotes && <QuoteLibrarySection quotes={adapted.quoteLibrary} roleColor={roleColor} />}
+            {hasHighlights && <HighlightScenesSection highlights={adapted.highlightScenes} roleColor={roleColor} />}
             {hasSource && (
                 <details className="ec-source-details">
                     <summary className="ec-source-summary">素材原文 ({adapted.sourceContent.length}字)</summary>
@@ -101,4 +134,4 @@ export default function CharacterTraits({ adapted }) {
     );
 }
 
-export { TraitTag, QuoteLibrarySection, TRAIT_FIELDS, PROFILE_FIELDS };
+export { TraitTag, QuoteLibrarySection, HighlightScenesSection, QuotesList, TRAIT_FIELDS, PROFILE_FIELDS };

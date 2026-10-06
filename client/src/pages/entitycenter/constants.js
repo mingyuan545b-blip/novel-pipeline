@@ -21,6 +21,7 @@ export const TABS = [
     { key: 'knowledge', icon: '👁', label: '限知' },
     { key: 'equipment', icon: '⚔', label: '装备' },
     { key: 'techniques', icon: '📖', label: '功法' },
+    { key: 'clues', icon: '🔎', label: '线索道具' },
     { key: 'pets', icon: '🐾', label: '宠物' },
     { key: 'servants', icon: '🧑‍💼', label: '仆人' },
     { key: 'relations', icon: '🔗', label: '关系' },
@@ -44,6 +45,7 @@ export const TAB_GROUPS = [
         children: [
             { key: 'equipment', icon: '⚔', label: '装备' },
             { key: 'techniques', icon: '📖', label: '功法' },
+            { key: 'clues', icon: '🔎', label: '线索道具' },
             { key: 'pets', icon: '🐾', label: '宠物' },
             { key: 'servants', icon: '🧑‍💼', label: '仆人' },
         ]
@@ -82,4 +84,32 @@ export const SCOPE_BORDER_COLORS = {
 
 export const CONFIDENCE_LABELS = { certain: '确信', suspect: '怀疑', misinformed: '误信', unknown: '未知' };
 export const CONFIDENCE_COLORS = { certain: '#4ecdc4', suspect: '#ffd700', misinformed: '#ff6b9d', unknown: '#888' };
-export const SOURCE_HOW_LABELS = { witnessed: '亲眼', told: '听说', inferred: '推理', discovered: '发现' };
+/** 获知渠道（事件视角的二级维度）。前四项为规范值，其余为模型返回的口语/别名，统一中文化避免裸英文。 */
+export const SOURCE_HOW_LABELS = {
+    witnessed: '亲眼', told: '听说', inferred: '推理', discovered: '发现',
+    observed: '观察', heard: '耳闻', read: '阅读', recalled: '回忆',
+    self_knowledge: '自身知晓', agreed: '被承认',
+};
+
+/** 定义类型（item-definitions.defType）→ 中文标签 */
+export const DEF_TYPE_LABELS = {
+    equipment: '装备', technique: '功法', 'cultivation-method': '修炼法门', 'power-system': '力量体系',
+    evidence: '证据', key_item: '关键道具', information: '情报', item: '道具', consumable: '消耗品',
+    clue: '线索', none: '未分类',
+};
+
+/** 素材/定义标签英文 → 中文（未收录的原样展示） */
+export const TAG_LABELS = {
+    'auto-generated': '自动生成', 'manual': '手动录入', 'system': '系统',
+    weapon: '武器', armor: '防具', accessory: '饰品', talisman: '符箓', pill: '丹药',
+    consumable: '消耗品', material: '材料', quest: '任务', clue: '线索', key: '关键',
+    'magic': '秘法', martial: '武学', 'support': '辅助', 'passive': '被动', 'active': '主动',
+};
+export const tagLabel = t => TAG_LABELS[t] || t;
+
+/** 素材类型 → 中文（生命周期/元数据展示用） */
+export const MATERIAL_TYPE_LABELS = {
+    character: '角色', equipment: '装备', technique: '功法', location: '地点', worldview: '世界观',
+    organization: '组织', institution: '机构', relationship: '关系', foreshadowing: '伏笔',
+    'power-system': '力量体系', other: '其他',
+};

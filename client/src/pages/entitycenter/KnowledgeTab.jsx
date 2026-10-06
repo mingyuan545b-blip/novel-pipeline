@@ -1,8 +1,10 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { CONFIDENCE_LABELS, SOURCE_HOW_LABELS } from './constants';
 import useKnowledgeState from './useKnowledgeState';
-import KnowledgeFactGroup from './KnowledgeFactGroup';
-import { presentCategories, chapterOptionsOf, filterKnowledge, groupByCategory } from './knowledgeUtils';
+import KnowledgeRecordRow from './KnowledgeRecordRow';
+import KnowledgeTree from './KnowledgeTree';
+import { presentCategories, chapterOptionsOf, filterKnowledge } from './knowledgeUtils';
+import { TREE_AXES, buildKnowledgeTree } from './knowledgeTreeBuild';
 import s from './knowledge.module.css';
 import './categoryBrowser.css';
 
@@ -17,13 +19,20 @@ export default function KnowledgeTab({ projectId, characters }) {
         for (const c of characters) m.set(c.id, c._adapted?.name || c.name || c.id);
         return m;
     }, [characters]);
-    const nameOf = (id) => entityNameMap.get(id) || id;
+    const nameOf = useCallback((id) => entityNameMap.get(id) || id, [entityNameMap]);
 
+    const [axis, setAxis] = useState('entity');
     const cats = useMemo(() => presentCategories(records), [records]);
     const chapters = useMemo(() => chapterOptionsOf(records), [records]);
-    const shown = useMemo(() => filterKnowledge(records, filter, nameOf), [records, filter, entityNameMap]);
-    const groups = useMemo(() => groupByCategory(shown), [shown]);
-    const factCount = groups.reduce((n, g) => n + g.facts.length, 0);
+    const shown = useMemo(() => filterKnowledge(records, filter, nameOf), [records, filter, nameOf]);
+    const nodes = useMemo(() => buildKnowledgeTree(shown, axis, nameOf), [shown, axis, nameOf]);
+    const factCount = useMemo(() => new Set(shown.map(r => r.factText || r.factId)).size, [shown]);
+    const byEvent = axis === 'event';
+    const renderLeaf = (r) => (
+        <KnowledgeRecordRow key={r.id} record={r} nameOf={nameOf}
+            showEntity={byEvent} showConfidence={byEvent} showSource={!byEvent}
+            showCategory={!byEvent} showFact={!byEvent} onDelete={handleDelete} />
+    );
 
     return (
         <div className="cyber-card">
@@ -63,8 +72,16 @@ export default function KnowledgeTab({ projectId, characters }) {
                 ))}
             </div>
 
-            <div className="ec-text-11 ec-text-muted ec-mb-12">
-                {cats.length} 个分类 · {factCount} 条事实 · {shown.length} 条认知记录
+            <div className="ec-flex ec-items-center ec-gap-8 ec-mb-12">
+                <span className="ec-text-11 ec-text-muted">视角：</span>
+                {TREE_AXES.map(m => (
+                    <button key={m.key} title={m.hint}
+                        className={`cyber-btn cyber-btn-sm ec-text-11 ${axis === m.key ? 'cyber-btn-primary' : ''}`}
+                        onClick={() => setAxis(m.key)}>{m.label}</button>
+                ))}
+                <span className="ec-text-11 ec-text-muted ec-ml-auto">
+                    {cats.length} 个分类 · {factCount} 条事实 · {shown.length} 条认知记录
+                </span>
             </div>
 
             {showForm && (
@@ -99,28 +116,14 @@ export default function KnowledgeTab({ projectId, characters }) {
             )}
 
             {loading ? <div className="ec-p-20 ec-text-center">加载中...</div> : (
-                groups.length === 0 ? (
+                nodes.length === 0 ? (
                     <div className={`ec-p-20 ec-text-center ${s.emptyHint}`}>
                         {records.length === 0
                             ? '暂无限知记录。章节审批通过后会自动提取限知数据，也可手动新增。'
                             : '没有匹配的限知记录（试试清空筛选）。'}
                     </div>
                 ) : (
-                    groups.map(g => (
-                        <section key={g.key} className="cb-group">
-                            <div className="cb-group-head">
-                                <span className="cb-group-dot" style={{ background: g.meta.color }} />
-                                <span className="cb-group-name" style={{ color: g.meta.color }}>{g.meta.label}</span>
-                                <span className="cb-group-count">{g.facts.length} 条事实</span>
-                            </div>
-                            <div className="ec-flex ec-flex-col ec-gap-12">
-                                {g.facts.map(f => (
-                                    <KnowledgeFactGroup key={f.factKey} factKey={f.factKey} records={f.records}
-                                        entityNameMap={entityNameMap} onDelete={handleDelete} />
-                                ))}
-                            </div>
-                        </section>
-                    ))
+                    <KnowledgeTree nodes={nodes} axis={axis} renderLeaf={renderLeaf} />
                 )
             )}
         </div>

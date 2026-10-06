@@ -119,6 +119,8 @@ async function batchCreateTraces(projectId, traces) {
                         fromWorld: t.transitionFrom,
                         toWorld: t.transitionTo,
                         action: 'transitioned',
+                        channel: t.transitionChannel || '',
+                        medium: t.transitionMedium || '',
                         note: t.transitionNote || ''
                     });
                     results.push({ entityId: t.entityId, success: true, action: 'transition_appended' });
@@ -134,6 +136,8 @@ async function batchCreateTraces(projectId, traces) {
                         fromWorld: t.transitionFrom,
                         toWorld: t.transitionTo,
                         action: 'transitioned',
+                        channel: t.transitionChannel || '',
+                        medium: t.transitionMedium || '',
                         note: t.transitionNote || '带回主世界'
                     });
                 }

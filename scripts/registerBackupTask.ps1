@@ -1,5 +1,8 @@
 # registerBackupTask.ps1 — 注册「每日 PG 备份」Windows 计划任务（当前用户，无需管理员）
 #
+# ⚠️ 已弃用：本机环境优先 cmd，请改用 scripts\registerBackupTask.bat。
+#    （保留本文件仅为向后兼容；新流程见 docs/sop/11-数据备份与恢复.md）
+#
 # 注意：这是系统级改动（写入任务计划程序）。按项目约定需由用户显式执行，不做自动安装。
 # 用法：
 #   powershell -ExecutionPolicy Bypass -File scripts\registerBackupTask.ps1

@@ -47,6 +47,21 @@ export const FACTION_STATUS = {
     emerging:    { id: 'emerging',    label: '新兴',   icon: '🌱' }
 };
 
+/** 副本带出策略（与后端 server/services/worldConstants.js 同步） */
+export const CARRY_OUT_POLICIES = {
+    locked:     { id: 'locked',     label: '不可带出', icon: '🔒' },
+    native:     { id: 'native',     label: '原生物可带出', icon: '✅' },
+    medium:     { id: 'medium',     label: '需媒介', icon: '🪢' },
+    item:       { id: 'item',       label: '需特殊道具', icon: '🗝' },
+    permission: { id: 'permission', label: '需渠道权限', icon: '🎫' },
+    plot:       { id: 'plot',       label: '需剧情许可', icon: '🎬' }
+};
+
+/** 带出策略中文标签（未知原样返回） */
+export function getCarryOutLabel(policy) {
+    return CARRY_OUT_POLICIES[policy]?.label || policy || '未定义';
+}
+
 /** 获取武力体系标签数组 */
 export function getPowerSystemLabels(systems) {
     if (!Array.isArray(systems)) return [];

@@ -6,6 +6,7 @@
  */
 const llm = require('./llm');
 const logger = require('../shared/logger');
+const { normalizeQuote } = require('./validateQuotes');
 
 const CHRONICLE_PROMPTS = {
     minimal: `分析以下章节内容，只提取主角和核心反派（最多2个角色）的立场。
@@ -43,25 +44,30 @@ const CHRONICLE_PROMPTS = {
 
 章节内容：`,
 
-    full: `分析以下章节内容，提取每个出场角色的立场、内在矛盾、语录和事迹。
+    full: `分析以下章节内容，提取每个出场角色的多维编年史数据（日常/心理变化/立场/立场变化/高光时刻/名言/事迹/关系变化）。
 
 输出JSON数组，每个元素：
 {
   "name": "角色名",
-  "stance": "当前立场（一句话描述该角色对核心事件的态度/立场）",
-  "innerConflict": "内在矛盾（一句话描述该角色内心的矛盾或挣扎）",
-  "quotes": ["该角色在本章说过的有代表性的话（最多3句，原文引用）"],
-  "deeds": ["该角色在本章做过的关键行为（最多3件，简洁描述）"],
-  "stanceShiftReason": "如果立场与之前不同，说明转变原因（无变化则为空字符串）"
+  "daily": "日常：本章生活化细节/习惯/口头禅（一句话，无则空字符串）",
+  "psychology": "心理变化：本章心理状态的变化（如 怕→赌→认命，无则空字符串）",
+  "stance": "当前立场（一句话，具体，不能是中立/未知）",
+  "innerConflict": "内在矛盾（一句话，无则空字符串）",
+  "stanceShiftReason": "立场变化：从什么立场变到什么立场+原因（无变化则空字符串）",
+  "highlights": [{"scene": "场景", "what": "做了什么/高光点", "why": "为什么是名场面/驱动了人格或命运的哪一环"}],
+  "quotes": [{"scene": "说这句话的处境", "quote": "原文引用，不可改写，最多3句", "why": "为什么记得住/驱动了什么"}],
+  "deeds": ["本章关键行为（最多3件，简洁，非流水账）"],
+  "relations": [{"target": "对象名", "from": "原关系", "to": "现关系", "reason": "变化原因"}]
 }
 
 规则：
 1. 只提取在章节中有实际出场或被明确提及的角色
-2. 语录必须是原文引用，不能改写
-3. 事迹要简洁，突出关键行为而非流水账
-4. 立场转变原因要具体，说明从什么立场转变到什么立场
-5. 如果无法提取任何角色信息，返回空数组[]
-6. 只输出JSON，不要其他内容
+2. quotes 必须是原文引用，并补全"场景(scene)"与"记忆点(why)"；缺场景/记忆点的鸡汤式台词不要收录
+3. highlights 只收"名场面/高光时刻"（角色发光、转折、立住人格），没有则空数组
+4. 禁止现代网络梗与抽象升华式台词；台词要能反推说话人的身份/处境
+5. 立场转变原因要具体，说明从什么立场转变到什么立场
+6. 如果无法提取任何角色信息，返回空数组[]
+7. 只输出JSON，不要其他内容
 
 章节内容：`
 };
@@ -100,6 +106,26 @@ async function extractChronicleFromChapter(projectId, chapterNumber, chapterCont
     }
 }
 
+/** 归一化单条编年史：兼容旧字段，补齐 8 维结构 */
+function _normalizeEntry(item) {
+    const quotes = (Array.isArray(item.quotes) ? item.quotes : []).map(normalizeQuote).filter(Boolean);
+    const highlights = (Array.isArray(item.highlights) ? item.highlights : [])
+        .filter(h => h && (h.scene || h.what));
+    const relations = (Array.isArray(item.relations) ? item.relations : [])
+        .filter(r => r && (r.target || r.to));
+    return {
+        ...item,
+        name: item.name,
+        daily: item.daily || item.dailyLife || '',
+        psychology: item.psychology || item.psychChange || '',
+        stance: item.stance || '',
+        innerConflict: item.innerConflict || '',
+        stanceShiftReason: item.stanceShiftReason || '',
+        highlights, quotes, relations,
+        deeds: Array.isArray(item.deeds) ? item.deeds : []
+    };
+}
+
 /**
  * 解析LLM返回的chronicle JSON
  */
@@ -109,8 +135,9 @@ function parseChronicleResponse(text) {
         if (!jsonMatch) return [];
         const parsed = JSON.parse(jsonMatch[0]);
         if (!Array.isArray(parsed)) return [];
-        return parsed.filter(item =>
-            item.name && (item.stance || item.innerConflict || (item.quotes && item.quotes.length > 0))
+        return parsed.map(_normalizeEntry).filter(e =>
+            e.name && (e.stance || e.innerConflict || e.daily || e.psychology ||
+                e.quotes.length > 0 || e.highlights.length > 0)
         );
     } catch (err) {
         logger.warn('chronicle', `Failed to parse chronicle response: ${err.message}`);

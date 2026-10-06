@@ -1,0 +1,21 @@
+{
+    "id": "甜宠匠心",
+    "label": "甜宠匠心",
+    "namingStyle": "poetic-imagery",
+    "namingStyleIntensity": "medium",
+    "worldviewTemplate": "old-city-alley",
+    "defaultMode": "novel",
+    "defaultArchetypes": ["fallen-artisan", "wild-artisan", "warm-neighbor", "rival-creator", "old-mentor", "street-smart"],
+    "defaultSpeechStyles": ["professional-artisan", "casual-neighborhood"],
+    "defaultDialects": [],
+    "styleHints": {
+        "pov": "第三人称限制视角/双视角交替",
+        "tone": "甜蜜烟火气·温暖治愈",
+        "style": "都市甜宠匠心"
+    },
+    "wordConfig": { "minWords": 2200, "targetWords": 2800, "maxWords": 3500 },
+    "constraintOverrides": ["sweet-artisan-pace", "sugar-abuse-ratio", "artisan-chemistry", "anti-dog-blood", "every-chapter-sugar", "hook-every-chapter", "no-coward-behavior", "artisan-sensory", "anti-bazong"],
+    "reviewFocus": ["糖点密度与职业化学反应", "手艺人反差萌vs霸总行为", "职业感官描写质量", "社区温度与烟火气", "反狗血与反AI味", "创作冲突合理性"],
+    "defaultSystemPersona": "artisan-sweet",
+    "materialFocus": ["character", "character-psychology", "character-relationship", "character-dialogue", "equipment", "foreshadowing", "worldview", "famous-scene", "catchphrase"]
+}

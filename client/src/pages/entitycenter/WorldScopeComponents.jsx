@@ -16,6 +16,8 @@ function TransitionTimeline({ events }) {
                             <span className="ws-timeline-arrow">→</span>
                             <span className="ws-timeline-to">{t.to}</span>
                             {t.from && <span className="ws-timeline-from">（从 {t.from}）</span>}
+                            {t.channel && <span className="ws-timeline-channel">渠道: {t.channel}</span>}
+                            {t.medium && <span className="ws-timeline-channel">媒介: {t.medium}</span>}
                             <span className="ws-timeline-ch">第{t.chapterNumber}章</span>
                         </div>
                     </div>

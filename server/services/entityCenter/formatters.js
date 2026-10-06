@@ -81,6 +81,10 @@ function _buildDetailText(entity) {
     if (entity.roleLevel) lines.push(`角色等级: ${entity.roleLevel}`);
     if (entity.position) lines.push(`身份: ${entity.position}`);
     if (entity.factionName) lines.push(`阵营: ${entity.factionName}`);
+    // 副本归属（见 docs/design/实体中心-副本归属与带出机制.md）
+    if (entity.locationSlot) lines.push(`所在位置: ${entity.locationSlot}`);
+    if (entity.scopeWorldId && entity.scopeWorldId !== 'main-world') lines.push(`归属世界/副本: ${entity.scopeWorldId}`);
+    if (entity.bindMedium) lines.push(`绑定媒介: ${entity.bindMedium}`);
     if (entity.personality) lines.push(`性格: ${entity.personality}`);
     if (entity.speakingTone) lines.push(`说话语气: ${entity.speakingTone}`);
     if (entity.signatureDetail) lines.push(`标志性细节: ${entity.signatureDetail}`);
@@ -99,6 +103,11 @@ function _buildDetailText(entity) {
     if (profile.appearance) lines.push(`外貌: ${profile.appearance}`);
     if (profile.background) lines.push(`背景: ${profile.background}`);
     if (profile.motivation) lines.push(`核心动机: ${profile.motivation}`);
+    // 人物四件套（欲望/恐惧/谎言/创伤）——写作与审核的"人设不崩"依据
+    if (profile.desire) lines.push(`核心欲望: ${profile.desire}`);
+    if (profile.fear) lines.push(`核心恐惧: ${profile.fear}`);
+    if (profile.lie) lines.push(`核心谎言: ${profile.lie}`);
+    if (profile.trauma) lines.push(`核心创伤: ${profile.trauma}`);
 
     // 人物魅力系统4维度——注入到detailText供Reviewer/Writer参考
     if (entity.charisma) lines.push(`人格魅力: ${entity.charisma}`);
@@ -108,6 +117,12 @@ function _buildDetailText(entity) {
         lines.push('金句库:');
         for (const q of entity.quoteLibrary) {
             lines.push(`  【${q.scene || '通用场景'}】${q.quote}`);
+        }
+    }
+    if (Array.isArray(entity.highlightScenes) && entity.highlightScenes.length > 0) {
+        lines.push('高光时刻:');
+        for (const h of entity.highlightScenes) {
+            lines.push(`  【${h.scene || '名场面'}】${h.what}${h.why ? '（' + h.why + '）' : ''}`);
         }
     }
 

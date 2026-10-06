@@ -5,7 +5,7 @@ import {
     petGroupOf, petGroups, petSearchOf, PET_SORTS,
     servantGroupOf, servantGroups, servantSearchOf, SERVANT_SORTS,
 } from './entityBrowserConfig';
-import { ownerFacetsOf, ownerGroupsOf } from './ownershipUtils';
+import { ownerFacetsOf } from './ownershipUtils';
 
 function PetStat({ value, label, color }) {
     return (
@@ -24,6 +24,8 @@ function PetExpanded({ pet, getCharName }) {
             <div className="ec-grid-2 ec-text-12">
                 {pet._adapted?.abilities?.length > 0 && <div className="ec-text-muted">技能: <span className="ec-text-secondary">{pet._adapted.abilities.join(', ')}</span></div>}
                 {pet._adapted?.ownerId && <div className="ec-text-muted">主人: <span className="ec-text-secondary">{getCharName(pet._adapted.ownerId)}</span></div>}
+                {pet._adapted?.scopeWorldId && pet._adapted.scopeWorldId !== 'main-world' && <div className="ec-text-muted">归属: <span className="ec-text-secondary">{pet._adapted.scopeWorldId}</span></div>}
+                {pet._adapted?.locationSlot && <div className="ec-text-muted">位置: <span className="ec-text-secondary">{pet._adapted.locationSlot}</span></div>}
                 {pet._adapted?.briefDesc && <div className="ec-span-full ec-text-muted">描述: <span className="ec-text-secondary">{pet._adapted.briefDesc}</span></div>}
             </div>
         </div>
@@ -81,6 +83,8 @@ function ServantExpanded({ sv, getCharName }) {
         <div className="ec-expand-area ec-border-pink" onClick={e => e.stopPropagation()}>
             <div className="ec-grid-2 ec-text-12">
                 {sv._adapted?.masterId && <div className="ec-text-muted">主人: <span className="ec-text-secondary">{getCharName(sv._adapted.masterId)}</span></div>}
+                {sv._adapted?.scopeWorldId && sv._adapted.scopeWorldId !== 'main-world' && <div className="ec-text-muted">归属: <span className="ec-text-secondary">{sv._adapted.scopeWorldId}</span></div>}
+                {sv._adapted?.locationSlot && <div className="ec-text-muted">位置: <span className="ec-text-secondary">{sv._adapted.locationSlot}</span></div>}
                 {sv._adapted?.briefDesc && <div className="ec-span-full ec-text-muted">描述: <span className="ec-text-secondary">{sv._adapted.briefDesc}</span></div>}
             </div>
         </div>

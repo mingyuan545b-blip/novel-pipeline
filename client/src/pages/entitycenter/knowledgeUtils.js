@@ -1,10 +1,19 @@
 /**
- * knowledgeUtils.js — 限知认知的分类 / 筛选（纯函数）
+ * knowledgeUtils.js — 限知认知的分类 / 筛选 / 分组（纯函数）
  *
  * 分类来自事实标题（factText）前缀，如「身份:沈砚-销籍状态」→ 身份。
  * 数据里的前缀很发散（位置/地点信息/世界观真相/策略意图…），这里做**别名归一**到规范分类，
  * 避免 chips 变成另一种"大杂烩"。
+ *
+ * 分组维度（GROUP_MODES）：分类（category）/ 确信度（confidence）。
+ * 「确信度」以人物为筛选，一级=确信/怀疑/误信/未知，二级=逐条事实，阅读成本更低。
  */
+import { CONFIDENCE_LABELS, CONFIDENCE_COLORS } from './constants';
+
+export const GROUP_MODES = [
+    { key: 'confidence', label: '确信度', hint: '人物 × 确信/怀疑' },
+    { key: 'category', label: '分类', hint: '按事实类别归拢' },
+];
 
 export const K_CATEGORIES = [
     { key: '身份', label: '身份', color: '#00c8ff' },
@@ -96,6 +105,41 @@ export function filterKnowledge(records, { category, chapter, query }, nameOf) {
         }
         return true;
     });
+}
+
+/** 确信度展示顺序：确信 → 怀疑 → 误信 → 未知 */
+export const CONFIDENCE_ORDER = ['certain', 'suspect', 'misinformed', 'unknown'];
+
+export function confidenceMeta(key) {
+    const k = CONFIDENCE_ORDER.includes(key) ? key : 'unknown';
+    return { key: k, label: CONFIDENCE_LABELS[k] || k, color: CONFIDENCE_COLORS[k] || '#888' };
+}
+
+/**
+ * 按确信度聚合成 [{ key, meta, facts:[{ factKey, records }] }]。
+ * 叶子 = 单条认知记录（事实 × 人物），而非事实卡：同一事实在 A 是确信、B 是怀疑时
+ * 会分别落进两个桶，行内只呈现属于该桶的那条记录。
+ */
+export function groupByConfidence(records) {
+    const byConf = new Map();
+    for (const r of records) {
+        const k = confidenceMeta(r.confidence).key;
+        if (!byConf.has(k)) byConf.set(k, []);
+        byConf.get(k).push(r);
+    }
+    return CONFIDENCE_ORDER.filter(k => byConf.has(k)).map(k => ({
+        key: k,
+        meta: confidenceMeta(k),
+        facts: byConf.get(k)
+            .slice()
+            .sort((a, b) => String(a.factText || a.factId).localeCompare(String(b.factText || b.factId)))
+            .map(r => ({ factKey: r.factText || r.factId, records: [r] })),
+    }));
+}
+
+/** 分组维度分派：category | confidence */
+export function groupKnowledge(records, mode) {
+    return mode === 'category' ? groupByCategory(records) : groupByConfidence(records);
 }
 
 /** 按分类聚合成 [{ key, meta, facts:[{ factKey, records }] }] */

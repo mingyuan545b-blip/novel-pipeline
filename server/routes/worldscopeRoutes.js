@@ -47,6 +47,29 @@ router.post('/worldscope/:projectId/worlds', async (req, res) => {
     } catch (error) { return res.apiError(INTERNAL_ERROR.statusCode, error.message, INTERNAL_ERROR.code); }
 });
 
+/** 带出判定试算（后端为准）：给定世界+实体+凭据，返回是否可带出与渠道标签 */
+router.post('/worldscope/:projectId/carry-out-check', async (req, res) => {
+    try {
+        const { evaluateCarryOut, validateChannelTag, buildChannelTag } = require('../services/carryOutGate');
+        const { worldId, entityName, medium, item, permission, plotGrant } = req.body || {};
+        const worlds = await worldScopeModule.getProjectWorlds(req.params.projectId);
+        const world = worlds.find(w => w.id === worldId) || worlds[0] || {};
+        const evaluation = evaluateCarryOut({ name: entityName || '对象' }, world, { medium, item, permission, plotGrant });
+        res.json({
+            success: true,
+            data: {
+                world: {
+                    id: world.id, name: world.name,
+                    carryOutPolicy: world.carryOutPolicy, channelTag: world.channelTag, exitMethod: world.exitMethod
+                },
+                evaluation,
+                channel: validateChannelTag(world),
+                channelTag: buildChannelTag(world, { medium, item, permission })
+            }
+        });
+    } catch (error) { return res.apiError(INTERNAL_ERROR.statusCode, error.message, INTERNAL_ERROR.code); }
+});
+
 router.post('/worldscope/:projectId/extract', async (req, res) => {
     try {
         const store = require('../store');

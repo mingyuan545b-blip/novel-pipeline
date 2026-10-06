@@ -76,10 +76,15 @@ function adaptEntity(entity, materialsMap) {
             speakingTone: entity.speakingTone || '',
             signatureDetail: entity.signatureDetail || '',
             craftStyle: entity.craftStyle || '',
+            // 副本归属（见 docs/design/实体中心-副本归属与带出机制.md）
+            scopeWorldId: entity.scopeWorldId || 'main-world',
+            locationSlot: entity.locationSlot || '',
+            bindMedium: entity.bindMedium || '',
             // 人物魅力系统4维度（参考蛊真人方源设计）
             charisma: entity.charisma || '',
             philosophy: entity.philosophy || '',
             quoteLibrary: Array.isArray(entity.quoteLibrary) ? entity.quoteLibrary : [],
+            highlightScenes: Array.isArray(entity.highlightScenes) ? entity.highlightScenes : [],
             entranceDesign: entity.entranceDesign || '',
             // 行为约束（统一标准源）
             behaviorRules: entity.behaviorRules || '',
@@ -106,6 +111,9 @@ function adaptServant(sv) {
             masterId: resolveField(sv, 'masterId'),
             briefDesc: resolveField(sv, 'briefDesc'),
             servantType: resolveField(sv, 'servantType'),
+            scopeWorldId: sv.scopeWorldId || 'main-world',
+            locationSlot: sv.locationSlot || '',
+            bindMedium: sv.bindMedium || '',
         }
     };
 }
@@ -120,6 +128,9 @@ function adaptPet(pet) {
             briefDesc: resolveField(pet, 'briefDesc'),
             ownerId: resolveField(pet, 'ownerId'),
             abilities: safeArray(pet.abilities || pet.abilitiesJson),
+            scopeWorldId: pet.scopeWorldId || 'main-world',
+            locationSlot: pet.locationSlot || '',
+            bindMedium: pet.bindMedium || '',
         }
     };
 }

@@ -9,6 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 const { inferPermanence } = require('../../services/characterBind');
 const { buildCharNameMap } = require('./outlineRelationCreator');
 const { resolveMaterialName } = require('./materialNameResolver');
+const { buildItemProperties } = require('../itemStageParser');
 
 function buildItemDefinition(defId, projectId, mat) {
     // P0-3 止血：内容唯一存 materials，定义行**不再复制 4 级描述**，只保留身份并回指素材
@@ -17,7 +18,7 @@ function buildItemDefinition(defId, projectId, mat) {
         materialId: mat.id || null,
         rarity: 'common', briefDesc: '', summaryDesc: '', detailDesc: '', loreDesc: '',
         briefTokens: 0, summaryTokens: 0, detailTokens: 0, loreTokens: 0,
-        propertiesJson: {}, constraintsJson: {},
+        propertiesJson: buildItemProperties(mat.content || ''), constraintsJson: {},
         sourceChapter: 0, tags: [],
         createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     };

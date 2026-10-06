@@ -16,6 +16,16 @@
 /* 展开区域 */
 .ec-expand-area { margin-top: 8px; padding: 10px 12px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; }
 
+/* 定义紧凑卡（装备/功法/线索）：只读概要，点击后右侧详情栏展开 */
+.ec-def-card { display: flex; align-items: flex-start; gap: 10px; padding: 9px 11px; border-radius: 10px;
+    box-sizing: border-box; transition: border-color 0.15s, background 0.15s; }
+.ec-def-card:hover { border-color: rgba(0, 200, 255, 0.35); }
+.ec-def-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ec-def-card-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ec-def-card-title > .ec-ellipsis { flex: 1; min-width: 0; }
+.ec-def-card-foot { display: flex; align-items: center; gap: 6px; margin-top: 1px; }
+.ec-def-card-foot > .ec-ellipsis { flex: 1; min-width: 0; }
+
 /* 徽章 */
 .ec-badge { font-size: 10px; padding: 1px 6px; border-radius: 6px; flex-shrink: 0; }
 .ec-badge-lg { font-size: 10px; padding: 2px 8px; border-radius: 8px; flex-shrink: 0; }

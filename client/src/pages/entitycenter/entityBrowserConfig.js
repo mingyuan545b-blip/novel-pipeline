@@ -30,6 +30,31 @@ export function defSortOptions(boundIds) {
     ];
 }
 
+// ————— 线索道具（item-definitions 里非装备/功法/战力体系的类型）—————
+// 这些条目（证据/关键道具/情报/道具/消耗品）原本只活在 def 表、UI 无正式位置，现单独成列。
+const BINDABLE_DEF_TYPES = new Set(['equipment', 'technique', 'cultivation-method', 'power-system']);
+export const EVIDENCE_DEF_TYPES = new Set(['evidence', 'key_item', 'information', 'item', 'consumable']);
+export const CLUE_TYPE_LABELS = {
+    evidence: '证据', key_item: '关键道具', information: '情报', item: '道具',
+    consumable: '消耗品', clue: '线索', none: '未分类',
+};
+export const isClueDef = d => !BINDABLE_DEF_TYPES.has(d.defType);
+export const clueTypeOf = d => {
+    const t = d.defType;
+    if (EVIDENCE_DEF_TYPES.has(t)) return t;
+    return 'none';
+};
+const CLUE_TYPE_COLORS = {
+    evidence: '#ff9f43', key_item: 'var(--neon-purple)', information: '#00c8ff',
+    item: '#4ecdc4', consumable: '#ffd700', none: '#64748b',
+};
+export const clueFacetOf = clueTypeOf;
+export const clueFacetLabelOf = k => CLUE_TYPE_LABELS[k] || k;
+export const clueFacets = defs =>
+    [...new Set(defs.map(clueTypeOf))].map(k => ({ key: k, label: CLUE_TYPE_LABELS[k] || k, color: CLUE_TYPE_COLORS[k] || '#64748b' }));
+export const clueGroups = clueFacets;
+export const clueSearchOf = defSearchOf;
+
 // ————— 宠物 —————
 const PET_GROWTH = ['幼体', '成长体', '成熟体', '完全体', '超凡体'];
 export const petFacetOf = p => p.growthStage || '未标注';

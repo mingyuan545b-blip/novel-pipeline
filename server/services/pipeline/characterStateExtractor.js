@@ -136,6 +136,13 @@ function extractCharacterStateFromContent(content, schema) {
     // 第一层：标签格式提取
     Object.assign(state, extractLabeledFields(content));
 
+    // 高光场景：标签型单段文本 → 结构化 [ { scene, what } ]（供 entities.highlightScenes / formatters 使用）
+    if (state.highlightSceneText && !state.highlightScenes) {
+        const what = String(state.highlightSceneText).trim();
+        if (what) state.highlightScenes = [{ scene: '高光场景', what }];
+    }
+    delete state.highlightSceneText;
+
     // 金句库独立提取（多句多场景，无法用单行正则）
     const quoteLibrary = extractQuoteLibrary(content);
     if (quoteLibrary.length > 0) state.quoteLibrary = quoteLibrary;
@@ -149,8 +156,8 @@ function extractCharacterStateFromContent(content, schema) {
     // 第三层：纯文本fallback
     if (!state.personality) state.personality = fallbackPlainTextPersonality(content);
 
-    // 将profile字段打包到profile对象
-    const profileKeys = ['appearance', 'background', 'motivation'];
+    // 将profile字段打包到profile对象（含人物四件套：欲望/恐惧/谎言/创伤）
+    const profileKeys = ['appearance', 'background', 'motivation', 'desire', 'fear', 'lie', 'trauma'];
     const profile = {};
     for (const pk of profileKeys) {
         if (state[pk]) { profile[pk] = state[pk]; delete state[pk]; }

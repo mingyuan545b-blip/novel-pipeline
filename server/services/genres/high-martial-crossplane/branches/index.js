@@ -2,7 +2,7 @@
  * branches/index.js — 分支注册器+组装器
  *
  * 功能：
- * 1. 注册三个世界观分支（programmatic/layered/metaverse）
+ * 1. 注册四个世界观分支（programmatic/layered/metaverse/kanding）
  * 2. 提供 getBranchConfig(key) 获取分支配置
  * 3. 提供 applyBranch(genre, branchKey) 将分支配置注入题材插件
  *
@@ -17,11 +17,13 @@ const logger = require('../../../../shared/logger');
 const branchProgrammatic = require('./branchProgrammatic');
 const branchLayered = require('./branchLayered');
 const branchMetaverse = require('./branchMetaverse');
+const branchKanDing = require('./branchKanDing');
 
 const BRANCH_REGISTRY = {
     [branchProgrammatic.key]: branchProgrammatic,
     [branchLayered.key]: branchLayered,
-    [branchMetaverse.key]: branchMetaverse
+    [branchMetaverse.key]: branchMetaverse,
+    [branchKanDing.key]: branchKanDing
 };
 
 const DEFAULT_BRANCH_KEY = branchProgrammatic.key;

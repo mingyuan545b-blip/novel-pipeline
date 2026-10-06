@@ -29,7 +29,7 @@ module.exports = {
   "requiredConstraints": [
     "grounded-style",
     "fast-pace",
-    "comedy-mandatory",
+    "comedy-adaptive",
     "anti-ai-trace",
     "hook-every-chapter"
   ],

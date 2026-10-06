@@ -52,6 +52,11 @@ export function SummaryTab({ summaryCharId, setSummaryCharId, selectedChapter, s
 
             {blocks.length > 0 && (
                 <>
+                    <div className="ec-sum-note">
+                        摘要卡片默认只显示「概要」；点击卡片标题载入该角色的详细字段。
+                        摘要保存的是指向状态库的引用地址，而非全量数据堆叠 ——
+                        <b>生命值 / 战力</b> 等易变项来自状态追踪，已单独归入「运行时状态」，不计入设定摘要。
+                    </div>
                     <div className="cb-tools ec-mb-10">
                         <input className="cb-search" placeholder="搜索角色 / 摘要内容…" value={query}
                             onChange={e => setQuery(e.target.value)} aria-label="搜索摘要" />
@@ -84,7 +89,8 @@ export function SummaryTab({ summaryCharId, setSummaryCharId, selectedChapter, s
                             <span className="cb-group-hint">{g.meta.hint}</span>
                         </div>
                         <div className="ec-flex-col ec-gap-12">
-                            {g.members.map((block, i) => <CharSummaryCard key={block.name} block={block} index={i} />)}
+                            {g.members.map((block, i) => <CharSummaryCard key={block.name} block={block} index={i}
+                                chapter={selectedChapter || csMeta?.currentChapter || summaryData?.chapter} source={dataSource} />)}
                         </div>
                     </section>
                 ))

@@ -11,6 +11,7 @@ export default function CategoryBrowser({
     facets = [], facetOf, facetAllLabel = '全部',
     groups = [], groupOf, sortOptions = [],
     renderCard, emptyIcon = '📦', emptyText = '暂无数据',
+    selectedId = null, onSelect,
 }) {
     const [query, setQuery] = useState('');
     const [facetKey, setFacetKey] = useState('all');
@@ -68,8 +69,15 @@ export default function CategoryBrowser({
                             {g.hint && <span className="cb-group-hint">{g.hint}</span>}
                         </div>
                     )}
-                    <div className="cb-grid">
-                        {g.members.map(it => <div className="cb-cell" key={it.id}>{renderCard(it)}</div>)}
+                    <div className="cb-list">
+                        {g.members.map(it => (
+                            <div className={`cb-cell${selectedId === it.id ? ' cb-cell-on' : ''}`} key={it.id}
+                                role="button" tabIndex={0} aria-pressed={selectedId === it.id}
+                                onClick={onSelect ? () => onSelect(it.id) : undefined}
+                                onKeyDown={e => { if (onSelect && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onSelect(it.id); } }}>
+                                {renderCard(it)}
+                            </div>
+                        ))}
                     </div>
                 </section>
             ))}

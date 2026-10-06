@@ -56,3 +56,6 @@
 
 /* 绿色badge */
 .ec-badge-green { background: rgba(0, 255, 150, 0.1); color: var(--neon-green); border: 1px solid rgba(0, 255, 150, 0.3); }
+
+/* 台词记忆点（编年史四要素回流展示） */
+.ec-quote-why { display: block; font-size: 11px; color: var(--text-muted, #8a93a6); margin-top: 2px; }

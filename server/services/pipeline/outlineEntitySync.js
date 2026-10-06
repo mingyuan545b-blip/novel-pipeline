@@ -22,8 +22,21 @@ async function syncCharacterToEntityCenter(projectId, mat, materialId) {
         const roleLevel = isProtag ? 'protagonist' : (mat.roleLevel || 'npc');
 
         // 从素材content中解析结构化字段
-        const content = mat.content || '';
+        // 陷阱：素材对象把正文存在 currentContent/initialContent，旧代码只读 mat.content
+        // → 补全后的素材/回填路径解析到空字符串，实体工艺字段全空（用户反馈"角色卡空壳"）。
+        const content = mat.content || mat.currentContent || mat.initialContent || '';
         const parsed = extractCharacterStateFromContent(content, {});
+
+        // 人物工艺字段：素材正文里已有【人格魅力】【哲学观】【金句库】【出场设计】【高光场景】
+        // 等标签，旧代码只映射 3 个浅字段 → 全部丢失。此处统一映射，空值不覆盖已有数据。
+        const craft = {
+            charisma: mat.charisma || parsed.charisma || '',
+            philosophy: mat.philosophy || parsed.philosophy || '',
+            entranceDesign: mat.entranceDesign || parsed.entranceDesign || '',
+            highlightScenes: mat.highlightScenes || parsed.highlightScenes || [],
+            craftStyle: mat.craftStyle || parsed.craftStyle || '',
+            quoteLibrary: mat.quoteLibrary || parsed.quoteLibrary || [],
+        };
 
         await entityCenter.getOrCreateEntity(projectId, 'character', resolveMaterialName(mat), {
             roleLevel, sourceChapter: null,
@@ -32,11 +45,17 @@ async function syncCharacterToEntityCenter(projectId, mat, materialId) {
             personality: mat.personality || parsed.personality || '',
             speakingTone: mat.speakingTone || parsed.speakingTone || '',
             signatureDetail: mat.signatureDetail || parsed.signatureDetail || '',
+            ...craft,
+            tags: Array.isArray(mat.tags) ? mat.tags : undefined,
             sourceContent: content.substring(0, 2000),
             profile: {
-                appearance: mat.appearance || '',
-                background: mat.background || '',
-                motivation: mat.motivation || '',
+                appearance: mat.appearance || parsed.appearance || '',
+                background: mat.background || parsed.background || '',
+                motivation: mat.motivation || parsed.motivation || '',
+                desire: parsed.desire || '',
+                fear: parsed.fear || '',
+                lie: parsed.lie || '',
+                trauma: parsed.trauma || '',
                 innerConflict: parsed.innerConflict || '',
                 fateArc: parsed.fateArc || '',
             }

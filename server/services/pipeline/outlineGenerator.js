@@ -10,69 +10,16 @@ const { buildConstraintInjection } = require('../prompts/constraintInjector');
 const { buildStyleInjection } = require('../prompts/styleInjector');
 const { resolveGenreFromProject, detectGenre } = require('../../services/genreConfig');
 const { getDataContext } = require('../dataContext');
-const { buildMaterialTypeList, buildMaterialSystemPromptWithProject, buildMaterialUserPrompt, buildChapterOutlineSystemPrompt, buildSupplementOutlineSystemPrompt, buildOutlineMaterialDigest } = require('./outlineTemplateBuilder');
-const { parseJsonResponse, parseMarkdownOutlines } = require('./outlineResponseParser');
-const { saveMaterial, findExistingCharacterMaterial, updateExistingMaterial, createCharacterRelations, createEquipmentBinds, saveChapterOutlines } = require('./outlineMaterialSaver');
-const { syncCharacterToEntityCenter, initCharacterKVState, autoSetProtagonistName } = require('./outlineEntitySync');
-const { enforceMaterialDepth } = require('./materialDepthEnforcer');
-const { syncFactsFromMaterials } = require('../knowledgeBase');
+const { buildChapterOutlineSystemPrompt, buildSupplementOutlineSystemPrompt, buildOutlineMaterialDigest } = require('./outlineTemplateBuilder');
+const { parseMarkdownOutlines } = require('./outlineResponseParser');
+const { saveChapterOutlines } = require('./outlineMaterialSaver');
 const { detectOutlineDrift, formatDriftReport } = require('./outlineDriftGuard');
 const { generateFromTemplate } = require('./outlineTemplateGenerator');
 
 const DRIFT_MAX_RETRIES = 2;
 
-async function generateInitialMaterials(projectId, userPrompt) {
-    const ctx = await getDataContext(projectId);
-    const project = await ctx.getProject();
-    if (!project) throw new Error('Project not found');
-
-    const enrichedProfile = { ...(project?.styleProfile || {}), genre: project?.genre, styleTemplateId: project?.styleTemplateId, genreProfile: project?.genreProfile };
-    const genre = resolveGenreFromProject(project) || detectGenre(enrichedProfile);
-    const materialFocus = genre?.styleProfile?.materialFocus || project?.styleProfile?.materialFocus || {};
-    const materialRules = genre?.materialRules || {};
-    const primaryTypes = materialFocus.primary || ['character', 'relationship', 'famous-scene', 'catchphrase', 'worldview', 'foreshadowing'];
-    const secondaryTypes = materialFocus.secondary || [];
-    const skipTypes = materialFocus.skip || [];
-
-    const typeListStr = buildMaterialTypeList(primaryTypes, secondaryTypes, skipTypes, materialRules);
-    const constraintInjection = await buildConstraintInjection(projectId, 'outline');
-    const styleInjection = await buildStyleInjection(projectId);
-    const systemContent = await buildMaterialSystemPromptWithProject(genre, typeListStr, constraintInjection + styleInjection, projectId);
-    const userContent = buildMaterialUserPrompt(project, userPrompt, genre);
-
-    const messages = [{ role: 'system', content: systemContent }, { role: 'user', content: userContent }];
-    const result = await llm.chat(messages, { maxTokens: 32768, temperature: 0.8, enableThinking: false, apiConfig: await getOutlineApiConfig(), projectId, usageStep: 'material-generator' });
-    const responseText = result.choices?.[0]?.message?.content || '';
-    logger.info('outlineGen', `generateInitialMaterials response length: ${responseText.length}`);
-
-    try {
-        const materials = parseJsonResponse(responseText);
-        const created = [];
-        for (const mat of materials) {
-            if (mat.type === 'character' && mat.name) {
-                const existing = await findExistingCharacterMaterial(projectId, mat.name);
-                if (existing) { const updated = await updateExistingMaterial(existing, mat.content); created.push(updated); await syncCharacterToEntityCenter(projectId, mat, existing.id); continue; }
-            }
-            const item = await saveMaterial(projectId, mat);
-            created.push(item);
-            if (mat.type === 'character') { await syncCharacterToEntityCenter(projectId, mat, item.id); await initCharacterKVState(projectId, item.id, mat); }
-        }
-        await autoSetProtagonistName(projectId, materials);
-        await createCharacterRelations(projectId, materials, created);
-        await createEquipmentBinds(projectId, materials, created);
-        const syncedFacts = await syncFactsFromMaterials(projectId, created);
-        logger.info('outlineGen', `generateInitialMaterials: synced ${syncedFacts} facts to knowledge base`);
-        // 角色素材深度强制达标（题材要求主角≥600字/配角≥400字，实测常被LLM压到250~350字）
-        const cp = genre?.characterProfile || {};
-        const depthStats = await enforceMaterialDepth(projectId, {
-            apiConfig: await getOutlineApiConfig(),
-            roleWordCounts: { protagonist: cp.protagonistWordCount, supporting: cp.supportingWordCount, npc: cp.npcWordCount },
-        });
-        return { created, count: created.length, syncedFacts, depthStats };
-    } catch (e) {
-        return { created: [], count: 0, raw: responseText, error: e.message };
-    }
-}
+// 初始素材生成已拆到 materialGenerator.js（保持单文件≤200行）；此处仅再导出以兼容既有调用点
+const { generateInitialMaterials } = require('./materialGenerator');
 
 
 /**

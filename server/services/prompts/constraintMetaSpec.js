@@ -94,6 +94,74 @@ const META_CONSTRAINTS = Object.freeze({
 - 必须：配角有独立目标/恐惧/偏好/与主角的分歧
 - 工具性台词占比<50%`,
     },
+    M6: {
+        id: 'M6',
+        label: '张力处禁止玩梗',
+        description: '紧张/悲壮场景禁止用玩梗、抖机灵、现代梗消解张力',
+        coveredWordConstraints: ['生死关头讲笑话', '段尾俏皮话', '紧张处插科打诨', '网络梗乱入'],
+        detectionMode: 'pattern',
+        detectionFn: 'detectBanterDeflation',
+        block: true,
+        promptText: `【M6·张力不可消解】紧张/危机/悲壮场景禁止玩梗与抖机灵。
+- 禁止：高张力句（死亡/流血/追杀/剧痛）之后紧接现代梗或俏皮话收尾
+- 禁止：用"差评/KPI/加班/客服/进度条/开挂"等现代词在紧张处制造笑点
+- 允许：日常/过渡场景玩梗；紧张场景笑点降至0-1处，且只能是冷面内心OS，不得泄掉张力
+- 幽默的正确来源：世界观内行话的错位，而非把现代网络语境塞进古代生死场`,
+    },
+    M7: {
+        id: 'M7',
+        label: '禁止升华收尾',
+        description: '禁止用抽象抒情/宏大拔高/套话钩子做段末与章末收尾',
+        coveredWordConstraints: ['渺小却无处不在', '才刚刚开始', '久久挥之不去', '这才是真谛', '融入画卷'],
+        detectionMode: 'pattern',
+        detectionFn: 'detectAbstractEnding',
+        block: true,
+        promptText: `【M7·结尾须落地】段末与章末禁止抽象升华。
+- 禁止结尾：渺小/浩瀚/融入画卷/终将/注定/这才是真谛/而这一切
+- 禁止套话钩子："真正的麻烦才刚刚开始""故事才刚刚开始"
+- 禁止情绪概括：久久挥之不去/难以言喻/莫名的/无声地
+- 正确写法：用具体动作或物件收尾（他把半截笔杆塞进袖口／暗纹收缩／齿轮咬合声贴上边界）`,
+    },
+    M8: {
+        id: 'M8',
+        label: '章首承接压力值',
+        description: '本章开头必须承接上一章结尾的情绪压力（不只是场景）',
+        coveredWordConstraints: ['上章生死威胁被遗忘', '情绪断档', '两章像两本书', '危机感蒸发'],
+        detectionMode: 'pattern',
+        detectionFn: 'detectEmotionalContinuity',
+        block: true,
+        promptText: `【M8·情绪衔接】本章开头必须承接上一章结尾的压力值，而非只承接场景。
+- 禁止：上章结尾生死威胁/重大失去，本章开头对此毫无心理余温
+- 禁止：上章结尾的钩子在本章开头被完全遗忘
+- 必须：开头300字内体现上章结尾的高压仍在延续，或明确交代其被消化
+- 与M3区别：M3管场景/动作是否衔接，M8管情绪/威胁是否衔接`,
+    },
+    M9: {
+        id: 'M9',
+        label: '意象禁止跨章复用',
+        description: '比喻意象不得在近章中逐字复用',
+        coveredWordConstraints: ['同一比喻反复使用', '蝉鸣式复用', '陈年腐臭堆砌', '意象疲劳'],
+        detectionMode: 'pattern',
+        detectionFn: 'detectMotifReuse',
+        block: true,
+        promptText: `【M9·意象唯一】比喻意象全书尽量只用一次，禁止在近章中复用。
+- 禁止：同一比喻/喻体在2章内逐字重复（同一地点应写"它变了什么"，而非复用初次的描写）
+- 禁止：高频复用同一组感官词（陈年/腐烂/酸臭/霉）
+- 正确写法：同一场景第二次出现，写它的变化与新增细节，而非复制首访描写`,
+    },
+    M10: {
+        id: 'M10',
+        label: '章末钩子去同质',
+        description: '章末钩子类型必须轮换，禁止连续两章同型',
+        coveredWordConstraints: ['每章都是真正的麻烦才刚开始', '钩子同质化', '结尾套话'],
+        detectionMode: 'pattern',
+        detectionFn: 'detectHookMonotony',
+        block: false,
+        promptText: `【M10·钩子轮换】章末钩子类型必须轮换，禁止连续两章同型。
+- 钩子类型：危险钩 / 信息钩 / 抉择钩 / 反转钩 / 代价钩 / 留白钩
+- 禁止：连续两章都用"危险逼近"型，或都用"真正麻烦才刚开始"式套话
+- 必须：与前章钩子类型不同，且落点为具体物件或动作`,
+    },
 });
 
 const META_CONSTRAINT_IDS = Object.freeze(Object.keys(META_CONSTRAINTS));

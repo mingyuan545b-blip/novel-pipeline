@@ -48,6 +48,7 @@ const FIELD_SPECS = Object.freeze({
     '人格魅力': { label: '人格魅力', minChars: 10, qualityHints: ['魅力', '特质', '气质', '独特', '吸引'] },
     '哲学观': { label: '哲学观', minChars: 12, qualityHints: ['信念', '价值观', '认知', '天道', '生死', '规则', '认为', '信奉'] },
     '金句库': { label: '金句库', minChars: 20, qualityHints: ['场景', '金句', '：', '场景：'] },
+    '高光场景': { label: '高光场景', minChars: 10, qualityHints: ['场景', '高光', '名场面', '转折', '立住'] },
     '出场设计': { label: '出场设计', minChars: 10, qualityHints: ['出场', '首次', '方式', '场景', '登场'] },
 
     // === 世界观字段 ===

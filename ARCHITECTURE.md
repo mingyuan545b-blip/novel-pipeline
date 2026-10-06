@@ -741,7 +741,7 @@ llm.chat → llmBudgetGuard.begin(options)
 |------|------|
 | `scripts/pgBackup.js` | 备份 / 校验（sha256）/ 恢复演练 / 保留策略 |
 | `scripts/lib/pgBackupCore.js` | 核心逻辑（pg_dump 自动发现、导出、manifest、保留、恢复） |
-| `scripts/pgBackupTask.bat` + `registerBackupTask.ps1` | Windows 计划任务外壳（需用户显式注册） |
+| `scripts/pgBackupTask.bat` + `registerBackupTask.bat` | Windows 计划任务外壳（需用户显式注册；cmd 原生） |
 | `backups/pg/backup-<时间戳>/` | `dump.pgc`（-Fc 自定义格式）+ `manifest.json`（sha256 + 各表行数基线） |
 
 - **只备份不演练 = 没备份**：`--restore-test` 真建临时库恢复并逐表比对行数。

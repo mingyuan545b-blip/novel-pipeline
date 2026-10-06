@@ -3,12 +3,87 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-10-01（**藏经阁重设计 / 运行看板 / 全书设定 三个前端交付 + DataContext 缓存失效与主题变量两处真实缺陷修复**，见 §一 0j）
-> 上一轮：P1-4a/b/c 已完成，P1-4d 密度策略待做，见 `docs/design/章节因果门槛与单点素材装配（计划书）.md` §八
+> 最后更新：2026-10-07（**字段单一源 & Agent 协作完整性体检（只读）**，见 §一 0n；**下个窗口按该体检的计划书 S1→S8 施工**）
+> 上一轮：勘定交接问题修复 + 同规模复建压测（2026-10-06，见 0m）
 
 ---
 
 ## 一、当前结论（重要）
+
+0n. **（2026-10-07 本会话）字段单一源 & Agent 协作完整性体检（只读，未改代码）**
+   - **产物（下个窗口施工总图）**：`docs/design/字段单一源与Agent协作闭环（体检+计划书）.md`；会话记录 `docs/worklog/2026-10-07-字段与Agent协作完整性体检.md`。
+   - **用户 5 疑问统一结论**：①实体中心角色字段缺=投影只在"建素材时同步一次"+merge 真值覆盖；②PG 映射表**确实没发给 agent**（`fieldRegistry*` 只被 `server/db/*` 消费，从无 prompt 注入点）；③流程**确实没闭环**（10 处字段词汇表互不引用、无一致性闸门）；④第一轮字数少=**量化扩写指令只发 round>1** + `rejectMin==targetMin` 无救区；⑤登记/agent 失败=校验标签对不上（实测 10/10 角色 `valid=false`）+ registrar 把告警当失败 + 契约深度键产不出来。
+   - **本轮新发现 P0-A（用户尚未反馈，日志已发生）**：`orchestratorStepHandlers.js:69/92/129` 写入非法状态 `first-reviewed/second-reviewed`（不在 `chapterStatus.ALL_STATUSES`）→ `STUCK_STATUSES` 不覆盖 → 永不重置/永不再选/补跑只认 `approved` → 该章永久半成品，后续章被门槛活锁（`_kanding_server.log` 逐字吻合）。
+   - **本轮新发现 P0-C**：`contracts/*.yml` 7 份重复 `stateJson.anyOf:[innerConflict/independentStance/fateArc/...]`，而 `agentMaterialHelpers.buildStateJson` 从不产出这些键 → CH2+ 七个 agent 被同一键卡死；且 `pipelineStepRunner.js:72` 把 WARN/HIGH 也当致命阻断。
+   - **本轮新发现 P1-A**：`scripts/verifyMaterialAssemblyEntry.js` 是假阳性（只 grep `scheduleMaterials(`，不校验 agent 是否走装配入口）；实际 7 个 agent（material-manager/organizer/registrar/intent-planner/outline-generator/knowledge-extractor/consistency-constraint）绕过单点装配。
+   - **计划书施工序**：S1 状态机单一源+一致性闸门 → S2 契约 severity/深度键 → S3 registrar errors/warnings 分诊 → S4 实体投影重建 → S5 字段注册表 R1 → S6 装配全覆盖+reader 返修走主循环 → S7 第一轮量化字数 → S8 dataFlowSpec/文档同步。
+   - **待用户拍板 3 项**：状态命名（补进 reviewed 态 vs 改回 reviewing 子态）、字段注册表覆盖范围（character 8 字段起步 vs 全类型）、契约深度键（换实体已有键 vs 生产端真产出）。
+   - **未提交**（本会话只读）。
+
+0m. **（2026-10-06 本会话）勘定交接问题修复 + 同规模复建压测（详见 `docs/worklog/2026-10-06-勘定交接问题修复与复建压测.md`）**
+   - **用户反馈修复**：编年史「基础/精简/完整都一个样」→ `chronicleDimensions` 增档位→维度映射（minimal=立场 / basic=立场+日常+心理 / full=8 维），`ChronicleDims/ChronicleTab` 按档位收敛展示并显示"展示：…"。
+   - **P0-A**：新项目默认 `settings.chronicleLevel/worldScopeLevel='basic'`（修"招牌功能默认 0 数据"）。
+   - **P0-C（角色卡空壳）**：`outlineEntitySync.syncCharacterToEntityCenter` 补齐 charisma/philosophy/entranceDesign/highlightScenes/craftStyle/quoteLibrary + 四件套；extractor 增【高光场景】【方言/语感/说话风格】标签；`backfillCharismaFields` 支持回落素材正文。
+   - **P0-D**：新增 `itemStageParser`（纯函数）把素材【成长阶段】解析进 `item-definitions.propertiesJson.stages`；三处写入点接入；新增 `backfillItemStages.js`。
+   - **#12/#13**：新增 `materialBatchPlan` 分批 + `materialGenerator.js`（从 outlineGenerator 拆出）；按 `(type,name)` 统一 upsert + 单条容错。复建实测 **10 角色**（旧版 4）。
+   - **#17**：新增纯函数 `worldRefResolve`（name→id + 主世界别名/复合串），落库前归一；`normalizeWorldScopeRefs.js` 回填存量。
+   - **P0-B 更正**：限知 confidence/sourceHow 的 UI 数据源是 `knowledge-access`（有数据），交接测的 `knowledge-facts` 本就不含认知维度 → 非缺陷。
+   - **复建压测**：`7d3e3e66-9e8b-4135-8053-d6ddb8b645d8`（kanding/7 世界/full）→ 25 素材、10 角色工艺字段全非空、编年史 7 条 8 维、世界域 27、限知 15 带渠道、ch1-3 = 2430/2348/2039 字全 material-updated。
+   - **回归**：后端 **240 套件/3839 用例全绿**；前端 **17 failed/932 passed（17 为基线既有）**；hardcode 0 / standards 通过 / eslint --max-warnings=0 通过。
+   - **遗留**：P1-E 宠物/仆从素材类型（题材级）；世界域 LLM 自造世界名（要在 prompt 里限定只能选项目世界）；#14 门槛不自动续跑；#15 章长门禁偏松；复建项目大纲只出 5 章（疑远景色大纲）。
+
+0l. **（2026-10-05 本会话）副本带出机制 + 编年史多维升级（P0-P2 开工，未提交）**
+   - **副本归属/带出**（doc：`docs/design/实体中心-副本归属与带出机制.md`）：
+     - 新增 `services/carryOutGate.js`（带出判定纯函数 `evaluateCarryOut`/`validateChannelTag`/`buildChannelTag`）；
+     - `worldConstants` 增 `CARRY_OUT_POLICIES`(6 策略) + `buildWorld.exitMethod/carryOutPolicy/channelTag` + `validateWorld` 校验；
+     - `crossWorldTraceConstants` +`carried-out` 动作、+character/pet/servant/consumable 类型、事件写 `channel`/`medium`；
+     - `worldScopeExtractor`/`Runner` 抽存 `locationSlot` + 渠道/媒介；`entities` 增 `scopeWorldId/locationSlot/bindMedium`；
+     - `scripts/backfillScopeOwnership.js`（默认干跑）回填归属。
+   - **编年史 8 维 + 台词质检**（doc：`docs/design/角色编年史升级-多维分层与素材质检.md`）：
+     - 编年史 4→**8 维**（日常/心理/立场/立场变化/高光/名言/事迹/关系）；quotes 升**四要素**(带 why)；
+     - 新增 `services/validateQuotes.js`（四要素质检+去重）、`services/entityCraftReflow.js`（编年史→实体回流 `quoteLibrary`/`highlightScenes`）；
+     - `entities` 增 `highlightScenes`；`materialDepthSpec` 增「高光场景」；
+     - 前端 `ChronicleComponents` 增 `HighlightsSection` + 兼容对象型 quotes（避免渲染对象报错）。
+     - `scripts/designCharacterCraft.js`（人物工艺体检 + 设计模板，只读）。实测：现有项目**所有角色（含 5 主角）工艺字段全空**。
+   - **记录改优先 cmd**：PROJECT_STANDARDS §十/§B、项目身份与硬约束、sop/04/09/11、CLAUDE/AGENTS、ARCHITECTURE
+     由"禁 PowerShell / 用 .ps1"改为**优先 cmd**；新增 `scripts/registerBackupTask.bat`（cmd 原生，ASCII+CRLF，三分支验证通过），
+     旧 `registerBackupTask.ps1` 标注弃用（**未删**，按约定删文件需用户确认）。
+   - **字段落点**：新增字段全部走各表 `data` JSON 列（无需 DDL/迁移）；`fieldRegistryCharacter` 未加列。
+   - **回归基线**：后端 **237 套件/3820 用例全绿**（较基线 +8 套件）；前端 vitest **17 failed/921 passed（与基线一致，0 新增失败）**；
+     audit-hardcode 0 issue；audit-iron-law --pre-deliver 无违反；改动文件 eslint --max-warnings=0 通过。
+   - **UI（与后端同步，已实测）**：新增 `WorldContractPanel`（世界通行契约：策略/渠道标签/离开方式**可编辑**）、
+     `OwnershipSection`（角色详情「副本归属/带出」+ **试算带出** 调后端 `POST .../carry-out-check`）；
+     宠物/仆从展开显示归属/位置；`TransitionTimeline` 显示渠道/媒介；`buildWorldScopeView` 把带出违规挂到章节事件（ViolationPanel 可见）。
+     **Playwright 实测**：契约面板渲染、试算带出返回"✅ 允许带出"、**0 console 错误**。
+   - **UI 重设计（用户反馈 2026-10-05）**：
+     ①「世界域」拆 4 个子标签（世界与归属 / **通行契约** / 穿越事件 / 势力），**通行契约独立成栏**、每个世界一行带归属数可就地编辑；
+     ②「编年史」重写为**多维视图**：维度筛选条（全部/立场/立场转变/心理/日常/高光/名言/事迹/关系，各带计数）+ 按维度/按章节切换
+     （`chronicleDimensions.js` 纯函数 + `ChronicleDims.jsx` 组件）。
+     实测：通行契约 11 行归属数正确、编年史 chips=9/维度卡=4，**0 console 错误**；前端 **17 failed/930 passed（17 为基线既有失败）**。
+     ⚠ Vite 长跑会缓存污染返回旧模块 → 改前端后如界面不更新，`node scripts/killPort.js 5173` 后重启 `npm run dev`。
+   - **遗留（未做完）**：带出**硬阻断**接 `materialGate` 装配（现为软门禁）、sop/12 §八 增"台词/高光"验收项、
+     LLM 自动人物工艺生成。
+
+0k. **（2026-10-04 本会话）实体中心三处用户反馈修复（前端，未提交）**
+   - **① 装备卡片"重叠 + 宽高不一致"（真实缺陷）**：根因是**全站缺 `box-sizing: border-box`**，
+     而 `categoryBrowser.css` 里 `.cb-cell > * { width:100% }` 把 22px padding 叠加在 100% 之外
+     → **实测单元格 274px / 卡片 298px**，右侧压住相邻卡片（在 1641 视口下实测 **5 对卡片几何重叠**）。
+     修法：`.cb-cell > *` 补 `box-sizing:border-box` + `.cb-list` 改 `align-items:stretch` + 卡片 `height:100%`
+     → 复测 **卡片统一 274×78、重叠 0 对**。线索道具等复用 CategoryBrowser 的 tab 同步受益（实测 0 溢出/0 重叠）。
+   - **② 装备详情"点击后右边没数据"**：`item-definitions` 双存止血后只留 `materialId`，四级描述为空，
+     `densitiesOf` 未读素材正文 → 详情栏只剩"暂无描述 / 暂无分阶段数据"。修法：`densitiesOf` 的「概要」级
+     回落 `material.description/currentContent`（SSOT 仍在素材），占位文案改为面向用户的
+     "该条目暂无分阶段属性/特效数据，以上为素材概要内容"。实测选中 白事堂·黑色兽皮纸 后右栏显示素材正文+元数据。
+   - **③ 限知改树状（用户诉求）**：`tags`… 新增 `knowledgeTreeBuild.js`（纯函数，人物轴/事件轴）+ `KnowledgeTree.jsx`
+     （两级可折叠 + 展开/折叠全部）；人物轴 一级=人物→二级=确信/怀疑/误信/未知→叶子=事实；
+     事件轴 一级=事件→二级=获知渠道（亲眼/听说/推理/发现…）→叶子=知情者。
+     `SOURCE_HOW_LABELS` 补全模型返回的口语渠道（observed/heard/read/recalled/self_knowledge/agreed）避免裸英文。
+     实测：人物轴 15 个一级节点（沈砚 60 条），事件轴 94 个一级节点；折叠全部=0 叶子、展开全部恢复、0 控制台错误。
+     新增 `__tests__/pages/knowledgeTreeBuild.test.js`（14 例）。
+   - **回归基线**：前端 vitest **17 failed / 921 passed**（与交接卡记录的 17 全在 entitycenter/* **完全一致，本次 0 新增失败**）；
+     铁律/硬编码（0 issue）/项目标准（0 error）通过；改动文件 `eslint --max-warnings=0` 通过。
+   - **遗留**：`KnowledgeFactGroup.jsx` 的默认导出（事实大卡）已无人使用（仅剩 ConfidenceBadge/SourceBadge 被复用），
+     清理与否待确认（删文件按约定需用户同意）。
 
 0j. **（2026-10-01 本会话）藏经阁重设计 + 运行看板 + 全书设定（3 个前端交付 + 2 个真实缺陷修复）**（新窗口优先读本节）
    - **藏经阁重设计**：新增 `services/libraryCompleteness.js`（完整度判定）+ `GET /api/library/sources`（提取来源）
@@ -33,7 +108,7 @@
    - **P0-1 数据灾备（此前为零）**：`scripts/pgBackup.js` + `lib/pgBackupCore.js` + `tests/unit/pgBackup.test.js`(18)。
      支持 `--dry-run/--list/--verify/--restore-test/--keep/--out`；产物 `backups/pg/`（已 gitignore）。
      **实测：备份 5.87MB/40表 → sha256 校验 → 恢复演练临时库 40 表行数完全一致 → 临时库已清理**。
-     计划任务外壳 `pgBackupTask.bat` + `registerBackupTask.ps1`（**需用户显式注册**，未自动安装）。
+     计划任务外壳 `pgBackupTask.bat` + `registerBackupTask.bat`（**需用户显式注册**，未自动安装；cmd 原生）。
      新增 [docs/sop/11-数据备份与恢复.md](sop/11-数据备份与恢复.md)。
    - **P0-2 项目预算熔断**：`config/systemConfigBudget.js`(PROJECT_BUDGET) + `services/pipeline/projectBudget.js`
      + `llmBudgetGuard.js` + kv `project-spend`（锁保护自增）+ `stopConditions.js` 优雅停机
@@ -282,8 +357,7 @@
 
 ### 🔴 需用户本人操作
 - [ ] **注册每日数据库备份**（2026-09-30 新增能力，尚未启用）：
-      `powershell -ExecutionPolicy Bypass -File scripts
-egisterBackupTask.ps1`
+      `scripts\registerBackupTask.bat`（cmd 原生；旧 `.ps1` 版已弃用）
       建议加 `--out D:/pgbak` 指到另一块盘（同盘坏则备份与数据一起没）；季度跑一次 `npm run backup:restore-test`
 - [ ] **确认后跑 100 章长程验证**（唯一能暴露摘要漂移/伏笔账本膨胀/实体状态爆炸的手段）：
       `node scripts/run20ChapterE2E.js --chapters 100 --yes`（≈1000万tokens ≈¥20 ≈3.3小时）

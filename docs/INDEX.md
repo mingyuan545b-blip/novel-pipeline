@@ -43,6 +43,7 @@
 | 约束系统变更 | [sop/08-约束执行规范.md](sop/08-约束执行规范.md) | 约束词/审核/override/hardBlock/元约束M1-M5 |
 | 新项目约束词设计 | [sop/09-新项目约束词设计SOP.md](sop/09-新项目约束词设计SOP.md) | 新建项目/更换题材/新增约束词（4步闭环：题材选择→约束词配置→冲突预检→端到端验证） |
 | 长任务/上下文将压缩 | [sop/10-上下文交接规范.md](sop/10-上下文交接规范.md) | **任何预计超长的任务开始前必读**；收到上下文压缩提示时立即执行落盘 |
+| **创作工艺/反AI化** | [sop/12-创作工艺与反AI化规范.md](sop/12-创作工艺与反AI化规范.md) | 新建项目/设计题材元素/写人设世界观/写章节/审读打分/出现"AI味""读不下去""烂尾" |
 | 前端页面/视觉 | [07-Pipeline变更.md](sop/07-Pipeline变更.md)（含前端复杂度与主题变量约束） | 新增页面、改视觉、主题变量名 |
 | 备份/恢复/灾备 | [sop/11-数据备份与恢复.md](sop/11-数据备份与恢复.md) | 备份计划任务、校验、恢复演练；**长篇项目开工前必读**（一失全失风险） |
 
@@ -54,6 +55,10 @@
 |------|------|------|
 | [design/实体中心-重规划（素材单一源与生命周期）.md](design/实体中心-重规划（素材单一源与生命周期）.md) | 实体中心定位=素材管理与预加载；素材**单一源**、单点预处理入口、生命周期/章节区间、与题材无关字段过滤 | 动素材/状态加载链、清理重复源、治理 token 黑洞时**先读** |
 | [design/章节因果门槛与单点素材装配（计划书）.md](design/章节因果门槛与单点素材装配（计划书）.md) | **P1-4 施工图**：断档失忆根因取证（规划超前/跳章执行/补跑只认approved/兜底静默）、章节门槛 materialGate、远景粗纲+就近细纲、单点装配入口 materialStateAssembler、密度策略、缺口兜底与追溯、分批实施与验收 | 改管线顺序/装配/兜底告警时**先读**；新窗口接手 P1-4 直接按 §八 开工 |
+| [design/字段单一源与Agent协作闭环（体检+计划书）.md](design/字段单一源与Agent协作闭环（体检+计划书）.md) | **字段/类型/状态/契约 词汇表漂移的体检与根治计划**：10 套词汇表无单一源、无一致性闸门；非法状态 `second-reviewed` 致死锁（P0-A）；契约 WARN 当致命+深度键产不出（P0-C）；registrar 告警当失败（P1-C）；实体快照（P1-D）；第一轮字数（P1-F）。含 R1-R4 注册表 + CI 闸门 + S1-S8 施工序 | 遇"字段缺失/登记未通过/agent 契约失败/第一轮字数少/章节卡住"**先读**；新窗口接手直接按 §四 施工 |
+| [design/主位面高武·反套路喜剧-拆解与藏经阁入库.md](design/主位面高武·反套路喜剧-拆解与藏经阁入库.md) | 参考作拆解：吸引点6条、世界观骨架、17条通用技法入库清单、与《逆江湖》对照 | 设计题材元素/反套路喜剧/规则怪谈副本时**先读** |
+| [design/实体中心-副本归属与带出机制.md](design/实体中心-副本归属与带出机制.md) | 副本模式归属三件套：实体**归属**（scopeWorldId/locationSlot）、世界**通行契约**（exitMethod/carryOutPolicy/channelTag）、跨世界**带出证据链**（cross-world-traces 扩 character/pet/servant + channel/medium + carried-out）；带出门禁 carryOutGate | 设计副本归属/宠物NPC道具带出/渠道标签/串台检测时**先读** |
+| [design/角色编年史升级-多维分层与素材质检.md](design/角色编年史升级-多维分层与素材质检.md) | 编年史 4→**8 维**（日常/心理/立场/立场变化/高光/名言/事迹/关系）；台词**四要素**质检（speaker/scene/quote/why + 原文回查 + 语义查重）；Agent 决策=不新增 runtime Agent（离线人物工艺设计器 + 扩 material-manager/chronicleExtractor）；新篇流程与质量下限 | 改编年史/台词库/人物高光/开新篇质量门禁时**先读** |
 
 ---
 
@@ -76,6 +81,14 @@
 | 症状 | 根因文档 | 检测代码 |
 |------|---------|---------|
 | AI味严重（仿佛/似乎/一抹泛滥） | [08 §二 M1](sop/08-约束执行规范.md) + [00 #42](sop/00-陷阱清单.md) | `detectors/detectMetaphorSubstitution.js` |
+| AI味（段尾俏皮话/说明文旁白/现代梗） | [12 §五](sop/12-创作工艺与反AI化规范.md) | `detectors/detectBanterDeflation.js`(M6) |
+| 升华收尾/套话钩子（渺小/画卷/才刚刚开始） | [12 §五 5.2 + §七 7.2](sop/12-创作工艺与反AI化规范.md) | `detectors/detectAbstractEnding.js`(M7) |
+| 配角工具人（角色卡motivation为空） | [12 §七 7.1](sop/12-创作工艺与反AI化规范.md) | 🟡`materialDepthRequirements.js`（非空强校验待接入contractValidator） |
+| 意象/比喻跨章复用 | [12 §六 6.3](sop/12-创作工艺与反AI化规范.md) | `detectors/detectMotifReuse.js`(M9) |
+| 章节钩子同质化 | [12 §六 6.2](sop/12-创作工艺与反AI化规范.md) | `detectors/detectHookMonotony.js`(M10, 提示级) |
+| 张力被笑话泄掉（情绪断档） | [12 §五 5.4 + §七 7.2](sop/12-创作工艺与反AI化规范.md) | `detectors/detectEmotionalContinuity.js`(M8) |
+| 结尾跳时烂尾/伏笔回收章超出总章数 | [12 §三 Stage3 + §七 7.5](sop/12-创作工艺与反AI化规范.md) | `services/pipeline/foreshadowFeasibility.js` |
+| 笑点配额被当成"均匀撒糖" | [12 §五 5.4 + §七 7.2](sop/12-创作工艺与反AI化规范.md) | `constraintPresets.js` `comedy-adaptive` |
 | 冲突套路重复（被动打脸连续） | [08 §二 M2](sop/08-约束执行规范.md) + [00 #42](sop/00-陷阱清单.md) | `detectors/detectConflictPatternRepeat.js` |
 | 章节衔接断裂（开头与上章结尾不连贯） | [08 §二 M3](sop/08-约束执行规范.md) + [04 §6.8](sop/04-bug修复.md) + [00 #41](sop/00-陷阱清单.md) | `detectors/detectChapterCoherence.js` |
 | 抽象抒情泛滥（时间静止/命运齿轮） | [08 §二 M4](sop/08-约束执行规范.md) | `detectors/detectAbstractSentiment.js` |
@@ -141,6 +154,7 @@
 | sop/08-约束执行规范.md | 🟢活跃 | 2026-06-28 | **新增** CES元约束体系M1-M5 |
 | sop/09-新项目约束词设计SOP.md | 🟢活跃 | 2026-06-29 | **新增** 4步闭环约束词设计流程 |
 | sop/10-上下文交接规范.md | 🟢活跃 | 2026-08-27 | **新增** 防失忆协议（三层记忆架构+恢复锚点） |
+| sop/12-创作工艺与反AI化规范.md | 🟢活跃 | 2026-10-02 | **新增** 老书虫评审版：立项/设定/人物/大纲/章节/反AI化/有趣性/审读门禁，含类型元素配置表；§九 落地M6-M10+comedy-adaptive+伏笔门禁+叙事承诺注入 |
 | reference/项目身份与硬约束.md | 🟢活跃 | 2026-06-27 | 级联删除53个 |
 | reference/文件地图.md | 🟢活跃 | 2026-06-27 | 技术债务P0/P1 |
 | reference/题材插件规范.md | 🟢活跃 | 2026-06-27 | 模式表3→1种长篇 |

@@ -52,4 +52,4 @@ This project is indexed by GitNexus as **novel-pipeline** (14852 symbols, 28154 
 3. 架构以 `ARCHITECTURE.md` 为准；但注意历史记录不完全可信，**结论以代码+测试实测为准**。
 4. 改铁律/规则前：`node scripts/audit-iron-law.js --self-check`；规则唯一定义源 `scripts/lib/ironLawRules.js`。
 5. 提交走 pre-commit 五关门禁（铁律→eslint→硬编码→级联→标准），被拦时修根因不要绕。
-6. 用户约定：删文件/改全局配置/破坏性git操作先确认；只读检查可直接做；回答用中文。
+6. 用户约定：删文件/改全局配置/破坏性git操作先确认；只读检查可直接做；回答用中文；**命令执行优先使用 cmd**（本机环境不支持 PowerShell）。

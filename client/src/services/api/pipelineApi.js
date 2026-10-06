@@ -55,6 +55,8 @@ export const pipelineApi = {
         api.get(`/pipeline/worldscope/${projectId}/entity/${entityId}`),
     saveWorldScopeWorlds: (projectId, worlds) =>
         api.post(`/pipeline/worldscope/${projectId}/worlds`, { worlds }),
+    carryOutCheck: (projectId, payload) =>
+        api.post(`/pipeline/worldscope/${projectId}/carry-out-check`, payload),
     extractWorldScope: (projectId, { chapterNumbers, level } = {}) =>
         api.post(`/pipeline/worldscope/${projectId}/extract`, { chapterNumbers, level }),
 

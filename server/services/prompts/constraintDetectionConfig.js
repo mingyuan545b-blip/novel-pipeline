@@ -64,6 +64,49 @@ const DETECTION_CONFIG = Object.freeze({
         independentInfoMarkers: /(?:但是|可是|不过|我觉得|我认为|我不|我还有|我需要|我想要|我有条件|不过我|但是我)/,
         dialoguePattern: /(?:["「『"])(.{1,30})(?:["」』"])/g,
     },
+    // —— 12-创作工艺 新增：治"AI味/张力泄气/升华收尾/意象复用/钩子同质/情绪断档" ——
+    M6: {
+        threshold: 2,
+        lookaheadChars: 60,
+        tensionPattern: /(?:死|血|伤|命|杀|逃|危|颤|战栗|冷汗|剧痛|喘息|嘶|断裂|碎裂|逼|擒|锁|僵|惨|尸|葬|亡|鬼|魂|地府|阎王|收尸|棺|丧|埋|追兵|黑榜|偿命)/,
+        banterPattern: /(?:差评|吐槽|甲方|乙方|报销|绩效|打卡|加班|客服|进度条|KPI|老板|打工|下班|工资|月薪|外包|供应商|用户体验|开挂|上分|BUG|内存|代码|服务器|上线|售后|退货|发票|减压|健身|减肥)/,
+        tonePattern: /(?:嘿嘿|哈哈|冷笑话|开个玩笑|打个比方|自嘲|苦中作乐)/,
+    },
+    M7: {
+        threshold: 2,
+        endingChars: 160,
+        paragraphTailChars: 40,
+        elevationPatterns: {
+            scaleVista: /(?:渺小|微不足道|浩瀚|辽阔|无垠|苍茫|天地之间|融入[^，。！？\n]{0,8}(?:画卷|洪流|长河|夜色))/g,
+            fateStatement: /(?:终将|注定|或许[^，。！？\n]{0,10}才是|才是[^，。！？\n]{0,8}(?:真谛|答案|意义)|而这一切|这一切)/g,
+            openEnding: /(?:(?:真正的|一切)[^，。！？\n]{0,6}(?:才|刚刚)开始|才刚刚开始|故事[^，。！？\n]{0,4}开始|没有人知道|无人知晓)/g,
+            lingeringEmotion: /(?:久久不|挥之不去|难以言喻|说不出的|莫名的)/g,
+        },
+    },
+    M8: {
+        threshold: 0,
+        prevTailChars: 250,
+        openingChars: 320,
+        tensionPattern: /(?:死|血|伤|命|杀|逃|危|颤|冷|痛|抖|慌|惊|怕|喘|汗|断|碎|裂|沉|逼|压|锁|僵|惨)/,
+        minOverlapBigrams: 3,
+    },
+    M9: {
+        threshold: 1,
+        minImageLength: 6,
+        similePattern: /(?:像|好像|如同|仿佛|宛如|犹如|好似|恰似|恍若)[^，。！？\n]{2,24}/g,
+    },
+    M10: {
+        threshold: 0,
+        endingChars: 150,
+        minSharedBigrams: 3,
+        hookTypes: {
+            danger: /(?:脚步声|逼近|袭来|阴影里|扑来|杀意|危险|贴上|压境|合拢|涌出|踏地声|转动|启动)/,
+            information: /(?:纸条|一行|小字|写着|刻着|字迹|落款|署名|符号|地图|暗纹|印记)/,
+            choice: /(?:选择|抉择|该不该|要么|必须)[^，。！？\n]{0,12}(?:还是|或|要么)/,
+            reversal: /(?:原来|竟然|没想到|其实|真正|反倒|反而)/,
+            cost: /(?:代价|失去|换来|再也|回不去|折了|葬送)/,
+        },
+    },
 });
 
 function getConfig(constraintId) {

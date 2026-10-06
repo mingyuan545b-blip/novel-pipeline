@@ -7,10 +7,21 @@
 const logger = require('../shared/logger');
 const store = require('../store');
 const { setWorldFaction } = require('./worldFactionModule');
+const { getProjectWorlds } = require('./worldScopeCrud');
+const { detectCarryOutViolation } = require('./carryOutGate');
+const { normalizeWorldRefs } = require('./worldRefResolve');
 
 async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
     const { extractWorldScopeFromChapter } = require('./worldScopeExtractor');
     const result = await extractWorldScopeFromChapter(projectId, chapterNumber, chapterContent, level);
+
+    // #17：LLM 常把副本名配上 worldId=main-world → 落库前按项目配置 name→id 归一
+    try {
+        const worlds = await getProjectWorlds(projectId);
+        normalizeWorldRefs(result, worlds);
+    } catch (e) {
+        logger.warn('worldScope', `worldRef normalization skipped: ${e.message}`);
+    }
 
     const now = new Date().toISOString();
     const entities = Array.isArray(result.entities) ? result.entities : [];
@@ -18,6 +29,9 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
     const worldInfos = Array.isArray(result.worldInfos) ? result.worldInfos : [];
     const factions = Array.isArray(result.factions) ? result.factions : [];
     const crossWorldItems = Array.isArray(result.crossWorldItems) ? result.crossWorldItems : [];
+
+    // 0. 软门禁：跨副本带出缺渠道标签 → 记违规（不阻断，先可见）
+    const violations = await _detectAndStoreViolations(projectId, chapterNumber, transitions, crossWorldItems, now);
 
     // 1. 存储实体归属
     for (let i = 0; i < entities.length; i++) {
@@ -30,6 +44,7 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
             entityType: entity.entityType || 'character',
             worldId: entity.worldId || 'main-world',
             worldName: entity.worldName || '主世界',
+            locationSlot: entity.locationSlot || '',
             isVisitor: entity.isVisitor || false,
             chapterNumber,
             createdAt: now, updatedAt: now
@@ -46,6 +61,8 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
             character: trans.character || 'unknown',
             fromWorld: trans.from || '',
             toWorld: trans.to || '',
+            channel: trans.channel || '',
+            medium: trans.medium || '',
             chapterNumber,
             createdAt: now, updatedAt: now
         });
@@ -66,6 +83,9 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
             rules: w.rules || '',
             dangerLevel: w.dangerLevel || 'low',
             entryMethod: w.entryMethod || '',
+            exitMethod: w.exitMethod || '',
+            carryOutPolicy: w.carryOutPolicy || 'native',
+            channelTag: w.channelTag || '',
             description: w.description || '',
             chapterNumber,
             createdAt: now, updatedAt: now
@@ -92,8 +112,33 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
     // 5. 存储跨世界物品溯源
     await _saveCrossWorldTraces(projectId, chapterNumber, crossWorldItems);
 
-    logger.info('worldScope', `extractAndSave ch${chapterNumber}: ${entities.length} entities, ${transitions.length} transitions, ${worldInfos.length} worlds, ${factions.length} factions, ${crossWorldItems.length} crossItems`);
+    logger.info('worldScope', `extractAndSave ch${chapterNumber}: ${entities.length} entities, ${transitions.length} transitions, ${worldInfos.length} worlds, ${factions.length} factions, ${crossWorldItems.length} crossItems, ${violations.length} violations`);
+    result.crossWorldViolations = [
+        ...(Array.isArray(result.crossWorldViolations) ? result.crossWorldViolations : []),
+        ...violations
+    ];
     return result;
+}
+
+/** 软门禁：检测跨副本带出缺渠道标签并落库（私有） */
+async function _detectAndStoreViolations(projectId, chapterNumber, transitions, crossWorldItems, now) {
+    let worlds = [];
+    try { worlds = await getProjectWorlds(projectId); } catch (e) { logger.warn('worldScope', `load worlds failed: ${e.message}`); }
+    const candidates = [
+        ...transitions.map(t => ({ character: t.character, from: t.from, to: t.to, channel: t.channel })),
+        ...crossWorldItems.map(it => ({ entityName: it.entityName, from: it.transitionFrom, to: it.transitionTo, channel: it.transitionChannel }))
+    ];
+    const violations = [];
+    for (let i = 0; i < candidates.length; i++) {
+        const v = detectCarryOutViolation(worlds, candidates[i]);
+        if (!v) continue;
+        violations.push(v);
+        const id = `ws-${projectId}-ch${chapterNumber}-v${i}`;
+        await store.setItem('world-scopes', id, {
+            id, projectId, type: 'transition-violation', ...v, chapterNumber, createdAt: now, updatedAt: now
+        });
+    }
+    return violations;
 }
 
 /** 存储跨世界物品溯源（私有） */
@@ -115,7 +160,9 @@ async function _saveCrossWorldTraces(projectId, chapterNumber, crossWorldItems) 
             transitionFrom: item.transitionFrom || '',
             transitionTo: item.transitionTo || '',
             transitionNote: item.transitionNote || '',
-            transitionChapter: item.transitionChapter || chapterNumber
+            transitionChapter: item.transitionChapter || chapterNumber,
+            transitionChannel: item.transitionChannel || '',
+            transitionMedium: item.transitionMedium || ''
         }));
         const traceResults = await batchCreateTraces(projectId, tracePayloads);
         const okCount = traceResults.filter(r => r.success).length;

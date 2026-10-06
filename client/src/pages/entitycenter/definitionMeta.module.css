@@ -1,0 +1,30 @@
+/* 定义详情：列表 + 详情 双栏 */
+
+/* 元数据块（详情栏内，横向 chips，避免竖排挤成长条） */
+.meta-col { display: flex; flex-direction: column; gap: 6px; }
+.meta-head { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; color: var(--text-secondary); }
+.meta-wrap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.meta-chip { display: inline-flex; align-items: baseline; gap: 5px; padding: 3px 9px; border-radius: 999px;
+    background: var(--bg-secondary); font-size: 11px; }
+.meta-key { color: var(--text-muted); }
+.meta-val { color: var(--text-secondary); font-weight: 600; }
+.tag { padding: 2px 8px; border-radius: 999px; background: rgba(162, 155, 254, 0.12);
+    color: var(--neon-purple); border: 1px solid rgba(162, 155, 254, 0.3); font-size: 11px; }
+
+/* 双栏容器：列表自适应，详情栏给足宽度（避免描述被压成一列长条） */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 460px); gap: 16px; align-items: start; }
+@media (max-width: 1180px) { .split { grid-template-columns: 1fr; } }
+.split-list { min-width: 0; }
+.split-pane { position: sticky; top: 12px; min-width: 0; max-height: calc(100vh - 190px); overflow-y: auto; }
+
+/* 详情面板 */
+.pane { display: flex; flex-direction: column; gap: 12px; padding: 14px;
+    border-radius: 12px; background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 2px solid var(--pane-accent, var(--neon-cyan)); }
+
+.pane-head { display: flex; align-items: flex-start; gap: 10px; }
+.pane-head-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.pane-name { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 15px;
+    font-weight: 700; color: var(--text-primary); }
+.pane-head-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }

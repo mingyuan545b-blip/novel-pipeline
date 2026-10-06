@@ -56,8 +56,8 @@ describe('entity center constants', () => {
     test('GENRE_COLORS has entries', () => {
         expect(GENRE_COLORS['high-martial']).toBeTruthy();
     });
-    test('TABS has 13 entries', () => {
-        expect(TABS).toHaveLength(13);
+    test('TABS has 14 entries', () => {
+        expect(TABS).toHaveLength(14);
         expect(TABS[0].key).toBe('characters');
     });
     test('STATS_CONFIG has 5 entries', () => {

@@ -65,7 +65,7 @@ grep -rn "<pattern>" server/
 ### 4.1 代码验证
 - [ ] 修改文件≤200行
 - [ ] 无新增硬编码
-- [ ] 无PowerShell
+- [ ] 命令使用 cmd/Node（未使用 PowerShell）
 - [ ] async调用都加了await
 
 ### 4.2 功能验证

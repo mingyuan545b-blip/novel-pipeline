@@ -315,33 +315,34 @@ LLM输出 → cleanChapterContent → deduplicateContent → cleanFinalContent
 
 ## 十、代码操作安全规范（血泪教训）
 
-### 1. 禁止使用PowerShell操作含Unicode的文件
-- **严禁**使用PowerShell的`Set-Content`、`-replace`等命令修改包含中文/emoji的源代码文件
-- PowerShell默认编码会破坏UTF-8多字节字符（中文、emoji），导致文件不可逆损坏
-- **唯一允许**：所有其他方法都尝试过且无法解决时，才可使用PowerShell，但必须指定`-Encoding UTF8`
-- **推荐替代**：使用Node.js脚本（`node -e`）或SearchReplace工具操作文件
+### 1. 优先使用 cmd / Node，禁止用 PowerShell 操作含 Unicode 的文件
+- 本机环境不支持 PowerShell → **命令一律优先使用 cmd 或 Node.js**
+- 禁止用 PowerShell 的 `Set-Content`、`-replace` 等命令修改包含中文/emoji 的源代码文件
+  （PowerShell 默认编码会破坏 UTF-8 多字节字符，导致文件不可逆损坏）
+- **推荐替代**：使用 Node.js 脚本（`node -e`）或 SearchReplace 工具操作文件
 
-### 2. 禁止使用PowerShell进行API测试
-- **严禁**使用PowerShell的`Invoke-RestMethod`等命令测试API
-- PowerShell对JSON嵌套、特殊字符、长响应处理差，容易超时或丢失数据
-- **推荐替代**：使用`node -e`脚本测试API
+### 2. 禁止用 PowerShell 进行 API 测试
+- 禁止使用 PowerShell 的 `Invoke-RestMethod` 等命令测试 API
+  （PowerShell 对 JSON 嵌套、特殊字符、长响应处理差，容易超时或丢失数据）
+- **推荐替代**：使用 `node -e` 脚本测试 API
 - **示例**：`node -e "fetch('http://localhost:3001/api/models').then(r=>r.json()).then(d=>console.log(d))"`
 
-### 3. 禁止使用PowerShell的&&连接符
-- PowerShell不支持`&&`语法，必须用`;`或分多条命令执行
-- **错误**：`cd dir && npm start`
-- **正确**：`cd dir; npm start` 或分两步执行
+### 3. 命令语法（cmd 为准）
+- cmd 支持 `&&` / `&` / `||` 串联命令；**禁止混入 bash 专有语法**（`| tail`、`$1`、`2>&1`）或 PowerShell 专有语法
+- **错误**：`cd dir; npm start`（分号是 PowerShell/bash 写法）
+- **正确**：`cd dir && npm start` 或分两步执行
+- 含中文的 `.bat` 需存为 **ASCII 或 GBK** 并保持 **CRLF** 换行（UTF-8 会被 cmd 按 OEM 代码页误读）
 
 ### 4. 文件修改工具优先级
 1. **SearchReplace工具**（首选）- 精确替换，不破坏编码
 2. **Node.js脚本**（次选）- `node -e "const fs=require('fs');..."`
 3. **Write工具**（重写整个文件时使用）
-4. **PowerShell**（最后手段，必须指定UTF-8编码）
+4. **cmd 批处理 / 其他**（最后手段；操作含中文文件时仍优先 Node/SearchReplace）
 
 ### 5. 修改前必须备份关键文件
 - 对PipelinePage.jsx等大文件（>500行）做修改前，先确认有恢复手段
 - 如果文件被损坏，优先用git恢复：`git checkout -- <file>`
-- 没有git时，用Node.js脚本修复编码，不要用PowerShell
+- 没有git时，用Node.js脚本修复编码，不要用PowerShell（本机不支持）
 
 ### 6. 批量替换必须验证
 - 任何批量替换操作后，必须立即编译验证（`node -c <file>`）
@@ -555,8 +556,8 @@ parsed.passed || parsed.approved  →  '✅ 通过' : '❌ 未通过'
 | 6 | 状态枚举必须明确分类 | 进行中/已完成/失败/终态 |
 | 7 | 清日志必须先停流水线 | 否则清完又被重新生成 |
 | 8 | 清日志必须全链路同步 | reviews→materials→chapters→output级联 |
-| 9 | PowerShell禁止操作Unicode文件 | 用Node.js脚本或SearchReplace替代 |
-| 10 | PowerShell禁止用&&连接符 | 用;或分步执行 |
+| 9 | 优先cmd，禁止用PowerShell操作Unicode文件 | 用cmd/Node.js脚本或SearchReplace替代 |
+| 10 | 命令记录禁bash/PowerShell专有语法 | 用cmd语法（&&/&）或分步执行 |
 | 11 | 新增检测必须集成到HARD BLOCK | 检测而不拦截等于没检测 |
 | 12 | **新增检测必须同时集成到两套系统** | **pipeline.js和chapterAuditor.js同步** |
 | 13 | **字数检查必须覆盖所有输出点** | **writer/reviser/polisher/final-editor** |

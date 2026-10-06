@@ -4,6 +4,7 @@ import { CharacterHeader, RoleBadge, WorldScopeBadge, formatTime } from './Chara
 import DataHealthBanner from './DataHealthBanner';
 import { BindsSection, RelationsSection } from './BindsAndRelations';
 import CharacterTraits from './CharacterTraits';
+import OwnershipSection from './OwnershipSection';
 import { BehaviorRulesSection } from './BehaviorRulesSection';
 import GenreStateSection from './GenreStateSection';
 import KnowledgeSection from './KnowledgeSection';
@@ -26,6 +27,7 @@ function CharacterDetail({ selectedChar, charBinds, charRelations, getCharName, 
             <CharacterHeader adapted={adapted} roleColor={roleColor} />
             <DataHealthBanner adapted={adapted} projectId={projectId} onRepaired={onRepaired} />
             <CharacterTraits adapted={adapted} />
+            <OwnershipSection projectId={projectId} adapted={adapted} />
             <BehaviorRulesSection behaviorRules={adapted?.behaviorRules} />
             <GenreStateSection adapted={adapted} />
             <BindsSection charBinds={charBinds} />

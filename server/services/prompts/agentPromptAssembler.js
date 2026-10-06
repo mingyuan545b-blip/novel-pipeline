@@ -1,18 +1,13 @@
 'use strict';
-
-/**
- * Agent提示词组装引擎
- * 核心流程：岗位模板 → 逐Slot解析 → 带标签组装 → 去重
- * 每个Section带【标签】，出问题可直接定位到哪个Slot
- */
-
+// Agent提示词组装引擎：岗位模板 → 逐Slot解析 → 带标签组装 → 去重（Section带标签便于定位）
 const { getDataContext } = require('../dataContext');
-const { detectGenre } = require('../genreConfig');
+const { detectGenre, resolveGenreFromProject } = require('../genreConfig');
 const { getStyleProfileForProject } = require('./styleInjector');
 const { deduplicateSystemPrompt, getAgentTemplate } = require('./promptBuilder');
 const { SLOT_DEFINITIONS } = require('./agentSlotRegistry');
 const { getJobTemplate } = require('./agentJobTemplates');
 const { resolveSlotContent } = require('./slotResolvers');
+const { buildNarrativePromiseBlock } = require('./narrativePromise');
 const logger = require('../../shared/logger');
 
 async function assembleAgentPrompt(agentType, mode, projectId, options = {}) {
@@ -53,6 +48,10 @@ async function assembleAgentPrompt(agentType, mode, projectId, options = {}) {
 
     let fullSystem = baseSystem;
     if (sections.length) fullSystem += '\n\n' + sections.join('\n\n');
+
+    // 12-创作工艺：注入"本书叙事承诺"——让写手知道读者要什么，而非只拿到素材与约束
+    const promiseBlock = buildNarrativePromiseBlock(ctx.project);
+    if (promiseBlock) fullSystem = promiseBlock + '\n\n' + fullSystem;
 
     if (ctx.styleProfile) {
         fullSystem = deduplicateSystemPrompt(fullSystem, agentType, ctx.styleProfile);
@@ -182,7 +181,16 @@ async function _fetchSharedData(projectId) {
     const _asmCtx = await getDataContext(projectId);
     const project = await _asmCtx.getProject();
     const styleProfile = await getStyleProfileForProject(projectId);
-    const genrePlugin = styleProfile ? detectGenre(styleProfile) : null;
+    // 陷阱（分支题材）：detectGenre(styleProfile) 会丢失分支上下文——分支的
+    // styleProfileOverrides.key 不是题材 id（如 kanding 分支 key="kanding-rules-thriller"），
+    // detectGenre 按 key/genreProfile 匹配可能返回基础题材或 null，导致 genre-foundation
+    // 等"题材级"槽位解析为 null → writer 提示词不完整 → PROMPT_INCOMPLETE 硬停。
+    // 修复：优先用 resolveGenreFromProject（含 subGenre + branchKey 分支解析），失败再回退 detectGenre。
+    let genrePlugin = null;
+    try {
+        genrePlugin = resolveGenreFromProject(project);
+    } catch (_) { /* fall through to detectGenre */ }
+    if (!genrePlugin) genrePlugin = styleProfile ? detectGenre(styleProfile) : null;
     return { project, styleProfile, genrePlugin };
 }
 

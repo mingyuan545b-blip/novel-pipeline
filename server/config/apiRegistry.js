@@ -60,6 +60,7 @@ const TEST_PATHS = Object.freeze({
         worldscopeEntity: '/api/pipeline/worldscope/:projectId/entity/:entityId',
         worldscopeExtract: '/api/pipeline/worldscope/:projectId/extract',
         worldscopeWorlds: '/api/pipeline/worldscope/:projectId/worlds',
+        worldscopeCarryOutCheck: '/api/pipeline/worldscope/:projectId/carry-out-check',
         constraints: '/api/pipeline/consistency-constraints/:projectId'
     },
     entityCenter:   {

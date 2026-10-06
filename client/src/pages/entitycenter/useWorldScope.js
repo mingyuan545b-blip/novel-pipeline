@@ -23,9 +23,14 @@ function useWorldScope(projectId, scopeLevel) {
             const res = await pipelineApi.getWorldScope(projectId);
             const body = res.data || {};
             const rawItems = Array.isArray(body) ? body : (body.items || body.data || []);
-            const events = rawItems.filter(it => /transition|event/.test(String(it.type || '')));
+            // 优先用后端组装的事件（含 transitions + 带出违规 violations），退回原始记录过滤
+            const events = Array.isArray(body.events) && body.events.length
+                ? body.events
+                : rawItems.filter(it => /transition|event/.test(String(it.type || '')));
             setScopeData({
                 worlds: buildWorlds(rawItems, DEFAULT_WORLDS),
+                // 项目世界配置（含 carryOutPolicy/channelTag/exitMethod，通行契约以它为准）
+                projectWorlds: Array.isArray(body.worlds) ? body.worlds : [],
                 worldEntities: buildEntityIndex(rawItems),
                 worldInfos: rawItems.filter(it => it.type === 'world-info'),
                 factionsByWorld: body.factionsByWorld || {},

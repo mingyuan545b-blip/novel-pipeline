@@ -19,6 +19,17 @@ const FIELD_LIMITS = {
 // 系统唯一支持的模式：长篇。所有项目统一走novel模式
 const SUPPORTED_MODE = 'novel';
 
+/**
+ * 实体中心模块的项目级默认档位。
+ * 修复（2026-10-05 勘定压测 P0-A）：模块注册默认值是 'off'，新项目不设置 → 编年史/世界域
+ * 提取链永不触发，实体中心的招牌功能（编年史/世界域）默认全 0 条。这里给新项目一个
+ * 可用的默认档位（仍可在 UI 切换到 off/minimal/full）。
+ */
+const DEFAULT_MODULE_SETTINGS = Object.freeze({
+    chronicleLevel: 'basic',
+    worldScopeLevel: 'basic',
+});
+
 // 过滤前端可能传入的"null"/"undefined"字符串（非真实null值）
 function sanitizeOptionalString(value) {
     if (!value || value === 'null' || value === 'undefined') return null;
@@ -145,7 +156,7 @@ function createProjectData(req) {
         targetWordCount: req.body.targetWordCount || 0,
         currentChapter: 0, status: 'draft',
         styleProfile: normalizedStyleProfile,
-        settings: { autoPipeline: false, chapterRounds: 3, ...req.body.settings },
+        settings: { autoPipeline: false, chapterRounds: 3, ...DEFAULT_MODULE_SETTINGS, ...req.body.settings },
         styleTemplateId: req.body.styleTemplateId || '',
         constraints: req.body.constraints || (getDefaultsForGenre(genrePlugin || null, { mode }).defaultConstraints || []),
         wordConfig,

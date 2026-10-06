@@ -21,19 +21,24 @@ const ORIGIN_METHODS = Object.freeze({
 const TRACE_ACTIONS = Object.freeze({
     acquired:     { id: 'acquired',     label: '获取',   icon: '✓', color: 'green' },
     transitioned: { id: 'transitioned', label: '跨世界', icon: '→', color: 'blue' },
+    'carried-out':{ id: 'carried-out',  label: '带出',   icon: '🚚', color: 'green' },
     transformed:  { id: 'transformed',  label: '转化',   icon: '✨', color: 'purple' },
     lost:         { id: 'lost',         label: '遗失',   icon: '✗', color: 'red' },
     destroyed:    { id: 'destroyed',    label: '损毁',   icon: '💥', color: 'red' },
     sealed:       { id: 'sealed',       label: '封印',   icon: '🔒', color: 'orange' }
 });
 
-/** 实体类型枚举（可被溯源的物品类型） */
+/** 实体类型枚举（可被溯源的对象类型：物品 + 可被带出副本的角色/宠物/仆从） */
 const TRACE_ENTITY_TYPES = Object.freeze({
     equipment:            { id: 'equipment',            label: '装备',     icon: '⚔' },
     technique:            { id: 'technique',            label: '功法',     icon: '📖' },
     'cultivation-method': { id: 'cultivation-method',   label: '修炼法',   icon: '🧘' },
     'power-system':       { id: 'power-system',         label: '武力体系', icon: '💎' },
-    treasure:             { id: 'treasure',             label: '法宝',     icon: '✨' }
+    treasure:             { id: 'treasure',             label: '法宝',     icon: '✨' },
+    consumable:           { id: 'consumable',           label: '消耗品',   icon: '🧪' },
+    character:            { id: 'character',            label: '角色/NPC', icon: '👤' },
+    pet:                  { id: 'pet',                  label: '宠物',     icon: '🐾' },
+    servant:              { id: 'servant',              label: '仆从',     icon: '🧑‍💼' }
 });
 
 /** 工厂函数：构造一条溯源记录的默认结构 */
@@ -83,6 +88,8 @@ function appendTraceEvent(trace, event) {
         fromWorld: event.fromWorld || '',
         toWorld: event.toWorld || '',
         action: event.action,
+        channel: event.channel || '',
+        medium: event.medium || '',
         note: event.note || '',
         timestamp: new Date().toISOString()
     };

@@ -292,3 +292,32 @@
 .ws-entity-more { font-size: 11px; color: #5b6b80; padding: 2px 0 0 4px; }
 .ws-expand-btn { align-self: flex-start; margin-top: 2px; }
 .ws-entity-chapter { font-size: 10px; color: #5b6b80; }
+
+/* 世界通行契约（副本带出策略/渠道标签） */
+.ws-contract-list { display: flex; flex-direction: column; gap: 8px; }
+.ws-contract-row {
+    background: var(--bg-card, rgba(0,0,0,0.2));
+    border: 1px solid var(--border-subtle, rgba(255,255,255,0.08));
+    border-radius: 6px; padding: 8px 10px;
+}
+.ws-contract-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ws-contract-name { font-weight: 600; color: var(--text-primary); }
+.ws-contract-policy { font-size: 12px; color: var(--neon-cyan); }
+.ws-contract-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.ws-contract-field { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--text-muted, #8a93a6); }
+.ws-contract-field input, .ws-contract-field select {
+    background: var(--bg-input, rgba(0,0,0,0.25)); border: 1px solid var(--border-subtle, rgba(255,255,255,0.12));
+    border-radius: 4px; color: var(--text-primary); font-size: 12px; padding: 3px 6px; min-width: 140px; outline: none;
+}
+.ws-contract-warn { margin-top: 4px; font-size: 11px; color: var(--neon-orange, #ff9f43); }
+.ws-timeline-channel { font-size: 11px; color: var(--neon-cyan); margin-left: 6px; }
+
+.ws-subtabs { display: flex; gap: 6px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px; }
+.ws-subtab {
+    background: transparent; border: 1px solid transparent; border-radius: 6px;
+    color: var(--text-muted); font-size: 12px; padding: 5px 12px; cursor: pointer;
+}
+.ws-subtab:hover { color: var(--text-primary); }
+.ws-subtab.ws-subtab-on { background: rgba(0,200,255,0.12); border-color: var(--neon-cyan); color: var(--text-primary); font-weight: 600; }
+.ws-subtab-badge { background: var(--neon-orange, #ff9f43); color: #000; border-radius: 999px; font-size: 10px; padding: 0 6px; margin-left: 4px; }
+.ws-contract-count { color: var(--text-muted); font-size: 11px; margin-left: 8px; font-weight: 400; }

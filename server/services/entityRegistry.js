@@ -8,8 +8,12 @@ const VALID_ROLE_LEVELS = ['protagonist', 'supporting', 'npc'];
 const MERGEABLE_FIELDS = [
     'position', 'personality', 'speakingTone', 'signatureDetail',
     'craftStyle', 'factionName', 'genreId', 'description', 'lifecycleState',
+    // 副本归属（见 docs/design/实体中心-副本归属与带出机制.md）
+    'scopeWorldId', 'locationSlot', 'bindMedium',
     // 人物魅力系统4维度
     'charisma', 'philosophy', 'quoteLibrary', 'entranceDesign',
+    // 高光时刻（编年史回流）
+    'highlightScenes',
 ];
 
 class EntityRegistry {

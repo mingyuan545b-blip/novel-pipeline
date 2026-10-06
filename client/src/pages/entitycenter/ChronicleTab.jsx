@@ -1,12 +1,15 @@
-import { StanceTimeline, QuotesSection, DeedsSection, EntityFilter, WorldFilter } from './ChronicleComponents';
+import { useState } from 'react';
+import { EntityFilter, WorldFilter } from './ChronicleComponents';
+import { dimensionCounts, dimensionKeysForLevel, LEVEL_HINTS } from './chronicleDimensions';
+import { DimensionChips, ChronicleByDimension, ChronicleByChapter } from './ChronicleDims';
 import useChronicleState from './useChronicleState';
 import './chronicle.css';
 
 const CHRONICLE_LEVELS = [
     { key: 'off', label: '关闭', desc: '不提取角色编年史数据' },
     { key: 'minimal', label: '精简', desc: '只提取主角+核心反派立场（最多2角色）' },
-    { key: 'basic', label: '基础', desc: '提取所有角色立场+内在矛盾' },
-    { key: 'full', label: '完整', desc: '提取立场+语录+事迹+转变原因' }
+    { key: 'basic', label: '基础', desc: '提取所有角色立场+内在矛盾+日常/心理' },
+    { key: 'full', label: '完整', desc: '全维度：日常/心理/立场/转变+高光+名言(场景/记忆点)+事迹+关系' }
 ];
 
 function ChronicleGuideCard({ project, onUpdateLevel }) {
@@ -16,8 +19,8 @@ function ChronicleGuideCard({ project, onUpdateLevel }) {
             <div className="chr-guide-icon" aria-hidden="true">📜</div>
             <div className="chr-guide-title">角色编年史</div>
             <div className="chr-guide-desc">
-                追踪角色的立场转变、语录和事迹。<br />
-                启用后，Pipeline每章完成后自动提取角色数据。
+                按 <b>8 个维度</b> 追踪角色：立场 / 立场转变 / 心理变化 / 日常 / 高光时刻 / 名言台词 / 事迹 / 关系变化。<br />
+                启用后，Pipeline 每章完成后自动提取。
             </div>
             <div className="chr-guide-btns">
                 {CHRONICLE_LEVELS.map(lv => (
@@ -42,10 +45,12 @@ export default function ChronicleTab({ projectId, project, onUpdateProject }) {
         setSelectedEntityId, setSelectedWorldId, fetchChronicle, handleExtract,
     } = useChronicleState(projectId, project);
 
+    const [activeDim, setActiveDim] = useState('all');
+    const [viewMode, setViewMode] = useState('dimension'); // dimension | chapter
+
     const handleUpdateLevel = async (level) => {
         if (!project || !onUpdateProject) return;
         try {
-            // 只发送 settings 字段，避免发送完整 project 对象触发验证器 400
             const newSettings = { ...(project.settings || {}), chronicleLevel: level };
             await onUpdateProject({ settings: newSettings });
         } catch { /* non-critical */ }
@@ -55,8 +60,10 @@ export default function ChronicleTab({ projectId, project, onUpdateProject }) {
         return <ChronicleGuideCard project={project} onUpdateLevel={handleUpdateLevel} />;
     }
 
-    const isFull = chronicleLevel === 'full';
     const levelLabel = CHRONICLE_LEVELS.find(l => l.key === chronicleLevel)?.label || chronicleLevel;
+    // 档位切换后若当前选中维度不在新档位可见范围内 → 视作「全部」（避免空白，且不用 effect setState）
+    const activeDimSafe = activeDim === 'all' || dimensionKeysForLevel(chronicleLevel).includes(activeDim) ? activeDim : 'all';
+    const counts = dimensionCounts(filteredChronicleData, chronicleLevel);
 
     return (
         <div className="chr-container">
@@ -64,7 +71,7 @@ export default function ChronicleTab({ projectId, project, onUpdateProject }) {
                 <div className="chr-header-title">
                     角色编年史
                     <span className="chr-header-sub">
-                        {levelLabel}模式 · {filteredChronicleData.length}条记录
+                        {levelLabel}模式 · {filteredChronicleData.length}条记录 · 展示：{LEVEL_HINTS[chronicleLevel] || '全维度'}
                     </span>
                 </div>
                 <div className="chr-header-btns">
@@ -81,10 +88,18 @@ export default function ChronicleTab({ projectId, project, onUpdateProject }) {
                 </div>
             </div>
 
-            <EntityFilter entities={entities} selectedEntityId={selectedEntityId} onChange={setSelectedEntityId} />
-            {worldScopeLevel !== 'off' && (
-                <WorldFilter projectId={projectId} selectedWorldId={selectedWorldId} onChange={setSelectedWorldId} />
-            )}
+            <div className="chr-toolbar">
+                <EntityFilter entities={entities} selectedEntityId={selectedEntityId} onChange={setSelectedEntityId} />
+                {worldScopeLevel !== 'off' && (
+                    <WorldFilter projectId={projectId} selectedWorldId={selectedWorldId} onChange={setSelectedWorldId} />
+                )}
+                <div className="chr-viewtoggle">
+                    <button className={viewMode === 'dimension' ? 'chr-toggle-on' : ''} onClick={() => setViewMode('dimension')}>按维度</button>
+                    <button className={viewMode === 'chapter' ? 'chr-toggle-on' : ''} onClick={() => setViewMode('chapter')}>按章节</button>
+                </div>
+            </div>
+
+            <DimensionChips counts={counts} active={activeDimSafe} onChange={setActiveDim} level={chronicleLevel} />
 
             {loading ? (
                 <div className="chr-loading">加载中...</div>
@@ -93,14 +108,10 @@ export default function ChronicleTab({ projectId, project, onUpdateProject }) {
                     <span>{error}</span>
                     <button className="cyber-btn cyber-btn-sm cyber-btn-outline" onClick={fetchChronicle}>重试</button>
                 </div>
-            ) : filteredChronicleData.length === 0 ? (
-                <div className="chr-empty">暂无编年史数据，Pipeline运行后将自动提取</div>
+            ) : viewMode === 'dimension' ? (
+                <ChronicleByDimension data={filteredChronicleData} active={activeDimSafe} level={chronicleLevel} />
             ) : (
-                <>
-                    <StanceTimeline chronicleData={filteredChronicleData} />
-                    {isFull && <QuotesSection chronicleData={filteredChronicleData} />}
-                    {isFull && <DeedsSection chronicleData={filteredChronicleData} />}
-                </>
+                <ChronicleByChapter data={filteredChronicleData} level={chronicleLevel} />
             )}
         </div>
     );

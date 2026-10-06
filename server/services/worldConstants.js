@@ -55,6 +55,19 @@ const FACTION_STATUS = Object.freeze({
 });
 
 /**
+ * 副本带出策略（carryOutPolicy）——主角把副本内的 NPC/宠物/道具带出副本的条件。
+ * 见 docs/design/实体中心-副本归属与带出机制.md
+ */
+const CARRY_OUT_POLICIES = Object.freeze({
+    locked:     { id: 'locked',     label: '不可带出', desc: '副本内绑定生效，离开即失/回收' },
+    native:     { id: 'native',     label: '原生物可带出', desc: '无门槛，默认策略' },
+    medium:     { id: 'medium',     label: '需媒介', desc: '需信物/契约/容器等媒介绑定' },
+    item:       { id: 'item',       label: '需特殊道具', desc: '需钥匙/通行证等特殊道具' },
+    permission: { id: 'permission', label: '需渠道权限', desc: '需势力/身份/等级等渠道权限' },
+    plot:       { id: 'plot',       label: '需剧情许可', desc: '需一次性剧情授权/付出代价' }
+});
+
+/**
  * 构建扩展后的默认世界对象
  * @param {object} overrides - 覆盖字段
  * @returns {object} 完整的world对象
@@ -73,6 +86,9 @@ function buildWorld(overrides = {}) {
         rules: '',                        // 世界规则/物理法则
         dangerLevel: 'low',               // 危险等级
         entryMethod: '自然进入',           // 进入方式
+        exitMethod: '自然离开',            // 离开方式
+        carryOutPolicy: 'native',         // 带出策略（见 CARRY_OUT_POLICIES）
+        channelTag: '',                   // 渠道标签：出副本必带凭据（副本建议必填，缺则视同 locked）
         description: '',                  // 世界简介
         ...overrides
     };
@@ -86,6 +102,7 @@ function validateWorld(world) {
     if (!WORLD_TYPES[world.type]) errors.push(`type必须是: ${Object.keys(WORLD_TYPES).join('/')}`);
     if (world.techLevel && !TECH_LEVELS[world.techLevel]) errors.push(`techLevel无效: ${world.techLevel}`);
     if (world.dangerLevel && !DANGER_LEVELS[world.dangerLevel]) errors.push(`dangerLevel无效: ${world.dangerLevel}`);
+    if (world.carryOutPolicy && !CARRY_OUT_POLICIES[world.carryOutPolicy]) errors.push(`carryOutPolicy无效: ${world.carryOutPolicy}`);
     if (Array.isArray(world.powerSystem)) {
         const invalid = world.powerSystem.filter(p => !POWER_SYSTEMS[p]);
         if (invalid.length > 0) errors.push(`powerSystem含无效值: ${invalid.join(',')}`);
@@ -99,6 +116,7 @@ module.exports = {
     TECH_LEVELS,
     DANGER_LEVELS,
     FACTION_STATUS,
+    CARRY_OUT_POLICIES,
     buildWorld,
     validateWorld
 };

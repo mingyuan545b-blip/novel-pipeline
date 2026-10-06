@@ -1,8 +1,4 @@
-/**
- * 素材保存与关联创建模块
- * 负责将AI生成的素材保存到store，创建角色关系和装备绑定
- */
-
+// 素材保存与关联创建：写 store、幂等 upsert、角色关系/装备绑定
 const store = require('../../store');
 const { v4: uuidv4 } = require('uuid');
 const { getDataContext } = require('../dataContext');
@@ -14,6 +10,7 @@ const { createEquipmentBinds } = require('./outlineEquipmentBinds');
 const { getGenrePlugin } = require('../genreConfig');
 const genreProfileRegistry = require('../genreProfileRegistry');
 const { resolveMaterialName } = require('./materialNameResolver');
+const { STATUS_VALUES } = require('../chapterStatus');
 
 function buildCharTags(isChar, mat) {
     if (!isChar) return [];
@@ -42,9 +39,14 @@ async function saveMaterial(projectId, mat) {
     return item;
 }
 
+async function findExistingMaterial(projectId, type, name) {
+    if (!name) return null;
+    const existing = await store.queryItems('materials', { projectId, type });
+    return existing.find(m => !m.archived && m.name === name) || null;
+}
+
 async function findExistingCharacterMaterial(projectId, name) {
-    const existing = await store.queryItems('materials', { projectId, type: 'character' });
-    return existing.find(m => !m.archived && m.name === name);
+    return findExistingMaterial(projectId, 'character', name);
 }
 
 async function updateExistingMaterial(existingMat, newContent) {
@@ -71,7 +73,7 @@ async function saveTemplateOutlines(projectId, chapterOutlines) {
             chapterNumber: ol.chapterNumber,
             title: ol.title || '',
             outline: ol.outline || '',
-            status: 'outlined',
+            status: STATUS_VALUES.OUTLINED,
             round: 0,
             wordCount: 0,
             createdAt: now,
@@ -119,7 +121,7 @@ async function saveChapterOutlines(projectId, outlines) {
             chapterNumber: ol.chapterNumber,
             title: ol.title || '',
             outline: ol.outline || '',
-            status: 'outlined',
+            status: STATUS_VALUES.OUTLINED,
             round: 0,
             wordCount: 0,
             createdAt: now,
@@ -176,7 +178,7 @@ async function saveProjectFromTemplate(template) {
         id: projectId, name, genre: genreStr, description: setting || '',
         mode: 'novel', subGenre: resolvedSubGenre, targetChapters: targetChapters ?? 100, currentChapter: 0,
         status: 'template-generated',
-        settings: { autoPipeline: false, chapterRounds: 3 },
+        settings: { autoPipeline: false, chapterRounds: 3, chronicleLevel: 'basic', worldScopeLevel: 'basic' },
         styleTemplateId: '', constraints: constraints || getDefaultsForGenre(null, null).defaultConstraints,
         template: { elements: elementStr, style, tone, pov, conflict, themes },
         wordConfig: resolvedWordConfig,
@@ -188,7 +190,7 @@ async function saveProjectFromTemplate(template) {
 }
 
 module.exports = {
-    saveMaterial, findExistingCharacterMaterial, updateExistingMaterial,
+    saveMaterial, findExistingMaterial, findExistingCharacterMaterial, updateExistingMaterial,
     createCharacterRelations, createEquipmentBinds,
     saveTemplateOutlines, saveMainQuests, saveTimeline, saveChapterOutlines,
     saveProjectFromTemplate

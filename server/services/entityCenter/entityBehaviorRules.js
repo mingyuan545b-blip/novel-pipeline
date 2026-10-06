@@ -16,6 +16,8 @@ const REGISTRY_SYNC_FIELDS = [
     'factionName', 'genreId', 'behaviorRules', 'lifecycleState',
     // 人物魅力系统4维度（参考蛊真人方源设计）
     'charisma', 'philosophy', 'quoteLibrary', 'entranceDesign',
+    // 高光时刻 + 副本归属（实体中心列表/详情需要）
+    'highlightScenes', 'scopeWorldId', 'locationSlot', 'bindMedium',
 ];
 
 /**
@@ -100,7 +102,7 @@ async function syncToRegistry(entity, force = false) {
 /** 合并已有实体的字段（不覆盖已有值，只填充空字段） */
 async function mergeExistingEntity(center, existing, defaults) {
     const updates = {};
-    const mergeableFields = ['position', 'personality', 'speakingTone', 'signatureDetail', 'craftStyle', 'sourceContent', 'behaviorRules', 'charisma', 'philosophy', 'quoteLibrary', 'entranceDesign'];
+    const mergeableFields = ['position', 'scopeWorldId', 'locationSlot', 'bindMedium', 'personality', 'speakingTone', 'signatureDetail', 'craftStyle', 'sourceContent', 'behaviorRules', 'charisma', 'philosophy', 'quoteLibrary', 'highlightScenes', 'entranceDesign'];
     for (const field of mergeableFields) { if (defaults[field] && defaults[field] !== existing[field]) updates[field] = defaults[field]; }
     if (defaults.genreState && typeof defaults.genreState === 'object') updates.genreState = { ...existing.genreState, ...defaults.genreState };
     if (defaults.profile && typeof defaults.profile === 'object') updates.profile = { ...existing.profile, ...defaults.profile };

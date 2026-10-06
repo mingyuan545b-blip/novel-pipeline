@@ -8,6 +8,7 @@
 const store = require('../store');
 const entityCenter = require('./entityCenter');
 const { extractChronicleFromChapter } = require('./chronicleExtractor');
+const { buildCraftPatch } = require('./entityCraftReflow');
 const logger = require('../shared/logger');
 
 const STORE_TYPE = 'character-chronicle';
@@ -17,9 +18,13 @@ async function saveChronicleEntry(projectId, entityId, entityName, chapterNumber
     const entry = {
         id, projectId, entityId, entityName, chapterNumber,
         stance: data.stance || '',
+        daily: data.daily || '',
+        psychology: data.psychology || '',
         innerConflict: data.innerConflict || '',
+        highlights: data.highlights || [],
         quotes: data.quotes || [],
         deeds: data.deeds || [],
+        relations: data.relations || [],
         stanceShiftReason: data.stanceShiftReason || '',
         level: data.level || 'basic',
         createdAt: new Date().toISOString()
@@ -55,6 +60,16 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
             } catch (err) {
                 logger.warn('chronicle', `Failed to update entity genreState: ${err.message}`);
             }
+        }
+
+        // 回流台词库/高光场景到实体素材（单一源，只增不空写）
+        try {
+            const patch = buildCraftPatch(entity, item);
+            if (Object.keys(patch).length > 0) {
+                await entityCenter.updateEntity(entity.id, patch);
+            }
+        } catch (err) {
+            logger.warn('chronicle', `Failed to reflow craft to entity: ${err.message}`);
         }
         saved.push(entry);
     }

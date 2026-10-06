@@ -10,6 +10,7 @@ import ChronicleTab from './entitycenter/ChronicleTab';
 import WorldScopeTab from './entitycenter/WorldScopeTab';
 import CrossWorldTraceTab from './entitycenter/CrossWorldTraceTab';
 import { EquipmentTab, TechniquesTab } from './entitycenter/EntityCard';
+import ClueTab from './entitycenter/ClueTab';
 import { PetsTab, ServantsTab } from './entitycenter/PetServantTab';
 import EntityGraph from './entitycenter/EntityGraph';
 import StateTrackingTab from './entitycenter/StateTrackingTab';
@@ -23,7 +24,7 @@ export default function EntityCenterPage() {
     const state = useEntityCenterState();
     const {
         currentProject, activeTab, setActiveTab,
-        selectedCharId, setSelectedCharId, expandedIds, descLevel,
+        selectedCharId, setSelectedCharId, expandedIds,
         kvScopeFilter, setKvScopeFilter, historyCharId, setHistoryCharId,
         summaryCharId, setSummaryCharId, selectedChapter, setSelectedChapter,
         syncFrom, setSyncFrom, syncTo, setSyncTo,
@@ -31,7 +32,7 @@ export default function EntityCenterPage() {
         allBinds, allRelations, csCharactersData, kvData, summaryData,
         statesData, csMeta, historyData, syncMut, chapterOptions,
         getCharName, toBeijingTime, handleSync, handleMigrateChineseKeys,
-        selectedChar, charBinds, charRelations, toggleExpand, toggleDesc,
+        selectedChar, charBinds, charRelations, toggleExpand,
         statsValues, handleRepaired, materialsByName, patchLifecycle,
     } = state;
     const onPatchLifecycle = (id, patch) => patchLifecycle.mutate({ id, patch });
@@ -104,14 +105,15 @@ export default function EntityCenterPage() {
                     <KnowledgeTab projectId={currentProject?.id} characters={characters} />
                 )}
                 {activeTab === 'equipment' && (
-                    <EquipmentTab equipment={equipment} expandedIds={expandedIds} descLevel={descLevel}
-                        toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName}
-                        materialsByName={materialsByName} onPatchLifecycle={onPatchLifecycle} />
+                    <EquipmentTab equipment={equipment} allBinds={allBinds} getCharName={getCharName}
+                        materialsByName={materialsByName} onPatchLifecycle={onPatchLifecycle} currentChapter={csMeta?.currentChapter} />
                 )}
                 {activeTab === 'techniques' && (
-                    <TechniquesTab techniques={techniques} expandedIds={expandedIds} descLevel={descLevel}
-                        toggleExpand={toggleExpand} toggleDesc={toggleDesc} allBinds={allBinds} getCharName={getCharName}
-                        materialsByName={materialsByName} onPatchLifecycle={onPatchLifecycle} />
+                    <TechniquesTab techniques={techniques} allBinds={allBinds} getCharName={getCharName}
+                        materialsByName={materialsByName} onPatchLifecycle={onPatchLifecycle} currentChapter={csMeta?.currentChapter} />
+                )}
+                {activeTab === 'clues' && (
+                    <ClueTab projectId={currentProject?.id} allBinds={allBinds} getCharName={getCharName} currentChapter={csMeta?.currentChapter} />
                 )}
                 {activeTab === 'pets' && (
                     <PetsTab pets={pets} expandedIds={expandedIds} toggleExpand={toggleExpand} getCharName={getCharName} />

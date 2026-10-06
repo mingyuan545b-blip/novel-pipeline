@@ -7,6 +7,7 @@ const itemDefinition = require('../../itemDefinition');
 const entityCenter = require('../../entityCenter');
 const { extractRoleLevelFromContent, extractGenreStateFromContent, extractFieldFromContent } = require('./materialFieldUtils');
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
+const { buildItemProperties } = require('../../itemStageParser');
 
 async function populateCharacterFields(newMaterial, update, chapter, projectId, protagonistName, genreId) {
     newMaterial.roleLevel = extractRoleLevelFromContent(update.content, protagonistName, update.name) || update.roleLevel || 'npc';
@@ -25,6 +26,14 @@ async function populateCharacterFields(newMaterial, update, chapter, projectId, 
             philosophy: parsed.philosophy || '',
             quoteLibrary: Array.isArray(parsed.quoteLibrary) ? parsed.quoteLibrary : [],
             entranceDesign: parsed.entranceDesign || '',
+            highlightScenes: Array.isArray(parsed.highlightScenes) ? parsed.highlightScenes : [],
+            craftStyle: parsed.craftStyle || '',
+            profile: {
+                appearance: parsed.appearance || '', background: parsed.background || '',
+                motivation: parsed.motivation || '', desire: parsed.desire || '',
+                fear: parsed.fear || '', lie: parsed.lie || '', trauma: parsed.trauma || '',
+                innerConflict: parsed.innerConflict || '', fateArc: parsed.fateArc || '',
+            },
             sourceContent: (update.content || '').substring(0, 2000),
         });
         if (entity && entity.id !== newMaterial.id) {
@@ -79,6 +88,7 @@ async function syncToRegistries(newMaterial, update, chapter, projectId, protago
             await itemDefinition.createDefinition(projectId, defType, update.name, {
                 id: `def-${defType}-${newMaterial.id}`, briefDesc: content.substring(0, 100),
                 summaryDesc: content.substring(0, 300), detailDesc: content.substring(0, 800),
+                propertiesJson: buildItemProperties(content), materialId: newMaterial.id,
                 sourceChapter: chapter.chapterNumber || null
             });
         }

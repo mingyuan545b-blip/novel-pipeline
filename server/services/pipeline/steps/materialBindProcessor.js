@@ -1,5 +1,6 @@
 const store = require('../../../store');
 const { characterBind, inferPermanence } = require('../../characterBind');
+const { buildItemProperties } = require('../../itemStageParser');
 const { v4: uuidv4 } = require('uuid');
 
 async function processBindChanges(charUpdate, existingMat, chapter, projectId, operations, errors) {
@@ -27,12 +28,13 @@ async function handleBindAcquire(bc, existingMat, chapter, projectId, operations
         defId = `def-${uuidv4()}`;
         // P0-3 止血：不再把 bindChange 描述复制进定义（内容唯一存 materials），只留身份 + 回指素材
         const sameMats = await store.queryItems('materials', { projectId, name: bc.itemName });
+        const srcContent = sameMats[0] ? (sameMats[0].currentContent || sameMats[0].initialContent || '') : '';
         await store.setItem('item-definitions', defId, {
             id: defId, projectId, defType: bc.bindType || 'equipment',
             name: bc.itemName, materialId: sameMats[0]?.id || null, rarity: 'common',
             briefDesc: '', summaryDesc: '', detailDesc: '', loreDesc: '',
             briefTokens: 0, summaryTokens: 0, detailTokens: 0, loreTokens: 0,
-            propertiesJson: {}, constraintsJson: {}, sourceChapter: chapter.chapterNumber, tags: [],
+            propertiesJson: buildItemProperties(srcContent), constraintsJson: {}, sourceChapter: chapter.chapterNumber, tags: [],
             createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         });
     }

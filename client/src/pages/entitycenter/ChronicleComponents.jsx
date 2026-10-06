@@ -1,66 +1,9 @@
+/**
+ * ChronicleComponents.jsx — 编年史筛选控件
+ * （原 StanceTimeline/Quotes/Deeds/Highlights 已由 ChronicleDims.jsx 的多维视图替代）
+ */
 import { useState, useEffect } from 'react';
 import { pipelineApi } from '../../services/api';
-
-function StanceTimeline({ chronicleData }) {
-    if (!chronicleData || chronicleData.length === 0) {
-        return <div className="chr-timeline-empty">暂无立场数据，Pipeline运行后将自动提取</div>;
-    }
-    return (
-        <div className="chr-timeline">
-            {chronicleData.map((c, i) => (
-                <div key={c.id || i} className="chr-entry">
-                    <div className="chr-entry-header">
-                        <span className="chr-entry-chapter">第{c.chapterNumber}章 · {c.entityName}</span>
-                        {c.stanceShiftReason && <span className="chr-entry-shift">立场转变</span>}
-                    </div>
-                    {c.stance && <div className="chr-entry-stance">立场: {c.stance}</div>}
-                    {c.innerConflict && <div className="chr-entry-conflict">内心矛盾: {c.innerConflict}</div>}
-                    {c.stanceShiftReason && (
-                        <div className="chr-entry-reason">转变原因: {c.stanceShiftReason}</div>
-                    )}
-                </div>
-            ))}
-        </div>
-    );
-}
-
-function QuotesSection({ chronicleData }) {
-    const allQuotes = chronicleData?.filter(c => c.quotes && c.quotes.length > 0) || [];
-    if (allQuotes.length === 0) return null;
-    return (
-        <div className="chr-section">
-            <div className="chr-section-title-cyan">语录</div>
-            {allQuotes.map((c, i) => (
-                <div key={c.id || i} className="chr-quote-group">
-                    <div className="chr-quote-chapter">第{c.chapterNumber}章 · {c.entityName}</div>
-                    {c.quotes.map((q, qi) => (
-                        <div key={qi} className="chr-quote-item">"{q}"</div>
-                    ))}
-                </div>
-            ))}
-        </div>
-    );
-}
-
-function DeedsSection({ chronicleData }) {
-    const allDeeds = chronicleData?.filter(c => c.deeds && c.deeds.length > 0) || [];
-    if (allDeeds.length === 0) return null;
-    return (
-        <div className="chr-section">
-            <div className="chr-section-title-orange">事迹</div>
-            {allDeeds.map((c, i) => (
-                <div key={c.id || i} className="chr-deed-group">
-                    <div className="chr-deed-chapter">第{c.chapterNumber}章 · {c.entityName}</div>
-                    {c.deeds.map((d, di) => (
-                        <div key={di} className="chr-deed-item">▸ {d}</div>
-                    ))}
-                </div>
-            ))}
-        </div>
-    );
-}
-
-export { StanceTimeline, QuotesSection, DeedsSection };
 
 function EntityFilter({ entities, selectedEntityId, onChange }) {
     if (!entities || entities.length === 0) return null;

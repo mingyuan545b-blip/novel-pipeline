@@ -50,10 +50,10 @@ const SYSTEM_PROMPT = `你是一个小说世界域分析器。你的任务是分
     }
   ],
   "transitions": [
-    { "character": "角色名", "from": "来源世界", "to": "目标世界", "chapterNumber": N }
+    { "character": "角色名", "from": "来源世界", "to": "目标世界", "chapterNumber": N, "channel": "离开渠道标签(如无则空)", "medium": "带出媒介/道具(如无则空)" }
   ],
   "entities": [
-    { "name": "实体名", "entityType": "character|npc|equipment|pet|servant", "worldId": "世界ID", "worldName": "世界名", "isVisitor": false }
+    { "name": "实体名", "entityType": "character|npc|equipment|pet|servant", "worldId": "世界ID", "worldName": "世界名", "locationSlot": "在副本内的特定位置(可空)", "isVisitor": false }
   ],
   "crossWorldViolations": [
     { "entity": "实体名", "homeWorld": "归属世界", "appearedIn": "出现世界", "description": "描述" }
@@ -71,7 +71,8 @@ const SYSTEM_PROMPT = `你是一个小说世界域分析器。你的任务是分
       "transitionFrom": "如果本章该物品从原世界被带往另一世界，填写来源世界ID",
       "transitionTo": "目标世界ID(通常是main-world)",
       "transitionNote": "跨世界原因(如：主角完成副本带回主世界)",
-      "transitionChapter": N
+      "transitionChapter": N,
+      "transitionChannel": "带出渠道标签/媒介(如：副本渠道标签、使用的信物/通行证；如无则空)"
     }
   ]
 }
@@ -88,6 +89,7 @@ const SYSTEM_PROMPT = `你是一个小说世界域分析器。你的任务是分
    - 必须记录来源世界(originWorldId)和获取章节(originChapter)
    - 若本章发生跨世界转移(如主角离副本回主世界)，填transitionFrom/transitionTo
    - 主世界原生物品不提取
+   - 从副本带出的，必须记录带出凭据：transitionChannel 填渠道标签/媒介（无凭据的"白拿"应写入crossWorldViolations）
 8. 只输出JSON，不要其他内容`;
 
 const EXTRACT_PROMPTS = {

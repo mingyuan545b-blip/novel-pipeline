@@ -37,7 +37,7 @@ P0 安全（不破坏现有功能/不丢数据/不泄露敏感信息）
 | P1-F3 | 修复后必跑测试 | P1 | 修改后无jest运行记录 | 工具调用记录 |
 | P1-F4 | 教训必持久化 | P1 | 犯错后project_memory.md无更新 | 文件修改时间 |
 | P2-C1 | 禁止不查证就建议 | P2 | 建议前无Read工具调用 | 工具调用记录 |
-| P2-B1 | 禁止PowerShell语法 | P2 | 命令含`\| tail`/`$1`/`2>&1` | RunCommand记录 |
+| P2-B1 | 优先使用 cmd（禁 PowerShell/bash 专有语法混用） | P2 | 命令含PowerShell专有语法或`\| tail`/`$1`/`2>&1`等bash语法 | RunCommand记录 |
 
 ### 0.3 铁律违反检测机制
 

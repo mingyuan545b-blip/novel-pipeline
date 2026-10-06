@@ -80,3 +80,76 @@
 }
 .chr-filter-select:focus { border-color: var(--neon-purple); }
 .chr-filter-select option { background: var(--bg-secondary); color: var(--text-primary); }
+
+/* 编年史多维升级（日常/心理/高光/名言场景与记忆点） */
+.chr-entry-daily {
+    font-size: 12px;
+    color: var(--text-muted, #8a93a6);
+    margin-top: 2px;
+}
+.chr-quote-scene {
+    font-size: 12px;
+    color: var(--neon-cyan);
+}
+.chr-quote-why {
+    font-size: 12px;
+    color: var(--text-muted, #8a93a6);
+    margin-top: 2px;
+}
+.chr-highlight-item {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin: 4px 0;
+    line-height: 1.6;
+}
+.chr-highlight-scene {
+    color: var(--neon-purple);
+    margin-right: 4px;
+}
+
+/* ===== 编年史多维视图（重设计） ===== */
+.chr-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chr-viewtoggle { display: inline-flex; border: 1px solid rgba(138,43,226,0.3); border-radius: 6px; overflow: hidden; margin-left: auto; }
+.chr-viewtoggle button {
+    background: transparent; border: none; color: var(--text-muted); font-size: 12px;
+    padding: 4px 12px; cursor: pointer;
+}
+.chr-viewtoggle button.chr-toggle-on { background: rgba(138,43,226,0.25); color: var(--text-primary); font-weight: 600; }
+
+.chr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chr-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px; color: var(--text-secondary); font-size: 12px; padding: 4px 10px; cursor: pointer;
+}
+.chr-chip:hover { border-color: var(--chip-color, var(--neon-cyan)); }
+.chr-chip.chr-chip-on { background: rgba(0,200,255,0.12); border-color: var(--chip-color, var(--neon-cyan)); color: var(--text-primary); font-weight: 600; }
+.chr-chip.chr-chip-empty { opacity: 0.45; }
+.chr-chip-count {
+    background: rgba(0,0,0,0.35); border-radius: 999px; padding: 0 6px; font-size: 10px; color: var(--text-muted);
+}
+
+.chr-dim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 10px; }
+.chr-dim-card {
+    background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);
+    border-left: 3px solid var(--dim-color, var(--neon-cyan)); border-radius: 8px; padding: 10px 12px;
+}
+.chr-dim-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.chr-dim-title { color: var(--dim-color, var(--neon-cyan)); font-weight: 600; font-size: 13px; }
+.chr-dim-count { background: rgba(0,0,0,0.35); border-radius: 999px; padding: 1px 8px; font-size: 11px; color: var(--text-muted); }
+.chr-dim-empty { color: var(--text-muted); font-size: 12px; padding: 6px 0; }
+.chr-dim-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.chr-dim-item { border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 6px; }
+.chr-dim-meta { display: block; color: var(--text-muted); font-size: 10px; margin-bottom: 2px; }
+.chr-dim-scene { color: var(--dim-color, var(--neon-cyan)); font-size: 12px; margin-right: 4px; }
+.chr-dim-text { color: var(--text-primary); font-size: 13px; line-height: 1.6; }
+.chr-dim-note { display: block; color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+.chr-bychapter { display: flex; flex-direction: column; gap: 10px; }
+.chr-chapter-block { border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 12px; }
+.chr-chapter-title { color: var(--neon-purple); font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+.chr-chapter-entry { border-top: 1px dashed rgba(255,255,255,0.08); padding: 6px 0; }
+.chr-chapter-entity { color: var(--text-primary); font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+.chr-chapter-dim { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin: 2px 0 2px 8px; }
+.chr-chapter-dimlabel { color: var(--dim-color, var(--neon-cyan)); font-size: 11px; min-width: 72px; }
+.chr-chapter-item { color: var(--text-secondary); font-size: 12px; }
