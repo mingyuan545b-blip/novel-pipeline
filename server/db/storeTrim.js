@@ -4,6 +4,7 @@
  * Size-level truncation applies only when serialized data exceeds max.
  */
 const { STORE_SIZE_LIMITS, STORE_DEFAULT_MAX_SIZE, STORE_TRIMMING } = require('../config/systemConfig');
+const { normalizeMaterialRecord } = require('../config/materialShape');
 
 const CHAPTER_TRUNC_FIELDS = {
     writerOutput: 'outputTruncateLength',
@@ -35,6 +36,8 @@ function trimChapterFields(data) {
 }
 
 function trimMaterialFields(data) {
+    // T4：形状不变量（provenance / changeLog v2 / 时间戳 / version）——存储层单点兜底
+    Object.assign(data, normalizeMaterialRecord(data));
     if (data.changeLog && data.changeLog.length > STORE_TRIMMING.materialChangeLogKeep) {
         data.changeLog = data.changeLog.slice(-STORE_TRIMMING.materialChangeLogKeep);
     }

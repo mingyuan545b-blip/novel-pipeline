@@ -34,4 +34,30 @@ function warnOnEmptyOrganizingPlan(organizingPlan, chapterNum) {
     }
 }
 
-module.exports = { warnOnEmptyOrganizingPlan };
+/**
+ * T6：深度缺口检测 —— 出场的角色必须有深度 Field 产出，
+ * 否则那条角色的深度键要靠 materialDepthBackfill 从素材正文回填（可见、可统计）。
+ * @returns {{gaps:Array<{name:string}>, total:number}}
+ */
+const DEPTH_NOTE_FIELDS = ['innerConflictNote', 'independentStanceNote', 'fateArcNote', 'protagonistMirrorNote'];
+
+function collectDepthGaps(organizingPlan) {
+    const chars = (organizingPlan && Array.isArray(organizingPlan.characters)) ? organizingPlan.characters : [];
+    const appeared = chars.filter(c => c && c.appeared !== false && c.name);
+    // 显式写「无变化」= 模型尽到了职责（不算缺口）；写「无」/留空 = 缺口
+    const declared = (v) => typeof v === 'string' && v.trim().length > 0 && !/^(无|暂无|未知)$/.test(v.trim());
+    const gaps = appeared
+        .filter(c => !DEPTH_NOTE_FIELDS.some(f => declared(c[f])))
+        .map(c => ({ name: c.name, roleLevel: c.roleLevel || 'npc' }));
+    return { gaps, total: appeared.length, covered: appeared.length - gaps.length };
+}
+
+/** 深度缺口告警（不阻断：回填能兜，但必须留痕） */
+function warnOnDepthGaps(organizingPlan, chapterNum) {
+    const { gaps, total, covered } = collectDepthGaps(organizingPlan);
+    if (gaps.length === 0 || total === 0) return { gaps: [], total, covered };
+    logger.warn('materialOrganizer', `[T6] ch${chapterNum}: ${gaps.length}/${total} 名出场角色无深度字段产出（${gaps.slice(0, 8).map(g => g.name).join('、')}），将尝试素材正文回填`);
+    return { gaps, total, covered };
+}
+
+module.exports = { warnOnEmptyOrganizingPlan, collectDepthGaps, warnOnDepthGaps, DEPTH_NOTE_FIELDS };

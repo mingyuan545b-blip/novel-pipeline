@@ -1,7 +1,7 @@
-const { v4: uuidv4 } = require('uuid');
 const { mergeWithBaseline } = require('./materialContentMerger');
 const logger = require('../../../shared/logger');
-const store = require('../../../store');
+const { createMaterial, updateMaterial } = require('../../materialRepository');
+const { ORIGINS } = require('../../../config/materialProvenance');
 const { validateNewMaterial } = require('../../genreConfig');
 
 async function extractFromMarkdown(mdText, chapter, projectId, materials, styleProfile) {
@@ -33,19 +33,10 @@ async function extractFromMarkdown(mdText, chapter, projectId, materials, styleP
             // 合并模式：保留人设基座，只覆盖状态类标签；并按上限做防膨胀裁剪
             // （否则一章就把角色深度冲没；见 config/materialContentPolicy）
             const nextContent = mergeWithBaseline(existing.initialContent, existing.currentContent, content, { type: existing.type }) || content;
-            await store.setItem('materials', existing.id, {
-                ...existing,
-                currentContent: nextContent,
-                sourceChapter: chapter.chapterNumber,
-                changeLog: [...(existing.changeLog || []), {
-                    from: existing.currentContent || '',
-                    to: nextContent,
-                    reason: 'Markdown extraction update',
-                    chapterNumber: chapter.chapterNumber,
-                    timestamp: new Date().toISOString()
-                }],
-                version: (existing.version || 1) + 1,
-                updatedAt: new Date().toISOString()
+            // T2/T4：走唯一写入 API —— 不再覆盖 sourceChapter（创建章节不可变），changeLog 归一 v2
+            await updateMaterial(existing, { currentContent: nextContent }, {
+                chapter: chapter.chapterNumber || 0,
+                reason: 'Markdown extraction update',
             });
             logger.info('materialMdExtract', `Markdown extraction: updated ${type} "${name}"`);
             appliedUpdates.push({ action: 'update', type, name, reason: 'Markdown extraction update' });
@@ -56,14 +47,13 @@ async function extractFromMarkdown(mdText, chapter, projectId, materials, styleP
                 continue;
             }
 
-            const newMatId = uuidv4();
-            await store.setItem('materials', newMatId, {
-                id: newMatId, projectId, type, name,
-                initialContent: content, currentContent: content,
-                parentPlane: null, parentFaction: null, version: 1, status: 'active',
-                sourceChapter: chapter.chapterNumber, tags: [],
-                changeLog: [{ action: 'import', from: 'markdown-extraction', at: new Date().toISOString() }],
-                createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+            // T2/T4：走唯一写入 API（provenance + changeLog v2）
+            await createMaterial({
+                projectId, type, name, content,
+                chapter: chapter.chapterNumber || 0,
+                origin: ORIGINS.IMPORT,
+                reason: 'Markdown extraction create',
+                extra: { parentPlane: null, parentFaction: null, status: 'active' },
             });
             logger.info('materialMdExtract', `Markdown extraction: created ${type} "${name}"`);
             appliedUpdates.push({ action: 'create', type, name, reason: 'Markdown extraction create' });

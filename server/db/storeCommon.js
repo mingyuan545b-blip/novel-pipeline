@@ -1,5 +1,6 @@
 const { STORE_SIZE_LIMITS, STORE_DEFAULT_MAX_SIZE, STORE_TRIMMING } = require('../config/systemConfig');
 const { CRAFT_TYPES } = require('../config/materialTypes');
+const { normalizeMaterialRecord } = require('../config/materialShape');
 
 function isFoundationMaterialCheck(mat, getFactionFn, visited = new Set(), depth = 0) {
     if (!mat) return false;
@@ -56,8 +57,12 @@ function trimItemData(type, data) {
         }
     }
 
-    if (type === 'materials' && data.changeLog && data.changeLog.length > STORE_TRIMMING.materialChangeLogKeep) {
-        data.changeLog = data.changeLog.slice(-STORE_TRIMMING.materialChangeLogKeep);
+    if (type === 'materials') {
+        // T4：形状不变量（PG 写入路径同样单点兜底）
+        Object.assign(data, normalizeMaterialRecord(data));
+        if (data.changeLog && data.changeLog.length > STORE_TRIMMING.materialChangeLogKeep) {
+            data.changeLog = data.changeLog.slice(-STORE_TRIMMING.materialChangeLogKeep);
+        }
     }
 
     if (type === 'projects') {

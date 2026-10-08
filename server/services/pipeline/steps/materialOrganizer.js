@@ -1,5 +1,5 @@
 const logger = require('../../../shared/logger');
-const { warnOnEmptyOrganizingPlan } = require('./materialOrganizerGuards');
+const { warnOnEmptyOrganizingPlan, warnOnDepthGaps } = require('./materialOrganizerGuards');
 const store = require('../../../store');
 const stateKVIndex = require('../../stateKVIndex');
 const { getCharacterStateSchema } = require('../../../config/characterStateSchemas');
@@ -149,6 +149,7 @@ async function handleMaterialOrganizer(params) {
     // 陷阱#90防护：检测空organizingPlan，防止连锁下游问题
     // 不阻断pipeline（某些章节可能确实无角色变化），但记录warning便于排查
     warnOnEmptyOrganizingPlan(organizingPlan, chapterNum);
+    warnOnDepthGaps(organizingPlan, chapterNum);   // T6：深度缺口必须可见（回填能兜，但不能静默）
 
     return {
         step: 'material-organizer',

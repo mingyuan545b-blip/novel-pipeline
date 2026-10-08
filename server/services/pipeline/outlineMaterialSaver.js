@@ -7,6 +7,8 @@ const { createCharacterRelations } = require('./outlineRelationCreator');
 const { saveTimelineEvent } = require('../timelineAdapter');
 const { normalizeStyleProfile } = require('../../config/styleProfileNormalizer');
 const { createEquipmentBinds } = require('./outlineEquipmentBinds');
+const { createMaterial, updateMaterial } = require('../materialRepository');
+const { ORIGINS } = require('../../config/materialProvenance');
 const { getGenrePlugin } = require('../genreConfig');
 const genreProfileRegistry = require('../genreProfileRegistry');
 const { resolveMaterialName } = require('./materialNameResolver');
@@ -22,21 +24,18 @@ function buildCharTags(isChar, mat) {
 }
 
 async function saveMaterial(projectId, mat) {
-    const id = uuidv4();
-    const now = new Date().toISOString();
     const isChar = mat.type === 'character';
     const roleLevel = isChar ? (mat.isMainCharacter ? 'protagonist' : (mat.roleLevel || 'npc')) : undefined;
-    const item = {
-        id, projectId, type: mat.type || 'other', name: resolveMaterialName(mat),
-        description: '', initialContent: mat.content || '', currentContent: mat.content || '',
+    // T2：初始素材也必须有出身（origin=outline / createdChapter=0），
+    // 否则 UI"来源章节"为空、无法回答"这条设定是什么时候、由什么生成的"
+    return createMaterial({
+        projectId, type: mat.type || 'other', name: resolveMaterialName(mat),
+        content: mat.content || '', chapter: 0, origin: ORIGINS.OUTLINE,
+        reason: 'Initial creation',
         tags: buildCharTags(isChar, mat), roleLevel,
         isMainCharacter: isChar ? !!mat.isMainCharacter : undefined,
-        isLocked: mat.type === 'worldview', version: 1,
-        changeLog: [{ from: '', to: mat.content || '', reason: 'Initial creation', timestamp: now }],
-        createdAt: now, updatedAt: now
-    };
-    await store.setItem('materials', id, item);
-    return item;
+        isLocked: mat.type === 'worldview',
+    });
 }
 
 async function findExistingMaterial(projectId, type, name) {
@@ -50,12 +49,10 @@ async function findExistingCharacterMaterial(projectId, name) {
 }
 
 async function updateExistingMaterial(existingMat, newContent) {
-    const updated = {
-        ...existingMat, currentContent: newContent || existingMat.currentContent,
-        version: (existingMat.version || 1) + 1, updatedAt: new Date().toISOString()
-    };
-    await store.setItem('materials', existingMat.id, updated);
-    return updated;
+    // T2：走唯一写入 API（保留 provenance，changeLog 归一为 v2）
+    return updateMaterial(existingMat, { currentContent: newContent || existingMat.currentContent }, {
+        chapter: 0, reason: 'Initial material upsert',
+    });
 }
 
 async function saveTemplateOutlines(projectId, chapterOutlines) {

@@ -145,9 +145,11 @@ function getOrganizerFieldHints(roleLevel) {
         '"signatureDetailNote": "标志性细节（必填，如：习惯动作/随身物品/外貌特征等）"',
     ];
     if (roleLevel === 'protagonist') {
-        base.push('"catchphraseNote": "口头禅/标志性语句（如有）"', '"innerConflictNote": "本章内在矛盾变化（如有）"');
+        // T6：主角的深度字段由"（如有）"改为**必填**（空着才是例外，必须显式写"无变化"）
+        base.push('"catchphraseNote": "口头禅/标志性语句（如有）"', '"innerConflictNote": "本章内在矛盾（必填；确实无变化则写「无变化」）"');
     } else if (roleLevel === 'supporting') {
-        base.push('"protagonistMirrorNote": "与主角的镜像对比（如有）"', '"independentStanceNote": "独立立场表达（如有）"', '"fateArcNote": "命运弧光推进（如有）"');
+        // T6：配角三个深度字段同样改为必填（契约 anyOf 深度键依赖它们）
+        base.push('"protagonistMirrorNote": "与主角的镜像对比（必填；确实无变化则写「无变化」）"', '"independentStanceNote": "独立立场表达（必填；确实无变化则写「无变化」）"', '"fateArcNote": "命运弧光推进（必填；确实无变化则写「无变化」）"');
     } else {
         base.push('"catchphraseNote": "口头禅（如有）"');
     }

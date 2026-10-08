@@ -11,6 +11,7 @@
 const logger = require('../../shared/logger');
 const { buildStateJson } = require('./agentMaterialHelpers');
 const entityCenter = require('../entityCenter');
+const { backfillDepthKeys } = require('./materialDepthBackfill');
 
 /**
  * 为契约校验丰富素材数据：对 character 素材合并 KV store 深度字段
@@ -55,10 +56,17 @@ async function enrichMaterialsForContract(materials, projectId) {
 
         try {
             const mergedStateJson = await buildStateJson(entity, projectId);
-            enriched.push({
-                ...m,
-                stateJson: { ...(m.stateJson || {}), ...mergedStateJson }
+            // T6：深度键多来源确定性回填（实体/KV → 素材正文【标签】）
+            // 只在缺失时填补，绝不覆盖；没有真实来源就不产生键（不臆造）
+            const { merged, filled } = backfillDepthKeys({
+                stateJson: { ...(m.stateJson || {}), ...mergedStateJson },
+                entity,
+                materialContent: m.currentContent || m.initialContent || '',
             });
+            if (filled.length > 0) {
+                logger.info('contractEnricher', `深度键回填 ${m.name}: ${filled.join(',')}`);
+            }
+            enriched.push({ ...m, stateJson: merged });
         } catch (e) {
             logger.warn('contractEnricher', `Failed to enrich ${m.name}: ${e.message}`);
             enriched.push(m);

@@ -4,7 +4,7 @@
  */
 
 const logger = require('../../../shared/logger');
-const store = require('../../../store');
+const { updateMaterial, archiveMaterial } = require('../../materialRepository');
 const entityCenter = require('../../entityCenter');
 const { extractRoleLevelFromContent, extractGenreStateFromContent } = require('./materialFieldUtils');
 const { extractCharacterStateFromContent } = require('../outlineResponseParser');
@@ -33,10 +33,11 @@ async function handleUpdateAction(update, existing, chapter, projectId, stylePro
     const protagonistName = styleProfile?.protagonistName || '';
     const genreId = String(styleProfile?.genre || styleProfile?.genreId || '');
 
+    // T2：不再改写 sourceChapter（创建章节不可变，由 provenance 承载）；
+    // 最近变化章走 lastUpdatedChapter / lastAppearChapter。
     const updatedMaterial = {
         ...existing,
         currentContent: resolveCurrentContent(update, existing),
-        sourceChapter: chapter.chapterNumber || existing.sourceChapter,
         lastAppearChapter: chapter.chapterNumber || existing.lastAppearChapter,
         version: (existing.version || 1) + 1,
         ...buildWriteStamp(chapter.chapterNumber || existing.lastUpdatedChapter),
@@ -74,25 +75,21 @@ async function handleUpdateAction(update, existing, chapter, projectId, stylePro
         }
     }
 
-    updatedMaterial.changeLog = [
-        ...(existing.changeLog || []),
-        { action: 'updated', reason: update.reason || 'auto-updated', at: new Date().toISOString() }
-    ];
-
-    await store.setItem('materials', existing.id, updatedMaterial);
+    // T2：changeLog 口径 + provenance 保留 + 版本号 由唯一写入 API 统一负责
+    await updateMaterial(existing, updatedMaterial, {
+        chapter: chapter.chapterNumber || existing.lastUpdatedChapter || 0,
+        reason: update.reason || 'auto-updated',
+    });
     return true;
 }
 
 async function handleArchiveAction(update, existing, chapter, projectId) {
     if (!existing || !existing.id) return false;
-    const archived = {
-        ...existing, archived: true, archivedAt: new Date().toISOString(),
-        archivedReason: update.reason || 'auto-archived',
-        version: (existing.version || 1) + 1,
-        ...buildWriteStamp(chapter.chapterNumber || existing.lastUpdatedChapter),
-        updatedAt: new Date().toISOString()
-    };
-    await store.setItem('materials', existing.id, archived);
+    await archiveMaterial(existing, {
+        chapter: chapter.chapterNumber || existing.lastUpdatedChapter || 0,
+        reason: update.reason || 'auto-archived',
+        action: update.action || 'deprecate',
+    });
     return true;
 }
 

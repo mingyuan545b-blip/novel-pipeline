@@ -4,16 +4,18 @@
  * 值优先取定义行，缺失时回落同名素材（合并过程中的过渡态）。
  */
 import { RARITY_LABELS, MATERIAL_TYPE_LABELS, tagLabel } from './constants';
+import { buildProvenanceRows } from './materialProvenanceView';
 import s from './definitionMeta.module.css';
 
 export default function DefinitionMetaColumn({ item, material }) {
     const rarity = item.rarity || material?.rarity;
-    const sourceChapter = item.sourceChapter || material?.sourceChapter;
     const matType = material?.type ? MATERIAL_TYPE_LABELS[material.type] : null;
     const tags = (Array.isArray(item.tags) && item.tags.length ? item.tags : material?.tags) || [];
+    // T2：定位信息改为"创建/最近更新/出身/创建时间"（含存量推断标注）
+    const provRows = buildProvenanceRows(item, material);
     const rows = [
         ['稀有度', RARITY_LABELS[rarity]],
-        ['来源章节', sourceChapter ? `第${sourceChapter}章` : ''],
+        ...provRows,
         ['素材类型', matType],
     ].filter(([, v]) => v);
 

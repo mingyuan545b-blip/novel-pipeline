@@ -2,13 +2,13 @@
  * 素材创建动作处理模块
  */
 const logger = require('../../../shared/logger');
-const store = require('../../../store');
 const { v4: uuidv4 } = require('uuid');
 const { validateMaterial } = require('../../materialValidator');
 const { validateNewMaterial } = require('../../genreConfig');
 const { parseFlavorTag } = require('./materialFieldUtils');
 const { ensureOutputDir } = require('./materialUpdateHelpers');
-const { buildWriteStamp } = require('../../../config/materialWriteOwnership');
+const { buildNewMaterialRecord, save } = require('../../materialRepository');
+const { ORIGINS } = require('../../../config/materialProvenance');
 const { populateCharacterFields, populateTypeSpecificFields, syncToRegistries } = require('./materialCreateHelpers');
 
 function applyFlavorTags(material, content) {
@@ -28,19 +28,21 @@ async function handleCreateAction(update, chapter, projectId, styleProfile) {
     const protagonistName = styleProfile?.protagonistName || '';
     const genreId = String(styleProfile?.genre || styleProfile?.genreId || '');
     const newMatId = uuidv4();
-    const newMaterial = {
+    // T2：创建走唯一写入 API —— provenance（不可变出身）+ changeLog v2 + 留痕一次成对
+    const newMaterial = buildNewMaterialRecord({
         id: newMatId, projectId, type: materialType, name: update.name,
+        content: update.content || '',
         description: (update.content || '').substring(0, 200),
-        initialContent: update.content || '', currentContent: update.content || '',
-        sourceChapter: chapter.chapterNumber || 0,
-        tags: update.tags || ['auto-generated'], version: 1,
-        changeLog: [{ action: 'created', reason: update.reason || 'auto-created', at: new Date().toISOString() }],
-        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-        parentPlane: update.parentPlane || null, parentFaction: update.parentFaction || null,
+        chapter: chapter.chapterNumber || 0,
+        origin: ORIGINS.CHAPTER,
+        reason: update.reason || 'auto-created',
+        tags: update.tags || ['auto-generated'],
         isLocked: false,
-        // P1-4c 写入留痕：谁写的、哪一章写的（materials 只有 material-manager 链可写）
-        ...buildWriteStamp(chapter.chapterNumber),
-    };
+        extra: {
+            parentPlane: update.parentPlane || null,
+            parentFaction: update.parentFaction || null,
+        },
+    });
 
     if (materialType === 'character') await populateCharacterFields(newMaterial, update, chapter, projectId, protagonistName, genreId);
     populateTypeSpecificFields(newMaterial, update, chapter);
@@ -57,7 +59,7 @@ async function handleCreateAction(update, chapter, projectId, styleProfile) {
         }
     } catch (_) { logger.warn('materialCreate', '[material-actions]', _.message || _); }
 
-    await store.setItem('materials', newMatId, newMaterial);
+    await save(newMaterial);
     await syncToRegistries(newMaterial, update, chapter, projectId, protagonistName);
     return { id: newMatId, type: materialType };
 }

@@ -1,30 +1,46 @@
 const logger = require('../../../shared/logger');
 const { extractJSON } = require('../../jsonUtils');
 
-function parseMaterialManagerOutput(rawResponse) {
-    const jsonBlocks = extractJsonBlocks(rawResponse);
+/**
+ * 可判定版本：返回 { ok, updates, reason }，**不再抛异常**。
+ *
+ * T1 修复点：原实现把 `{"updates": []}`（模型正确回答"本章无素材变更"）
+ * 与"完全无法解析"混为一谈，两者都抛 'JSON extraction failed'
+ * → 合法空更新被下游当成失败（或反之被静默吞掉）。
+ * 现在：**只要拿到 updates 数组（哪怕为空）就算 ok=true**。
+ */
+function parseMaterialManagerOutputDetailed(rawResponse) {
+    const raw = typeof rawResponse === 'string' ? rawResponse : '';
+    const jsonBlocks = extractJsonBlocks(raw);
     const allUpdates = [];
 
     for (const block of jsonBlocks) {
         const parsed = tryParseJson(block);
-        if (parsed && parsed.updates && Array.isArray(parsed.updates)) {
+        if (parsed && Array.isArray(parsed.updates)) {
             allUpdates.push(...parsed.updates);
         }
     }
 
-    if (allUpdates.length === 0) {
-        const parsed = extractJSON(rawResponse);
-        if (parsed && parsed.updates) {
-            allUpdates.push(...parsed.updates);
-        }
+    if (allUpdates.length > 0) {
+        logger.info('materialJsonParse', `material-manager解析出${allUpdates.length}条素材更新指令(block)`);
+        return { ok: true, updates: allUpdates, reason: 'json-block' };
     }
 
-    if (allUpdates.length === 0) {
-        throw new Error('JSON extraction failed');
+    let root = null;
+    try { root = extractJSON(raw); } catch (_) { root = null; }
+    if (root && Array.isArray(root.updates)) {
+        logger.info('materialJsonParse', `material-manager解析出${root.updates.length}条素材更新指令(root)`);
+        return { ok: true, updates: root.updates, reason: 'json-root' };
     }
 
-    logger.info('materialJsonParse', `material-manager解析出${allUpdates.length}条素材更新指令`);
-    return allUpdates;
+    return { ok: false, updates: [], reason: '响应中找不到 updates 数组' };
+}
+
+/** 兼容旧调用方：解析失败（含完全无 updates 数组）抛异常 */
+function parseMaterialManagerOutput(rawResponse) {
+    const detailed = parseMaterialManagerOutputDetailed(rawResponse);
+    if (!detailed.ok) throw new Error('JSON extraction failed');
+    return detailed.updates;
 }
 
 function extractJsonBlocks(rawResponse) {
@@ -87,6 +103,7 @@ function parseForeshadowTracking(response) {
 
 module.exports = {
     parseMaterialManagerOutput,
+    parseMaterialManagerOutputDetailed,
     parseForeshadowTracking,
     extractJsonBlocks,
     tryParseJson

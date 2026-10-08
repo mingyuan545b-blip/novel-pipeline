@@ -98,15 +98,24 @@ function checkSectionBuildersRuntime() {
     }
 }
 
-/** 校验4：所有Agent文件必须调用 scheduleMaterials */
+/**
+ * 校验4：所有 Agent 文件必须通过**统一装配入口**取素材
+ *
+ * 修正历史（2026-10-07）：装配入口在 P1-4c/S6 已从"直接调 scheduleMaterials"
+ * 收敛为 materialStateAssembler.assembleMaterialState（单点装配 + 记账）。
+ * 本校验器当时未同步，导致 6 个已合规的 agent 被误报为"绕过统一调度器"，ci:check 长期假红。
+ * 现在两个签名都接受（assembleMaterialState 为首选），真正的绕过程序由
+ * scripts/verifyMaterialAssemblyEntry.js 按 agent 名单逐一断言。
+ */
 function checkAgentsUseScheduler() {
-    console.log('\n=== 校验4：所有Agent文件必须调用 scheduleMaterials ===');
+    console.log('\n=== 校验4：所有Agent文件必须通过统一装配入口取素材 ===');
     for (const relPath of AGENT_FILES) {
         const content = readFile(relPath);
         if (!content) { error(`无法读取 ${relPath}`); continue; }
         const fileName = path.basename(relPath);
-        if (content.includes('scheduleMaterials')) ok(`${fileName} 调用 scheduleMaterials`);
-        else error(`${fileName} 未调用 scheduleMaterials — 绕过统一调度器！`);
+        if (content.includes('assembleMaterialState')) ok(`${fileName} 走单点装配入口 assembleMaterialState`);
+        else if (content.includes('scheduleMaterials')) ok(`${fileName} 调用 scheduleMaterials`);
+        else error(`${fileName} 未走统一装配入口（assembleMaterialState/scheduleMaterials）— 可能绕过统一调度器！`);
     }
 }
 
