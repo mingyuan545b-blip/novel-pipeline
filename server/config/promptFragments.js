@@ -1,4 +1,6 @@
 const { detectGenre, getGenreById } = require('../services/genreConfig');
+const namingQualitySpec = require('../services/namingQualitySpec');
+const { buildCraftGuidance } = require('../services/craftQualitySpec');
 
 const CREATION_STANDARDS_TEMPLATE = `【素材创作标准（新建素材必须满足）——按角色等级差异化！】
 - ⭐ 主角(character + roleLevel:"protagonist"): 必须包含以下全部标签，至少{{PROTAGONIST_WORD_COUNT}}字：
@@ -56,7 +58,10 @@ function resolve(genreId) {
         IS_DEPTH_PROFILE: !!(cp.supportingWriterPrinciples),
         WORLDVIEW_TEMPLATE: cp.worldviewTemplate || '',
         NAMING_TEMPLATE: cp.namingTemplate || '',
-        FLAVOR_TEMPLATE: cp.flavorTemplate || ''
+        FLAVOR_TEMPLATE: cp.flavorTemplate || '',
+        // 2026-10-08：命名与人物工艺的判定标准（单一源在 namingQualitySpec / craftQualitySpec）
+        NAMING_GUIDANCE: namingQualitySpec.buildNamingGuidance(namingQualitySpec.inferEraKey(genreId)),
+        CRAFT_GUIDANCE: buildCraftGuidance(),
     };
 }
 

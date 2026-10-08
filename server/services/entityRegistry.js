@@ -12,6 +12,8 @@ const MERGEABLE_FIELDS = [
     'scopeWorldId', 'locationSlot', 'bindMedium',
     // 人物魅力系统4维度
     'charisma', 'philosophy', 'quoteLibrary', 'entranceDesign',
+    // 口头禅/名梗（设计期产出 + 编年史回流）
+    'catchphrases',
     // 高光时刻（编年史回流）
     'highlightScenes',
 ];

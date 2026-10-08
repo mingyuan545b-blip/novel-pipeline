@@ -1,7 +1,7 @@
 /**
  * entityCraftReflow 单元测试 — 台词库/高光场景回流合并
  */
-const { mergeQuoteLibrary, mergeHighlights, buildCraftPatch } = require('../../server/services/entityCraftReflow');
+const { mergeQuoteLibrary, mergeHighlights, mergeCatchphrases, buildCraftPatch } = require('../../server/services/entityCraftReflow');
 
 const good = { speaker: '方源', scene: '抉择', quote: '路就在脚下', why: '点明绝不回头的道' };
 
@@ -36,6 +36,19 @@ describe('mergeHighlights', () => {
         ]);
         expect(r.added).toBe(0);
         expect(r.highlightScenes).toEqual([]);
+    });
+});
+
+describe('mergeCatchphrases', () => {
+    const c1 = { text: '这账，平了才叫结', trigger: '面对赖账的人时', why: '因为他是记账人，所以宁可当恶人，也不肯留一笔糊涂账' };
+    test('只收过三问的，按 text 去重', () => {
+        const r = mergeCatchphrases([c1], [c1, { text: '上车。', trigger: '催促时', why: '因为急着走所以宁可催也不等' }]);
+        expect(r.added).toBe(0);
+        expect(r.catchphrases).toHaveLength(1);
+    });
+    test('过场句/现代梗不回流', () => {
+        const r = mergeCatchphrases([], [{ text: 'yyds', trigger: '夸人', why: '因为他是铁粉，所以宁可吹也不黑' }]);
+        expect(r.added).toBe(0);
     });
 });
 

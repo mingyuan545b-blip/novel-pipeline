@@ -17,6 +17,8 @@ const REGISTRY_SYNC_FIELDS = [
     'factionName', 'genreId', 'behaviorRules', 'lifecycleState',
     // 人物魅力系统4维度（参考蛊真人方源设计）
     'charisma', 'philosophy', 'quoteLibrary', 'entranceDesign',
+    // 口头禅/名梗（2026-10-08）
+    'catchphrases',
     // 高光时刻 + 副本归属（实体中心列表/详情需要）
     'highlightScenes', 'scopeWorldId', 'locationSlot', 'bindMedium',
 ];
@@ -103,7 +105,7 @@ async function syncToRegistry(entity, force = false) {
 /** 合并已有实体的字段（占位/空值不覆盖已有好数据） */
 async function mergeExistingEntity(center, existing, defaults) {
     const updates = {};
-    const mergeableFields = ['position', 'scopeWorldId', 'locationSlot', 'bindMedium', 'personality', 'speakingTone', 'signatureDetail', 'craftStyle', 'sourceContent', 'behaviorRules', 'charisma', 'philosophy', 'quoteLibrary', 'highlightScenes', 'entranceDesign'];
+    const mergeableFields = ['position', 'scopeWorldId', 'locationSlot', 'bindMedium', 'personality', 'speakingTone', 'signatureDetail', 'craftStyle', 'sourceContent', 'behaviorRules', 'charisma', 'philosophy', 'quoteLibrary', 'highlightScenes', 'entranceDesign', 'catchphrases'];
     // P1-D：默认值必须"有意义"才写入；"无 | 无" 等占位词不得覆盖已有好值
     for (const field of mergeableFields) { if (hasMeaningfulValue(defaults[field]) && defaults[field] !== existing[field]) updates[field] = defaults[field]; }
     if (defaults.genreState && typeof defaults.genreState === 'object') updates.genreState = { ...existing.genreState, ...defaults.genreState };

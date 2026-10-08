@@ -91,6 +91,9 @@
 | 结尾跳时烂尾/伏笔回收章超出总章数 | [12 §三 Stage3 + §七 7.5](sop/12-创作工艺与反AI化规范.md) | `services/pipeline/foreshadowFeasibility.js` |
 | 笑点配额被当成"均匀撒糖" | [12 §五 5.4 + §七 7.2](sop/12-创作工艺与反AI化规范.md) | `constraintPresets.js` `comedy-adaptive` |
 | **高光/名言写成流水账或评论腔**（"展现了…""上车。"） | [12 §8.3](sop/12-创作工艺与反AI化规范.md) + [编年史设计 §十](design/角色编年史升级-多维分层与素材质检.md) | `services/craftQualitySpec.js`（判定标准单一源）+ `validateHighlights.js` + `validateQuotes.js` + `entityCraftReflow.js`（过质检才回流） |
+| **名字烂大街/跨项目复用**（萧炎/龙傲天/沈砚/顾清寒/柳如烟） | [12 §8.3](sop/12-创作工艺与反AI化规范.md) + [编年史设计 §十一](design/角色编年史升级-多维分层与素材质检.md) | `services/namingQualitySpec.js`（禁用名单+时代取法+命名三问，注入生成端）+ `scripts/audit-character-names.js`（只读体检） |
+| **设计期角色工艺为空 → 写手只能写流水账** | [12 §8.3/§8.7](sop/12-创作工艺与反AI化规范.md) | `services/craftDesigner.js`（批量补设计，初始化自动跑）+ `scripts/designCharacterCraft.js --generate --apply` |
+| **写手不知道读者要什么（一眼AI文）** | [12 §七 7.6](sop/12-创作工艺与反AI化规范.md) | `services/narrativePromiseDesigner.js` → `project.narrativePromise` → `prompts/narrativePromise.js` 注入所有 agent |
 | 冲突套路重复（被动打脸连续） | [08 §二 M2](sop/08-约束执行规范.md) + [00 #42](sop/00-陷阱清单.md) | `detectors/detectConflictPatternRepeat.js` |
 | 章节衔接断裂（开头与上章结尾不连贯） | [08 §二 M3](sop/08-约束执行规范.md) + [04 §6.8](sop/04-bug修复.md) + [00 #41](sop/00-陷阱清单.md) | `detectors/detectChapterCoherence.js` |
 | 抽象抒情泛滥（时间静止/命运齿轮） | [08 §二 M4](sop/08-约束执行规范.md) | `detectors/detectAbstractSentiment.js` |

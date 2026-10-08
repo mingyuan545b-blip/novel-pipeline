@@ -1,6 +1,6 @@
 /**
  * chronicleDimensions.js — 编年史维度定义与抽取（纯函数，供组件与 Tab 共用）
- * 8 个维度：立场 / 立场转变 / 心理变化 / 日常 / 高光时刻 / 名言台词 / 事迹 / 关系变化
+ * 9 个维度：立场 / 立场转变 / 心理变化 / 日常 / 高光时刻 / 名言台词 / 口头禅名梗 / 事迹 / 关系变化
  */
 export const DIMENSIONS = [
     { key: 'stance', label: '立场', icon: '🎯', color: '#00c8ff' },
@@ -9,6 +9,7 @@ export const DIMENSIONS = [
     { key: 'daily', label: '日常', icon: '🍵', color: '#4ecdc4' },
     { key: 'highlight', label: '高光时刻', icon: '✨', color: '#a29bfe' },
     { key: 'quote', label: '名言台词', icon: '💬', color: '#8ab4f8' },
+    { key: 'catchphrase', label: '口头禅名梗', icon: '🗣', color: '#f7b731' },
     { key: 'deed', label: '事迹', icon: '⚔', color: '#ff9f43' },
     { key: 'relation', label: '关系变化', icon: '🔗', color: '#ff6b9d' },
 ];
@@ -19,7 +20,7 @@ export const DIMENSIONS = [
  * 三个档位看起来完全相同。现在按档位收敛展示面：
  *   精简(minimal): 只提取/展示主角+核心反派的立场；
  *   基础(basic)  : 立场 + 日常 + 心理变化；
- *   完整(full)   : 全 8 维（含立场转变/高光/名言/事迹/关系）。
+ *   完整(full)   : 全 9 维（含立场转变/高光/名言/口头禅/事迹/关系）。
  */
 export const LEVEL_DIMENSIONS = {
     minimal: ['stance'],
@@ -31,7 +32,7 @@ export const LEVEL_DIMENSIONS = {
 export const LEVEL_HINTS = {
     minimal: '仅主角+核心反派的立场',
     basic: '立场 / 日常 / 心理变化',
-    full: '全 8 维：立场 / 转变 / 心理 / 日常 / 高光 / 名言 / 事迹 / 关系',
+    full: '全 9 维：立场 / 转变 / 心理 / 日常 / 高光 / 名言 / 口头禅 / 事迹 / 关系',
 };
 
 /** 档位允许的维度 key（未知档位按完整处理） */
@@ -67,6 +68,11 @@ export function itemsOf(entry, key) {
             return fromList(entry.quotes, q => {
                 const x = typeof q === 'string' ? { quote: q } : q;
                 return { ...base, scene: x.scene, text: `“${x.quote}”`, note: x.why };
+            });
+        case 'catchphrase':
+            return fromList(entry.catchphrases, c => {
+                const x = typeof c === 'string' ? { text: c } : c;
+                return { ...base, scene: x.trigger, text: `「${x.text}」`, note: x.why };
             });
         case 'deed':
             return fromList(entry.deeds, d => ({ ...base, text: typeof d === 'string' ? d : (d && (d.text || d.what)) }));

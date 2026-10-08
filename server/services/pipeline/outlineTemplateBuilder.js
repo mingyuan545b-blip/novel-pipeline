@@ -80,7 +80,7 @@ async function buildMaterialSystemPromptWithProject(genre, typeListStr, constrai
 
 function buildMaterialUserPrompt(project, userPrompt, genre) {
     const vars = require('../../config/promptFragments').resolve(genre);
-    return `小说名称：${project.name}\n类型：${project.genre}\n描述：${project.description}\n\n用户需求：${userPrompt}\n\n【重要】character类型素材必须设置以下字段：\n1. isMainCharacter: 甜宠/言情/双强题材男女主都设为true（双主角），其他题材只有1个角色设为true\n2. roleLevel: 主角设为"protagonist"，重要配角设为"supporting"，其他设为"npc"。甜宠/言情题材男女主都设为"protagonist"\n3. 不同roleLevel的角色必须按照上方分级要求填写不同详细程度的内容！主角${vars.PROTAGONIST_WORD_COUNT}字+，配角${vars.SUPPORTING_WORD_COUNT}字+，NPC${vars.NPC_WORD_COUNT}字+`;
+    return `小说名称：${project.name}\n类型：${project.genre}\n描述：${project.description}\n\n用户需求：${userPrompt}\n\n【重要】character类型素材必须设置以下字段：\n1. isMainCharacter: 甜宠/言情/双强题材男女主都设为true（双主角），其他题材只有1个角色设为true\n2. roleLevel: 主角设为"protagonist"，重要配角设为"supporting"，其他设为"npc"。甜宠/言情题材男女主都设为"protagonist"\n3. 不同roleLevel的角色必须按照上方分级要求填写不同详细程度的内容！主角${vars.PROTAGONIST_WORD_COUNT}字+，配角${vars.SUPPORTING_WORD_COUNT}字+，NPC${vars.NPC_WORD_COUNT}字+${'\n\n'}${vars.NAMING_GUIDANCE}${'\n\n'}${vars.CRAFT_GUIDANCE}`;
 }
 
 // P1-4b 远景粗纲约束：规划一次覆盖 N 章时，后续章节的素材还没长出来，

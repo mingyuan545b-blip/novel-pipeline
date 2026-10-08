@@ -10,6 +10,7 @@
  */
 const { validateQuotes, dedupeQuotes } = require('./validateQuotes');
 const { validateHighlights, dedupeHighlights } = require('./validateHighlights');
+const { validateCatchphrases, dedupeCatchphrases } = require('./validateCatchphrases');
 
 /** 合并台词库：只收录"名言三问"合格的名言，并按 quoteKey 去重 */
 function mergeQuoteLibrary(existing, incoming) {
@@ -29,6 +30,15 @@ function mergeHighlights(existing, incoming) {
     return { highlightScenes: merged, added: added.length };
 }
 
+/** 合并口头禅/名梗：只收录过"口头禅三问"的，按 text 去重 */
+function mergeCatchphrases(existing, incoming) {
+    const base = Array.isArray(existing) ? existing : [];
+    const { items } = validateCatchphrases(incoming);
+    if (items.length === 0) return { catchphrases: base, added: 0 };
+    const { merged, added } = dedupeCatchphrases(base, items);
+    return { catchphrases: merged, added: added.length };
+}
+
 /** 依编年史条目计算实体素材补丁（仅在有新增时给出字段，避免空写） */
 function buildCraftPatch(entity, entry) {
     const patch = {};
@@ -36,7 +46,9 @@ function buildCraftPatch(entity, entry) {
     if (q.added > 0) patch.quoteLibrary = q.quoteLibrary;
     const h = mergeHighlights(entity?.highlightScenes, entry?.highlights);
     if (h.added > 0) patch.highlightScenes = h.highlightScenes;
+    const c = mergeCatchphrases(entity?.catchphrases, entry?.catchphrases);
+    if (c.added > 0) patch.catchphrases = c.catchphrases;
     return patch;
 }
 
-module.exports = { mergeQuoteLibrary, mergeHighlights, buildCraftPatch };
+module.exports = { mergeQuoteLibrary, mergeHighlights, mergeCatchphrases, buildCraftPatch };

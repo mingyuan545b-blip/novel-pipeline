@@ -110,7 +110,20 @@ async function generateInitialMaterials(projectId, userPrompt) {
             apiConfig: await getOutlineApiConfig(),
             roleWordCounts: { protagonist: cp.protagonistWordCount, supporting: cp.supportingWordCount, npc: cp.npcWordCount },
         });
-        return { created, count: created.length, syncedFacts, depthStats, batches: batchResults };
+        const apiConfig = await getOutlineApiConfig();
+        // 设计期补设计（2026-10-08）：人物工艺（人格魅力/哲学观/金句库/高光场景/口头禅）——不达标才花 token
+        let craftStats = null;
+        try {
+            const { designCharacterCraft } = require('../craftDesigner');
+            craftStats = await designCharacterCraft(projectId, { apply: true, apiConfig });
+        } catch (e) { logger.warn('outlineGen', `craft designer failed: ${e.message}`); }
+        // 立项四件（叙事承诺）：缺失才生成，注入所有 agent 防"一眼AI文"
+        let promiseStats = null;
+        try {
+            const { designNarrativePromise } = require('../narrativePromiseDesigner');
+            promiseStats = await designNarrativePromise(projectId, { apply: true, apiConfig });
+        } catch (e) { logger.warn('outlineGen', `narrative promise failed: ${e.message}`); }
+        return { created, count: created.length, syncedFacts, depthStats, craftStats, narrativePromise: promiseStats, batches: batchResults };
     } catch (e) {
         return { created, count: created.length, batches: batchResults, error: e.message };
     }

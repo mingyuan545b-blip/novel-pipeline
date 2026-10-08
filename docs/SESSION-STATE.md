@@ -3,12 +3,45 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-10-08（**高光/名言/魅力判定标准落地：让编年史提取"认识什么算高光"**，见 §一 0q）
+> 最后更新：2026-10-09（**建项目即产出好工艺+好名字：设计期补设计 / 命名质量 / 口头禅入编年史**，见 §一 0r）
+> 上一轮：高光/名言/魅力判定标准落地（2026-10-08，见 0q）
 > 上一轮：素材链路 T1→T6 施工完成（2026-10-07，见 0p）；字段单一源 S1→S8（2026-10-07，见 0o）
 
 ---
 
 ## 一、当前结论（重要）
+
+0r. **（2026-10-09 本会话）设计期补设计 + 命名质量 + 口头禅入编年史（用户："保证下个窗口建项目不产流水账/AI文/烂名字"）**
+   - **已把前两批未提交改动提交**：`3eb5e50`（素材链路 T1→T6，上一会话遗留）+ `e934754`（高光/名言/魅力判定标准）。
+   - **补设计（此前是空转的根因）**：设计期 `charisma/philosophy/quoteLibrary/highlightScenes` 普遍为空 →
+     写手没依据只能写流水账（garbage in）。新增 `services/craftDesigner.js`：对未达标的主角/配角**一次批量 LLM** 产出
+     6 项工艺，**只填空缺、过 validateQuotes/validateHighlights/validateCatchphrases 才落库**；
+     `materialGenerator.generateInitialMaterials` 末尾**自动执行**（无缺口零调用）。
+     CLI：`node scripts/designCharacterCraft.js --project <id> --generate [--apply]`。
+   - **立项四件**：新增 `services/narrativePromiseDesigner.js` 生成"读者承诺/差异化卖点/主循环/情绪配方"落
+     `project.narrativePromise`（此前**从没人写** → `narrativePromise.js` 注入块恒被跳过 → 写手不知道读者要什么）；
+     初始化时自动跑（缺才生成）。
+   - **命名质量（用户点名）**：新增 `services/namingQualitySpec.js`——禁用名单（萧炎/龙傲天/叶凡/叶辰/韩立/沈砚/顾清寒/柳如烟/
+     林晓/陈默/慕容轩…）、流水线拼名正则（"顾清寒"式/复姓套餐）、**按时代风格的取法**（仙侠/武侠/志怪/民国/都市/西幻/科幻，
+     示例取法参考《墓王之王》骆时秋/寒千落/风满楼/烛九阴/陈梦飞/齐庆疾/南锦屏）、命名三问（时代感/无同款/可反推身份）、
+     `buildNamingGuidance()`；接入 `namingStyleRegistry`（风格块+审核块）、`outlineConstants.TYPE_NAMING_RULES.character`、
+     `outlineTemplateBuilder.buildMaterialUserPrompt`、`promptFragments.resolve`。
+     新增只读体检 `scripts/audit-character-names.js`（禁用名/跨项目重名/姓氏扎堆，`--strict` 可接 CI）。
+   - **名梗进编年史**：新增 `services/validateCatchphrases.js`（口头禅三问：可复用/有辨识度/长在题材里，禁过场句与现代网络梗）；
+     编年史 8→**9 维**（多"口头禅名梗"）：extractor prompt/归一、`characterChronicle` 落库、`entityCraftReflow` 回流、
+     实体新增 `catchphrases` 字段（entityCRUD/behaviorRules/registry/formatters/fieldRegistry）、前端 `chronicleDimensions` + 测试。
+   - **实测取证**：`node scripts/audit-character-names.js` → 40 角色 **违规 6**（席准/岑野/沈砚/柳三娘命中禁用名单、林渊命中流水线名）、
+     **跨项目重名 1**（沈砚出现在 2 个项目）、姓氏扎堆 3（老/苏/林×4）。**按指令不修存量**。
+   - **回归**：后端 **261 套件/3996 用例全绿**（较上场 256/3964，+5 套件 +32 例）；新增测试 5 个文件
+     （namingQualitySpec / validateCatchphrases / craftDesigner / narrativePromiseDesigner / characterNameAudit）；
+     `eslint server/ scripts/ --max-warnings=0` 通过；PROJECT_STANDARDS 0 error；iron-law `--pre-deliver` 无违反；
+     hardcode 0（超 200 行文件 0——期间把 characterStateExtractor/outlineTemplateBuilder 拆分压回 ≤200）；词汇表 0 违规；
+     前端 `chronicleDimensions` 8/8 通过。
+   - **⚠️ 未完成 / 下个窗口注意**：① writer 侧"每章一个可截图瞬间"配额（**M11**）仍未接；
+     ② 存量项目工艺/命名未回填（用户要求不修）；③ 建新项目时初始化会多两次 LLM 调用（工艺补设计 + 立项四件），
+     无缺口/已齐备时零调用；④ `designCharacterCraft --generate` 未经真实 LLM 端到端跑（本地未验证真实产出质量，
+     只验证了闸门与纯函数）——**下个窗口建项目时应看日志 `[craftDesigner]`/`[narrativePromise]` 确认实际落库**。
+   - 详见 `docs/design/角色编年史升级-多维分层与素材质检.md` §十一、`docs/sop/12` §8.3/§8.7。
 
 0q. **（2026-10-08 本会话）高光/名言/魅力"判定标准"落地——把"什么算高光/名言"写进 prompt（用户反馈）**
    - **用户诉求**：编年史的高光/名言"怎么定义的？"；参考《凡人修仙传》"人生如棋，落子无悔"、《英雄联盟》卡蜜尔

@@ -1,10 +1,16 @@
 import { DIMENSIONS, itemsOf, dimensionCounts, dimensionsForLevel, dimensionKeysForLevel } from '../../pages/entitycenter/chronicleDimensions';
 
 describe('chronicleDimensions', () => {
-    test('8 个维度定义', () => {
+    test('9 个维度定义（2026-10-08 增"口头禅名梗"）', () => {
         expect(DIMENSIONS.map(d => d.key)).toEqual(
-            ['stance', 'shift', 'psychology', 'daily', 'highlight', 'quote', 'deed', 'relation']
+            ['stance', 'shift', 'psychology', 'daily', 'highlight', 'quote', 'catchphrase', 'deed', 'relation']
         );
+    });
+    test('itemsOf 口头禅/名梗', () => {
+        const e = { chapterNumber: 4, entityName: '陈梦飞', catchphrases: [{ text: '这账，平了才叫结', trigger: '面对赖账的人时', why: '记账人的世界观' }] };
+        const it = itemsOf(e, 'catchphrase');
+        expect(it).toHaveLength(1);
+        expect(it[0]).toMatchObject({ scene: '面对赖账的人时', text: '「这账，平了才叫结」', note: '记账人的世界观' });
     });
     test('itemsOf 标量维度', () => {
         const e = { chapterNumber: 5, entityName: '沈砚', stance: '查真相', innerConflict: '怕被算清' };
@@ -28,12 +34,12 @@ describe('chronicleDimensions', () => {
     test('档位收敛展示维度（修"基础/精简/完整都一个样"）', () => {
         expect(dimensionKeysForLevel('minimal')).toEqual(['stance']);
         expect(dimensionKeysForLevel('basic')).toEqual(['stance', 'daily', 'psychology']);
-        expect(dimensionKeysForLevel('full')).toHaveLength(8);
+        expect(dimensionKeysForLevel('full')).toHaveLength(9);
         // 三个档位展示面必须互不相同
         expect(dimensionsForLevel('minimal').map(d => d.key)).not.toEqual(dimensionsForLevel('basic').map(d => d.key));
         expect(dimensionsForLevel('basic').map(d => d.key)).not.toEqual(dimensionsForLevel('full').map(d => d.key));
         // 未知档位按完整处理
-        expect(dimensionKeysForLevel(undefined)).toHaveLength(8);
+        expect(dimensionKeysForLevel(undefined)).toHaveLength(9);
     });
     test('dimensionCounts 按档位只统计可见维度', () => {
         const data = [{ stance: 'x', quotes: ['a'], deeds: ['d'] }];

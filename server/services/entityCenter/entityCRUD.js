@@ -51,6 +51,7 @@ async function getOrCreateEntity(center, projectId, entityType, name, defaults =
         quoteLibrary: defaults.quoteLibrary || [],   // 金句库：预设代表性金句+适用场景
         highlightScenes: defaults.highlightScenes || [], // 高光时刻：名场面/高光场景（运行期由编年史回流）
         entranceDesign: defaults.entranceDesign || '', // 出场设计：出场方式和标志性场景
+        catchphrases: defaults.catchphrases || [], // 口头禅/名梗：可复用的招牌话（设计期产出 + 编年史回流）
         genreState: defaults.genreState || (genreId ? buildGenreStateDefaults(genreId) : {}),
         profile: defaults.profile || {}, bindsSummary: [], relationsSummary: [],
         behaviorRules: defaults.behaviorRules || '',

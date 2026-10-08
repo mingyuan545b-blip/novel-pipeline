@@ -122,7 +122,13 @@ function _buildDetailText(entity) {
     if (Array.isArray(entity.highlightScenes) && entity.highlightScenes.length > 0) {
         lines.push('高光时刻:');
         for (const h of entity.highlightScenes) {
-            lines.push(`  【${h.scene || '名场面'}】${h.what}${h.why ? '（' + h.why + '）' : ''}`);
+            lines.push(`  【${h.scene || '名场面'}】${h.what}${h.cost ? `（代价：${h.cost}）` : ''}${h.why ? '（' + h.why + '）' : ''}`);
+        }
+    }
+    if (Array.isArray(entity.catchphrases) && entity.catchphrases.length > 0) {
+        lines.push('口头禅/名梗:');
+        for (const c of entity.catchphrases) {
+            lines.push(`  「${c.text}」${c.trigger ? `（${c.trigger}）` : ''}`);
         }
     }
 

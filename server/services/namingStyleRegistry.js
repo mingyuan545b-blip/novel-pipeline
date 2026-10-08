@@ -1,4 +1,6 @@
 const { GENRE_NAMING_MAP, inferFromGenre } = require('./namingGenreMap');
+// 禁用名单/判定标准/时代取法：单一数据源在 namingQualitySpec（2026-10-08）
+const namingSpec = require('./namingQualitySpec');
 
 const NAMING_STYLES = {
     classical: {
@@ -53,14 +55,15 @@ function _generateSamples(style, count = 3) {
     return samples;
 }
 
+/** 命名风格 id → 时代/风格键（用 namingQualitySpec 的取法与禁用名单判定） */
+const ERA_FROM_STYLE = { classical: 'minguo', fantasy: 'xianxia', wuxia: 'wuxia', scifi: 'scifi', modern: 'urban' };
+
 function validateName(name, styleId) {
     const style = get(styleId);
-    if (!style) return { valid: true, warnings: [] };
-    const warnings = [];
-    const AI高频名 = ['林晓', '苏雨', '陈默', '顾言', '叶凡', '苏瑶', '林夕', '李默', '王浩', '张伟'];
-    if (AI高频名.includes(name)) warnings.push(`"${name}"是AI高频名，建议更换`);
-    const 烂梗名 = ['龙傲天', '叶辰', '柳如烟', '萧炎', '唐三', '林动', '石昊'];
-    if (烂梗名.includes(name)) warnings.push(`"${name}"是网文烂梗名，必须更换`);
+    const eraKey = ERA_FROM_STYLE[styleId] || namingSpec.inferEraKey(styleId);
+    const r = namingSpec.validateName(name, eraKey);
+    const warnings = [...r.issues];
+    if (!style && styleId) warnings.push(`未知命名风格：${styleId}`);
     return { valid: warnings.length === 0, warnings };
 }
 
@@ -83,7 +86,8 @@ async function buildCombinedPromptBlock(projectId) {
     if (!style) return '';
     const block = buildPromptBlock(styleId, 'high');
     const warnings = _buildAINameWarnings();
-    return block + (warnings ? '\n' + warnings : '');
+    const eraGuide = namingSpec.buildNamingGuidance(namingSpec.inferEraKey(genreId));
+    return block + (warnings ? '\n' + warnings : '') + '\n' + eraGuide;
 }
 
 async function buildCombinedReviewBlock(projectId) {
@@ -94,13 +98,13 @@ async function buildCombinedReviewBlock(projectId) {
     const styleId = inferFromGenre(genreId);
     const style = get(styleId);
     if (!style) return '';
-    return `【命名审核·${style.label}】检查角色名是否符合${style.label}风格，排除AI高频名和烂梗名`;
+    return `【命名审核·${style.label}】检查角色名是否符合${style.label}风格，并逐个过"命名三问"：`
+        + namingSpec.NAME_TESTS.map(t => t.name).join('/')
+        + `。命中禁用名单或流水线拼名（如"顾清寒"式）→ 报 hardIssue。`;
 }
 
 function _buildAINameWarnings() {
-    const aiNames = ['林晓', '苏雨', '陈默', '顾言', '叶凡', '苏瑶', '林夕', '李默', '王浩', '张伟'];
-    const memeNames = ['龙傲天', '叶辰', '柳如烟', '萧炎', '唐三', '林动', '石昊'];
-    return `【禁止使用的AI高频名】${aiNames.join('、')}\n【禁止使用的烂梗名】${memeNames.join('、')}`;
+    return `【禁用名（出现即不合格）】${namingSpec.BANNED_NAMES.join('、')}`;
 }
 
 function list() { return getAllStyles(); }

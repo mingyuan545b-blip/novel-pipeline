@@ -28,6 +28,7 @@ const FIELD_ALIASES = Object.freeze({
     '金句库': ['金句', '代表性金句'],
     '出场设计': ['出场方式', '出场场景', '首次出场'],
     '高光场景': ['高光时刻', '名场面'],
+    '口头禅': ['名梗', '招牌话', '口头语', '口头习惯'],
     '代价/限制': ['代价', '限制'],
     '升级条件': ['进阶条件', '突破条件'],
     '功能': ['效果', '作用'],
@@ -50,6 +51,7 @@ const FIELD_MAPPINGS = Object.freeze({
     '金句库': { entityKey: 'quoteLibrary', stateJsonKey: 'quoteLibrary', pgColumn: null },
     '出场设计': { entityKey: 'entranceDesign', stateJsonKey: 'entranceDesign', pgColumn: null },
     '高光场景': { entityKey: 'highlightScenes', stateJsonKey: 'highlightScenes', pgColumn: null },
+    '口头禅': { entityKey: 'catchphrases', stateJsonKey: 'catchphrases', pgColumn: null },
 });
 
 // 生成端提示语（追加到题材 prompt tags，保证"校验要什么、prompt 就说什么"）

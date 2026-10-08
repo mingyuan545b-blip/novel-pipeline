@@ -3,7 +3,7 @@
  * 从AI返回的文本中提取结构化角色字段
  */
 
-const { extractLabeledFields } = require('./characterStateLabeledFields');
+const { extractLabeledFields, splitQuoteMemoryPoint, parseCatchphraseText } = require('./characterStateLabeledFields');
 
 /**
  * 从【金句库】标签提取金句列表
@@ -13,17 +13,6 @@ const { extractLabeledFields } = require('./characterStateLabeledFields');
  *   - 纯金句（无场景标注）归为通用场景
  * 返回：[{ scene, quote }, ...]
  */
-/**
- * 拆出金句尾部的"（记忆点）"——设计模板要求每条金句带为什么记得住。
- * 形如 `绝境：人生如棋，落子无悔（他一生都在替别人算账）` → why="他一生都在替别人算账"
- */
-function splitQuoteMemoryPoint(raw) {
-    const text = String(raw || '').trim();
-    const m = text.match(/^(.+?)\s*[（(]([^（()）]{4,})[)）]\s*$/);
-    if (!m) return { quote: text.replace(/[。.；;]$/, ''), why: '' };
-    return { quote: m[1].trim().replace(/[。.；;]$/, ''), why: m[2].trim() };
-}
-
 function extractQuoteLibrary(content) {
     if (!content) return [];
     // 截取【金句库】到下一个【XX】标签或文本结尾
@@ -153,6 +142,13 @@ function extractCharacterStateFromContent(content, schema) {
         if (what) state.highlightScenes = [{ scene: '高光场景', what }];
     }
     delete state.highlightSceneText;
+
+    // 口头禅/名梗：标签型多行文本 → 结构化 [ { text, trigger, why } ]
+    if (state.catchphraseText && !state.catchphrases) {
+        const parsed = parseCatchphraseText(state.catchphraseText);
+        if (parsed.length > 0) state.catchphrases = parsed;
+    }
+    delete state.catchphraseText;
 
     // 金句库独立提取（多句多场景，无法用单行正则）
     const quoteLibrary = extractQuoteLibrary(content);

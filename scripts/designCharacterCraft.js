@@ -10,8 +10,10 @@
  *   node scripts/designCharacterCraft.js --help                 # 用法
  *   node scripts/designCharacterCraft.js [--project <id>]       # 体检（只读）
  *   node scripts/designCharacterCraft.js --json                 # JSON 输出
- *   node scripts/designCharacterCraft.js --emit-prompt          # 打印设计模板
+ *   node scripts/designCharacterCraft.js --emit-prompt          # 打印设计模板 + 判定标准
  *   node scripts/designCharacterCraft.js --strict               # 主角缺工艺则退出码=1
+ *   node scripts/designCharacterCraft.js --project <id> --generate          # LLM 补设计（预览）
+ *   node scripts/designCharacterCraft.js --project <id> --generate --apply  # LLM 补设计并落库
  */
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env'), override: true });
@@ -24,6 +26,8 @@ if (argv.includes('--help') || argv.includes('-h')) {
 const AS_JSON = argv.includes('--json');
 const STRICT = argv.includes('--strict');
 const EMIT = argv.includes('--emit-prompt');
+const GENERATE = argv.includes('--generate');
+const APPLY = argv.includes('--apply');
 const pIdx = argv.indexOf('--project');
 const PROJECT = pIdx >= 0 ? String(argv[pIdx + 1] || '') : '';
 
@@ -80,6 +84,17 @@ function checkEntity(entity) {
     const { initPgPool } = require('../server/db/pgPool');
     await initPgPool(process.env.DATABASE_URL);
     const store = require('../server/store');
+
+    // --generate：LLM 补设计（默认预览，--apply 落库）
+    if (GENERATE) {
+        if (!PROJECT) { console.log('[craft-design] --generate 需要 --project <id>'); process.exit(1); }
+        const { designCharacterCraft } = require('../server/services/craftDesigner');
+        const stats = await designCharacterCraft(PROJECT, { apply: APPLY });
+        console.log(`[craft-design] 目标 ${stats.targets} / 候选 ${stats.proposals.length} / 写入 ${stats.applied}${APPLY ? '' : '（预览；加 --apply 落库）'}`);
+        for (const p of stats.proposals) console.log(`  - ${p.name}: ${p.fields.join('/')}`);
+        if (STRICT && !APPLY && stats.proposals.length > 0) process.exit(1);
+        return;
+    }
 
     let entities = await store.queryItems('entities', { entityType: 'character' });
     if (PROJECT) entities = entities.filter(e => e.projectId === PROJECT);

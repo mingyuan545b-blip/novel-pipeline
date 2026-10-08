@@ -28,6 +28,13 @@ describe('parseChronicleResponse 多维归一化', () => {
             why: '因为他怕线索断，所以宁可违规，也不肯放走证人'
         });
     });
+    test('catchphrases（口头禅/名梗）归一', () => {
+        const out = parseChronicleResponse(JSON.stringify([
+            { name: '沈砚', stance: '查真相', catchphrases: [{ text: '这账，平了才叫结', trigger: '面对赖账的人时', why: '记账人的世界观' }, { text: '' }] }
+        ]), 6);
+        expect(out[0].catchphrases).toHaveLength(1);
+        expect(out[0].catchphrases[0]).toEqual({ text: '这账，平了才叫结', trigger: '面对赖账的人时', why: '记账人的世界观' });
+    });
     test('新格式 quotes 对象 + highlights/relations 保留', () => {
         const out = parseChronicleResponse(JSON.stringify([
             {
@@ -72,5 +79,9 @@ describe('full 档提示词：把"什么是高光/名言"写进 prompt（防回�
         expect(p).toContain('"cost"');
         expect(p).toContain('"speaker"');
         expect(p).toContain('逐字');
+    });
+    test('含口头禅/名梗维度与禁现代梗', () => {
+        expect(p).toContain('"catchphrases"');
+        expect(p).toContain('口头禅');
     });
 });

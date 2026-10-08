@@ -8,6 +8,7 @@ const llm = require('./llm');
 const logger = require('../shared/logger');
 const { normalizeQuote } = require('./validateQuotes');
 const { normalizeHighlight } = require('./validateHighlights');
+const { normalizeCatchphrase } = require('./validateCatchphrases');
 const { buildCraftGuidance } = require('./craftQualitySpec');
 
 const CHRONICLE_PROMPTS = {
@@ -48,7 +49,7 @@ const CHRONICLE_PROMPTS = {
 
     full: `${buildCraftGuidance()}
 
-【任务】分析章节内容，提取每个出场角色的多维编年史数据（日常/心理变化/立场/立场变化/高光时刻/名言/事迹/关系变化）。
+【任务】分析章节内容，提取每个出场角色的多维编年史数据（日常/心理变化/立场/立场变化/高光时刻/名言/口头禅/事迹/关系变化）。
 
 输出JSON数组，每个元素：
 {
@@ -60,6 +61,7 @@ const CHRONICLE_PROMPTS = {
   "stanceShiftReason": "立场变化：从什么立场变到什么立场+原因（无变化则空字符串）",
   "highlights": [{"scene": "什么处境（≤15字，含压力/代价）", "what": "他做的那个选择（含动作或台词原文，禁概述式罗列）", "cost": "代价或反差：他失去了/放弃了/背负了什么", "why": "因果句：因为他【信念/恐惧】，所以他宁可【做X】，也不【做Y】"}],
   "quotes": [{"speaker": "谁说的", "scene": "说这句话的处境", "quote": "原文逐字引用，不可改写", "why": "这句话暴露了他的哪条信念/哪段代价", "chapter": 本章章号}],
+  "catchphrases": [{"text": "口头禅/名梗原文（简短、能反复出现的招牌话）", "trigger": "什么场合会这么说", "why": "为什么别人说会很怪/只属于他"}],
   "deeds": ["本章关键行为（最多3件，简洁，非流水账）"],
   "relations": [{"target": "对象名", "from": "原关系", "to": "现关系", "reason": "变化原因"}]
 }
@@ -68,6 +70,7 @@ const CHRONICLE_PROMPTS = {
 1. 只提取在章节中有实际出场或被明确提及的角色
 2. quotes 必须原文逐字引用；填 speaker 与 chapter；scene/why 缺失的不收；过场句（"上车。""进去了。""几多钱？"）不收
 3. highlights 只收通过"高光四问（可截图/只有他会做/有代价/不可逆）"的名场面，一章最多2条，没有就 []
+3b. catchphrases 只收能反复出现的口头禅/招牌话（不是一次性对白，不是过场句），禁现代网络梗（yyds/内卷/KPI/破防）；没有就 []
 4. why 一律禁止评论腔（展现/体现/凸显/彰显/标志着/生动/侧面/营造/渲染/立住/暗示/铺垫/推动剧情/刻画）
 5. 禁止现代网络梗与抽象升华式台词；台词要能反推说话人的身份/处境
 6. 立场转变原因要具体，说明从什么立场转变到什么立场
@@ -121,6 +124,8 @@ function _normalizeEntry(item, chapterNumber) {
         .map(q => ({ ...q, speaker: q.speaker || speaker, chapter: q.chapter || chapter }));
     const highlights = (Array.isArray(item.highlights) ? item.highlights : [])
         .map(normalizeHighlight).filter(Boolean);
+    const catchphrases = (Array.isArray(item.catchphrases) ? item.catchphrases : [])
+        .map(normalizeCatchphrase).filter(Boolean);
     const relations = (Array.isArray(item.relations) ? item.relations : [])
         .filter(r => r && (r.target || r.to));
     return {
@@ -131,7 +136,7 @@ function _normalizeEntry(item, chapterNumber) {
         stance: item.stance || '',
         innerConflict: item.innerConflict || '',
         stanceShiftReason: item.stanceShiftReason || '',
-        highlights, quotes, relations,
+        highlights, quotes, catchphrases, relations,
         deeds: Array.isArray(item.deeds) ? item.deeds : []
     };
 }
@@ -149,7 +154,7 @@ function parseChronicleResponse(text, chapterNumber) {
         if (!Array.isArray(parsed)) return [];
         return parsed.map(item => _normalizeEntry(item, chapterNumber)).filter(e =>
             e.name && (e.stance || e.innerConflict || e.daily || e.psychology ||
-                e.quotes.length > 0 || e.highlights.length > 0)
+                e.quotes.length > 0 || e.highlights.length > 0 || e.catchphrases.length > 0)
         );
     } catch (err) {
         logger.warn('chronicle', `Failed to parse chronicle response: ${err.message}`);

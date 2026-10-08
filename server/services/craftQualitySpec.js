@@ -40,6 +40,25 @@ const QUOTE_TESTS = Object.freeze([
 /** 人格魅力：不是形容词，是压力下的选择函数 */
 const CHARISMA_FORM = '当【处境】时，他宁可【做X】，也不【做Y】——且 X 要付代价';
 
+/** 现代网络梗：只准在题材内行话里造梗，禁止把现实网络语塞进正文/名言/口头禅 */
+const MODERN_MEME_WORDS = Object.freeze([
+    'yyds', '绝绝子', '内卷', '躺平', 'emo', 'KPI', 'OKR', '打工人', '社畜', '破防',
+    '栓Q', '蚌埠住了', 'awsl', '爷青回', '我可以', '笑死', '麻了', '整挺好', '真的会谢',
+    '666', '点赞', '差评', '开挂', '氪金', '进度条', '用户体验', '可持续发展', '客服',
+]);
+
+/** 口头禅/名梗三问：可复用 / 有辨识度 / 只属于他 */
+const CATCHPHRASE_TESTS = Object.freeze([
+    { id: 'repeatable', name: '可复用', desc: '它是能反复出现的口头习惯或招牌话，不是一次性对白' },
+    { id: 'recognizable', name: '有辨识度', desc: '单独拎出来就知道是谁说的（别人说会很怪）' },
+    { id: 'in-world', name: '长在题材里', desc: '用世界观内行话造梗，禁现代网络梗（yyds/内卷/KPI/破防）' },
+]);
+
+function hasModernMeme(text) {
+    const s = String(text == null ? '' : text).toLowerCase();
+    return MODERN_MEME_WORDS.some((w) => s.includes(w.toLowerCase()));
+}
+
 function hasCommentaryVoice(text) {
     const s = String(text == null ? '' : text);
     return COMMENTARY_WORDS.some((w) => s.includes(w));
@@ -77,6 +96,11 @@ function buildCraftGuidance() {
 写法固定为：${CHARISMA_FORM}。
 反例（×）："智勇双全、游走于灰色地带"（形容词堆砌，无法执行）。
 
+四、口头禅/名梗＝能反复出现、且只属于他的招牌话（不是一次性对白，也不是网络梗）。
+三问全过才算：${CATCHPHRASE_TESTS.map((t) => `${t.name}=${t.desc}`).join('；')}。
+正例："这账，平了才叫结"（记账人的世界观内行话，别人说会怪）。
+反例（×）："上车。"（过场句）、"yyds/内卷/KPI"（现代网络梗乱入古风）。
+
 四、输出前逐条自检（三步）
 ① 把这条的角色名抹掉，句子还成立吗？成立→删。
 ② why 里有没有评论词（展现/体现/凸显/彰显/标志着/生动/侧面/营造/渲染/暗示/铺垫/推动剧情/刻画）？有→改写成因果句。
@@ -87,10 +111,13 @@ function buildCraftGuidance() {
 module.exports = {
     COMMENTARY_WORDS,
     FILLER_LINE,
+    MODERN_MEME_WORDS,
     HIGHLIGHT_TESTS,
     QUOTE_TESTS,
+    CATCHPHRASE_TESTS,
     CHARISMA_FORM,
     hasCommentaryVoice,
     isFillerLine,
+    hasModernMeme,
     buildCraftGuidance,
 };

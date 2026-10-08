@@ -27,6 +27,8 @@ const LABELED_PATTERNS = [
     [/【?(?:出场设计|出场方式|出场场景|首次出场)[/:：】]\s*([^【\n]{2,400})/, 'entranceDesign'],
     // 高光场景（名场面）——初始设计即产出，此前无映射 → highlightScenes 恒空
     [/【?(?:高光场景|高光时刻|名场面)[/:：】]\s*([^【\n]{2,400})/, 'highlightSceneText'],
+    // 口头禅/名梗（2026-10-08）：可复用的招牌话，非一次性对白
+    [/【?(?:口头禅|名梗|招牌话|口头语|口头习惯)[/:：】]\s*([^【\n]{2,400})/, 'catchphraseText'],
     // 人物四件套（欲望/恐惧/谎言/创伤）——主角设计必填，落 profile
     [/【?(?:欲望|核心欲望|渴望)[/:：】]\s*([^【\n]{2,200})/, 'desire'],
     [/【?(?:恐惧|核心恐惧)[/:：】]\s*([^【\n]{2,200})/, 'fear'],
@@ -56,4 +58,28 @@ function extractLabeledFields(content) {
     return state;
 }
 
-module.exports = { LABELED_PATTERNS, stripLabelResidue, extractLabeledFields };
+/**
+ * 拆出金句尾部的"（记忆点）"——设计模板要求每条金句带为什么记得住。
+ * 形如 `绝境：人生如棋，落子无悔（他一生都在替别人算账）` → why="他一生都在替别人算账"
+ */
+function splitQuoteMemoryPoint(raw) {
+    const text = String(raw || '').trim();
+    const m = text.match(/^(.+?)\s*[（(]([^（()）]{4,})[)）]\s*$/);
+    if (!m) return { quote: text.replace(/[。.；;]$/, ''), why: '' };
+    return { quote: m[1].trim().replace(/[。.；;]$/, ''), why: m[2].trim() };
+}
+
+/** 口头禅/名梗标签文本 → 结构化 [{ text, trigger, why }]（支持"场合：口头禅（辨别度）"多行） */
+function parseCatchphraseText(text) {
+    const list = String(text || '').split(/\n|(?=\d+[.、)])/).map(s => s.trim()).filter(Boolean);
+    const out = [];
+    for (const line of list) {
+        const m = line.replace(/^\d+[.、)]\s*/, '').match(/^([^:：]{2,20})[：:]\s*(.+)$/);
+        const src = m ? m[2] : line;
+        const { quote, why } = splitQuoteMemoryPoint(src);
+        if (quote) out.push({ text: quote, trigger: m ? m[1].trim() : '', why: why || '' });
+    }
+    return out;
+}
+
+module.exports = { LABELED_PATTERNS, stripLabelResidue, extractLabeledFields, splitQuoteMemoryPoint, parseCatchphraseText };

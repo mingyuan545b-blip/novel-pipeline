@@ -23,6 +23,7 @@ async function saveChronicleEntry(projectId, entityId, entityName, chapterNumber
         innerConflict: data.innerConflict || '',
         highlights: data.highlights || [],
         quotes: data.quotes || [],
+        catchphrases: data.catchphrases || [],
         deeds: data.deeds || [],
         relations: data.relations || [],
         stanceShiftReason: data.stanceShiftReason || '',
