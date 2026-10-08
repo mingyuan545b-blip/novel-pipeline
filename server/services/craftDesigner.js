@@ -3,11 +3,12 @@
 /**
  * craftDesigner — 人物工艺设计器（离线补设计，LLM 生成/补全）
  *
- * 解决：设计期 charisma/philosophy/quoteLibrary/highlightScenes 普遍为空 →
- *   写作端没有"高光/名言/魅力"可依据 → 正文只能写流水账，编年史也抽不出东西。
+ * 解决：设计期 charisma/philosophy/quoteLibrary/highlightScenes/catchphrases 为空或写成
+ *   第三人称功能说明 → 写作端没有"高光/名言/魅力"可依据 → 正文只能写流水账，编年史也抽不出东西。
  * 做法：对工艺不达标的角色做**一次批量 LLM 调用**，产出符合 craftQualitySpec 判定的工艺，
- *   写入 entities（单一源），并逐个过 validateQuotes/validateHighlights/validateCatchphrases 闸门。
- * 依据：docs/design/角色编年史升级-多维分层与素材质检.md §十 / §四（离线设计器）
+ *   写入 entities（单一源）；判定/筛选/合并的纯逻辑在 craftTargets，
+ *   产出逐个过 validateQuotes/validateHighlights/validateCatchphrases 闸门才落库。
+ * 依据：docs/design/角色编年史升级-多维分层与素材质检.md §十 / §十一
  */
 const store = require('../store');
 const llm = require('./llm');
@@ -16,33 +17,9 @@ const entityCenter = require('./entityCenter');
 const { extractJSON } = require('./jsonUtils');
 const { buildCraftGuidance } = require('./craftQualitySpec');
 const namingSpec = require('./namingQualitySpec');
-const { validateQuotes, quoteKey } = require('./validateQuotes');
-const { validateHighlights, highlightKey } = require('./validateHighlights');
-const { validateCatchphrases, catchphraseKey } = require('./validateCatchphrases');
+const craftTargets = require('./craftTargets');
 
-const DESIGN_ROLE_LEVELS = ['protagonist', 'key-supporting', 'supporting'];
-const MAX_TARGETS = 6;
-
-/** 工艺是否达标（纯函数）：文本字段非空，台词/高光/口头禅有合格项 */
-function needsCraft(entity) {
-    const missing = [];
-    if (!String(entity.charisma || '').trim()) missing.push('人格魅力');
-    if (!String(entity.philosophy || '').trim()) missing.push('哲学观');
-    if (!String(entity.entranceDesign || '').trim()) missing.push('出场设计');
-    if (validateQuotes(entity.quoteLibrary || []).passed === 0) missing.push('金句库');
-    if (validateHighlights(entity.highlightScenes || []).passed === 0) missing.push('高光场景');
-    if (validateCatchphrases(entity.catchphrases || []).passed === 0) missing.push('口头禅');
-    return missing;
-}
-
-function selectCraftTargets(entities, limit) {
-    const max = Number(limit) || MAX_TARGETS;
-    return (entities || [])
-        .filter((e) => DESIGN_ROLE_LEVELS.indexOf(e.roleLevel) >= 0)
-        .map((e) => ({ entity: e, missing: needsCraft(e) }))
-        .filter((t) => t.missing.length > 0)
-        .slice(0, max);
-}
+const { needsCraft, selectCraftTargets, buildCraftPatchFromItem, findTarget, MAX_TARGETS } = craftTargets;
 
 function _parseItems(raw) {
     if (!raw) return [];
@@ -75,15 +52,16 @@ function _buildMessages(targets, ctx) {
         _jsonSchemaHint(),
         '硬性要求：',
         '1. 必须紧扣该角色既有设定（身份/性格/欲望/恐惧/伤口），不得改名、不得改人设',
-        '2. 金句必须有处境与记忆点；高光必须含代价；口头禅要能反复出现',
-        '3. 一律禁评论腔（展现/体现/立住…）、禁过场句（上车。/进去了。）、禁现代网络梗',
-        '4. 只输出 JSON，不要解释、不要 Markdown 代码块',
+        '2. 人格魅力必须写成"当【处境】时，他宁可【做X】，也不【做Y】"；禁止第三人称功能说明（"展现了…""他是主角的锚点…"）',
+        '3. 金句必须有处境与记忆点；高光必须含代价；口头禅要能反复出现',
+        '4. 一律禁评论腔（展现/体现/立住…）、禁过场句（上车。/进去了。）、禁现代网络梗',
+        '5. 只输出 JSON，不要解释、不要 Markdown 代码块',
     ].join('\n');
     const body = targets.map((t) => {
         const e = t.entity;
         return [
             '### 角色：' + e.name + '（' + e.roleLevel + '）',
-            '缺失工艺：' + t.missing.join('/'),
+            '缺失/不达标：' + t.missing.join('/'),
             e.personality ? '性格：' + e.personality : '',
             e.position ? '身份：' + e.position : '',
             e.profile && e.profile.desire ? '核心欲望：' + e.profile.desire : '',
@@ -97,39 +75,10 @@ function _buildMessages(targets, ctx) {
     return [{ role: 'system', content: system }, { role: 'user', content: user }];
 }
 
-function _text(v) { return String(v == null ? '' : v).trim(); }
-
-/** 单角色补丁（纯函数）：只填空缺项，数组按 key 合并去重，不做删除 */
-function buildCraftPatchFromItem(entity, item) {
-    const patch = {};
-    if (_text(item.charisma) && !_text(entity.charisma)) patch.charisma = _text(item.charisma);
-    if (_text(item.philosophy) && !_text(entity.philosophy)) patch.philosophy = _text(item.philosophy);
-    if (_text(item.entranceDesign) && !_text(entity.entranceDesign)) patch.entranceDesign = _text(item.entranceDesign);
-    const q = validateQuotes(item.quoteLibrary);
-    if (q.passed > 0) patch.quoteLibrary = _mergeUnique(entity.quoteLibrary, q.items, quoteKey);
-    const h = validateHighlights(item.highlightScenes);
-    if (h.passed > 0) patch.highlightScenes = _mergeUnique(entity.highlightScenes, h.items, highlightKey);
-    const c = validateCatchphrases(item.catchphrases);
-    if (c.passed > 0) patch.catchphrases = _mergeUnique(entity.catchphrases, c.items, catchphraseKey);
-    return patch;
-}
-
-function _mergeUnique(existing, incoming, keyOf) {
-    const out = Array.isArray(existing) ? existing.slice() : [];
-    const seen = new Set(out.map(keyOf));
-    for (let i = 0; i < incoming.length; i++) {
-        const k = keyOf(incoming[i]);
-        if (!k || seen.has(k)) continue;
-        seen.add(k);
-        out.push(incoming[i]);
-    }
-    return out;
-}
-
 /**
  * 设计/补全人物工艺
  * @param {string} projectId
- * @param {object} options { apply=false, apiConfig, maxItems }
+ * @param {object} options { apply=false, apiConfig, maxItems, debug }
  * @returns {Promise<{checked:number,targets:number,applied:number,proposals:Array}>}
  */
 async function designCharacterCraft(projectId, options) {
@@ -158,11 +107,13 @@ async function designCharacterCraft(projectId, options) {
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
         if (!item || !item.name) continue;
-        const target = targets.find((t) => t.entity.name === item.name);
+        const target = findTarget(targets, item.name);
         if (!target) continue;
         const patch = buildCraftPatchFromItem(target.entity, item);
         if (Object.keys(patch).length === 0) continue;
-        stats.proposals.push({ name: item.name, fields: Object.keys(patch) });
+        const entry = { name: item.name, fields: Object.keys(patch) };
+        if (opts.debug) entry.patch = patch;
+        stats.proposals.push(entry);
         if (!opts.apply) continue;
         await entityCenter.updateEntity(target.entity.id, patch);
         stats.applied++;
@@ -171,4 +122,8 @@ async function designCharacterCraft(projectId, options) {
     return stats;
 }
 
-module.exports = { designCharacterCraft, needsCraft, selectCraftTargets, buildCraftPatchFromItem, DESIGN_ROLE_LEVELS, MAX_TARGETS };
+module.exports = {
+    designCharacterCraft,
+    needsCraft, selectCraftTargets, buildCraftPatchFromItem, findTarget,
+    MAX_TARGETS, DESIGN_ROLE_LEVELS: craftTargets.DESIGN_ROLE_LEVELS,
+};

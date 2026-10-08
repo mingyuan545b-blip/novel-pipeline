@@ -72,3 +72,26 @@ describe('buildCraftPatchFromItem', () => {
         expect(patch.quoteLibrary).toHaveLength(1);
     });
 });
+
+describe('名字模糊匹配（实体名常带别名，如"阿宽 (Kuan)"）', () => {
+    const { findTarget } = require('../../server/services/craftDesigner');
+    test('去掉括号别名后能匹配', () => {
+        const targets = [{ entity: { name: '阿宽 (Kuan)' } }, { entity: { name: '林婉（勘定局同事）' } }];
+        expect(findTarget(targets, '阿宽').entity.name).toBe('阿宽 (Kuan)');
+        expect(findTarget(targets, '林婉').entity.name).toBe('林婉（勘定局同事）');
+        expect(findTarget(targets, '张三')).toBeNull();
+    });
+});
+
+describe('弱魅力也要补（治"他是主角人性锚点的重要组成部分"式功能说明）', () => {
+    test('第三人称功能说明被判定为弱、且用规定句式替换', () => {
+        const entity = { name: '阿宽', charisma: '他是主角人性锚点的重要组成部分，代表着市井生活的真实质感。' };
+        expect(needsCraft(entity)).toContain('人格魅力');
+        const patch = buildCraftPatchFromItem(entity, { charisma: '当摊主被暴力催收时，他宁可挡在门口挨打，也不报警逃跑' });
+        expect(patch.charisma).toContain('宁可');
+    });
+    test('新值不是规定句式时不落库（宁缺毋滥）', () => {
+        const patch = buildCraftPatchFromItem({ name: '甲', charisma: '智勇双全，游走灰色地带' }, { charisma: '高智商带来的压迫感' });
+        expect(patch.charisma).toBeUndefined();
+    });
+});
