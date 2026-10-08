@@ -13,6 +13,17 @@ const { extractLabeledFields } = require('./characterStateLabeledFields');
  *   - 纯金句（无场景标注）归为通用场景
  * 返回：[{ scene, quote }, ...]
  */
+/**
+ * 拆出金句尾部的"（记忆点）"——设计模板要求每条金句带为什么记得住。
+ * 形如 `绝境：人生如棋，落子无悔（他一生都在替别人算账）` → why="他一生都在替别人算账"
+ */
+function splitQuoteMemoryPoint(raw) {
+    const text = String(raw || '').trim();
+    const m = text.match(/^(.+?)\s*[（(]([^（()）]{4,})[)）]\s*$/);
+    if (!m) return { quote: text.replace(/[。.；;]$/, ''), why: '' };
+    return { quote: m[1].trim().replace(/[。.；;]$/, ''), why: m[2].trim() };
+}
+
 function extractQuoteLibrary(content) {
     if (!content) return [];
     // 截取【金句库】到下一个【XX】标签或文本结尾
@@ -31,16 +42,16 @@ function extractQuoteLibrary(content) {
         const cleaned = line.replace(/^\d+[.、)]\s*/, '').trim();
         if (!cleaned || cleaned.length < 2) continue;
 
-        // 尝试匹配 "场景：金句" 或 "场景: 金句"
+        // 尝试匹配 "场景：金句" 或 "场景: 金句"；金句尾部可带"（记忆点）"
         const sceneMatch = cleaned.match(/^([^:：]{2,20})[：:]\s*(.+)$/);
         if (sceneMatch) {
             const scene = sceneMatch[1].trim();
-            const quote = sceneMatch[2].trim().replace(/[。.；;]$/, '');
-            if (quote.length >= 2) quotes.push({ scene, quote });
+            const { quote, why } = splitQuoteMemoryPoint(sceneMatch[2]);
+            if (quote.length >= 2) quotes.push(why ? { scene, quote, why } : { scene, quote });
         } else {
             // 无场景标注，归为"通用场景"
-            const quote = cleaned.replace(/[。.；;]$/, '');
-            if (quote.length >= 2) quotes.push({ scene: '通用场景', quote });
+            const { quote, why } = splitQuoteMemoryPoint(cleaned);
+            if (quote.length >= 2) quotes.push(why ? { scene: '通用场景', quote, why } : { scene: '通用场景', quote });
         }
     }
     return quotes;

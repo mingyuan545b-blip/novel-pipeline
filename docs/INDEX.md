@@ -59,7 +59,7 @@
 | [worklog/2026-10-07-S1至S8-字段单一源与契约闭环施工.md](worklog/2026-10-07-S1至S8-字段单一源与契约闭环施工.md) | **S1-S8 施工记录**：状态机单一源 / 契约 severity+深度键生产端 / 登记分诊 / 实体投影 / 字段注册表 R1 / 装配审计+门槛活锁 / 首轮字数+可救区 / dataFlowSpec 同步；含回归基线与遗留 | 接手该主线时**先读**；闸门 `audit-vocabulary-consistency.js` 是防复发核心 |
 | [design/主位面高武·反套路喜剧-拆解与藏经阁入库.md](design/主位面高武·反套路喜剧-拆解与藏经阁入库.md) | 参考作拆解：吸引点6条、世界观骨架、17条通用技法入库清单、与《逆江湖》对照 | 设计题材元素/反套路喜剧/规则怪谈副本时**先读** |
 | [design/实体中心-副本归属与带出机制.md](design/实体中心-副本归属与带出机制.md) | 副本模式归属三件套：实体**归属**（scopeWorldId/locationSlot）、世界**通行契约**（exitMethod/carryOutPolicy/channelTag）、跨世界**带出证据链**（cross-world-traces 扩 character/pet/servant + channel/medium + carried-out）；带出门禁 carryOutGate | 设计副本归属/宠物NPC道具带出/渠道标签/串台检测时**先读** |
-| [design/角色编年史升级-多维分层与素材质检.md](design/角色编年史升级-多维分层与素材质检.md) | 编年史 4→**8 维**（日常/心理/立场/立场变化/高光/名言/事迹/关系）；台词**四要素**质检（speaker/scene/quote/why + 原文回查 + 语义查重）；Agent 决策=不新增 runtime Agent（离线人物工艺设计器 + 扩 material-manager/chronicleExtractor）；新篇流程与质量下限 | 改编年史/台词库/人物高光/开新篇质量门禁时**先读** |
+| [design/角色编年史升级-多维分层与素材质检.md](design/角色编年史升级-多维分层与素材质检.md) | 编年史 4→**8 维**（日常/心理/立场/立场变化/高光/名言/事迹/关系）；台词**四要素**质检（speaker/scene/quote/why + 原文回查 + 语义查重）；**§十 判定标准**：高光四问（可截图/只有他会做/有代价/不可逆）、名言三问（去语境/可反推/有重量）、魅力句式，含正例（凡人/英雄联盟）与真实反例、评论腔禁词 | 改编年史/台词库/人物高光/开新篇质量门禁时**先读** |
 
 ---
 
@@ -90,6 +90,7 @@
 | 张力被笑话泄掉（情绪断档） | [12 §五 5.4 + §七 7.2](sop/12-创作工艺与反AI化规范.md) | `detectors/detectEmotionalContinuity.js`(M8) |
 | 结尾跳时烂尾/伏笔回收章超出总章数 | [12 §三 Stage3 + §七 7.5](sop/12-创作工艺与反AI化规范.md) | `services/pipeline/foreshadowFeasibility.js` |
 | 笑点配额被当成"均匀撒糖" | [12 §五 5.4 + §七 7.2](sop/12-创作工艺与反AI化规范.md) | `constraintPresets.js` `comedy-adaptive` |
+| **高光/名言写成流水账或评论腔**（"展现了…""上车。"） | [12 §8.3](sop/12-创作工艺与反AI化规范.md) + [编年史设计 §十](design/角色编年史升级-多维分层与素材质检.md) | `services/craftQualitySpec.js`（判定标准单一源）+ `validateHighlights.js` + `validateQuotes.js` + `entityCraftReflow.js`（过质检才回流） |
 | 冲突套路重复（被动打脸连续） | [08 §二 M2](sop/08-约束执行规范.md) + [00 #42](sop/00-陷阱清单.md) | `detectors/detectConflictPatternRepeat.js` |
 | 章节衔接断裂（开头与上章结尾不连贯） | [08 §二 M3](sop/08-约束执行规范.md) + [04 §6.8](sop/04-bug修复.md) + [00 #41](sop/00-陷阱清单.md) | `detectors/detectChapterCoherence.js` |
 | 抽象抒情泛滥（时间静止/命运齿轮） | [08 §二 M4](sop/08-约束执行规范.md) | `detectors/detectAbstractSentiment.js` |

@@ -47,8 +47,9 @@ const FIELD_SPECS = Object.freeze({
     // === 人物魅力4维度（主角必填，陷阱#22修复）===
     '人格魅力': { label: '人格魅力', minChars: 10, qualityHints: ['魅力', '特质', '气质', '独特', '吸引'] },
     '哲学观': { label: '哲学观', minChars: 12, qualityHints: ['信念', '价值观', '认知', '天道', '生死', '规则', '认为', '信奉'] },
-    '金句库': { label: '金句库', minChars: 20, qualityHints: ['场景', '金句', '：', '场景：'] },
-    '高光场景': { label: '高光场景', minChars: 10, qualityHints: ['场景', '高光', '名场面', '转折', '立住'] },
+    '金句库': { label: '金句库', minChars: 20, qualityHints: ['场景', '处境', '记忆点', '：'] },
+    // 高光场景：须含处境+代价（"立住/展现"是评论腔，不作为合格关键词——见 craftQualitySpec）
+    '高光场景': { label: '高光场景', minChars: 10, qualityHints: ['场景', '名场面', '处境', '代价', '转折'] },
     '出场设计': { label: '出场设计', minChars: 10, qualityHints: ['出场', '首次', '方式', '场景', '登场'] },
 
     // === 世界观字段 ===

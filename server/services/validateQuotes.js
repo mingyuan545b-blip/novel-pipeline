@@ -4,11 +4,15 @@
  * 四要素：{ speaker, scene, quote, why, chapter }
  *   - scene / quote / why 必填；speaker 在角色编年史上下文内可继承（允许为空）
  *   - quote 必须原文引用（不可改写），由上游保证逐字一致
- * 依据：docs/design/角色编年史升级-多维分层与素材质检.md
+ *   - 2026-10-08 加严：过场/功能句（"上车。""进去了。"）不收；why 出现评论腔
+ *     （展现/体现/立住…）不收。判定表见 craftQualitySpec（单一数据源）
+ * 依据：docs/design/角色编年史升级-多维分层与素材质检.md §三/§十
  */
-const MIN_QUOTE_CHARS = 2;
+const { hasCommentaryVoice, isFillerLine } = require('./craftQualitySpec');
+
+const MIN_QUOTE_CHARS = 4;
 const MIN_SCENE_CHARS = 2;
-const MIN_WHY_CHARS = 4;
+const MIN_WHY_CHARS = 6;
 
 /** 归一化：兼容旧格式（纯字符串 / {scene,quote}）与新格式（四要素） */
 function normalizeQuote(raw) {
@@ -42,8 +46,10 @@ function validateQuote(raw) {
     if (!n) return { valid: false, issues: ['空台词'], normalized: null };
     const issues = [];
     if (n.quote.length < MIN_QUOTE_CHARS) issues.push('quote（原文）过短');
+    else if (isFillerLine(n.quote)) issues.push('过场/功能句（指令·应答·问价），不是名言');
     if (n.scene.length < MIN_SCENE_CHARS) issues.push('scene（适用场景）缺失');
     if (n.why.length < MIN_WHY_CHARS) issues.push('why（记忆点）缺失');
+    else if (hasCommentaryVoice(n.why)) issues.push('why 是评论腔（展现/体现/立住…），须改写成记忆点');
     return { valid: issues.length === 0, issues, normalized: n };
 }
 

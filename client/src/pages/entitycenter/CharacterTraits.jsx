@@ -70,6 +70,7 @@ function HighlightScenesSection({ highlights, roleColor }) {
                     <li key={idx} className="ec-quote-item">
                         <span className="ec-quote-scene">【{h.scene || '名场面'}】</span>
                         <span className="ec-quote-text">{h.what}</span>
+                        {h.cost && <span className="ec-quote-why">代价：{h.cost}</span>}
                         {h.why && <span className="ec-quote-why">↳ {h.why}</span>}
                     </li>
                 ))}

@@ -29,6 +29,8 @@ const PROJECT = pIdx >= 0 ? String(argv[pIdx + 1] || '') : '';
 
 const { FIELD_SPECS } = require('../server/config/materialDepthSpec');
 const { validateQuotes } = require('../server/services/validateQuotes');
+const { validateHighlights } = require('../server/services/validateHighlights');
+const { buildCraftGuidance } = require('../server/services/craftQualitySpec');
 
 const CRAFT_FIELDS = [
     { key: 'charisma', label: '人格魅力' },
@@ -43,11 +45,11 @@ const DESIGN_TEMPLATE = `【人物工艺设计模板】（供设计器/人工填
 【恐惧】[深层驱动：他最怕什么]
 【谎言】[他信错的东西，会被现实打碎＝成长弧]（配角可省）
 【创伤/软肋】[一碰就破防的点]
-【人格魅力】[核心魅力特质，参考蛊真人方源/龙公]
+【人格魅力】[写成"当【处境】时，他宁可【做X】，也不【做Y】"——禁形容词堆砌]
 【哲学观】[核心信念与价值观]
-【金句库】[每条格式 场景：原文金句（＋记忆点）]
+【金句库】[处境：原文金句（记忆点=它暴露了他的哪条信念/哪段代价）；禁过场句、禁评论腔]
 【出场设计】[出场方式与标志性场景]
-【高光场景】[场景＋做了什么＋为什么是名场面]`;
+【高光场景】[处境＋他的选择（含动作或台词原文）＋代价＋为什么只有他会这样]`;
 
 function checkEntity(entity) {
     const missing = [];
@@ -60,9 +62,9 @@ function checkEntity(entity) {
             detail[f.label] = `${r.passed} 条合格名言`;
             if (r.passed === 0) missing.push(f.label);
         } else if (f.kind === 'highlights') {
-            const n = Array.isArray(val) ? val.length : 0;
-            detail[f.label] = `${n} 条高光`;
-            if (n === 0) missing.push(f.label);
+            const r = validateHighlights(Array.isArray(val) ? val : []);
+            detail[f.label] = `${r.passed} 条合格高光`;
+            if (r.passed === 0) missing.push(f.label);
         } else {
             const len = (typeof val === 'string' ? val : '').trim().length;
             detail[f.label] = `${len} 字`;
@@ -73,7 +75,7 @@ function checkEntity(entity) {
 }
 
 (async () => {
-    if (EMIT) { console.log(DESIGN_TEMPLATE); return; }
+    if (EMIT) { console.log(DESIGN_TEMPLATE + '\n\n' + buildCraftGuidance()); return; }
 
     const { initPgPool } = require('../server/db/pgPool');
     await initPgPool(process.env.DATABASE_URL);

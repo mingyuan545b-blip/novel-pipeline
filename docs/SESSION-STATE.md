@@ -3,12 +3,50 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-10-07（**字段单一源与 Agent 协作闭环 S1→S8 施工完成**，见 §一 0o）
-> 上一轮：字段单一源 & Agent 协作完整性体检（只读，产出计划书）（2026-10-07，见 0n）
+> 最后更新：2026-10-08（**高光/名言/魅力判定标准落地：让编年史提取"认识什么算高光"**，见 §一 0q）
+> 上一轮：素材链路 T1→T6 施工完成（2026-10-07，见 0p）；字段单一源 S1→S8（2026-10-07，见 0o）
 
 ---
 
 ## 一、当前结论（重要）
+
+0q. **（2026-10-08 本会话）高光/名言/魅力"判定标准"落地——把"什么算高光/名言"写进 prompt（用户反馈）**
+   - **用户诉求**：编年史的高光/名言"怎么定义的？"；参考《凡人修仙传》"人生如棋，落子无悔"、《英雄联盟》卡蜜尔
+     "我曾踏足山巅，也曾坠入低谷，二者都让我受益匪浅"；让 AI **认识什么是高光/魅力/名言而不是流水账**。
+   - **取证（真实 PG 数据，项目 7d3e3e66 / e5f0c24e）**：高光 **15 条里 10 条 why 是评论腔**
+     （"展现了…/体现了…/确立了…/立住了…"）；`what` 退化成**剧情摘要**（"使用勘定笔…冻结探员行动权，趁乱带走流浪汉"）；
+     quotes 收进**过场句**（"上车。""进去了。""几多钱？""莫搞。"）；`speaker` **100% 空**、`chapter` **100% 为 0**。
+     根因：提示词只给"要什么"，**没给"什么不算"**（无反例/无判定测试/无自检），且 quotes/deeds/highlights 定义重叠。
+   - **标准单一源**：新增 `services/craftQualitySpec.js`——**高光四问**（可截图/只有他会做/有代价/不可逆）、
+     **名言三问**（去语境/可反推/有重量）、魅力句式（"当X时宁可Y也不Z"）、评论腔禁词表、过场句正则、`buildCraftGuidance()` 提示词块。
+   - **改了什么**：① `chronicleExtractor` full 档 prompt 重写（标准+**正例出处**《凡人》何仙师赠韩立"人生如棋，落子无悔"／
+     卡蜜尔台词 + **本项目真实反例** + 自检三步 + 禁词）② highlights 增 `cost`（代价），quotes 要求 `speaker/chapter`
+     ③ `_normalizeEntry(item, chapter)` **回填** speaker=角色名、chapter=当前章（修历史 100% 空/0）
+     ④ 新增 `validateHighlights.js`（四问+评论腔拦截+去重）、`validateQuotes` 加严（过场句不收、评论腔 why 不收，
+     `MIN_QUOTE_CHARS 2→4 / MIN_WHY_CHARS 4→6`）⑤ `entityCraftReflow` 改为**过质检才回流实体**（宁缺毋滥）
+     ⑥ 设计端：`materialDepthSpec` 高光/金句 qualityHints 去掉评论腔词"立住"改"处境/代价/记忆点"、`fieldRegistry` PROMPT_HINTS、
+     `designCharacterCraft --emit-prompt` 输出完整标准 ⑦ `characterStateExtractor` 支持【金句库】`处境：原文（记忆点）`
+     ⑧ UI：高光卡片显示"代价："。
+   - **测试**：新增 `tests/unit/validateHighlights.test.js`(9)；`validateQuotes`/`entityCraftReflow`/`chronicleExtractor` 增补负例
+     + **prompt 防回退断言**；`entityCraftReflow` 两处 fixture 改为合格数据（**故意**：证明新闸门生效）。
+   - **回归**：后端 **256 套件/3964 用例全绿**（基线 255/3949）；改动文件 `eslint --max-warnings=0` 通过；
+     词汇表闸门 0 违规；铁律互斥自检通过；前端 `chronicleDimensions` 7/7 通过。
+   - **⚠️ 未了**：① **garbage in**：提取是事后的，正文没高光就抽不出——待做 **M11「writer 侧高光/名言配额」**；
+     ② 存量老章的评论腔 why 不会自动修（需重跑提取或人工）；③ 名梗/口头禅维度未纳入编年史（`meme-lexicon` 是喜剧素材，两回事，
+     要不要加 `catchphrase` 维度**待用户定**）；④ 本次未提交。
+   - 详见 `docs/design/角色编年史升级-多维分层与素材质检.md` §十。
+
+0p. **（2026-10-07 本会话）素材链路 T1→T6 六项改造完成**（详见 `docs/worklog/2026-10-07-T1至T6-素材链路定位校验兜底与省token.md`）
+   - **回答用户 5 疑问**：①定位=**有**（`provenance.createdChapter/createdAt` 不可变；此前 `sourceChapter` 被每次更新改写→创建章节永久丢失）②交接校验=**有骨架但关键一环是空的**（输出契约只有"response≥10字"，`updates[]` 无结构校验）③兜底=**有三级但第一级静默吞**（解析失败只 warn，重试/门槛被绕过）④token=可大幅减少（实测材料管理投喂正文**压 56%**）⑤格式=**读已单点、写从未收口**（46 处手搓素材）。
+   - **T1**：双策略失败 → 抛 `MATERIAL_MANAGER_OUTPUT_UNPARSABLE` + `materialManagerFailed` + 不写 processed/知识库（让 L2 重试/门槛/补跑真正接管）；顺带修 `{"updates":[]}` 被误判为解析失败。
+   - **T2**：新增不可变 `provenance` + changeLog v2（4 种旧结构归一）；`materialRepository` 成为唯一语义写入 API；真实 PG **116 条已 --apply 回填**（0 条目丢失）；UI 元数据显示"创建/最近更新/出身"并标注存量推断值。
+   - **T3**：`materialOutputSchema` 硬校验 type/name/action/content（此前 `action:"新增"` 会**静默什么都不做**）；违规只回喂违规条目做 1 次定向修复，且修复必须按 name 绑定（防绕过"每章最多3个新素材"）。
+   - **T4**：形状不变量**下沉到存储单点**（storeTrim/storeCommon），46 处写入自动合规；新增闸门 `scripts/audit-material-shape.js`（接线检查 + 写入点基线冻结 + `--db` 真实抽样），**已接入 ci:check**。
+   - **T5**：`enableMaterialPrecheck` 开关（**默认关**）+ 正文压缩；真实测量 **80106→35255 字（压缩 56%）**，可跳过章 0（本批数据都有信号）；含防"位置偏置丢信号"设计。
+   - **T6**：`materialDepthBackfill` 多来源确定性回填（实体/KV→素材正文【标签】→编年史），只填补不覆盖不臆造；**真实数据四类深度键 1/40 → 7/40**；prompt 深度字段改必填 + 深度缺口告警。
+   - **回归**：后端 **255 套件/3949 用例全绿**（基线 247/3877）；前端 17 失败=既有基线（entitycenter hook）；iron-law/hardcode(0)/词汇表(0)/装配入口 全通过。
+   - **⚠️ 未了**：`npm run ci:check` 仍非全绿 —— 3 项**既有**检查在 HEAD 上就失败（`verifyStyleProfileSchema`/`verifyApiContract`/`verifyDocFreshness`，已用 git worktree 干净副本取证），需用户决定是否修；另修掉了同类的既有假红 `verifyMaterialMigration` 校验4（装配入口改名未同步）。
+   - **开关与遗留**：T5 预判按项目开启；T6 深度键只做运行时回填，未批量回写实体。
 
 0o. **（2026-10-07 本会话）S1→S8 施工完成：字段单一源与 Agent 协作闭环**（详见 `docs/worklog/2026-10-07-S1至S8-字段单一源与契约闭环施工.md`）
    - **用户拍板三项**：① first/second-reviewed **补进**状态机；② 字段注册表**一次性覆盖全部类型**；③ 契约深度键**真正生产**。

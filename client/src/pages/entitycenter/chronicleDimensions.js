@@ -59,7 +59,10 @@ export function itemsOf(entry, key) {
         case 'daily':
             return entry.daily ? [{ ...base, text: entry.daily }] : [];
         case 'highlight':
-            return fromList(entry.highlights, h => ({ ...base, scene: h.scene, text: h.what, note: h.why }));
+            return fromList(entry.highlights, h => ({
+                ...base, scene: h.scene, text: h.what,
+                note: [h.cost ? `代价：${h.cost}` : '', h.why].filter(Boolean).join(' / ')
+            }));
         case 'quote':
             return fromList(entry.quotes, q => {
                 const x = typeof q === 'string' ? { quote: q } : q;
