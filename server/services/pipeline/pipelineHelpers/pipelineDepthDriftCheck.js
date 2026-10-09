@@ -11,7 +11,7 @@ const logger = require('../../../shared/logger');
 
 async function runDepthDriftCheck(projectId, chapterId, chapterNumber, pipelineLog, onStep, genre) {
     try {
-        const { enforceChapterDrift } = require('../../materialDepthEnforcer');
+        const { enforceChapterDrift } = require('../materialDepthEnforcer');
         const { getOutlineApiConfig } = require('../constants');
         const cp = genre?.characterProfile || {};
         const stats = await enforceChapterDrift(projectId, {

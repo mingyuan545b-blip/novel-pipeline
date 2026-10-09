@@ -49,7 +49,7 @@ async function checkPowerConsistency(projectId, chapterNumber, chapterContent) {
         const psContent = ps.currentContent || ps.initialContent || '';
         const rules = ext.extractPowerRules(psContent);
         for (const rule of rules) {
-            const violation = ext.detectPowerRuleViolation(content, rule);
+            const violation = ext.detectPowerRuleViolation(chapterContent || '', rule);
             if (violation) {
                 issues.push({
                     dimension: CHECK_DIMENSIONS.POWER, severity: SEVERITY.CRITICAL,

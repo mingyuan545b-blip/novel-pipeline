@@ -72,16 +72,35 @@ function buildSystemNarrativeSection() {
 }
 
 /**
- * 构建完整的写作红线约束区（敏感词+方括号+系统交互）
+ * 构建元叙事章回引用红线约束段（原则引导，非枚举）
+ *
+ * 背景（2026-10-09 跨界副本博弈建项实测根因）：`contentMetadataDetector` +
+ * `firstReviewChecks.runHardBlockChecks` 会用 META_NARRATIVE_PATTERNS 硬拦截正文里的
+ * "上一章/前一章/第X章"等元叙事引用（打破第四面墙），但 writer/reviser 提示词**从未声明**该规则
+ * ——属于"只查不写"（约束被强制执行却未告知生成端），导致正文极易复现该词并被硬阻断、章节无法收敛。
+ * 这里把规则落到唯一构建器，writer/reviser 同时生效。
+ * @returns {string} 元叙事章回引用约束段
+ */
+function buildMetaNarrativeSection() {
+    return `\n【⚠️ 元叙事章回引用红线 - 绝对禁止】
+禁止在正文中出现任何指代"叙述层级"的元叙事词：上一章、前一章、下一章、本章、第X章、上回书等。
+这类表达会打破第四面墙（角色/旁白跳到"章节"层面说话），系统会硬性拦截并直接退回。
+需要表达"前情/往事/之前发生的事"时，必须改写为故事内的时间指代（如"此前""那晚""方才""上回在那片废墟里""三天前"），不得使用章节编号。
+写完后必须搜索"上一章/前一章/下一章/本章/第X章"，如有必须全部改为故事内时间指代。`;
+}
+
+/**
+ * 构建完整的写作红线约束区（敏感词+方括号+系统交互+元叙事引用）
  * @returns {string} 完整约束区
  */
 function buildWritingGuardSection() {
-    return `${buildSensitiveWordSection()}\n${buildBracketTagSection()}\n${buildSystemNarrativeSection()}`;
+    return `${buildSensitiveWordSection()}\n${buildBracketTagSection()}\n${buildSystemNarrativeSection()}\n${buildMetaNarrativeSection()}`;
 }
 
 module.exports = {
     buildSensitiveWordSection,
     buildBracketTagSection,
     buildSystemNarrativeSection,
+    buildMetaNarrativeSection,
     buildWritingGuardSection
 };

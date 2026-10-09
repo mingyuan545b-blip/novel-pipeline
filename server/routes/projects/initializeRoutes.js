@@ -36,7 +36,7 @@ async function handleInitialize(req, res) {
         let materialResult = null;
         try {
             materialResult = await pipeline.generateInitialMaterials(project.id, req.body.materialPrompt || '');
-            steps.push({ step: 'materials', status: 'ok', count: materialResult.materials?.length || 0 });
+            steps.push({ step: 'materials', status: 'ok', count: materialResult.count ?? materialResult.created?.length ?? 0 });
         } catch (matErr) {
             logger.error('initialize', '素材生成失败:', { errorMessage: matErr.message });
             steps.push({ step: 'materials', status: 'failed', error: matErr.message });
@@ -50,7 +50,7 @@ async function handleInitialize(req, res) {
                 req.body.outlinePrompt || '',
                 req.body.targetChapters ?? null
             );
-            steps.push({ step: 'outlines', status: 'ok', count: outlineResult.chapters?.length || 0 });
+            steps.push({ step: 'outlines', status: 'ok', count: outlineResult.count ?? outlineResult.outlines?.length ?? 0 });
         } catch (outErr) {
             logger.error('initialize', '大纲生成失败:', { errorMessage: outErr.message });
             steps.push({ step: 'outlines', status: 'failed', error: outErr.message });

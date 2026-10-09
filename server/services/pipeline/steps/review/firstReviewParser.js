@@ -115,7 +115,7 @@ async function buildWriterConstraints(ctx, projectId, chapter, project) {
 
     // 2. 关系阶段守卫（审核员需要知道关系阶段铁律，才能判断关系越级）
     try {
-        const { buildRelationshipStageGuard } = require('../../../relationshipStageGuard');
+        const { buildRelationshipStageGuard } = require('../../relationshipStageGuard');
         const guard = await buildRelationshipStageGuard(projectId, chapterNum);
         if (guard) {
             sections.push(`【🔗 关系阶段守卫（审核依据——判断关系越级）】\n以下是writer看到的关系阶段铁律，正文必须遵守：\n${guard}\n审核规则：如发现关系越级（如仇人突然变挚友、陌生人突然表白），判定为critical`);

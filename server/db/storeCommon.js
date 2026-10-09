@@ -32,6 +32,18 @@ function applyFilter(items, filter) {
 }
 
 function trimItemData(type, data) {
+    // T4 形状不变量（provenance / changeLog v2 / 时间戳 / version / archived）：
+    // **必须先于任何"体积"提前返回执行**——形状归一与体积裁剪无关。
+    // 修复（2026-10-09 跨界副本博弈建项）：此前本函数的归一被放在 size 早返回之后，
+    // 导致**未超限的素材永不归一**（新素材缺 provenance，门禁恒失败；旧数据只因 T2 批量回填而合规）。
+    // 与 storeTrim.js（JSON 后端，归一在早返回之前）对齐，消除"两套 trimItemData 行为不一致"。
+    if (type === 'materials') {
+        Object.assign(data, normalizeMaterialRecord(data));
+        if (data.changeLog && data.changeLog.length > STORE_TRIMMING.materialChangeLogKeep) {
+            data.changeLog = data.changeLog.slice(-STORE_TRIMMING.materialChangeLogKeep);
+        }
+    }
+
     const maxSize = STORE_SIZE_LIMITS[type] || STORE_DEFAULT_MAX_SIZE;
     let serialized = JSON.stringify(data, null, 2);
 
@@ -54,14 +66,6 @@ function trimItemData(type, data) {
             if (data[field] && data[field].length > maxLen) {
                 data[field] = data[field].substring(0, maxLen) + '\n...[truncated]';
             }
-        }
-    }
-
-    if (type === 'materials') {
-        // T4：形状不变量（PG 写入路径同样单点兜底）
-        Object.assign(data, normalizeMaterialRecord(data));
-        if (data.changeLog && data.changeLog.length > STORE_TRIMMING.materialChangeLogKeep) {
-            data.changeLog = data.changeLog.slice(-STORE_TRIMMING.materialChangeLogKeep);
         }
     }
 
