@@ -3,15 +3,30 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-10-09（**崩溃转储 process.report + 并发压测 + AI 味高频词审计，并提交根因修复**，见 §一 0t）
+> 最后更新：2026-10-10（**UI 盲区修复 + 铁律三根因（幽灵规则/误报）+ AI 味词表接入 M11 检测器**，见 §一 0u）
+> 上一轮：崩溃转储 process.report + 并发压测 + AI 味审计（2026-10-09，见 0t）
 > 上一轮：跨界副本博弈建项 + 20 章生产 + 12 项问题溯源（2026-10-09，见 0s）
-> 上一轮：建项目即产出好工艺+好名字（2026-10-09，见 0r）；高光/名言/魅力判定标准（2026-10-08，见 0q）
 
 ---
 
 ## 一、当前结论（重要）
 
-0t. **（2026-10-09 本会话）崩溃转储（process.report）+ 并发压测 + AI 味高频词审计（用户："加 process.report 崩溃转储 + 并发压测；提交根因修复；检查 AI 写作高频词"）**
+0u. **（2026-10-10 本会话）UI 盲区修复 + 铁律三根因 + AI 味词表接入检测器（用户："点任何章 UI 都显示固定错误：复审未通过·系统提示未化为高武意境表达·违反铁律三"）**
+   - **先判性质 = UI bug，不是数据**：全书只有第 1、6 章真含"铁律三"（章节表 + 流水线日志双证）；用户所见"固定错误"是**看板坏了**。
+   - **UI 根因**：`client/src/pages/pipeline/usePipelinePageState.js` 两处叠加——①状态轮询空闲时也用**项目级** infinite 日志覆盖执行日志；
+     ②`loadPipelineLogs` 有"仅当 logs 为空才加载"守卫 → 点任何章都不刷新。**已修**（空闲只显示所选章日志；去掉守卫）。
+   - **顺手修潜伏 bug**：同文件 `STATUS_VALUES` 未 import →「补跑素材管理员」按钮必 `ReferenceError` 静默失败（baseline 亦然）。已修。
+   - **铁律三根因**：①**幽灵规则**——审稿器引用"铁律一/二/三"但全库无定义（"只查不写"）→ 已把 **铁律一/二/三 补进唯一源 `foundation.js`** + 加防漂断言；
+     ②**检测器误报**——原 `content.includes('系统提示')` 把"**不是**系统提示"判 critical → 改结构化 `systemMetadataLeak()` + 否定豁免，**刻意不收录"状态栏"等剧情化 HUD 词**。
+   - **接入检测器**：新增 **M11「AI 腔高频词控制」**（用户点名词表）——`constraintDetectionConfig.M11` + `detectors/detectAiSlop.js` +
+     `constraintMetaSpecAiSlop.js`（拆文件守 200 行）+ 注册表；走 `hardBlockChecks` + `constraintFeedbackCollector` + `getMetaConstraintsForPrompt()`（writer 侧**既查也写**），`block:false`。
+   - **验证**：`server/tests/unit` **110/110**；`tests/unit` **265 套件/4025 例全绿**（基线 262/4008）；client `usePipelinePageState` 8/8（全量 17 失败=既有 entitycenter 基线）。
+   - **⚠️ 下窗口待办（问题统计见 worklog §六）**：P1 铁律三只在二审"LLM 先过"后才查（真违规可能漏网）；
+     P2 pipeline 内 **19 处空 catch / 9 处 silent**（静默吞错）；P3 `constraintDesignCoveredCheck` M1–M10 既有覆盖缺口；
+     P4 审稿器铁律编号仍硬编码（应取唯一定义源）；P6 方法论：需常态化"审稿器引用 ⟷ 执笔端声明"一致性盘点。
+   - 详见 `docs/worklog/2026-10-10-UI盲区与铁律三根因-AI味接入检测器.md`。
+
+0t. **（2026-10-09 上一会话）崩溃转储（process.report）+ 并发压测 + AI 味高频词审计（用户："加 process.report 崩溃转储 + 并发压测；提交根因修复；检查 AI 写作高频词"）**
    - **交付**：`server/bootstrap/crashDump.js`（**`reportOnFatalError=true`** —— 原生致命错误 0xC0000409 唯一留证通道；
      `reportOnSignal=false` 避免停机产报告；`uncaughtException` 先落报告再退出码 1）→ 接入 `server/index.js` 顶部 +
      `scripts/serverStart.js` 加 CLI 兜底 `--report-on-fatalerror --report-compact --stack-trace-limit=50`；

@@ -94,8 +94,10 @@ module.exports = {
             const warningIssues = [];
             const hints = [];
 
-            if (content.includes('系统提示') || content.match(/积分[:：]\d+/)) {
-                hardBlockIssues.push({ severity: 'critical', description: '系统提示未内化为高武意境表达，违反铁律三。', title: '元数据泄露' });
+            // 铁律三：系统UI元数据直出（结构化检测 + 否定语境豁免，修误报）
+            const metaCheck = detectors.systemMetadataLeak(content);
+            if (metaCheck.isViolation) {
+                hardBlockIssues.push({ severity: 'critical', description: `检测到${metaCheck.count}处系统UI元数据直出（${metaCheck.issues.map(i => i.text).slice(0, 3).join('、')}），违反铁律三：系统提示/积分面板须内化为世界观具象表达。`, title: '元数据泄露' });
             }
 
             const literaryCheck = detectors.literaryBloat(content);

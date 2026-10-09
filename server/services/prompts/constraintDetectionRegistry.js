@@ -19,6 +19,7 @@ const { detectAbstractEnding } = require('./detectors/detectAbstractEnding');
 const { detectEmotionalContinuity } = require('./detectors/detectEmotionalContinuity');
 const { detectMotifReuse } = require('./detectors/detectMotifReuse');
 const { detectHookMonotony } = require('./detectors/detectHookMonotony');
+const { detectAiSlop } = require('./detectors/detectAiSlop');
 const { getMetaConstraintDetectionSpec } = require('./constraintMetaSpec');
 const logger = require('../../shared/logger');
 
@@ -34,6 +35,8 @@ const DETECTION_REGISTRY = Object.freeze({
     M8: { fn: detectEmotionalContinuity, source: 'meta' },
     M9: { fn: detectMotifReuse, source: 'meta' },
     M10: { fn: detectHookMonotony, source: 'meta' },
+    // 2026-10-10 新增：AI 味高频词
+    M11: { fn: detectAiSlop, source: 'meta' },
 });
 
 async function runConstraintDetection(constraintId, params) {

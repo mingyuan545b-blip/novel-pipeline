@@ -37,6 +37,31 @@ module.exports = {
             if (uiMatches) { count += uiMatches.length; instances.push(...uiMatches.map(t => ({ type: 'system_ui', text: t }))); violationCount++; }
             return { count, instances, violationCount };
         },
+        systemMetadataLeak(content) {
+            // 铁律三：系统UI元数据直出检测（面板/进度条/积分数字/带冒号的系统提示文本）。
+            // 修复（2026-10-10）：原判据 content.includes('系统提示') 会把"**不是**系统提示，而是…"
+            // 这类否定/转述语境误判为 critical HARD BLOCK（问题#铁律三误报）。改为结构化模式 + 否定前缀豁免。
+            const patterns = [
+                /积分\s*[:：]\s*\d+/g,                                                     // 「积分：500」数值直出
+                /进度条/g,                                                                // 铁律三明文禁止的UI控件
+                /(?:系统|任务|副本|活动|公告)\s*(?:提示|公告|通知|警告)\s*[:：]/g,          // 「系统提示：…」UI文本直出
+                /[\[【][^\]】\n]{0,24}(?:Lv\.?\s*\d|积分|经验值|贡献值|任务完成|系统提示|警告|奖励)[^\]】\n]{0,24}[\]】]/g, // 「【任务完成】」括注UI令牌
+            ];
+            // 刻意不收「状态栏/属性面板/面板显示」等词：游戏化题材里它们是**剧情化的HUD描写**
+            // （如"把防御代码粘贴到自己状态栏"），属合理叙事，收了就是新的误报。
+            const NEG_PREFIX = /(?:不是|并非|而非|绝不是|不再是|不算|没有|不像|谈不上|未出现)\s*$/;
+            const issues = [];
+            for (const p of patterns) {
+                const re = new RegExp(p.source, p.flags);
+                let m;
+                while ((m = re.exec(content)) !== null) {
+                    const before = content.slice(Math.max(0, m.index - 6), m.index);
+                    if (NEG_PREFIX.test(before)) continue; // 否定/转述语境，不算直出
+                    issues.push({ type: 'system_metadata', text: m[0], index: m.index });
+                }
+            }
+            return { isViolation: issues.length > 0, count: issues.length, issues };
+        },
         modernSlang(content, styleProfile) {
             const slangPattern = /(我他妈|卧槽|牛逼|绝了|就这|栓Q)/g;
             const matches = content.match(slangPattern);

@@ -13,6 +13,7 @@
  */
 
 const { getConfig } = require('./constraintDetectionConfig');
+const { AI_SLOP_META } = require('./constraintMetaSpecAiSlop');
 
 const META_CONSTRAINTS = Object.freeze({
     M1: {
@@ -162,6 +163,7 @@ const META_CONSTRAINTS = Object.freeze({
 - 禁止：连续两章都用"危险逼近"型，或都用"真正麻烦才刚开始"式套话
 - 必须：与前章钩子类型不同，且落点为具体物件或动作`,
     },
+    ...AI_SLOP_META,
 });
 
 const META_CONSTRAINT_IDS = Object.freeze(Object.keys(META_CONSTRAINTS));

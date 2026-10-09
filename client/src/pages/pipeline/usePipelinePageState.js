@@ -11,7 +11,7 @@ import {
     useResetChaptersBulk, useSaveProjectTargets, useSyncHookBudget, useExtractRuleStack, useRegisterHook,
 } from '../../hooks/queries';
 import { pipelineApi, genreDebugApi } from '../../services/api';
-import { PIPELINE_STEPS, OUTPUT_TABS, buildPipelineSteps, buildOutputTabs } from './pipelineConstants';
+import { PIPELINE_STEPS, OUTPUT_TABS, STATUS_VALUES, buildPipelineSteps, buildOutputTabs } from './pipelineConstants';
 import { useInfinitePipeline } from './useInfinitePipeline';
 import { useAuditState } from './useAuditState';
 import { useToolsState } from './useToolsState';
@@ -92,14 +92,16 @@ export default function usePipelinePageState() {
     /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (!currentProject || !pipelineStatusData) return;
-        if (pipelineStatusData.logs?.length > 0)
-            setPipelineState({ logs: mapInfiniteLogs(pipelineStatusData.logs), running: pipelineStatusData.running, currentStep: pipelineStatusData.phase });
-        if (!pipelineStatusData.running) {
-            pipelineStatusData.logs?.length > 0
-                ? setPipelineState({ logs: mapInfiniteLogs(pipelineStatusData.logs), running: false, currentStep: null })
-                : setPipelineState({ running: false, currentStep: null });
-            if (selectedChapter?.id && chaptersData) { const u = chaptersData.find(c => c.id === selectedChapter.id); if (u) setSelectedChapter(u); }
-        } else if (selectedChapter?.id && chaptersData) { const u = chaptersData.find(c => c.id === selectedChapter.id); if (u) setSelectedChapter(u); }
+        if (pipelineStatusData.running) {
+            // 运行中：项目级实时日志是唯一能反映"当前在跑什么"的来源
+            setPipelineState({ logs: mapInfiniteLogs(pipelineStatusData.logs || []), running: true, currentStep: pipelineStatusData.phase });
+        } else {
+            // 空闲：**不复写 logs**，保留"所选章节"的日志（点哪章看哪章）。
+            // 修复（2026-10-10 UI 盲区）：此前空闲时也用项目级 infinite 日志覆盖 logs，
+            // 叠加 loadPipelineLogs 的"仅当 logs 为空才加载"守卫 → 点任何章节都固定显示同一条历史错误。
+            setPipelineState({ running: false, currentStep: null });
+        }
+        if (selectedChapter?.id && chaptersData) { const u = chaptersData.find(c => c.id === selectedChapter.id); if (u) setSelectedChapter(u); }
     }, [currentProject, pipelineStatusData, selectedChapter?.id, chaptersData, setPipelineState]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
@@ -109,10 +111,12 @@ export default function usePipelinePageState() {
         catch (e) { addPipelineLog({ step: 'supplement-outlines', status: 'error', error: e.message, timestamp: new Date().toISOString() }); }
     };
     const loadPipelineLogs = async (projectId, chapterId) => {
+        // 运行中不加载章节历史（避免与项目级实时日志打架）；空闲时按所选章节加载，点哪章看哪章
+        if (pipelineState.running) return;
         try {
-            const res = await pipelineApi.getPipelineLogs(projectId, chapterId); const entries = res.data?.entries || [];
-            if (entries.length > 0 && pipelineState.logs.length === 0)
-                setPipelineState({ logs: entries.map(e => ({ step: e.step, status: e.passed ? 'done' : 'error', result: e.passed !== undefined ? { passed: e.passed, feedback: e.feedback } : undefined, error: e.error, timestamp: e.timestamp, round: e.round })) });
+            const res = await pipelineApi.getPipelineLogs(projectId, chapterId);
+            const entries = res.data?.entries || [];
+            setPipelineState({ logs: entries.map(e => ({ step: e.step, status: e.passed ? 'done' : 'error', result: e.passed !== undefined ? { passed: e.passed, feedback: e.feedback } : undefined, error: e.error, timestamp: e.timestamp, round: e.round })) });
         } catch (e) { logger.error('PipelinePage', 'Load pipeline logs failed:', e.message); }
     };
     const resetChapterContent = async (chapterId, chapterNumber) => {
