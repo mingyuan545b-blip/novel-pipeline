@@ -5,6 +5,10 @@ module.paths.unshift(__dirname);
 
 const logger = require('shared/logger');
 
+// 崩溃转储：尽早开启（原生致命错误 0xC0000409 的唯一留证通道，见陷阱#34 / worklog 2026-10-09 问题#2）
+const { initCrashDump } = require('./bootstrap/crashDump');
+initCrashDump({ logger });
+
 // .env智能恢复 + 前端认证同步
 const { ensureEnvFile, syncFrontendEnv, ENV_PATH } = require('./config/envSync');
 ensureEnvFile();

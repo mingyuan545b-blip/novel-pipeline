@@ -135,6 +135,10 @@ function startServer(port) {
         '--max-old-space-size=12288',
         '--max-semi-space-size=256',
         '--trace-gc',
+        // 崩溃转储：CLI 兜底（JS 层 crashDump.initCrashDump 之前若崩，也留证）+ 提高 JS 栈上限便于定位深递归
+        '--report-on-fatalerror',
+        '--report-compact',
+        '--stack-trace-limit=50',
         SERVER_ENTRY
     ], {
         cwd: PROJECT_ROOT,

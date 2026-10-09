@@ -65,5 +65,8 @@ data/state-meta/
 data/timeline-events/
 data/genre-profiles/_imported*/
 
+# 崩溃转储（process.report 诊断报告，见 server/bootstrap/crashDump.js）
+data/crash-dumps/
+
 # 临时截图/调试图（根目录 _ 前缀）
 /_*.png

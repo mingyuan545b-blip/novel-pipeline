@@ -3,13 +3,49 @@
 > 新窗口/新AI接手时：先读本文件（2分钟），再按任务读 docs/INDEX.md 对应SOP。
 > 长任务必须遵守 docs/sop/10-上下文交接规范.md（状态落盘+恢复锚点，防上下文压缩失忆）。
 > 本文件只记录"当前状态与待办"，架构细节看 ARCHITECTURE.md。
-> 最后更新：2026-10-09（**建项目即产出好工艺+好名字：设计期补设计 / 命名质量 / 口头禅入编年史**，见 §一 0r）
-> 上一轮：高光/名言/魅力判定标准落地（2026-10-08，见 0q）
-> 上一轮：素材链路 T1→T6 施工完成（2026-10-07，见 0p）；字段单一源 S1→S8（2026-10-07，见 0o）
+> 最后更新：2026-10-09（**崩溃转储 process.report + 并发压测 + AI 味高频词审计，并提交根因修复**，见 §一 0t）
+> 上一轮：跨界副本博弈建项 + 20 章生产 + 12 项问题溯源（2026-10-09，见 0s）
+> 上一轮：建项目即产出好工艺+好名字（2026-10-09，见 0r）；高光/名言/魅力判定标准（2026-10-08，见 0q）
 
 ---
 
 ## 一、当前结论（重要）
+
+0t. **（2026-10-09 本会话）崩溃转储（process.report）+ 并发压测 + AI 味高频词审计（用户："加 process.report 崩溃转储 + 并发压测；提交根因修复；检查 AI 写作高频词"）**
+   - **交付**：`server/bootstrap/crashDump.js`（**`reportOnFatalError=true`** —— 原生致命错误 0xC0000409 唯一留证通道；
+     `reportOnSignal=false` 避免停机产报告；`uncaughtException` 先落报告再退出码 1）→ 接入 `server/index.js` 顶部 +
+     `scripts/serverStart.js` 加 CLI 兜底 `--report-on-fatalerror --report-compact --stack-trace-limit=50`；
+     `scripts/crashReport.js`（读转储摘要，抠原生栈）；`scripts/stressTest.js`（并发压测，含预检/崩溃检测/429 提示）；
+     `scripts/audit-ai-slop.js`（AI 味高频词审计）。转储目录 `data/crash-dumps/`（已 gitignore）。
+   - **提交**：上一会话 6 处根因修复（#1/#4/#6/#7/#9/#10/#12）+ 回归测试 + worklog + 本文件，已过 pre-commit 五关。
+   - **验证**：`crashDump.test.js` 4/4；`kuaijieRegression`+`materialShapeGate` 17/17；后端带转储重启成功；
+     压测 health 64×20 / mixed 48×25 均 ok=全、**未复现 0xC0000409**（health 256×8 触发限流 → 压力被削弱）。
+     **结论：偶发性未复现；转储已就位，下次崩溃将留下原生栈。**
+   - **AI 味审计（用户点名词表）**：项目 `万界副本·博弈者` 定稿 **中招** —— `嘴角勾起×16`、`这意味着×9`、`底层逻辑×7`、
+     `交织×6`、`心中一凛×2`、`瞳孔微缩×1`…（final 104 次/55k 字，严重词 36）。**覆盖缺口**：现有 M1–M10 检测器
+     **未收录**这些词 → 生成端无约束、审读端不拦。**建议加 M11「AI 腔设定词」并 writer 侧声明（待拍板）**。
+   - 详见 `docs/worklog/2026-10-09-崩溃转储与并发压测-AI味高频词审计.md`。
+
+0s. **（2026-10-09 同日上一会话）跨界副本博弈建项 + 20 章生产 + 12 项问题溯源（用户："追根溯源，不是打补丁"）**
+   - **交付**：新建项目 `万界副本·博弈者`（genre=高武/high-martial-comedy，**branch=metaverse 游戏化元宇宙·副本**），
+     `POST /api/projects/initialize` 走 SOP 四阶段；**20/20 章全部 material-updated**（总 52,572 字，均 2,629/章），
+     素材 16→112、facts 23、世界域 52、穿越痕迹 7。项目 id `8bc180d6-a5cf-404e-96ea-9fcc572bf7cf`。
+   - **问题统计表（12 项）→ 根因修复 6 项**（详见 `docs/worklog/2026-10-09-跨界副本博弈-新项目20章-问题溯源.md`）：
+     - **#1（阻断级）** `outlineGenerator.js` 调 `parseJsonResponse` 却未导入 → 大纲恒 0 → 连带 quests 失败。补导入。
+     - **#12（最有价值）** **两套 `trimItemData` 分叉**：`db/storeCommon.js`（PG 路径）把材质形状归一放在
+       **体积早返回之后** → **未超限素材永不归一**（新素材缺 provenance）；历史数据只因 T2 一次性回填而合规。
+       修复=归一提到早返回前（与 `storeTrim.js` 对齐）+ 回填 68 条；`audit-material-shape.js --db` 归零、`materialShapeGate` 转绿。
+     - **#6/#7/#10** 三处"静默失效"：`pipelineDepthDriftCheck` require 路径多一层 `../`；
+       `checkPowerTimeline` 用块外 `content`（ReferenceError → **战力规则校验从未生效**）；`firstReviewParser` require 路径多一层。
+     - **#9** 硬阻断后不收敛 → 前向活锁：ch3 正文出现"**上一章**"命中元叙事红线被 hardBlock；根因=**规则"只查不写"**
+       （检测端硬拦，writer/reviser 提示词从未声明）。修复=唯一构建器 `writingGuardSectionBuilder` 增「元叙事章回引用红线」段。
+   - **未修（已记录根因/方向）**：#2 后端偶发原生崩溃（`0xC0000409`，已知类#34，触发点未定位，已提供自愈监督器）；
+     #3 素材非角色批次 JSON 解析不健壮；#4 initialize count 上报（已改待验）；#5 writer 首章 relationship 缺口；
+     #8 润色缩字 + `content`/`normalContent` 语义分裂（5/20 章 <2400，1 章 <2000）；#11 门槛前向活锁（设计层）。
+   - **回归**：`tests/unit` **262 套件 / 4008 例全绿**（基线 261/3999；新增 `tests/unit/kuaijieRegression.test.js` 9 例防回退）。
+   - **全功能巡检**：31 个关键端点 31/31 通过（`scripts/_session_kuaijie/20_functional_tests.js`）。
+   - **提交状态**：①本批 6 处根因修复**已提交**（见 §一 0t）；②3 个重复同名项目待清理（删项目需确认）。
+   - **测试位置约定**：一次性驱动/诊断脚本放 `scripts/_session_kuaijie/`（含自愈监督器 `11_supervise_chapters.js`）；正式回归测试放 `tests/unit/`。
 
 0r. **（2026-10-09 本会话）设计期补设计 + 命名质量 + 口头禅入编年史（用户："保证下个窗口建项目不产流水账/AI文/烂名字"）**
    - **已把前两批未提交改动提交**：`3eb5e50`（素材链路 T1→T6，上一会话遗留）+ `e934754`（高光/名言/魅力判定标准）。
