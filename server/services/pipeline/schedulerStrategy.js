@@ -14,6 +14,15 @@ const DEFAULT_STRATEGY = {
             selected.push(item);
             usedBudget += item.content?.length || 0;
         }
+        // 【根因修复 2026-10-11】预算 < 单条素材时，旧逻辑第一条就 break → 静默返回空数组，
+        // 于是声明为 required 的素材类型变成 EMPTY（实测 ch5/ch6 的 second-review/polisher 角色卡=0，
+        // Agent 拿不到任何角色上下文）。改为"至少给一条"（超出则按预算截断），避免空转。
+        if (selected.length === 0 && items.length > 0) {
+            const first = items[0];
+            const len = first.content?.length || 0;
+            if (budget > 0 && len > budget) selected.push({ ...first, content: String(first.content).slice(0, budget) });
+            else selected.push(first);
+        }
         return selected;
     }
 };

@@ -70,3 +70,13 @@ data/crash-dumps/
 
 # 临时截图/调试图（根目录 _ 前缀）
 /_*.png
+
+# 服务器运行日志（daemon 自持 stdout/stderr，见 scripts/serverStart.js）
+logs/
+
+# 验证会话产物（日志/响应转储/临时探针输出）
+scripts/verify-2026-10-11/*.log
+scripts/verify-2026-10-11/*.out
+scripts/verify-2026-10-11/*_resp.json
+scripts/verify-2026-10-11/project_id.txt
+scripts/verify-2026-10-11/*.json

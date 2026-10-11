@@ -209,9 +209,15 @@ function checkDataFlowSpec() {
     const known = new Set(KNOWN_STEP_KEYS);
     let registered = [];
     try { registered = require('../server/core/pipeline/steps/StepRegistry').getMigratedSteps(); } catch (_) { registered = []; }
-    for (const step of registered) {
-        if (!known.has(step)) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `StepRegistry 步骤 "${step}" 未登记 KNOWN_STEP_KEYS` });
-        if (!DATA_FLOW_SPEC[step]) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `StepRegistry 步骤 "${step}" 缺少数据流规范条目` });
+    // 契约 STEP_ORDER 也是权威步骤来源（intent-planner/consistency-constraint 等未必在 StepRegistry）
+    let contractOrder = [];
+    try { contractOrder = require('../server/services/pipeline/pipelineContractDefs').PIPELINE_CONTRACT.STEP_ORDER || []; } catch (_) { contractOrder = []; }
+    // 权威步骤集 = KNOWN_STEP_KEYS ∪ StepRegistry 已迁移 ∪ 契约 STEP_ORDER。
+    // 根因修复 2026-10-11：此前只校验 registered（已迁移步骤），未迁移步骤不在集合内 → 规范缺条目不报警。
+    const authoritative = new Set([...known, ...registered, ...contractOrder]);
+    for (const step of authoritative) {
+        if (!known.has(step)) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `真实步骤 "${step}" 未登记 KNOWN_STEP_KEYS` });
+        if (!DATA_FLOW_SPEC[step]) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `真实步骤 "${step}" 缺少数据流规范条目` });
     }
     for (const [step, spec] of Object.entries(DATA_FLOW_SPEC)) {
         if (!known.has(step)) v.push({ check: '6', file: 'dataFlowSpec.js', detail: `规范含未知步骤 "${step}"` });

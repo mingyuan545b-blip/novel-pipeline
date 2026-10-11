@@ -1,6 +1,10 @@
 const providerRegistry = require('../config/providerRegistry');
 const { LLMTimeoutError, ContextOverflowError } = require('../shared/errors');
 
+// 供应商"内容安全审核"拦截：对**输入文本**的政策性拒绝（非网络/非过载，重发同请求必然仍失败）。
+// 典型码：阿里云 data_inspection_failed / "inappropriate content"。标记后由 llm.chat 走"换供应商"兜底。
+const CONTENT_INSPECTION_RE = /data_inspection_failed|inappropriate content|content[_ ]?(policy|filter)|sensitive content|risk[_ ]?control|审核|违规/i;
+
 // 供应商级思考关闭治理：llama.cpp系本地服务（LM Studio）的思考模型
 // 不认API层enable_thinking参数。双保险（陷阱#94实测：复杂prompt下软标记会被无视）：
 //   1) system追加硬指令（noThinkSystemDirective）
@@ -120,10 +124,11 @@ function classifyAndHandleError(error, config, maxRetries, attempt, retryDelay, 
         return { shouldThrow: true, error: err };
     }
 
-    return {
-        shouldThrow: true,
-        error: new Error(`API Error (${config.provider}/${config.model}, code:${statusCode || 'unknown'}): ${errMsg}`)
-    };
+    const err = new Error(`API Error (${config.provider}/${config.model}, code:${statusCode || 'unknown'}): ${errMsg}`);
+    if (CONTENT_INSPECTION_RE.test(String(errMsg)) || statusCode === 'data_inspection_failed') {
+        err.isContentInspection = true;
+    }
+    return { shouldThrow: true, error: err };
 }
 
 module.exports = {

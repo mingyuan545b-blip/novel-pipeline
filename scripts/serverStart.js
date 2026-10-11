@@ -129,40 +129,43 @@ function startServer(port) {
     // 2. 清理旧PID文件
     removePidFile();
 
-    // 3. 启动服务器子进程（堆内存12GB，避免大量entity dedup + LLM调用导致OOM）
-    // 陷阱#75：8GB堆内存在 postApproval 链路（material-organizer+registrar+knowledge-extraction）时OOM崩溃
-    const child = spawn(process.execPath, [
+    // 3. 启动服务器子进程
+    //
+    // 【根因修复 2026-10-11 · OOM】此前用 stdio:'inherit' 启动：daemon 的 stdout/stderr
+    //   与"调用方"的管道耦合。当调用方是后台任务／管道接 tail／被中断的会话时，管道读端一旦停摆，
+    //   Node 会把 stdout 写入缓存在 JS 堆里无限堆积 → 12GB OOM（实测 heap used 12.2GB、
+    //   external 仅 4MB，即纯 JS 堆被输出缓冲撑爆；`--trace-gc` 持续刷屏把增长放大百倍）。
+    //   修法（daemon 化，治本而非调大 limit）：daemon 自己持有日志文件（不继承调用方管道）+ detached 独立存活。
+    const LOG_DIR = path.join(PROJECT_ROOT, 'logs');
+    if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
+    const outFd = fs.openSync(path.join(LOG_DIR, 'server.out.log'), 'a');
+    const errFd = fs.openSync(path.join(LOG_DIR, 'server.err.log'), 'a');
+
+    const nodeFlags = [
         '--max-old-space-size=12288',
         '--max-semi-space-size=256',
-        '--trace-gc',
         // 崩溃转储：CLI 兜底（JS 层 crashDump.initCrashDump 之前若崩，也留证）+ 提高 JS 栈上限便于定位深递归
         '--report-on-fatalerror',
         '--report-compact',
         '--stack-trace-limit=50',
-        SERVER_ENTRY
-    ], {
+    ];
+    // --trace-gc 仅诊断时开启（默认关）：它持续刷 stdout，配合未 drain 的管道是 OOM 放大器
+    if (process.env.TRACE_GC === '1') nodeFlags.push('--trace-gc');
+
+    const child = spawn(process.execPath, [...nodeFlags, SERVER_ENTRY], {
         cwd: PROJECT_ROOT,
-        stdio: 'inherit',
+        stdio: ['ignore', outFd, errFd],
+        detached: true,
         env: { ...process.env, NODE_PATH: path.join(PROJECT_ROOT, 'server') }
     });
+    fs.closeSync(outFd);
+    fs.closeSync(errFd);
+    child.unref(); // daemon 独立于启动器存活，启动器可立即退出
 
     // 4. 记录PID
     writePidFile(child.pid);
-    console.log(`[serverStart] 服务器已启动, PID ${child.pid}, PID文件已写入 ${PID_FILE}`);
-
-    // 5. 子进程退出时清理PID文件
-    child.on('exit', (code, signal) => {
-        removePidFile();
-        console.log(`[serverStart] 服务器进程退出 (code=${code}, signal=${signal})`);
-        process.exit(code || 0);
-    });
-
-    // 6. 主进程收到信号时转发给子进程
-    ['SIGINT', 'SIGTERM', 'SIGHUP'].forEach(sig => {
-        process.on(sig, () => {
-            if (!child.killed) child.kill(sig);
-        });
-    });
+    console.log(`[serverStart] 服务器已启动, PID ${child.pid}, PID文件 ${PID_FILE}`);
+    console.log(`[serverStart] 日志: logs/server.out.log · logs/server.err.log（daemon 自持，不继承调用方管道）`);
 }
 
 // 主入口

@@ -11,7 +11,22 @@
 
 ## 一、当前结论（重要）
 
-0u. **（2026-10-10 本会话）UI 盲区修复 + 铁律三根因 + AI 味词表接入检测器（用户："点任何章 UI 都显示固定错误：复审未通过·系统提示未化为高武意境表达·违反铁律三"）**
+0v. **（2026-10-11 本会话）新项目 10 章验证 + 5 处根因修复（OOM / 契约漂移 / 解析脆弱 / 工艺静默失败 / 题材误报）**
+   - 用户："新建项目跑 10 章，验证取名标准性/人物设计/章节质量/每 agent 前后工序资料交接与职责划分；根因修复不补丁。"
+   - **R1 OOM（P0）**：`POST /api/projects/initialize` 必崩（堆 12.2GB）。取证=JS 堆被 stdout 缓冲撑爆（external 仅 4MB）；
+     对照实验（stdout→文件则稳定 50MB）定位根因：daemon 继承调用方 stdout 管道、读端停摆时无限缓冲，`--trace-gc` 放大。
+     **修复**：`scripts/serverStart.js` daemon 化（`detached` + stdout/stderr→`logs/*.log`，不继承管道）；`--trace-gc` 改 `TRACE_GC=1` 才开。
+   - **R2 契约漂移**：`intent-planner`/`consistency-constraint` 在 KNOWN_STEP_KEYS 却无 dataFlowSpec 条目；闸门只查 StepRegistry 已迁移步骤→漏检。
+     **修复**：新增 `dataFlowSpecSupplement.js` + 闸门按权威步骤集（KNOWN∪StepRegistry∪STEP_ORDER）校验。
+   - **R3 解析脆弱**：`parseJsonResponse` 贪婪正则过匹配→项目静默 0 章。**修复**：改括号配平提取。
+   - **R4 工艺静默失败**：主角金句缺 `why`→validateQuotes 全拒，craftDesigner 仍报"写入 4"成功。**修复**：应用后复检 `needsCraft` 出 `unresolved` 告警 + prompt 加硬约束。
+   - **R5 题材误报**：`neverDropTypes` 硬编码 relationship，高武不产出→每章刷"决策需要但素材库无数据"假告警。**修复**：题材排除判定优先于 neverDrop。
+   - **R6 内容审核拦截卡章**：ch8 被供应商 `data_inspection_failed` 拒绝→无兜底→门槛连锁拦 ch9/ch10。**修复**：标记 `isContentInspection` + `llm.chat` 故障转移备用供应商（跳过占位密钥）。本机深 seek 密钥是占位符→仍阻断（环境/合规，非代码缺陷）。
+   - **R7 小预算选材空转**：`schedulerStrategy` 预算<单条时返回空数组→二审/polisher 角色卡 EMPTY。**修复**：至少给一条（超长截断）+ 回归单测。
+   - **验证**：`tests/unit` 全绿（271+ 套件，新增 schedulerStrategy 测试）；取名 8/8 通过；10 章实跑 7 成 3 卡（ch8-10 受 R6 阻断）；R5/R7 端到端复验通过（见 `scripts/verify-2026-10-11/`）。
+   - 详见 `docs/worklog/2026-10-11-新项目10章验证-根因修复.md`。
+
+0u. **（2026-10-10 上一会话）UI 盲区修复 + 铁律三根因 + AI 味词表接入检测器（用户："点任何章 UI 都显示固定错误：复审未通过·系统提示未化为高武意境表达·违反铁律三"）**
    - **先判性质 = UI bug，不是数据**：全书只有第 1、6 章真含"铁律三"（章节表 + 流水线日志双证）；用户所见"固定错误"是**看板坏了**。
    - **UI 根因**：`client/src/pages/pipeline/usePipelinePageState.js` 两处叠加——①状态轮询空闲时也用**项目级** infinite 日志覆盖执行日志；
      ②`loadPipelineLogs` 有"仅当 logs 为空才加载"守卫 → 点任何章都不刷新。**已修**（空闲只显示所选章日志；去掉守卫）。

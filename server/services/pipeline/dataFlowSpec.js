@@ -161,6 +161,11 @@ const DATA_FLOW_SPEC = {
     }
 };
 
+// 2026-10-11 补：intent-planner/consistency-constraint 等真实步骤的规范条目拆到 supplement
+// （S8「dataFlowSpec 与真实步骤对齐」遗漏；闸门因只查 StepRegistry 未迁移步骤而漏检）。
+const { SUPPLEMENT_SPEC } = require('./dataFlowSpecSupplement');
+Object.assign(DATA_FLOW_SPEC, SUPPLEMENT_SPEC);
+
 // 真实步骤清单（用于 dataFlowSpec 一致性闸门：规范不得漂移到不存在的步骤）
 const KNOWN_STEP_KEYS = Object.freeze([
     'outline-generator', 'intent-planner', 'writer', 'fast-review', 'first-review', 'second-review',

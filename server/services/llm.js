@@ -7,6 +7,7 @@ const { DEFAULT_MODEL } = require('../config/modelResolver');
 const { normalizeMessageContent } = require('./llmResponseParser');
 const { waitForRetry } = require('./llmRetryUtils');
 const { buildRequestPayload, buildRequestHeaders, classifyAndHandleError } = require('./llmRequestBuilder');
+const { switchToFallback } = require('./llmContentFallback');
 const llmMetrics = require('./llmMetrics');
 const llmTimeoutTracker = require('./llmTimeoutTracker');
 const { LLM_DEFAULTS } = require('../config/systemConfig');
@@ -27,25 +28,21 @@ async function resolveConfig(apiConfig) {
 }
 
 async function chat(messages, options = {}) {
-    const config = await resolveConfig(options.apiConfig);
+    let config = await resolveConfig(options.apiConfig);
     if (!config.apiKey) throw new Error('API Key not configured');
     // 项目预算闸门：超限即抛（所有 LLM 调用共用这一道闸，防绕过，见 llmBudgetGuard.js）
     const budgetProjectId = await llmBudgetGuard.begin(options);
     llmTimeoutTracker.recordRequest();
-
     const limiter = getRateLimiter(config.provider, { rpm: options.rpm, burst: options.burst });
     await limiter.acquire();
-
     const providerInfo = providerRegistry.PROVIDERS[config.provider];
     const tokenBucket = getTokenBucket(config.provider, { tpm: options.tpm || providerInfo?.tpmLimit });
-    const estimatedInputTokens = Math.ceil(JSON.stringify(messages).length / 3);
-    const estimatedOutputTokens = options.maxTokens || 8192;
+    const estimatedInputTokens = Math.ceil(JSON.stringify(messages).length / 3), estimatedOutputTokens = options.maxTokens || 8192;
     const estimatedTotalTokens = estimatedInputTokens + estimatedOutputTokens;
     await tokenBucket.acquire(estimatedTotalTokens);
 
     const maxRetries = options.maxRetries ?? 3;
     const retryDelay = options.retryDelay ?? 10000;
-
     const abortController = new AbortController();
     const externalSignal = options.signal;
     if (externalSignal) {
@@ -59,9 +56,8 @@ async function chat(messages, options = {}) {
     const slowWarnMs = options.slowWarnMs || Math.max(60000, Math.round(requestTimeoutMs / 3));
     if (externalSignal?.aborted) throw new Error('LLM request aborted before start');
 
-    const payload = buildRequestPayload(config, messages, options);
-    const headers = buildRequestHeaders(config);
-    const url = `${config.baseURL}/chat/completions`;
+    let payload = buildRequestPayload(config, messages, options);
+    let headers = buildRequestHeaders(config), url = `${config.baseURL}/chat/completions`, usedFallback = false;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         const attemptStart = Date.now();
@@ -138,6 +134,10 @@ async function chat(messages, options = {}) {
             }
             if (result.shouldThrow) {
                 llmMetrics.recordTokenUsage(config.provider, config.model, null, false, durationMs);
+                if (result.error && result.error.isContentInspection && !usedFallback) {
+                    const sw = await switchToFallback(config, messages, options);
+                    if (sw) { usedFallback = true; config = sw.config; payload = sw.payload; headers = sw.headers; url = sw.url; continue; }
+                }
                 throw result.error;
             }
         }

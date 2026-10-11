@@ -10,7 +10,7 @@ const {
     resolveChapterPhase, detectSceneTypes,
     getDepthAdjustment, getScenePriorityBoost, allocateBudget,
 } = require('./contextDecisionRules');
-const { assessRelevance, collectOutlineMentionedTypes, genreAccessForAgent, NEVER_DROP_TYPES } = require('./contextRelevance');
+const { assessRelevance, collectOutlineMentionedTypes, genreAccessForAgent } = require('./contextRelevance');
 const { getOverridesMap } = require('./contextOverrideStore');
 const { resolveServants, resolveTimelineContext } = require('./contextCommanderLoaders');
 const { resolveServantLoads } = require('./servantDecisionEngine');
@@ -66,9 +66,12 @@ async function resolveContext(agentType, params) {
             resolved.dropped = true;
             resolved.dropReason = 'not-relevant';
         }
-        // 题材元素组合：题材插件声明的可见素材类型之外的，整类不注入
-        if (!resolved.dropped && genreAllowed && !genreAllowed.has(resolved.type)
-            && !NEVER_DROP_TYPES.includes(resolved.type)) {
+        // 题材元素组合：题材插件声明的可见素材类型之外的，整类不注入。
+        // 【根因修复 2026-10-11】此判定必须优先于 neverDrop 兜底：题材"根本不产出"的类型
+        // （如高武 writer needs 无 relationship），若被 neverDrop 强留成空需求，会每章刷假告警
+        // "决策需要但素材库无数据"（EMPTY=warning 级）——正是"误报"家族。题材明确声明不产出的类型，
+        // 即便在 neverDropTypes 里也应整类丢弃（neverDrop 仍用于预算降级/相关性门控两条链）。
+        if (!resolved.dropped && genreAllowed && !genreAllowed.has(resolved.type)) {
             resolved.dropped = true;
             resolved.dropReason = 'genre-excluded';
         }

@@ -39,10 +39,10 @@ function _parseItems(raw) {
 
 function _jsonSchemaHint() {
     return '输出 JSON 数组，每项：'
-        + '{"name":"角色名","charisma":"当【处境】时，他宁可【做X】，也不【做Y】",'
+        + '{"name":"角色名","charisma":"当【具体处境】时，他宁可【做X】，也不【做Y】",'
         + '"philosophy":"核心信念与价值观","entranceDesign":"首次出场方式+标志性场景",'
-        + '"quoteLibrary":[{"scene":"处境","quote":"金句原文","why":"它暴露了他的哪条信念/哪段代价"}],'
-        + '"highlightScenes":[{"scene":"处境","what":"他的选择（含动作或台词原文）","cost":"代价","why":"为什么只有他会这样"}],'
+        + '"quoteLibrary":[{"scene":"<具体处境，写实不要照抄占位>","quote":"金句原文","why":"它暴露了他的哪条信念/哪段代价"}],'
+        + '"highlightScenes":[{"scene":"<具体处境>","what":"他的选择（含动作或台词原文）","cost":"代价","why":"为什么只有他会这样"}],'
         + '"catchphrases":[{"text":"口头禅原文","trigger":"什么场合说","why":"辨识度"}]}';
 }
 
@@ -54,6 +54,9 @@ function _buildMessages(targets, ctx) {
         '1. 必须紧扣该角色既有设定（身份/性格/欲望/恐惧/伤口），不得改名、不得改人设',
         '2. 人格魅力必须写成"当【处境】时，他宁可【做X】，也不【做Y】"；禁止第三人称功能说明（"展现了…""他是主角的锚点…"）',
         '3. 金句必须有处境与记忆点；高光必须含代价；口头禅要能反复出现',
+        '3b. 【硬性】quoteLibrary 每项必须含 scene/quote/why 三字段；缺 why（记忆点）该项一律作废丢弃——' +
+            'why 要写"这句话暴露了他的哪条信念/哪段代价"，不要写"记忆点：强调…"这类空评。',
+        '3c. highlightScenes 每项必须含 scene/what/cost/why；缺 cost 作废。',
         '4. 一律禁评论腔（展现/体现/立住…）、禁过场句（上车。/进去了。）、禁现代网络梗',
         '5. 只输出 JSON，不要解释、不要 Markdown 代码块',
     ].join('\n');
@@ -83,7 +86,7 @@ function _buildMessages(targets, ctx) {
  */
 async function designCharacterCraft(projectId, options) {
     const opts = options || {};
-    const stats = { checked: 0, targets: 0, applied: 0, proposals: [] };
+    const stats = { checked: 0, targets: 0, applied: 0, proposals: [], unresolved: [] };
     const entities = await entityCenter.getEntitiesForProject(projectId, { entityType: 'character' });
     stats.checked = entities.length;
     const targets = selectCraftTargets(entities, opts.maxItems);
@@ -110,15 +113,25 @@ async function designCharacterCraft(projectId, options) {
         const target = findTarget(targets, item.name);
         if (!target) continue;
         const patch = buildCraftPatchFromItem(target.entity, item);
-        if (Object.keys(patch).length === 0) continue;
+        if (Object.keys(patch).length === 0) {
+            // 回包该角色一个字段都没过闸（如金句缺 why）——此前静默跳过，缺口永不被发现
+            stats.unresolved.push({ name: item.name, stillMissing: target.missing, note: '回包未过闸门（如金句缺 why/高光缺 cost）' });
+            continue;
+        }
         const entry = { name: item.name, fields: Object.keys(patch) };
         if (opts.debug) entry.patch = patch;
         stats.proposals.push(entry);
         if (!opts.apply) continue;
-        await entityCenter.updateEntity(target.entity.id, patch);
+        const updated = await entityCenter.updateEntity(target.entity.id, patch);
         stats.applied++;
+        // 应用后复检：印证"写入成功"不等于"缺口已补"（缺 why 的金句会被 validateQuotes 丢弃）
+        const remaining = needsCraft(updated || { ...target.entity, ...patch });
+        if (remaining.length > 0) stats.unresolved.push({ name: item.name, stillMissing: remaining });
     }
     logger.info('craftDesigner', '补设计完成: 候选 ' + stats.proposals.length + ', 写入 ' + stats.applied + '（apply=' + !!opts.apply + '）');
+    if (stats.unresolved.length > 0) {
+        logger.warn('craftDesigner', '补设计后仍有缺口（未静默）: ' + stats.unresolved.map((u) => u.name + '(' + u.stillMissing.join('/') + (u.note ? '·' + u.note : '') + ')').join(', '));
+    }
     return stats;
 }
 
