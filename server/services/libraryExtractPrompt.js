@@ -36,9 +36,12 @@ ${subMap}
 4. anti_patterns 是"抄错的样子"，2-${MAX_ANTI}条，说明错误用法及其后果。
 5. evidence 只作例证，1-2条，每条≤40字，允许出现原作内容，但不得成为定义的一部分。
 6. tags 3-${MAX_TAGS}个检索标签，用于后续BM25检索，用中文短词。
+7. judgement_test 是「判定这条技法有没有被正确执行」的**可检验标准**，一句话，
+   必须给出可观察的信号/阈值（例：「正文该段出现具体数字或倒计时词，且间隔≤3段；否则视为未执行」），
+   禁止写"写得好不好"这类无法判定的空话。（B4 源头准入：新条目必须自带判定测试）
 
 【输出格式】只输出JSON，不要任何解释、不要markdown代码块：
-{"techniques":[{"name":"","department":"","subcategory":"","definition":"","implementation_rules":[""],"anti_patterns":[""],"applicability":"","evidence":[""],"word_count_impact":"+0~+10%","tags":[""]}]}`;
+{"techniques":[{"name":"","department":"","subcategory":"","definition":"","implementation_rules":[""],"anti_patterns":[""],"judgement_test":"","applicability":"","evidence":[""],"word_count_impact":"+0~+10%","tags":[""]}]}`;
 }
 
 function buildUserPrompt({ dimension, novelName, excerpt, existingNames }) {

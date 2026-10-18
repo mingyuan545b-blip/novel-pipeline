@@ -28,7 +28,7 @@ const FULL_RULE_THRESHOLD = 2;
  *   level: full（规则≥2，可直接注入）| partial（有部分内容）| empty（空壳，仅有名字标签）
  */
 function assessCompleteness(tech) {
-    const empty = { level: LEVELS.EMPTY, hasRules: false, rulesCount: 0, antiCount: 0, hasDescription: false, score: 0 };
+    const empty = { level: LEVELS.EMPTY, hasRules: false, rulesCount: 0, antiCount: 0, hasDescription: false, hasJudgement: false, score: 0 };
     if (!tech) return empty;
 
     const rules = Array.isArray(tech.implementation_rules) ? tech.implementation_rules : [];
@@ -36,6 +36,7 @@ function assessCompleteness(tech) {
     const rulesCount = rules.length;
     const antiCount = anti.length;
     const hasDescription = Boolean(tech.description && String(tech.description).trim());
+    const hasJudgement = Boolean(tech.judgement_test && String(tech.judgement_test).trim());
 
     let level = LEVELS.EMPTY;
     if (rulesCount >= FULL_RULE_THRESHOLD) level = LEVELS.FULL;
@@ -43,7 +44,7 @@ function assessCompleteness(tech) {
 
     // 排序权重：规则最重要，反模式次之，描述再次（仅用于前端"有内容优先"排序）
     const score = rulesCount * 10 + antiCount * 3 + (hasDescription ? 2 : 0);
-    return { level, hasRules: rulesCount > 0, rulesCount, antiCount, hasDescription, score };
+    return { level, hasRules: rulesCount > 0, rulesCount, antiCount, hasDescription, hasJudgement, score };
 }
 
 /** 供统计/来源面板聚合用的一行摘要 */

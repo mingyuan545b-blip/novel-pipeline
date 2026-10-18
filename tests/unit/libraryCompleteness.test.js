@@ -61,3 +61,12 @@ describe('summarize', () => {
         expect(summarize(null)).toEqual({ total: 0, full: 0, partial: 0, empty: 0 });
     });
 });
+
+describe('hasJudgement（B4 源头准入字段）', () => {
+    test('有 judgement_test → hasJudgement=true；空白不算', () => {
+        expect(assessCompleteness({ implementation_rules: ['a', 'b'], judgement_test: '出现数字' }).hasJudgement).toBe(true);
+        expect(assessCompleteness({ implementation_rules: ['a', 'b'], judgement_test: '   ' }).hasJudgement).toBe(false);
+        expect(assessCompleteness({}).hasJudgement).toBe(false);
+        expect(assessCompleteness(null).hasJudgement).toBe(false);
+    });
+});

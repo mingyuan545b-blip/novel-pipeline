@@ -73,3 +73,27 @@ describe('libraryExtractParse - ID生成', () => {
         expect(parse.makeId('06_世界构建部', '07_宏大感构建', [])).toBe('06_世界构建部_07_宏大感构建_01');
     });
 });
+
+describe('libraryExtractParse - judgement_test（B4 源头准入）', () => {
+    const base = {
+        name: '压力倒计时可视化',
+        definition: '把不可见的压力换算成读者能自己计算的刻度',
+        implementation_rules: ['给出明确数值', '数值随时间收紧'],
+    };
+
+    test('judgement_test 透传动作为可检验标准', () => {
+        const t = parse.normalizeTechnique({ ...base, judgement_test: '该段出现具体数字且间隔≤3段' }, DIM);
+        expect(t.judgement_test).toBe('该段出现具体数字且间隔≤3段');
+    });
+
+    test('未提供 judgement_test 时为空串（不判废，保持向后兼容）', () => {
+        const t = parse.normalizeTechnique(base, DIM);
+        expect(t.judgement_test).toBe('');
+    });
+
+    test('超长 judgement_test 被裁剪', () => {
+        const long = 'x'.repeat(500);
+        const t = parse.normalizeTechnique({ ...base, judgement_test: long }, DIM);
+        expect(t.judgement_test.length).toBeLessThanOrEqual(120);
+    });
+});

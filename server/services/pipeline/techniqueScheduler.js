@@ -56,7 +56,10 @@ const GENRE_DEPARTMENT_AFFINITY = {
 function scheduleTechniques(params) {
     const { agentType, mode, sceneTypes = [], phase = 'development', outlineText = '', maxTokens = 600, knowledgeContext = null, genre = null, feedbackRates = null } = params;
 
-    const baseTechniques = techIndex.getTechniquesByInjectionPoint(agentType, mode);
+    // 源头过滤：auto_disabled（连续低效自动禁用）的技法不得进入注入候选。
+    // 此前只过滤深度/场景，未过滤禁用 → "自动禁用"在注入点形同虚设（D 增量·源头修正）。
+    const baseTechniques = techIndex.getTechniquesByInjectionPoint(agentType, mode)
+        .filter(t => !t.auto_disabled);
     if (baseTechniques.length === 0) return { techniques: [], formattedPrompt: '', tokenCost: 0 };
 
     const hasScenes = sceneTypes.length > 0;

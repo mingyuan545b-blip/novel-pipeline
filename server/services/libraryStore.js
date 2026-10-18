@@ -31,6 +31,8 @@ function normalize(t = {}) {
         trigger_condition: t.trigger_condition || t.triggerCondition || { chapter_range: [1, 999], narrative_state: [], emotion_curve: 'any' },
         implementation_rules: t.implementation_rules || t.implementationRules || [],
         anti_patterns: t.anti_patterns || t.antiPatterns || [],
+        // B4 源头准入：判定测试（"这条技法有没有被正确执行"的可检验标准）
+        judgement_test: t.judgement_test || t.judgementTest || '',
         evidence: t.evidence || [],
         source_novel: t.source_novel || t.sourceNovel || '',
         source_type: t.source_type || t.sourceType || 'curated',

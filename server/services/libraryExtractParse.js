@@ -12,6 +12,7 @@ const MAX_NAME_LEN = 14;
 const MAX_DEF_LEN = 120;
 const MAX_RULE_LEN = 160;
 const MAX_EVIDENCE_LEN = 60;
+const MAX_JUDGEMENT_LEN = 120;
 
 /** 去掉think标签与markdown代码块，截取JSON主体 */
 function extractJsonText(raw) {
@@ -87,6 +88,7 @@ function normalizeTechnique(raw, dimension) {
         description: definition,
         implementation_rules: rules,
         anti_patterns: clampList(raw.anti_patterns, MAX_ANTI, MAX_RULE_LEN),
+        judgement_test: clampText(raw.judgement_test, MAX_JUDGEMENT_LEN),
         evidence: clampList(raw.evidence, 2, MAX_EVIDENCE_LEN),
         retrieval_tags: clampList(raw.tags, MAX_TAGS, 12),
         word_count_impact: clampText(raw.word_count_impact || '+0~+10%', 16),
