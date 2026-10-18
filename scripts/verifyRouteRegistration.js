@@ -140,6 +140,7 @@ function inferRouteFile(routeVar) {
         'version': ['server/routes/versionRoutes.js'],
         'health': ['server/routes/health.js'],
         'context-commander': ['server/routes/pipeline/contextCommanderRoutes.js'],
+        'token-ledger': ['server/routes/pipeline/tokenLedgerRoutes.js'],
     };
 
     const files = specialMappings[baseName] || candidates;
@@ -183,10 +184,13 @@ function main() {
             continue;
         }
 
-        // 检查ROUTE_PREFIXES中是否有对应条目
+        // 检查ROUTE_PREFIXES中是否有对应条目，且前缀与真实挂载点一致
+        // （G3 教训：worldscopeRoutes 前缀写成空串 → verifyApiContract 13 条误报，且无门禁发现）
         const prefixEntry = ROUTE_PREFIXES[routeFile];
         if (prefixEntry === undefined) {
-            warn(`apiContractRoutePrefixes.js缺少: ${routeFile} → ${reg.mountPath}`);
+            error(`apiContractRoutePrefixes.js缺少映射: ${routeFile} → ${reg.mountPath}（verifyApiContract 会把它当成"后端无此路由"）`);
+        } else if (prefixEntry !== reg.mountPath) {
+            error(`前缀不一致: ${routeFile} 映射为 "${prefixEntry}"，实际挂载在 "${reg.mountPath}"`);
         }
     }
 

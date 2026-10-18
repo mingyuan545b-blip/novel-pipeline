@@ -29,7 +29,14 @@ const ROUTE_PREFIXES = {
     'server/routes/pipeline/pipelineOutputRoutes.js': '/api/pipeline',
     'server/routes/pipeline/contextCommanderRoutes.js': '/api/pipeline',
     'server/routes/pipeline/progressRoutes.js': '/api/pipeline',
-    'server/routes/worldscopeRoutes.js': '',
+    'server/routes/pipeline/tokenLedgerRoutes.js': '/api/pipeline',
+    // 世界域路由：routeRegistration.js:44 挂在 /api/pipeline（原为空串 → 13 条契约误报，G3）
+    'server/routes/worldscopeRoutes.js': '/api/pipeline',
+    // 调试日志检索：routeRegistration.js 挂在 /api/debug
+    'server/routes/debugRoutes.js': '/api/debug',
+    'server/routes/debugErrorRoutes.js': '/api/debug',
+    // 健康指标：嵌套挂在 health.js 的 '/metrics' 下（父前缀 /api/health）
+    'server/routes/healthMetricsRoutes.js': '/api/health/metrics',
     'server/routes/workshop.js': '/api/workshop',
     'server/routes/publish.js': '/api/publish',
     'server/routes/publishPlatformRoutes.js': '/api/publish',
@@ -80,6 +87,9 @@ const ROUTE_PREFIXES = {
     'server/routes/map.js': '/api/map',
     'server/routes/worldview-profiles.js': '/api/worldview-profiles',
     'server/routes/library.js': '/api/library',
+    // 藏经阁子路由：library.js:168-169 以 router.use('/', ...) 嵌套挂载
+    'server/routes/libraryMetaRoutes.js': '/api/library',
+    'server/routes/libraryExtractRoutes.js': '/api/library',
     // 库维护：孤儿扫描/清理、运行时预警快照、项目预算体检与设置
     'server/routes/maintenanceRoutes.js': '/api/maintenance',
     'server/routes/prompt-config.js': '/api/prompt-config',

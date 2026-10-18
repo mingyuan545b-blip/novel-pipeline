@@ -40,6 +40,57 @@ function resolveVars(rawPath, vars) {
     return rawPath.replace(/\$\{(\w+)\}/g, (_, varName) => vars[varName] || `\${${varName}}`);
 }
 
+/**
+ * 读取以 startIdx（指向开反引号）起始的模板字面量。
+ * 支持 ${...} 内嵌表达式与其中嵌套的反引号 —— 纯正则做不到，故用字符级扫描，
+ * 否则 `...${query ? `?${query}` : ''}` 会在第一个单引号处被截断，产生假"断裂"。
+ */
+function readTemplateLiteral(line, startIdx) {
+    let i = startIdx + 1;
+    let depth = 0;
+    let raw = '';
+    while (i < line.length) {
+        const ch = line[i];
+        if (ch === '\\') { raw += line[i + 1] || ''; i += 2; continue; }
+        if (ch === '$' && line[i + 1] === '{') { depth++; raw += '${'; i += 2; continue; }
+        if (depth > 0 && ch === '}') { depth--; raw += '}'; i++; continue; }
+        if (ch === '`' && depth === 0) return { raw, end: i };
+        raw += ch; i++;
+    }
+    return { raw, end: -1 };
+}
+
+/** 去掉 ${expr} 中用于拼接查询串的表达式（含 ?），使路径回到可比较的形态 */
+function stripQueryExpressions(raw) {
+    let out = '';
+    let i = 0;
+    while (i < raw.length) {
+        if (raw.startsWith('${', i)) {
+            let depth = 1;
+            let j = i + 2;
+            while (j < raw.length && depth > 0) {
+                if (raw[j] === '{') depth++;
+                else if (raw[j] === '}') depth--;
+                j++;
+            }
+            const expr = raw.slice(i + 2, j - 1);
+            if (!expr.includes('?')) out += raw.slice(i, j);
+            i = j;
+            continue;
+        }
+        out += raw[i];
+        i++;
+    }
+    return out;
+}
+
+/** 模板字面量 → 规范化路径（去查询表达式、截断字面量 ? 之后的部分） */
+function normalizeTemplatePath(raw) {
+    const stripped = stripQueryExpressions(raw);
+    const q = stripped.indexOf('?');
+    return q === -1 ? stripped : stripped.slice(0, q);
+}
+
 function extractFrontendCalls() {
     const apiDir = path.join(ROOT, 'client', 'src', 'services', 'api');
     const files = fs.readdirSync(apiDir).filter(f => f.endsWith('.js'));
@@ -52,17 +103,31 @@ function extractFrontendCalls() {
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             const regex = new RegExp(
-                `\\b(?:api|longApi)\\.(${HTTP_METHODS.join('|')})\\s*\\(\\s*(['"\`])([^'"\`]+)\\2`,
+                `\\b(?:api|longApi)\\.(${HTTP_METHODS.join('|')})\\s*\\(\\s*(['"\`])`,
                 'g'
             );
             let match;
             while ((match = regex.exec(line)) !== null) {
+                const delim = match[2];
+                const argStart = match.index + match[0].length;
+                let rawPath;
+                let consumedTo;
+                if (delim === '`') {
+                    const tpl = readTemplateLiteral(line, argStart - 1);
+                    rawPath = normalizeTemplatePath(tpl.raw);
+                    consumedTo = tpl.end;
+                } else {
+                    const close = line.indexOf(delim, argStart);
+                    rawPath = close === -1 ? line.slice(argStart) : line.slice(argStart, close);
+                    consumedTo = close;
+                }
                 calls.push({
                     method: match[1].toUpperCase(),
-                    path: resolveVars(match[3], vars),
+                    path: resolveVars(rawPath, vars),
                     file: `client/src/services/api/${file}`,
                     line: i + 1
                 });
+                regex.lastIndex = consumedTo > 0 ? consumedTo : regex.lastIndex;
             }
         }
     }

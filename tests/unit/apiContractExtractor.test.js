@@ -30,6 +30,23 @@ describe('apiContractExtractor', () => {
             }
         });
 
+        test('模板字面量中的查询表达式不得产生假断裂（G3 回归）', () => {
+            const calls = extractor.extractFrontendCalls();
+            const tracesCall = calls.find(c => c.file.endsWith('pipelineApi.js') && c.path.includes('/worldscope/') && c.path.includes('/traces'));
+            expect(tracesCall).toBeDefined();
+            // 原 bug：`.../traces${query ? `?${query}` : ''}` 在第一个单引号处截断
+            expect(tracesCall.path).not.toContain('?');
+            expect(tracesCall.path).not.toContain(': ');
+        });
+
+        test('真实前后端契约必须零断裂（门禁即断言）', () => {
+            const broken = extractor.compareContracts(
+                extractor.extractFrontendCalls(),
+                extractor.extractBackendRoutes()
+            );
+            expect(broken.map(b => `${b.file}:${b.line} ${b.method} ${b.path}`)).toEqual([]);
+        });
+
         test('应正确解析变量引用（${EC}等）', () => {
             const calls = extractor.extractFrontendCalls();
             // otherApi.js中使用了const EC = '/entity-center'等变量
@@ -53,6 +70,21 @@ describe('apiContractExtractor', () => {
                 expect(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']).toContain(route.method);
                 expect(route.path).toMatch(/^\//);
             }
+        });
+    });
+
+    describe('ROUTE_PREFIXES（G3 回归）', () => {
+        test('前缀不得为空串（空串=挂在根路径，历史上正是该 bug 的形态）', () => {
+            const { ROUTE_PREFIXES } = require('../../scripts/apiContractRoutePrefixes');
+            const empties = Object.entries(ROUTE_PREFIXES).filter(([, v]) => v === '');
+            expect(empties).toEqual([]);
+        });
+
+        test('关键路由文件的前缀必须与真实挂载一致', () => {
+            const { ROUTE_PREFIXES } = require('../../scripts/apiContractRoutePrefixes');
+            expect(ROUTE_PREFIXES['server/routes/worldscopeRoutes.js']).toBe('/api/pipeline');
+            expect(ROUTE_PREFIXES['server/routes/pipeline/tokenLedgerRoutes.js']).toBe('/api/pipeline');
+            expect(ROUTE_PREFIXES['server/routes/debugRoutes.js']).toBe('/api/debug');
         });
     });
 
