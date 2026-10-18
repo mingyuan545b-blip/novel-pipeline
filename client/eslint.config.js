@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import vitest from 'eslint-plugin-vitest'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
@@ -46,6 +47,7 @@ export default defineConfig([
   },
   {
     files: ['**/__tests__/**/*.{js,jsx}'],
+    plugins: { vitest },
     languageOptions: {
       globals: { ...globals.browser, describe: 'readonly', test: 'readonly', it: 'readonly', expect: 'readonly', beforeEach: 'readonly', afterEach: 'readonly', vi: 'readonly', jest: 'readonly' },
     },
@@ -53,6 +55,11 @@ export default defineConfig([
       'max-lines': 'off',
       'max-lines-per-function': 'off',
       'react-hooks/rules-of-hooks': 'off',
+      'vitest/expect-expect': 'error',
+      'vitest/no-conditional-expect': 'error',
+      'vitest/no-standalone-expect': 'error',
+      'vitest/no-identical-title': 'error',
+      'vitest/valid-expect': 'error',
     },
   },
 ])

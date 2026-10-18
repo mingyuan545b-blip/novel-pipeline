@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "gitnexus": {
+      "command": "gitnexus",
+      "args": ["mcp"]
+    },
+    "eslint": {
+      "command": "npx",
+      "args": ["-y", "@eslint/mcp"]
+    },
+    "vitest": {
+      "command": "npx",
+      "args": ["-y", "@djankies/vitest-mcp"]
+    },
+    "postgres": {
+      "command": "node",
+      "args": ["scripts/mcp-postgres.js"]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  }
+}

@@ -32,15 +32,21 @@ function gitLines(cmd) {
     }
 }
 
+const IGNORED_PATH_SEGMENTS = new Set(['node_modules', '.stryker-tmp', 'reports']);
+
+function isIgnoredPath(file) {
+    return file.split(/[\\/]/).some((segment) => IGNORED_PATH_SEGMENTS.has(segment));
+}
+
 function getStagedFiles() {
-    return gitLines('git diff --cached --name-only');
+    return gitLines('git diff --cached --name-only').filter((file) => !isIgnoredPath(file));
 }
 
 // 修复：历史版本只扫 git diff HEAD，漏掉未跟踪的新文件
 function getDeliverFiles() {
     const changed = gitLines('git diff --name-only HEAD');
     const untracked = gitLines('git ls-files --others --exclude-standard');
-    return [...new Set([...changed, ...untracked])];
+    return [...new Set([...changed, ...untracked])].filter((file) => !isIgnoredPath(file));
 }
 
 function readIfExists(file) {

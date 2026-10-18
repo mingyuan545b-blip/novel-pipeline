@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - run: npx eslint server --max-warnings=0
 
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - run: npx jest tests/unit --coverage --ci
       - name: Upload backend coverage
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - name: Integration tests
         run: node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration --testTimeout=120000
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - name: E2E material injection tests
         run: node --experimental-vm-modules node_modules/jest/bin/jest.js tests/e2e/e2eMaterialInjection.test.js --testTimeout=60000
@@ -57,7 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - run: npx eslint src --ignore-pattern "__tests__" --max-warnings=0
 
@@ -67,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - run: npx vitest run --coverage
       - name: Upload frontend coverage
@@ -108,16 +108,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - run: node scripts/verifyDocFreshness.js
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with: { node-version: 24.x }
+      - run: npm ci
+      - name: Dependency audit (root, production, high)
+        run: npm audit --audit-level=high --omit=dev
+      - name: Dependency audit (server, production, high)
+        working-directory: server
+        run: npm audit --audit-level=high --omit=dev
+      - name: Dependency audit (client, production, high)
+        working-directory: client
+        run: npm audit --audit-level=high --omit=dev
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   e2e-smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20.x }
+        with: { node-version: 24.x }
       - run: npm install
       - name: Module load smoke test
         run: node tests/e2e/e2eSmokeTest.js

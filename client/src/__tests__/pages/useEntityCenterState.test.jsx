@@ -40,6 +40,7 @@ vi.mock('../../hooks/queries/useCharacterStates', () => ({
 
 vi.mock('../../hooks/queries/useMaterials', () => ({
     useMaterials: vi.fn(() => ({ data: [] })),
+    useMaterialLifecycle: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
 }));
 
 vi.mock('../../hooks/queries/useChapters', () => ({

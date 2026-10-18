@@ -1,0 +1,55 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run test:unit:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run check:*)",
+      "Bash(npm run coverage:check:*)",
+      "Bash(npm run typecheck:js:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(node scripts/audit-*.js:*)",
+      "Bash(node scripts/verify*.js:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx jest:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./data/api-keys/**)",
+      "Read(./backups/**)",
+      "Read(./output/**)",
+      "Read(./logs/**)",
+      "Edit(./.env)",
+      "Edit(./data/api-keys/**)",
+      "Bash(git reset --hard:*)",
+      "Bash(git push --force:*)",
+      "Bash(rm -rf:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/claude-hooks/guard-bash.js"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/claude-hooks/lint-edited.js"
+          }
+        ]
+      }
+    ]
+  }
+}

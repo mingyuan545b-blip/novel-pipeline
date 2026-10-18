@@ -22,7 +22,13 @@ describe('useKnowledgeState', () => {
         const { result } = renderHook(() => useKnowledgeState('proj-1', []));
         expect(result.current.records).toEqual([]);
         expect(result.current.loading).toBe(true); // useEffect triggers loadRecords immediately
-        expect(result.current.filter).toEqual({ factId: '', entityId: '' });
+        expect(result.current.filter).toEqual({
+            factId: '',
+            entityId: '',
+            category: 'all',
+            chapter: 'all',
+            query: ''
+        });
         expect(result.current.showForm).toBe(false);
         expect(result.current.saving).toBe(false);
     });

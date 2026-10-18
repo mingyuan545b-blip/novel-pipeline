@@ -42,8 +42,9 @@ const HARDCODE_RULES = [
 
 function scanFile(filePath) {
     const content = fs.readFileSync(filePath, 'utf8');
-    const lines = content.split('\n');
-    const lineCount = lines.length;
+    const lines = content.split(/\r?\n/);
+    // A trailing newline produces one empty element; it is not a source line.
+    const lineCount = content.endsWith('\n') ? lines.length - 1 : lines.length;
     const issues = [];
 
     if (lineCount > MAX_LINES) {

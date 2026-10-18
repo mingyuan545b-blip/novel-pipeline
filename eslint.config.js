@@ -1,5 +1,7 @@
 const globals = require('globals');
 const localPlugin = require('./eslint-rules');
+const securityPlugin = require('eslint-plugin-security');
+const jestPlugin = require('eslint-plugin-jest');
 
 const EXEMPT_FILES = [
     'server/db/database-pg.js',
@@ -47,11 +49,11 @@ const R2_RESTRICTED_SYNTAX = [
 
 module.exports = [
     {
-        ignores: ['server/scripts/**', 'server/__tests__/**', 'tests/**']
+        ignores: ['server/scripts/**', 'server/__tests__/**']
     },
     {
         files: ['server/**/*.js'],
-        plugins: { local: localPlugin },
+        plugins: { local: localPlugin, security: securityPlugin },
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'commonjs',
@@ -64,7 +66,13 @@ module.exports = [
             'max-lines': ['error', { max: 200, skipBlankLines: true, skipComments: true }],
             'max-lines-per-function': ['warn', { max: 100, skipBlankLines: true, skipComments: true, IIFEs: true }],
             'no-empty': ['error', { allowEmptyCatch: false }],
-            'no-restricted-syntax': ['error', ...R2_RESTRICTED_SYNTAX]
+            'no-restricted-syntax': ['error', ...R2_RESTRICTED_SYNTAX],
+            // Security baseline. The noisy rules stay off until the legacy
+            // baseline is triaged; CI runs with --max-warnings=0.
+            'security/detect-eval-with-expression': 'error',
+            'security/detect-child-process': 'off',
+            'security/detect-non-literal-fs-filename': 'off',
+            'security/detect-object-injection': 'off'
         }
     },
     // R1规则：只对Agent业务逻辑目录生效（steps和infinite）
@@ -120,6 +128,41 @@ module.exports = [
             'max-lines': 'off',
             'max-lines-per-function': 'off',
             'no-empty': 'off'
+        }
+    },
+    // Test-quality rules: catch empty/conditional green tests.
+    // `npm run lint` does not include tests, so legacy violations do not block
+    // CI until `npm run lint:tests` is adopted.
+    {
+        files: ['tests/**/*.js', 'server/__tests__/**/*.js'],
+        plugins: { jest: jestPlugin },
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                ...globals.jest
+            }
+        },
+        rules: {
+            'jest/expect-expect': ['error', {
+                assertFunctionNames: [
+                    'expect',
+                    'assert',
+                    'assert.equal',
+                    'assert.strictEqual',
+                    'assert.deepEqual',
+                    'assert.deepStrictEqual',
+                    'assert.ok',
+                    'assert.throws',
+                    'assert.rejects',
+                    'assert.match',
+                    'assert.doesNotThrow'
+                ]
+            }],
+            'jest/no-conditional-expect': 'error',
+            'jest/no-standalone-expect': 'error',
+            'jest/no-identical-title': 'error',
+            'jest/valid-expect': 'error',
+            'jest/no-test-prefixes': 'error'
         }
     }
 ];

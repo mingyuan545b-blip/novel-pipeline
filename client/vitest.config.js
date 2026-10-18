@@ -10,9 +10,9 @@ export default defineConfig({
         include: ['src/__tests__/**/*.test.{js,jsx}'],
         css: false,
         pool: 'forks',
-        poolOptions: {
-            forks: { maxForks: 2, minForks: 1 }
-        },
+        // Vitest 4 removed poolOptions; these are now top-level test options.
+        maxForks: 2,
+        minForks: 1,
         coverage: {
             provider: 'v8',
             reporter: ['text', 'text-summary', 'lcov'],

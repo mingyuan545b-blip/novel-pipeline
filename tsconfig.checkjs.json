@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": false,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": ["node", "jest"]
+  },
+  "include": [
+    "server/core/**/*.js",
+    "server/services/pipeline/**/*.js",
+    "server/db/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "server/node_modules",
+    "**/*.test.js"
+  ]
+}

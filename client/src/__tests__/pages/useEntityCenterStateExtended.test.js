@@ -17,6 +17,7 @@ vi.mock('@tanstack/react-query', () => ({
 
 vi.mock('../../hooks/queries/useMaterials', () => ({
     useMaterials: vi.fn().mockReturnValue({ data: [] }),
+    useMaterialLifecycle: vi.fn(() => ({ mutate: vi.fn(), mutateAsync: vi.fn() })),
 }));
 
 vi.mock('../../hooks/queries/useEntityCenter', () => ({

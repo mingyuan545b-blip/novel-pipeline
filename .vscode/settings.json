@@ -1,0 +1,47 @@
+{
+  "eslint.validate": ["javascript", "javascriptreact"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/output": true,
+    "**/data": true,
+    "**/logs": true,
+    "**/backups": true,
+    "**/coverage": true,
+    "**/.next": true,
+    "**/.codegraph": true,
+    "**/.gitnexus": true,
+    "**/.stryker-tmp": true,
+    "**/client/dist": true,
+    "**/client/dist_backup": true,
+    "**/test-screenshots": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/output/**": true,
+    "**/data/**": true,
+    "**/logs/**": true,
+    "**/backups/**": true,
+    "**/coverage/**": true,
+    "**/.next/**": true,
+    "**/.codegraph/**": true,
+    "**/.gitnexus/**": true,
+    "**/.stryker-tmp/**": true,
+    "**/client/dist/**": true,
+    "**/client/dist_backup/**": true,
+    "**/test-screenshots/**": true
+  },
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+  "vitest.rootConfig": "client/vitest.config.js",
+  "markdownlint.config": {
+    "MD013": false,
+    "MD033": false,
+    "MD041": false
+  }
+}

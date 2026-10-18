@@ -1,5 +1,8 @@
 module.exports = {
     testEnvironment: 'node',
+    // Restrict discovery to tests/ so stale Stryker sandboxes under
+    // .stryker-tmp are never picked up by `npm test`.
+    roots: ['<rootDir>/tests'],
     testMatch: ['**/tests/**/*.test.js'],
     testTimeout: 30000,
     collectCoverageFrom: [

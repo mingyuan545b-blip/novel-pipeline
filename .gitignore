@@ -80,3 +80,11 @@ scripts/verify-2026-10-11/*.out
 scripts/verify-2026-10-11/*_resp.json
 scripts/verify-2026-10-11/project_id.txt
 scripts/verify-2026-10-11/*.json
+
+# Claude Code / quality tooling
+.stryker-tmp/
+reports/
+.claude/settings.local.json
+
+# server 依赖由 启动.bat / npm install 安装，禁止跟踪
+server/node_modules/

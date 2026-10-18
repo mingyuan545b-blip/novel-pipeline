@@ -52,7 +52,14 @@
     "verify:migration": "node scripts/verifyMaterialMigration.js",
     "verify:constraint": "node scripts/verifyConstraintChain.js",
     "verify:all": "node scripts/verifyMaterialMigration.js && node scripts/verifyConstraintChain.js && node scripts/verifyRegistryConsistency.js",
-    "prepare": "husky .githooks"
+    "prepare": "husky .githooks",
+    "test:mutation": "cross-env NODE_OPTIONS=--experimental-vm-modules stryker run",
+    "test:mutation:smoke": "cross-env NODE_OPTIONS=--experimental-vm-modules stryker run --mutate server/services/validateQuotes.js",
+    "typecheck:js": "tsc -p tsconfig.checkjs.json",
+    "lint:tests": "npx eslint tests --ext .js --max-warnings=0",
+    "audit:security": "npm audit --audit-level=high --omit=dev --registry=https://registry.npmjs.org",
+    "audit:secrets": "gitleaks detect --source . --verbose",
+    "docs:lint": "markdownlint-cli2 \"docs/**/*.md\" \"*.md\""
   },
   "dependencies": {
     "axios": "^1.16.1",
@@ -66,11 +73,29 @@
     "ws": "^8.21.0"
   },
   "devDependencies": {
+    "@djankies/vitest-mcp": "^0.5.1",
+    "@eslint/mcp": "^0.3.6",
+    "@modelcontextprotocol/server-postgres": "^0.6.2",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/jest-runner": "^9.6.1",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.19.2",
     "@vitest/coverage-v8": "^4.1.9",
+    "chrome-devtools-mcp": "^1.11.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.0.0",
+    "eslint-plugin-jest": "^29.17.0",
+    "eslint-plugin-security": "^4.2.0",
+    "fast-check": "^4.10.2",
+    "gpt-tokenizer": "^4.1.0",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
+    "jsonrepair": "^3.15.0",
     "lint-staged": "^15.2.0",
+    "markdownlint-cli2": "^0.23.3",
+    "supertest": "^7.3.1",
+    "typescript": "^5.9.3",
     "vitest": "^4.1.9"
   },
   "lint-staged": {
@@ -80,5 +105,8 @@
     "scripts/**/*.js": [
       "eslint --max-warnings=0"
     ]
+  },
+  "engines": {
+    "node": ">=20.12.0"
   }
 }

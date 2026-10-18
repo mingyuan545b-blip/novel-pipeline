@@ -26,7 +26,8 @@ const RULE_DEFINITION_FILES = [
 // ========== P0-4 硬编码敏感信息 ==========
 // 修正历史版本三个缺陷：统一阈值口径、补 /g 标志、覆盖 sk-sp- 等含点划线的密钥形态
 const SENSITIVE_PATTERNS = [
-    { id: 'api-key', name: 'API Key明文', pattern: /sk-[A-Za-z0-9._-]{16,}/g },
+    // 负向前瞻：避免把依赖名/URL 中的 "task-list-item-2.0.0.tgz" 误判为 sk- Key
+    { id: 'api-key', name: 'API Key明文', pattern: /(?<![A-Za-z0-9])sk-[A-Za-z0-9._-]{16,}/g },
     { id: 'password', name: '密码明文', pattern: /password\s*=\s*['"][^'"]{4,}['"]/gi },
     { id: 'apiKey-assign', name: 'apiKey明文', pattern: /\bapiKey\s*=\s*['"][^'"]{4,}['"]/gi },
     { id: 'secret-assign', name: 'secret明文', pattern: /\bsecret\s*=\s*['"][^'"]{4,}['"]/gi }

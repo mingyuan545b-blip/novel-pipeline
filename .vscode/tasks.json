@@ -1,0 +1,50 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "npm: test:unit",
+      "type": "npm",
+      "script": "test:unit",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: lint",
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    {
+      "label": "npm: check",
+      "type": "npm",
+      "script": "check",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: coverage:check",
+      "type": "npm",
+      "script": "coverage:check",
+      "problemMatcher": []
+    },
+    {
+      "label": "npm: typecheck:js",
+      "type": "npm",
+      "script": "typecheck:js",
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "client: test",
+      "type": "npm",
+      "script": "test",
+      "path": "client",
+      "problemMatcher": []
+    },
+    {
+      "label": "client: lint",
+      "type": "npm",
+      "script": "lint",
+      "path": "client",
+      "problemMatcher": ["$eslint-stylish"]
+    }
+  ]
+}

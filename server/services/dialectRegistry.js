@@ -168,7 +168,10 @@ function getIdentifierCharsRegex() {
         }
     }
     if (phrases.size === 0) {
-        _identifierCharsRegex = /(?!.)/;
+        // Never-match fallback. `/(?!.)/` matches at end-of-string, so it would
+        // falsely report "dialect characters present" when data/dialects is empty
+        // (fresh install, test sandbox, or missing data directory).
+        _identifierCharsRegex = /(?!)/;
         return _identifierCharsRegex;
     }
     const sorted = [...phrases].sort((a, b) => b.length - a.length);
