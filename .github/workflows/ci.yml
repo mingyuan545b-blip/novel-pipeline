@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master, dev]
+    branches: [main, master, dev, 'milestone/**']
   pull_request:
-    branches: [main, master]
+    branches: [main, master, 'milestone/**']
 
 jobs:
   backend-lint:
@@ -81,27 +81,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check 200-line limit
-        run: |
-          node -e "
-          const fs=require('fs'),p=require('path');
-          function walk(d,skip){
-            let r=[];
-            try{fs.readdirSync(d).forEach(f=>{
-              const fp=p.join(d,f),s=fs.statSync(fp);
-              if(s.isDirectory()&&!f.startsWith('.')&&f!=='node_modules'&&!skip.some(s=>fp.includes(s)))
-                r=r.concat(walk(fp,skip));
-              else if((f.endsWith('.js')||f.endsWith('.jsx'))&&!skip.some(s=>fp.includes(s))){
-                const c=fs.readFileSync(fp,'utf8').split('\n').length;
-                if(c>200) r.push(c+' '+fp);
-              }
-            })}catch(e){}
-            return r;
-          }
-          const over=[...walk('./server',['/scripts/','/__tests__/']),...walk('./client/src',['/__tests__/'])];
-          if(over.length){console.error('Files over 200 lines:');over.forEach(f=>console.error(f));process.exit(1)}
-          else console.log('All files within 200-line limit');
-          "
+      - name: Check line limit (single source: scripts/lib/ironLawRules.js)
+        run: node scripts/verifyLineCount.js
 
   doc-freshness-check:
     runs-on: ubuntu-latest
