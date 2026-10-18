@@ -22,6 +22,7 @@ const store = require('../store');
 const { v4: uuidv4 } = require('uuid');
 const { ORIGINS, buildProvenance, ensureProvenance, appendChangeLog } = require('../config/materialProvenance');
 const { MATERIAL_WRITER_ID } = require('../config/materialWriteOwnership');
+const { hasProperNounSignal } = require('./properNounGuard');
 
 const MATERIALS = 'materials';
 const CHANGE_LOG_KEEP = 12;
@@ -97,6 +98,10 @@ function buildArchivedMaterialRecord(existing, opts = {}) {
 }
 
 async function save(record) {
+    // D2-b 反趋同（素材链路）：疑似现实作品专名入库 → 非阻断告警，便于及早发现与改名
+    if (record && typeof record.name === 'string' && hasProperNounSignal(record.name)) {
+        logger.warn('materialRepo', `疑似现实作品专名入库: ${record.type}/${record.name}（反趋同 D2-b，建议改自创名）`);
+    }
     await store.setItem(MATERIALS, record.id, record);
     return record;
 }

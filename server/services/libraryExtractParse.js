@@ -7,6 +7,7 @@
  */
 const { ALL_DEPARTMENTS, DEPARTMENT_SUBCATEGORIES } = require('../config/libraryExtractDimensions');
 const { resolvePlacement, MAX_RULES, MAX_ANTI, MAX_TAGS } = require('./libraryExtractPrompt');
+const { hasProperNounSignal } = require('./properNounGuard');
 
 const MAX_NAME_LEN = 14;
 const MAX_DEF_LEN = 120;
@@ -55,8 +56,7 @@ function clampList(v, maxItems, maxLen) {
     return v.map(x => clampText(x, maxLen)).filter(Boolean).slice(0, maxItems);
 }
 
-/** 作品专有名词粗筛：技法名里出现引号/书名号/分隔符多为专有设定，直接判废 */
-const PROPER_NOUN_PATTERN = /[《》「」『』]|^[A-Za-z0-9]{2,}$/;
+/** 作品专名粗筛（单一源：properNounGuard，含可扩展信号配置） */
 
 /** 部门/子类校验：不在白名单内则回落到维度首选部门 */
 function resolveCategory(dimension, raw) {
@@ -76,7 +76,7 @@ function normalizeTechnique(raw, dimension) {
     const name = clampText(raw.name, MAX_NAME_LEN);
     const definition = clampText(raw.definition, MAX_DEF_LEN);
     if (!name || !definition) return null;
-    if (PROPER_NOUN_PATTERN.test(name)) return null;
+    if (hasProperNounSignal(name)) return null;
     const rules = clampList(raw.implementation_rules, MAX_RULES, MAX_RULE_LEN);
     if (rules.length < 2) return null;
     const { department, subcategory } = resolveCategory(dimension, raw);
