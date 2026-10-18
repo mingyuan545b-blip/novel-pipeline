@@ -29,7 +29,10 @@ jest.mock('../../server/services/publishers/PublisherBase', () => ({
     getAllBrowsers: jest.fn(() => ({}))
 }), { virtual: true });
 
+jest.mock('../../server/services/pipeline/materialDepthChecker', () => ({ checkProjectMaterials: jest.fn() }));
+
 const store = require('../../server/store');
+const { checkProjectMaterials } = require('../../server/services/pipeline/materialDepthChecker');
 const { HEALTH_MONITOR_CONFIG } = require('../../server/config/systemConfig');
 const {
     checkStuckChapters,
@@ -38,7 +41,8 @@ const {
     checkPipelineState,
     checkMemoryUsage,
     checkDataIntegrity,
-    cleanupOldFiles
+    cleanupOldFiles,
+    checkMaterialDepth
 } = require('../../server/services/healthCheckers');
 
 // 辅助：构造章节对象
@@ -302,6 +306,97 @@ describe('healthCheckers (R1)', () => {
             expect(typeof mod.checkMemoryUsage).toBe('function');
             expect(typeof mod.checkDataIntegrity).toBe('function');
             expect(typeof mod.cleanupOldFiles).toBe('function');
+        });
+    });
+});
+
+// ── E3b 覆盖补齐：material-depth 周期性校验 / 磁盘阈值 / 无进展 / 超龄日志清理 ──
+describe('healthCheckers (R1) — 覆盖补齐', () => {
+    beforeEach(() => jest.clearAllMocks());
+
+    describe('checkMaterialDepth（陷阱#72 4类素材深度周期校验）', () => {
+        test('无项目的项目/无已写章节：跳过，不上报', async () => {
+            store.listItems.mockResolvedValue([{ id: 'p1', name: 'P1' }]);
+            store.queryItems.mockResolvedValue([makeChapter('ch1', 'outlined')]);
+            await expect(checkMaterialDepth()).resolves.toEqual([]);
+            expect(checkProjectMaterials).not.toHaveBeenCalled();
+        });
+
+        test('有已写章节 + 深度不达标：按问题条数给 warning / critical', async () => {
+            store.listItems.mockResolvedValue([{ id: 'p1', name: 'P1' }, { id: 'p2', name: 'P2' }]);
+            store.queryItems.mockImplementation(async (type, q) => (q.projectId === 'p1'
+                ? [makeChapter('ch1', 'material-updated')]
+                : [makeChapter('ch2', 'approved')]));
+            checkProjectMaterials
+                .mockResolvedValueOnce({ passed: false, issues: ['缺高光', '缺名言'] })
+                .mockResolvedValueOnce({ passed: false, issues: ['a', 'b', 'c'] });
+
+            const out = await checkMaterialDepth();
+            expect(out).toHaveLength(5);
+            expect(out.filter(i => i.projectId === 'p1').every(i => i.level === 'warning')).toBe(true);
+            expect(out.filter(i => i.projectId === 'p2').every(i => i.level === 'critical')).toBe(true);
+        });
+
+        test('深度达标：不产生 issue；store 抛错时吞掉并返回空数组', async () => {
+            store.listItems.mockResolvedValue([{ id: 'p1', name: 'P1' }]);
+            store.queryItems.mockResolvedValue([makeChapter('ch1', 'written')]);
+            checkProjectMaterials.mockResolvedValue({ passed: true, issues: [] });
+            await expect(checkMaterialDepth()).resolves.toEqual([]);
+
+            store.listItems.mockRejectedValue(new Error('pg down'));
+            await expect(checkMaterialDepth()).resolves.toEqual([]);
+        });
+    });
+
+    describe('checkDataIntegrity — no-progress', () => {
+        test('outlined>0 且 written=0 且章节数>10 触发 no-progress', () => {
+            store.listItemsSync.mockReturnValue([{ id: 'p1' }]);
+            const chapters = [makeChapter('ch1', 'outlined')];
+            for (let i = 2; i <= 12; i++) chapters.push(makeChapter('ch' + i, 'material-updated'));
+            store.queryItems.mockReturnValue(chapters);
+            expect(checkDataIntegrity()).toEqual([expect.objectContaining({ type: 'no-progress', projectId: 'p1' })]);
+        });
+    });
+
+    describe('checkDiskSpace / checkMemoryUsage 阈值', () => {
+        test('库与 data 目录超阈值时上报对应 issue', () => {
+            const e = jest.spyOn(fs, 'existsSync').mockReturnValue(true);
+            const st = jest.spyOn(fs, 'statSync').mockReturnValue({ size: 1200 * 1024 * 1024, mtimeMs: Date.now() });
+            const rd = jest.spyOn(fs, 'readdirSync').mockReturnValue(['a.bin', 'b.bin']);
+            try {
+                const types = checkDiskSpace().map(i => i.type);
+                expect(types).toContain('database-size');
+                expect(types).toContain('data-dir-size');
+            } finally { e.mockRestore(); st.mockRestore(); rd.mockRestore(); }
+        });
+
+        test('堆/RSS 超阈值时上报 heap-usage / rss-usage', () => {
+            const mu = jest.spyOn(process, 'memoryUsage').mockReturnValue({ heapUsed: 600 * 1024 * 1024, rss: 1100 * 1024 * 1024 });
+            try {
+                const types = checkMemoryUsage().map(i => i.type);
+                expect(types).toContain('heap-usage');
+                expect(types).toContain('rss-usage');
+            } finally { mu.mockRestore(); }
+        });
+    });
+
+    describe('cleanupOldFiles 真实清理', () => {
+        test('超龄 .log 被清理，未超龄的保留', () => {
+            const dataDir = path.join(__dirname, '..', '..', 'data');
+            const oldFile = path.join(dataDir, '__test_old.log');
+            const newFile = path.join(dataDir, '__test_new.log');
+            fs.writeFileSync(oldFile, 'x');
+            fs.writeFileSync(newFile, 'x');
+            const oldSec = (Date.now() - HEALTH_MONITOR_CONFIG.MAX_LOG_AGE - 60000) / 1000;
+            fs.utimesSync(oldFile, oldSec, oldSec);
+            try {
+                const cleaned = cleanupOldFiles();
+                expect(cleaned).toContain('__test_old.log');
+                expect(fs.existsSync(newFile)).toBe(true);
+            } finally {
+                if (fs.existsSync(newFile)) fs.unlinkSync(newFile);
+                if (fs.existsSync(oldFile)) fs.unlinkSync(oldFile);
+            }
         });
     });
 });

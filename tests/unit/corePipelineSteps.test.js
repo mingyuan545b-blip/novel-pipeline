@@ -277,3 +277,35 @@ describe('MaterialRegistrarStep.execute()', () => {
         expect(handleMaterialRegistrar).toHaveBeenCalledWith(expect.objectContaining({ organizingPlan: { items: ['x'] } }));
     });
 });
+
+// ── E3b 覆盖补齐：handler 返回值缺字段时的 `||` 回退分支 ──
+describe('Step 回退分支（handler 只返回 passed）', () => {
+    const cases = [
+        ['first-review', FirstReviewStep, () => handleFirstReview],
+        ['second-review', SecondReviewStep, () => handleSecondReview],
+        ['writer', WriterStep, () => handleWriter],
+        ['reviser', ReviserStep, () => handleReviser],
+        ['final-editor', FinalEditorStep, () => handleFinalEditor],
+        ['material-registrar', MaterialRegistrarStep, () => handleMaterialRegistrar],
+    ];
+
+    test.each(cases)('%s: result/chapter/feedback 全缺时回退到默认值', async (name, StepClass, getHandler) => {
+        const step = new StepClass();
+        for (const passed of [true, false]) {
+            getHandler().mockResolvedValue({ passed });
+            const r = await step.execute(BASE_PARAMS);
+            expect(r.step).toBe(name);
+            expect(r.passed).toBe(passed);
+            expect(r.chapter).toEqual(BASE_PARAMS.chapter);
+            expect(r.result).toEqual(expect.objectContaining({ response: expect.any(String) }));
+            expect(r.materialGuidance).toBe('');
+        }
+    });
+
+    test('writer: result 缺失但 chapter.content 存在时回退到 chapter.content', async () => {
+        handleWriter.mockResolvedValue({ passed: true });
+        const step = new WriterStep();
+        const r = await step.execute({ ...BASE_PARAMS, chapter: { id: 'c', content: '正文' } });
+        expect(r.result).toEqual({ response: '正文' });
+    });
+});

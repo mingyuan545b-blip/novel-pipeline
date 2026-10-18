@@ -259,3 +259,67 @@ describe('materials 路由 (S5.3)', () => {
         });
     });
 });
+
+// ── E3b 覆盖补齐：深度校验端点 + 位面/势力归一化分支 ──
+describe('materials 路由 (S5.3) — 覆盖补齐', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockStore.clear();
+        validateHierarchy.mockResolvedValue({ valid: true });
+        store.isFoundationMaterial.mockResolvedValue(false);
+    });
+
+    describe('GET /depth/:projectId', () => {
+        test('批量校验项目下未归档素材的深度', async () => {
+            mockStore.set('materials:m1', { id: 'm1', _type: 'materials', projectId: 'p1', archived: false });
+            mockStore.set('materials:m2', { id: 'm2', _type: 'materials', projectId: 'p1', archived: true });
+            mockStore.set('materials:m3', { id: 'm3', _type: 'materials', projectId: 'p2', archived: false });
+            const { res } = await executeRoute(getRoutes(), 'GET', '/depth/p1');
+            expect(res._body).toHaveProperty('passed');
+            expect(res._body.total).toBe(1);
+        });
+    });
+
+    describe('GET /depth/:projectId/:materialId', () => {
+        test('单素材深度校验带上 id/name/type', async () => {
+            mockStore.set('materials:m1', { id: 'm1', _type: 'materials', projectId: 'p1', type: 'character', name: '甲' });
+            const { res } = await executeRoute(getRoutes(), 'GET', '/depth/p1/m1');
+            expect(res._body).toMatchObject({ id: 'm1', name: '甲', type: 'character' });
+        });
+
+        test('素材归属不符时返回 404', async () => {
+            mockStore.set('materials:m1', { id: 'm1', _type: 'materials', projectId: 'p2' });
+            const { res } = await executeRoute(getRoutes(), 'GET', '/depth/p1/m1');
+            expect(res._statusCode).toBe(404);
+        });
+    });
+
+    describe('POST / 位面与势力归一化', () => {
+        test('projectId+parentPlane/parentFaction 时经 normalizeMaterial 归一', async () => {
+            normalizeMaterial
+                .mockReturnValueOnce({ parentPlane: 'plane-normalized' })
+                .mockReturnValueOnce({ parentFaction: 'faction-normalized' });
+            const { res } = await executeRoute(getRoutes(), 'POST', '/', {
+                body: { projectId: 'p1', type: 'character', name: '甲', parentPlane: '小世界', parentFaction: '某势力' }
+            });
+            expect(res._statusCode).toBe(201);
+            expect(res._body.data.parentPlane).toBe('plane-normalized');
+            expect(res._body.data.parentFaction).toBe('faction-normalized');
+        });
+    });
+
+    describe('PUT /:id 引用归一化', () => {
+        test('projectId 存在时归一 parentPlane/parentFaction 并写入', async () => {
+            mockStore.set('materials:m1', { id: 'm1', _type: 'materials', projectId: 'p1', version: 1 });
+            normalizeMaterial
+                .mockReturnValueOnce({ parentPlane: 'plane-ref' })
+                .mockReturnValueOnce({ parentFaction: 'faction-ref' });
+            const { res } = await executeRoute(getRoutes(), 'PUT', '/m1', {
+                body: { parentPlane: '小世界', parentFaction: '某势力' }
+            });
+            expect(res._body.parentPlane).toBe('plane-ref');
+            expect(res._body.parentFaction).toBe('faction-ref');
+            expect(memory.invalidateCache).toHaveBeenCalledWith('p1');
+        });
+    });
+});
