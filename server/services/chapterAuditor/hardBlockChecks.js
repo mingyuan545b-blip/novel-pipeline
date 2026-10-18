@@ -1,7 +1,7 @@
 const logger = require('../../shared/logger');
 const { detectAdultPerspective, detectTechJargon, detectPipelineMetadataLeak, detectOnomatopoeiaDensity, detectVisualAnchors, detectMotherChildDialogue, detectModernSlang, detectTellVerbs, calcInfoDripScore, extractEndingTension, detectCrossChapterRepetition, scanSensitiveWords, validateTomatoMetrics } = require('../contentUtils');
 const { resolveConfig } = require('../../config');
-const { resolveGenreFromProject } = require('../genreConfig');
+const { resolveGenreFromProject, detectGenre } = require('../genreConfig');
 
 async function _runHardBlockChecks(content, styleProfile, project, projectId, store) {
     const issues = [];
@@ -97,7 +97,18 @@ async function _runHardBlockChecks(content, styleProfile, project, projectId, st
 
 async function _buildTechniqueHints(content, styleProfile, projectId, store) {
     const hints = [];
-    const genre = detectGenre(styleProfile);
+    // F6 修复（docs/worklog/2026-10-17-假成果审查-问题统计.md）：
+    // 原首行 `const genre = detectGenre(styleProfile)` —— detectGenre 在本文件从未定义/导入，
+    // 调用即抛 ReferenceError；且该行在 try 之外 → reviewChapter 必抛，"手动初审"全程走不完。
+    // 改为经 project 解析题材（store 由调用方传入正是为此），并整段 try 兜底，保证本函数永不抛。
+    let genre = null;
+    try {
+        const project = (projectId && store) ? await store.getItem('projects', projectId) : null;
+        genre = resolveGenreFromProject(project) || (styleProfile ? detectGenre(styleProfile) : null);
+    } catch (e) {
+        logger.warn('hardBlockChecks', 'genre resolve fallback: ' + (e.message || e));
+        genre = null;
+    }
     try {
         const tellResult = detectTellVerbs(content);
         if (tellResult.count > 0) hints.push(`【展示代替告知检测】发现${tellResult.count}处告知式描写(density:${tellResult.density}/千字)，请检查是否需要转化为动作/生理/环境描写`);

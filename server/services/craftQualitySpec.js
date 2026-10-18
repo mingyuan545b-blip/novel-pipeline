@@ -47,6 +47,33 @@ const MODERN_MEME_WORDS = Object.freeze([
     '666', '点赞', '差评', '开挂', '氪金', '进度条', '用户体验', '可持续发展', '客服',
 ]);
 
+/** 空壳处境标签：scene 只写这些 = 没写处境（"通用场景"是提取器兜底词，不是处境） */
+const GENERIC_SCENES = Object.freeze(['处境', '通用场景', '场景', '情境', '各种场合', '无', '其他', '无特定处境']);
+/** 标签式 why（"记忆点：…"是标签不是记忆点；记忆点必须是"为什么记得住"本身） */
+const LABEL_WHY_RE = /^\s*(记忆点|理由|说明|点评|释义|含义|作用)\s*[：:]/;
+/** quote 混入处境前缀（"面对X：“原话”"）——处境属于 scene，quote 只能是原话本身 */
+const SCENE_PREFIX_IN_QUOTE_RE = /^[^：:""''“”]{2,24}[：:]\s*["'“”'']/;
+/** 剧情摘要连接词：what 应是"那一个选择/动作或台词原文"，不是事件复述 */
+const SUMMARY_CONNECTORS = Object.freeze(['并给出', '并指出', '并说明', '并成功', '并最终', '随后', '接着', '最终决定', '最后决定', '于是决定']);
+
+/** 空壳处境（scene） */
+function isGenericScene(text) {
+    return GENERIC_SCENES.includes(String(text == null ? '' : text).trim());
+}
+/** 标签式 why（"记忆点：…"） */
+function isLabelWhy(text) {
+    return LABEL_WHY_RE.test(String(text == null ? '' : text));
+}
+/** quote 里是否混入了处境前缀 */
+function hasScenePrefixInQuote(text) {
+    return SCENE_PREFIX_IN_QUOTE_RE.test(String(text == null ? '' : text));
+}
+/** 是否像"剧情摘要"（事件复述）而非"那一个选择" */
+function looksLikeSummary(text) {
+    const s = String(text == null ? '' : text);
+    return SUMMARY_CONNECTORS.some((w) => s.includes(w));
+}
+
 /** 口头禅/名梗三问：可复用 / 有辨识度 / 只属于他 */
 const CATCHPHRASE_TESTS = Object.freeze([
     { id: 'repeatable', name: '可复用', desc: '它是能反复出现的口头习惯或招牌话，不是一次性对白' },
@@ -103,6 +130,8 @@ function buildCraftGuidance() {
 
 四、输出前逐条自检（三步）
 ① 把这条的角色名抹掉，句子还成立吗？成立→删。
+⓪ 共通硬性：scene 必须是**具体处境**（如"对账时发现有人做假账"），禁止空壳词（处境/通用场景/场景/情境）；
+   quote 只能是原话本身，禁止把处境写进 quote（不要"面对X：“…”"）；why 禁止写成"记忆点：…"这类标签。
 ② why 里有没有评论词（展现/体现/凸显/彰显/标志着/生动/侧面/营造/渲染/暗示/铺垫/推动剧情/刻画）？有→改写成因果句。
 ③ 这条能不能被任何一本同类书照抄？能→删。
 宁缺毋滥：没有就返回空数组，绝不用剧情摘要或读后感凑数。`;
@@ -116,8 +145,16 @@ module.exports = {
     QUOTE_TESTS,
     CATCHPHRASE_TESTS,
     CHARISMA_FORM,
+    GENERIC_SCENES,
+    LABEL_WHY_RE,
+    SCENE_PREFIX_IN_QUOTE_RE,
+    SUMMARY_CONNECTORS,
     hasCommentaryVoice,
     isFillerLine,
     hasModernMeme,
+    isGenericScene,
+    isLabelWhy,
+    hasScenePrefixInQuote,
+    looksLikeSummary,
     buildCraftGuidance,
 };

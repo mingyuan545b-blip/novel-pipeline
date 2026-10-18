@@ -40,8 +40,11 @@ async function processNewMaterials(organizingPlan, chapter, projectId, materials
         if (!newMat.name || !newMat.type) continue;
         const existing = findMaterialByName(projectId, materials, newMat.name, newMat.type);
         if (existing) { operations.push({ type: 'skipNewMaterial', scope: 'material', entityKey: existing.id, data: { reason: 'already exists' }, status: 'skipped' }); continue; }
-        if (newMat.type === 'character') {
-            const storeExisting = await store.queryItems('materials', { projectId, type: 'character' });
+        // 兜底：传入的 materials 可能不含该条（可见性过滤/名字带别名），此处统一按 (projectId,type,name) 回查存储。
+        // 根因（2026-10-10）：唯一索引 idx_materials_project_type_name(projectId,type,name) 下，
+        // 漏查即 INSERT 新 UUID → 撞唯一约束 → 登记报错。原逻辑只对 character 回查，非角色类型漏网。
+        {
+            const storeExisting = await store.queryItems('materials', { projectId, type: newMat.type });
             const storeMatch = storeExisting.find(m => !m.archived && m.name === newMat.name);
             if (storeMatch) { operations.push({ type: 'skipNewMaterial', scope: 'material', entityKey: storeMatch.id, data: { reason: 'already exists in store' }, status: 'skipped' }); continue; }
         }

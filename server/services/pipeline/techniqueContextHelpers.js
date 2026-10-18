@@ -49,6 +49,11 @@ async function recordReviewFeedback(projectId, chapterNumber, passed) {
     if (!techIds?.length) return;
     try {
         await recordFeedback(projectId, chapterNumber, techIds, passed);
+        // A4 修复（F4）：把审核结果回写技法库 success_rate/attempts（库 meta），否则"自动禁用/成功率"永远是死数据。
+        try {
+            const { ValidationEngine } = require('../validationEngine');
+            await new ValidationEngine().recordTechniqueResults(techIds, !!passed);
+        } catch (_) { /* 技法库不可用时不影响反馈主链 */ }
         _selectedCache.delete(key);
     } catch (_) { /* non-critical */ }
 }

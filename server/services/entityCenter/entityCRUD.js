@@ -9,17 +9,20 @@ const { _recomputePromptTexts } = require('./formatters');
 const { migrateIsActive, isValidTransition } = require('./entityLifecycle');
 const { syncToRegistry, resolveBehaviorRules, injectBehaviorRulesFromGenre, mergeExistingEntity, getEntityStats } = require('./entityBehaviorRules');
 const { detectGenreId } = require('./entityGenreDetect');
+const { fuzzyMatchCharacter } = require('./entityFuzzyMatch');
+const { gateEntityCraftPatch } = require('../craftWriteGate');
 
 const ENTITY_TYPE = 'entities';
 // 双主角题材白名单（仅保留通过质量门禁的题材）
 const DUAL_PROTAGONIST_GENRE_IDS = new Set([]);
 
 async function getOrCreateEntity(center, projectId, entityType, name, defaults = {}) {
+    defaults = gateEntityCraftPatch(defaults);
     let existing = await findEntityByName(projectId, entityType, name);
     if (existing) return await mergeExistingEntity(center, existing, defaults);
 
     if (name && entityType === 'character') {
-        existing = await _fuzzyMatchCharacter(projectId, name);
+        existing = await fuzzyMatchCharacter(projectId, name);
         if (existing) return await mergeExistingEntity(center, existing, defaults);
     }
 
@@ -96,6 +99,7 @@ async function updateEntity(entityId, updates) {
     const entity = await store.getItem(ENTITY_TYPE, entityId);
     if (!entity) { logger.warn('entityCenter', `Entity not found: ${entityId}`); return null; }
 
+    updates = gateEntityCraftPatch(updates);
     const genreStateUpdates = updates.genreState;
     if (genreStateUpdates && entity.genreId) {
         const errors = validateGenreState(entity.genreId, genreStateUpdates);
@@ -156,21 +160,6 @@ async function transitionLifecycle(entityId, toState, reason = '') {
     await syncToRegistry(entity);
     logger.info('entityCenter', `Lifecycle: ${entity.name} ${fromState}→${toState} (${reason})`);
     return entity;
-}
-
-async function _fuzzyMatchCharacter(projectId, name) {
-    const normalizedName = name.toLowerCase().replace(/[\s\-_··]/g, '');
-    // 空名/单字名不参与模糊匹配：''.includes(x) 恒真，会把任意新角色并进"无名实体"
-    if (normalizedName.length < 2) return null;
-    const allChars = await store.queryItems(ENTITY_TYPE, { projectId, entityType: 'character' });
-    const match = allChars.find(e => {
-        if (e.lifecycleState === 'archived' || e.archived) return false;
-        const eName = (e.name || '').toLowerCase().replace(/[\s\-_··]/g, '');
-        if (eName.length < 2) return false;
-        return eName === normalizedName || eName.includes(normalizedName) || normalizedName.includes(eName);
-    });
-    if (match) logger.info('entityCenter', `Fuzzy match: "${name}" -> existing "${match.name}" (${match.id})`);
-    return match || null;
 }
 
 async function enforceProtagonistLimit(projectId, defaults, options = {}) {

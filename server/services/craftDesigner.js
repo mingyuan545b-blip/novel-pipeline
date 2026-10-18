@@ -56,7 +56,10 @@ function _buildMessages(targets, ctx) {
         '3. 金句必须有处境与记忆点；高光必须含代价；口头禅要能反复出现',
         '3b. 【硬性】quoteLibrary 每项必须含 scene/quote/why 三字段；缺 why（记忆点）该项一律作废丢弃——' +
             'why 要写"这句话暴露了他的哪条信念/哪段代价"，不要写"记忆点：强调…"这类空评。',
-        '3c. highlightScenes 每项必须含 scene/what/cost/why；缺 cost 作废。',
+        '3b-1. 【硬性】scene 必须写**具体处境**（如"对账时发现有人做假账"），' +
+            '禁止空壳词：处境/通用场景/场景/情境；quote 只能是原话本身，禁止把处境写进 quote（不要"面对X：“…”"）。',
+        '3c. highlightScenes 每项必须含 scene/what/cost/why；缺 cost 作废；' +
+            'what 必须是"那一个选择/动作或台词原文"，禁止事件复述（不要"并给出方案""随后…""最终决定…"）。',
         '4. 一律禁评论腔（展现/体现/立住…）、禁过场句（上车。/进去了。）、禁现代网络梗',
         '5. 只输出 JSON，不要解释、不要 Markdown 代码块',
     ].join('\n');

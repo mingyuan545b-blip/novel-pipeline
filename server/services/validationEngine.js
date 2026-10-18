@@ -100,6 +100,36 @@ class ValidationEngine {
         return meta;
     }
 
+    /**
+     * 批量记录技法使用结果（审核步骤后一次回写，仅 reload 一次）。
+     *
+     * A4 修复（docs/worklog/2026-10-17-假成果审查-问题统计.md F4）：
+     * recordTechniqueResult 此前全仓 0 调用点 → 224 技法中 209 条 attempts=0、"自动禁用"名存实亡。
+     * 由 pipeline 审核反馈路径（techniqueContextHelpers.recordReviewFeedback）调用本方法回写真实结果。
+     * @param {string[]} techIds
+     * @param {boolean} success
+     * @returns {Promise<number>} 实际更新条数
+     */
+    async recordTechniqueResults(techIds, success) {
+        if (!Array.isArray(techIds) || techIds.length === 0) return 0;
+        let updated = 0;
+        for (const techId of techIds) {
+            const leaf = techIndex.getTechnique(techId);
+            if (!leaf) continue;
+            const attempts = (leaf.attempts || 0) + 1;
+            const prevRate = leaf.success_rate ?? 50;
+            const meta = {
+                attempts,
+                success_rate: Math.round((prevRate * (attempts - 1) + (success ? 100 : 0)) / attempts),
+            };
+            meta.auto_disabled = attempts >= AUTO_DISABLE_MIN_ATTEMPTS && meta.success_rate < AUTO_DISABLE_RATE;
+            const saved = await libraryStore.updateMeta(techId, meta);
+            if (saved) updated++;
+        }
+        if (updated > 0) await techIndex.reload();
+        return updated;
+    }
+
     getEnabledTechniques(mode, injectionPoint) {
         return techIndex.getAll().filter(t => {
             if (mode && !(t.applicable_modes || []).includes(mode)) return false;

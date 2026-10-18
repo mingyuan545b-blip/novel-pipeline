@@ -45,7 +45,11 @@ async function onPostApproval(projectId, chapterNumber, chapterContent) {
 
 function registerConstraintFeedbackModule() {
     const { registerModule } = require('../../pipelineModuleRegistry');
-    registerModule(MODULE_ID, { onPostApproval }, 'constraintFeedback', 'on');
+    // offValue 必须是"关闭"语义的值（'off'）。
+    // 修复 F2（docs/worklog/2026-10-17-假成果审查-问题统计.md）：
+    // 原为 'on' → getModuleConfig 在项目未配置时返回 'on' → isModuleEnabled = (config !== 'on') = false
+    // → 模块被永久禁用，16 个项目 / 137 章 0 条反馈数据。
+    registerModule(MODULE_ID, { onPostApproval }, 'constraintFeedback', 'off');
     logger.info('constraintFeedbackModule', 'Module registered: constraint-feedback');
 }
 

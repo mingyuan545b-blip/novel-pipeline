@@ -1,7 +1,7 @@
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **novel-pipeline** (14852 symbols, 28154 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **novel-pipeline** (17832 symbols, 41599 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -47,9 +47,11 @@ This project is indexed by GitNexus as **novel-pipeline** (14852 symbols, 28154 
 
 > 本节与 CLAUDE.md 保持同步（两处是不同AI工具的入口，内容必须一致；修改任一处必须同步另一处）。
 
-1. **先读 `docs/SESSION-STATE.md`**：当前状态、已完成、待办优先级、常用命令（2分钟）。
-2. **再按 `docs/INDEX.md` 选SOP**；长任务必须遵守 `docs/sop/10-上下文交接规范.md`（防上下文压缩失忆：状态必须落盘，禁止只存在上下文里）。
-3. 架构以 `ARCHITECTURE.md` 为准；但注意历史记录不完全可信，**结论以代码+测试实测为准**。
-4. 改铁律/规则前：`node scripts/audit-iron-law.js --self-check`；规则唯一定义源 `scripts/lib/ironLawRules.js`。
-5. 提交走 pre-commit 五关门禁（铁律→eslint→硬编码→级联→标准），被拦时修根因不要绕。
-6. 用户约定：删文件/改全局配置/破坏性git操作先确认；只读检查可直接做；回答用中文；**命令执行优先使用 cmd**（本机环境不支持 PowerShell）。
+1. **先读 `docs/SESSION-STATE.md`**：当前状态 + 会话索引（哪次会话做了什么、详情在哪），2分钟。
+2. **再按 `docs/INDEX.md` 选 SOP**（任务路由表 + "问题→文档反向索引"）。
+3. **按层加载，禁止全读**：L0 入口 → L1 索引（本文件/SESSION-STATE/INDEX）→ 只选 **1 个** L2 SOP（`docs/sop/00~12`）→ 需要才读 L3（`ARCHITECTURE.md`/`docs/reference`/`docs/design`）；细节查 `docs/worklog/`；历史在 `docs/archive/`（冷启动禁读）。
+4. 长任务必须遵守 `docs/sop/10-上下文交接规范.md`（防上下文压缩失忆：状态必须落盘，禁止只存在上下文里）。
+5. 架构以 `ARCHITECTURE.md` 为准；但注意历史记录不完全可信，**结论以代码+测试实测为准**。
+6. 改铁律/规则前：`node scripts/audit-iron-law.js --self-check`；规则唯一定义源 `scripts/lib/ironLawRules.js`。
+7. 提交走 pre-commit 五关门禁（铁律→eslint→硬编码→级联→标准），被拦时修根因不要绕。
+8. 用户约定：删文件/改全局配置/破坏性git操作先确认；只读检查可直接做；回答用中文；**命令执行优先使用 cmd**（本机环境不支持 PowerShell）。

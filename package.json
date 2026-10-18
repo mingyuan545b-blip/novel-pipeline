@@ -31,7 +31,7 @@
     "test:all": "node server/scripts/smoke-test.js && node server/scripts/e2e-test.js && node server/scripts/data-integrity-test.js",
     "test:e2e-smoke": "node -e \"process.env.NODE_PATH='server';require('./tests/e2e/e2eSmokeTest')\"",
     "test:e2e-api": "node tests/e2e/e2eApiTest.js",
-    "ci:check": "node -e \"process.env.NODE_PATH='server';require('./tests/e2e/e2eSmokeTest')\" && node scripts/importAudit.js && node scripts/verifyMaterialMigration.js && node scripts/verifyConstraintChain.js && node scripts/verifyProjectStandards.js && node scripts/verifyGuardChain.js && node scripts/verifyAuditConsistency.js && node scripts/verifyWordConfigSchema.js && node scripts/verifyTargetChaptersSchema.js && node scripts/verifyStyleProfileSchema.js && node scripts/verifyApiContract.js && node scripts/verifyChapterIntentsSchema.js && node scripts/verifyGenrePluginConsistency.js && node scripts/verifyCascadeDelete.js && node scripts/verifyFrontendComplexity.js && node scripts/verifyRouteRegistration.js && node scripts/auditApiRegistry.js && node scripts/audit-vocabulary-consistency.js && node scripts/audit-material-shape.js && node scripts/verifyMaterialAssemblyEntry.js && node scripts/verifyDataSourceConsistency.js && node scripts/verifyDocFreshness.js && node scripts/verifyErrorTraceability.js && node scripts/deepAudit.js && npx eslint server/ --ext .js --max-warnings=0 && npm run coverage:check && node scripts/perfBaselineCheck.js && node scripts/audit-leak-fix.js --ci",
+    "ci:check": "node -e \"process.env.NODE_PATH='server';require('./tests/e2e/e2eSmokeTest')\" && node scripts/importAudit.js && node scripts/verifyMaterialMigration.js && node scripts/verifyConstraintChain.js && node scripts/verifyProjectStandards.js && node scripts/verifyGuardChain.js && node scripts/verifyAuditConsistency.js && node scripts/verifyWordConfigSchema.js && node scripts/verifyTargetChaptersSchema.js && node scripts/verifyStyleProfileSchema.js && node scripts/verifyApiContract.js && node scripts/verifyChapterIntentsSchema.js && node scripts/verifyGenrePluginConsistency.js && node scripts/verifyCascadeDelete.js && node scripts/verifyFrontendComplexity.js && node scripts/verifyRouteRegistration.js && node scripts/auditApiRegistry.js && node scripts/audit-vocabulary-consistency.js && node scripts/audit-material-shape.js && node scripts/verifyMaterialAssemblyEntry.js && node scripts/verifyDataSourceConsistency.js && node scripts/verifyDocFreshness.js && node scripts/verifyErrorTraceability.js && node scripts/deepAudit.js && npx eslint server/ --ext .js --max-warnings=0 && npm run coverage:check && node scripts/perfBaselineCheck.js && node scripts/audit-leak-fix.js --ci && node scripts/verifyModuleSwitchDefaults.js && node scripts/verifyReachability.js && node scripts/audit-failopen.js",
     "audit:api": "node scripts/apiLiveAudit.js",
     "audit:api-registry": "node scripts/auditApiRegistry.js",
     "audit:imports": "node scripts/importAudit.js && node scripts/frontendImportAudit.js",
@@ -59,7 +59,10 @@
     "lint:tests": "npx eslint tests --ext .js --max-warnings=0",
     "audit:security": "npm audit --audit-level=high --omit=dev --registry=https://registry.npmjs.org",
     "audit:secrets": "gitleaks detect --source . --verbose",
-    "docs:lint": "markdownlint-cli2 \"docs/**/*.md\" \"*.md\""
+    "docs:lint": "markdownlint-cli2 \"docs/**/*.md\" \"*.md\"",
+    "gate:modules": "node scripts/verifyModuleSwitchDefaults.js",
+    "gate:reachability": "node scripts/verifyReachability.js",
+    "gate:failopen": "node scripts/audit-failopen.js"
   },
   "dependencies": {
     "axios": "^1.16.1",

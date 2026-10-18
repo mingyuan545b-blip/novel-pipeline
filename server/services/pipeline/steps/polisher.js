@@ -14,16 +14,33 @@ const store = require('../../../store');
  * 原因：输出契约只校验"润色后 ≥ 输入 80%"（PO-001，相对值），不管绝对下限。
  * 规则：正文已低于最低要求时，润色只允许持平或变长，禁止再缩短。
  */
+/**
+ * 润色字数下限判定（唯一源）：true=可采纳润色稿；false=应保留原文（禁止缩短）。
+ * 规则（2026-10-10 根因修复）：
+ *   ① 已达标(≥targetMin)的稿件，不得被润色降回 targetMin 以下（封住"越润越短到 targetMin 之下"）；
+ *   ② 终稿不得低于 rejectMin（且必须满足"不短于原文"才允许在该区间内）。
+ * 此前的守卫只在"原文本身就 <rejectMin"时才回退 → 原文≥rejectMin 时完全不设防，
+ * 加上只校验相对比例(0.8~1.2)，润色可"合法"缩水 20%，实测 20 章有 10 章跌破 targetMin。
+ */
+function shouldAcceptPolishedLength(originalWc, polishedWc, wordConfig) {
+    if (!(polishedWc > 0)) return false;
+    const targetMin = wordConfig?.targetMin || 0;
+    const rejectMin = wordConfig?.rejectMin || 0;
+    if (targetMin > 0 && originalWc >= targetMin && polishedWc < targetMin) return false;
+    if (rejectMin > 0 && polishedWc < rejectMin && polishedWc < originalWc) return false;
+    return true;
+}
+
 function guardPolishedLength(polished, original, project, genre) {
     const polishedWc = (polished || '').replace(/\s/g, '').length;
     const originalWc = (original || '').replace(/\s/g, '').length;
     if (!polishedWc) return { content: original, wordCount: originalWc, reverted: true, reason: '润色输出为空' };
     if (originalWc === 0) return { content: polished, wordCount: polishedWc, reverted: false };
-    let rejectMin = 0;
-    try { rejectMin = resolveConfig(genre, project).word.rejectMin; } catch (_) { logger.warn('polisher', _.message || _); }
-    if (rejectMin > 0 && originalWc < rejectMin && polishedWc < originalWc) {
-        logger.warn('polisher', `润色导致字数下降且低于下限(${originalWc}→${polishedWc}，下限${rejectMin})，回退定稿正文`);
-        return { content: original, wordCount: originalWc, reverted: true, reason: `原文已低于下限${rejectMin}字，润色不得再缩短` };
+    let word = {};
+    try { word = resolveConfig(genre, project).word || {}; } catch (_) { logger.warn('polisher', _.message || _); }
+    if (!shouldAcceptPolishedLength(originalWc, polishedWc, word)) {
+        logger.warn('polisher', `[字数守卫] 润色稿被拒(${originalWc}→${polishedWc}，targetMin=${word.targetMin}，rejectMin=${word.rejectMin})，保留定稿正文`);
+        return { content: original, wordCount: originalWc, reverted: true, reason: `润色不得把稿件降到下限以下（${originalWc}→${polishedWc}）` };
     }
     return { content: polished, wordCount: polishedWc, reverted: false };
 }
@@ -74,4 +91,4 @@ ${(chapter.content || '').substring(0, 8000)}`;
     return { step: 'polisher', result, passed: true, chapter };
 }
 
-module.exports = { handlePolisher, guardPolishedLength };
+module.exports = { handlePolisher, guardPolishedLength, shouldAcceptPolishedLength };

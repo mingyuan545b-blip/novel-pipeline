@@ -8,7 +8,9 @@
  *     （展现/体现/立住…）不收。判定表见 craftQualitySpec（单一数据源）
  * 依据：docs/design/角色编年史升级-多维分层与素材质检.md §三/§十
  */
-const { hasCommentaryVoice, isFillerLine } = require('./craftQualitySpec');
+const {
+    hasCommentaryVoice, isFillerLine, isGenericScene, isLabelWhy, hasScenePrefixInQuote
+} = require('./craftQualitySpec');
 
 const MIN_QUOTE_CHARS = 4;
 const MIN_SCENE_CHARS = 2;
@@ -47,8 +49,11 @@ function validateQuote(raw) {
     const issues = [];
     if (n.quote.length < MIN_QUOTE_CHARS) issues.push('quote（原文）过短');
     else if (isFillerLine(n.quote)) issues.push('过场/功能句（指令·应答·问价），不是名言');
+    else if (hasScenePrefixInQuote(n.quote)) issues.push('quote 混入了处境前缀（处境属于 scene，quote 只能是原话）');
     if (n.scene.length < MIN_SCENE_CHARS) issues.push('scene（适用场景）缺失');
+    else if (isGenericScene(n.scene)) issues.push('scene 是空壳词（处境/通用场景…），须写具体处境');
     if (n.why.length < MIN_WHY_CHARS) issues.push('why（记忆点）缺失');
+    else if (isLabelWhy(n.why)) issues.push('why 是标签（"记忆点：…"），须写"为什么记得住"本身');
     else if (hasCommentaryVoice(n.why)) issues.push('why 是评论腔（展现/体现/立住…），须改写成记忆点');
     return { valid: issues.length === 0, issues, normalized: n };
 }

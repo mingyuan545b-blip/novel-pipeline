@@ -20,15 +20,12 @@ const FIELD_LIMITS = {
 const SUPPORTED_MODE = 'novel';
 
 /**
- * 实体中心模块的项目级默认档位。
+ * 实体中心模块的项目级默认档位（单一源见 config/moduleDefaults.js）。
  * 修复（2026-10-05 勘定压测 P0-A）：模块注册默认值是 'off'，新项目不设置 → 编年史/世界域
  * 提取链永不触发，实体中心的招牌功能（编年史/世界域）默认全 0 条。这里给新项目一个
  * 可用的默认档位（仍可在 UI 切换到 off/minimal/full）。
  */
-const DEFAULT_MODULE_SETTINGS = Object.freeze({
-    chronicleLevel: 'basic',
-    worldScopeLevel: 'basic',
-});
+const { DEFAULT_MODULE_SETTINGS } = require('../../config/moduleDefaults');
 
 // 过滤前端可能传入的"null"/"undefined"字符串（非真实null值）
 function sanitizeOptionalString(value) {
@@ -166,4 +163,4 @@ function createProjectData(req) {
     };
 }
 
-module.exports = { createProjectData };
+module.exports = { createProjectData, DEFAULT_MODULE_SETTINGS };

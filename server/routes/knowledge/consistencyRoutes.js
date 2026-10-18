@@ -14,7 +14,9 @@ router.post('/consistency/:projectId/check', async (req, res) => {
     try {
         const { projectId } = req.params;
         const { chapterNumber, content } = req.body || {};
-        const result = await consistency.checkConsistency(projectId, { chapterNumber, content });
+        // 修复：引擎上不存在 checkConsistency()（原调用必抛 TypeError → 500）
+        // 全维度校验对应引擎方法为 fullCheck(projectId, chapterNumber, chapterContent)
+        const result = await consistency.fullCheck(projectId, Number(chapterNumber) || 0, content || '');
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -22,7 +24,10 @@ router.post('/consistency/:projectId/check', async (req, res) => {
 router.post('/consistency/:projectId/quick-check', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const result = await consistency.quickCheck(projectId);
+        const { chapterNumber, chapterContent, content } = req.body || {};
+        // 修复：原来只传 projectId，chapterNumber/chapterContent 丢失 → 正文恒为空
+        // → checkCharacter/Power 恒返回 0 问题（"通过"是假象，等于没校验）
+        const result = await consistency.quickCheck(projectId, Number(chapterNumber) || 0, chapterContent || content || '');
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });
@@ -30,8 +35,9 @@ router.post('/consistency/:projectId/quick-check', async (req, res) => {
 router.post('/consistency/:projectId/ai-check', async (req, res) => {
     try {
         const { projectId } = req.params;
-        const { chapterNumber } = req.body || {};
-        const result = await consistency.aiCheck(projectId, chapterNumber);
+        const { chapterNumber, chapterContent, content } = req.body || {};
+        // 修复：引擎方法名是 aiAssistedCheck（原调用 aiCheck 不存在 → 必抛 TypeError → 500）
+        const result = await consistency.aiAssistedCheck(projectId, Number(chapterNumber) || 0, chapterContent || content || '');
         res.json({ result });
     } catch (e) { return res.apiError(INTERNAL_ERROR.statusCode, e.message, INTERNAL_ERROR.code); }
 });

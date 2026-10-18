@@ -1,8 +1,8 @@
 // materialRelationSync.js — 关系变更处理实现（自 materialRelationProcessor.js 提取，行为不变）
 // 包含：关系类型推断 / 目标实体解析 / 单条关系变更处理 / 秘密关系限知表同步
 const store = require('../../../store');
-const { v4: uuidv4 } = require('uuid');
 const logger = require('../../../shared/logger');
+const { findExactRel, writeRetypedRelation, refreshRelation, createRelation } = require('./materialRelationWriter');
 
 const REL_TYPE_MAP = {
     '信任': 'ally', '友好': 'ally', '盟友': 'ally', '朋友': 'ally', '亲密': 'ally',
@@ -20,6 +20,11 @@ function inferRelType(label) {
     }
     return 'other';
 }
+
+/**
+ * 精确三键匹配 (fromCharacterId, toCharacterId, relType)——与唯一索引 idx_rel_unique 对齐。
+ * 实现与写入逻辑见 materialRelationWriter.js（本文件保持≤200行）。
+ */
 
 /** 秘密关系同步到限知表：关系双方确信，其他人未知 */
 async function syncSecretToKnowledgeAccess(projectId, fromId, toId, rc, chapter) {
@@ -127,37 +132,10 @@ async function processOneRelationshipChange(rc, ctx) {
 
         if (existing) {
             if (relType && relType !== existing.relType) {
-                // 关系类型变化：关闭旧关系，创建新关系（保留时间维度）
-                await store.setItem('character-relations', existing.id, {
-                    ...existing,
-                    endChapter: chapter.chapterNumber,
-                    endReason: `关系变为${rc.to || rc.from || relType}`,
-                    updatedAt: now
-                });
-                const newRelId = `rel-${uuidv4()}`;
-                await store.setItem('character-relations', newRelId, {
-                    id: newRelId, projectId,
-                    fromCharacterId: existing.fromCharacterId, toCharacterId: existing.toCharacterId,
-                    relType: relType,
-                    relLabel: rc.to || rc.from || '',
-                    strength: rc.strength || existing.strength,
-                    trustLevel: rc.trustLevel || existing.trustLevel,
-                    startChapter: chapter.chapterNumber,
-                    endChapter: null, isSecret,
-                    notes: rc.reason || '',
-                    createdAt: now, updatedAt: now
-                });
+                // 关系类型变化：关闭旧行 + 写新类型行（同键已存在则复活旧行，见 materialRelationWriter）
+                await writeRetypedRelation({ projectId, existing, existingRels, relType, rc, chapter, isSecret, now });
             } else {
-                await store.setItem('character-relations', existing.id, {
-                    ...existing,
-                    relType: relType || existing.relType,
-                    relLabel: rc.to || rc.from || existing.relLabel || '',
-                    strength: rc.strength || existing.strength,
-                    trustLevel: rc.trustLevel || existing.trustLevel,
-                    isSecret: isSecret || existing.isSecret,
-                    notes: rc.reason || existing.notes || '',
-                    updatedAt: now
-                });
+                await refreshRelation({ existing, relType, rc, isSecret, now });
             }
             operations.push({
                 type: 'updateRelationship', scope: 'relationship',
@@ -165,19 +143,7 @@ async function processOneRelationshipChange(rc, ctx) {
                 status: 'success'
             });
         } else {
-            const relId = `rel-${uuidv4()}`;
-            await store.setItem('character-relations', relId, {
-                id: relId, projectId,
-                fromCharacterId: fromId, toCharacterId: toId,
-                relType: relType || 'other',
-                relLabel: rc.to || rc.from || '',
-                strength: rc.strength || 50,
-                trustLevel: rc.trustLevel || 50,
-                startChapter: chapter.chapterNumber,
-                endChapter: null, isSecret,
-                notes: rc.reason || '',
-                createdAt: now, updatedAt: now
-            });
+            await createRelation({ projectId, fromId, toId, relType, rc, chapter, isSecret, now });
             operations.push({
                 type: 'createRelationship', scope: 'relationship',
                 entityKey: fromId, data: { with: rc.with, to: rc.to, reason: rc.reason },
@@ -194,4 +160,4 @@ async function processOneRelationshipChange(rc, ctx) {
     }
 }
 
-module.exports = { REL_TYPE_MAP, inferRelType, syncSecretToKnowledgeAccess, processOneRelationshipChange };
+module.exports = { REL_TYPE_MAP, inferRelType, findExactRel, syncSecretToKnowledgeAccess, processOneRelationshipChange };

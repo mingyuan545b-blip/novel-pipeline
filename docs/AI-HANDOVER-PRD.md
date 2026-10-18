@@ -143,7 +143,12 @@ L4 归档层（禁止主动读取）
 | ⑥ | 文档状态标记（🟢🟡📦❌）靠肉眼维护，过期无告警 | 加front-matter元数据（status/lastVerified/maxAgeDays），扩展audit-doc-sync.js检查"过期未核对"自动降级为🟡 | 🟢P3 |
 | ⑦ | worklog只有任务日志，缺"决策记录"——为什么选A不选B经常丢失 | worklog模板增加"关键决策"节（决策/理由/否决的备选），重大决策沉淀为ADR式条目 | 🟢P3 |
 
-**文档体系维护五原则（继承INDEX.md，保留）**：单一数据源 / 反向索引优先 / 状态即时更新 / 归档不删除 / 重复>30%即合并。
+**§4.3 进展（2026-10-11 文档瘦身批次）**：
+- ③ 根目录污染 → ✅ 已处理：`_*.png`/`_*.log`/`tmp_*`/`.tmp-*`/`client-eslint.json`/`v8-engine.html`/`page_screenshot.png` 等已移出根目录（备份于 `backups/docs-cleanup-2026-10-11/`）。
+- ① 入口薄指针 → 🟡 部分：`.trae/rules/project_rules.md` 已从 72KB 瘦身为薄指针（旧文冻结到 `docs/archive/trae-project-rules-legacy.md`）；`CLAUDE.md`/`AGENTS.md` 已加"按层加载"指引，gitnexus 块保留（工具生成）。
+- **额外完成**：`docs/SESSION-STATE.md` 从 582 行**瘦身为索引层**（当前状态 + 会话索引表，136 行），历史结论迁出到 `docs/archive/session-conclusions-archive.md`；完成任务的 worklog 移 `docs/archive/worklog/`；`docs/INDEX.md` 状态总览改为"按层导航"（不再逐文件记日期）；`verifyDocFreshness` 由 18 errors → **0 errors**。
+
+**文档体系维护五原则（继承INDEX.md，保留）**：单一数据源 / 反向索引优先 / **索引与详情分离** / 归档不删除 / 重复>30%即合并。
 
 ---
 
@@ -263,7 +268,7 @@ L4 归档层（禁止主动读取）
 | 前端异常 | 浏览器console + `node scripts/uiBugCheck.js` | .env.local覆盖.env导致403（ARCHITECTURE§一）/通配符路由 |
 | API行为 | curl直打3001对照契约 | POST返{success,data}、GET返数组的格式差异（陷阱#23） |
 | pipeline | `scripts/debugQueryPipelineLogs.js` / `debugQueryTaskLog.js` | 契约不匹配/污染守卫拦截/genre=null裸奔 |
-| LLM输出 | `scripts/tmp_verify_lmstudio.js` / modelBakeoff --dry-run | 思考吃光tokens(#94)/超时链/限流(errorRecovery.js) |
+| LLM输出 | `node scripts/modelBakeoff.js --models A,B --dry-run` / `curl localhost:3001/api/health`（看 llm-latency） | 思考吃光tokens(#94)/超时链/限流(errorRecovery.js) |
 | 数据 | `scripts/debugQueryChapters.js` / audit-cascade-delete | 孤儿数据/PG静默降级(store.js _backendStatus) |
 
 ### 8.3 调试硬规则

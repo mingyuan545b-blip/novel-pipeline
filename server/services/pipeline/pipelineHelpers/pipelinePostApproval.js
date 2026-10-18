@@ -17,6 +17,7 @@ const stateSnapshot = require('../../stateSnapshot');
 const consistency = require('../../consistency');
 const pipelineRegistry = require('../../pipelineRegistry');
 const { handleMaterialRegistrar } = require('../steps/materialRegistrar');
+const { shouldAcceptPolishedLength } = require('../steps/polisher');
 const { runMaterialOrganizer, runKnowledgeExtraction } = require('./pipelineKnowledgeExtraction');
 const { runDepthDriftCheck } = require('./pipelineDepthDriftCheck');
 const { getVisibleMaterials } = require('../volumeHelpers');
@@ -73,21 +74,28 @@ async function _runPolisher(projectId, chapterId, round, config, pipelineLog, on
         if (polishResult.result?.response) {
             const chapter = await store.getItem('chapters', chapterId);
             const polishedContent = polishResult.result.response;
-            const originalLength = (chapter?.normalContent || '').length;
+            const originalRaw = chapter?.normalContent || '', originalLength = originalRaw.length;
             const polishedLength = polishedContent.length;
             const ratio = originalLength > 0 ? polishedLength / originalLength : 1;
             if (ratio >= 0.8 && ratio <= 1.2 && polishedLength > 500) {
                 let finalPolished = cleanChapterContent(polishedContent);
-                const polishedWc = finalPolished.replace(/\s/g, '').length;
+                let polishedWc = finalPolished.replace(/\s/g, '').length;
                 const polishMaxWords = config.word.maxChapter;
                 if (polishedWc > polishMaxWords) {
                     logger.warn('postApproval', `Polisher字数超限: ${polishedWc}> 上限${polishMaxWords}字，截断到上限`);
                     finalPolished = truncateChapter(finalPolished, polishMaxWords).content;
+                    polishedWc = finalPolished.replace(/\s/g, '').length;
                 }
-                chapter.polishedContent = finalPolished; chapter.polisherOutput = finalPolished;
-                chapter.content = finalPolished; chapter.wordCount = finalPolished.replace(/\s/g, '').length;
-                chapter.updatedAt = new Date().toISOString();
-                await store.setItem('chapters', chapterId, chapter);
+                // 字数绝对下限守卫（根因）：此前只按相对比例0.8~1.2，润色可"合法"缩水20%把已达标稿打回下限下（实测20章10章<targetMin）。
+                const originalWc = originalRaw.replace(/\s/g, '').length;
+                if (!shouldAcceptPolishedLength(originalWc, polishedWc, config.word)) {
+                    logger.warn('postApproval', `Polish rejected by floor: ${originalWc}→${polishedWc} (targetMin=${config.word.targetMin}, rejectMin=${config.word.rejectMin})，保留定稿正文，不采用缩短稿`);
+                } else {
+                    chapter.polishedContent = finalPolished; chapter.polisherOutput = finalPolished;
+                    chapter.content = finalPolished; chapter.wordCount = polishedWc;
+                    chapter.updatedAt = new Date().toISOString();
+                    await store.setItem('chapters', chapterId, chapter);
+                }
             } else { logger.warn('postApproval', `Polish rejected: ratio=${ratio.toFixed(2)}, length=${polishedLength}.`); }
         }
     } catch (polishErr) {

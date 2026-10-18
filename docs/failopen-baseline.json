@@ -1,0 +1,8 @@
+{
+  "_comment": "fail-open 基线（docs/worklog/2026-10-17-假成果审查-问题统计.md §三.1）。计数只许下降。",
+  "measuredAt": "2026-10-18",
+  "totalCatch": 1177,
+  "failOpen": 257,
+  "pipelineCatch": 388,
+  "pipelineFailOpen": 141
+}

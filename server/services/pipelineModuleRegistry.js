@@ -134,6 +134,16 @@ function getRegisteredModules() {
     return [..._modules.keys()];
 }
 
+/**
+ * 获取所有已注册模块的元数据（只读副本）。
+ * 供门禁脚本使用：校验 offValue 语义、configKey 是否进入项目创建默认值。
+ * 背景见 docs/worklog/2026-10-17-假成果审查-问题统计.md F2（offValue 写反致模块永久禁用）。
+ * @returns {Array<{id: string, configKey: string, offValue: string}>}
+ */
+function getRegisteredModuleMeta() {
+    return [..._modules.values()].map(m => ({ id: m.id, configKey: m.configKey, offValue: m.offValue }));
+}
+
 module.exports = {
     registerModule,
     getModuleConfig,
@@ -141,5 +151,6 @@ module.exports = {
     onWriterPrompt,
     onPostApproval,
     onReaderCheck,
-    getRegisteredModules
+    getRegisteredModules,
+    getRegisteredModuleMeta
 };

@@ -935,7 +935,7 @@ timeline (per project per chapter)
 | id | TEXT PK | 技法ID：`部门_子类_序号`（如 `02_情节引擎部_02_悬念编码_05`） |
 | display_name | TEXT | 技法名（必须跨作品通用，禁止作品专有名词） |
 | department / subcategory / category_path | TEXT | 归属（7部门 × 子类），decision于注入调度 |
-| applicable_modes | TEXT(JSON) | 适用模式 novel/shuangwen/tomato-short |
+| applicable_modes | TEXT(JSON) | 适用模式 novel（shuangwen/tomato-short 已移除） |
 | context_slot / context_priority | TEXT/INT | L0(100) intent-planner、L2(80) writer、L3(70) polisher、L4(20) material-manager |
 | injection_point | TEXT | intent-planner / writer / polisher / material-manager |
 | worldview_depth | TEXT | macro / meso / micro |

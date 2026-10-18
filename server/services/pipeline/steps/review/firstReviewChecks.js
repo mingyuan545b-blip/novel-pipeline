@@ -60,6 +60,56 @@ async function collectWritingTechniqueHints(chapter, ctx, project) {
     return hints;
 }
 
+/**
+ * T0 元约束（M1–M11）检测 → pipeline 初审硬阻断条目。
+ *
+ * F1 修复（docs/worklog/2026-10-17-假成果审查-问题统计.md）：
+ * 此前 T0 元约束只在 UI 手动审计路由（chapterAuditor/hardBlockChecks）里跑，pipeline 初审
+ * 完全不含元约束检测 → sop/08 承诺的"hardBlock 自动阻断 pipeline"从未生效。本函数把
+ * runAllMetaConstraintDetections 真正接入 pipeline 初审。
+ *
+ * @returns {Promise<Array<{severity:string,title:string,description:string}>>}
+ */
+async function collectMetaConstraintIssues(content, chapter, ctx) {
+    const issues = [];
+    try {
+        const { runAllMetaConstraintDetections } = require('../../../prompts/constraintDetectionRegistry');
+        const allChapters = await ctx.getChapters();
+        const prevChapters = allChapters
+            .filter(c => c.chapterNumber < chapter.chapterNumber && c.content)
+            .sort((a, b) => b.chapterNumber - a.chapterNumber);
+        const prevChapterContent = prevChapters[0]?.content || '';
+        const recentChapterContents = prevChapters.slice(0, 5).map(c => c.content);
+        let sideCharacterNames = [];
+        try {
+            const charMats = await ctx.getCharacterMaterials();
+            sideCharacterNames = charMats
+                .filter(m => !m.archived && !(m.tags || []).includes('主角'))
+                .map(m => m.name)
+                .filter(Boolean);
+        } catch (_) { sideCharacterNames = []; }
+
+        const metaResults = await runAllMetaConstraintDetections({
+            content,
+            chapterNumber: chapter.chapterNumber,
+            prevChapterContent,
+            recentChapterContents,
+            sideCharacterNames,
+        });
+        for (const [id, result] of Object.entries(metaResults || {})) {
+            if (result && result.violated && result.block !== false) {
+                const top = result.violations?.[0];
+                issues.push({
+                    severity: 'critical',
+                    title: `T0元约束${id}违规`,
+                    description: `T0元约束${id}违规：${top?.reason || '检测违规'}（实际${result.actual}/阈值${result.threshold}）`,
+                });
+            }
+        }
+    } catch (e) { logger.warn('firstReview', 'meta-constraint: ' + (e.message || e)); }
+    return issues;
+}
+
 async function runHardBlockChecks(chapter, ctx, projectId) {
     const hardBlockIssues = [];
     const warningIssues = [];
@@ -93,10 +143,13 @@ async function runHardBlockChecks(chapter, ctx, projectId) {
         if (genreIntercept.hardBlockIssues?.length > 0) hardBlockIssues.push(...genreIntercept.hardBlockIssues);
         if (genreIntercept.warningIssues?.length > 0) warningIssues.push(...genreIntercept.warningIssues);
 
+        // F1 修复：T0 元约束（M1–M11）接入 pipeline 初审硬阻断通道
+        hardBlockIssues.push(...await collectMetaConstraintIssues(content, chapter, ctx));
+
         try { const charMats = await ctx.getCharacterMaterials(); const charNames = charMats.filter(m => !m.archived).map(m => m.name).filter(Boolean); if (charNames.length > 0) { const nameResult = detectCharacterNameMismatch(content, charNames); if (nameResult.unknownNames.length > 0) warningIssues.push({ severity: 'medium', description: `可能有未知角色名：${nameResult.unknownNames.slice(0, 5).map(n => `"${n.name}"`).join('、')}`, title: '疑似未知角色名' }); } } catch (e) { logger.warn('firstReview', e.message || e); }
     } catch (e) { logger.warn('firstReview', e.message || e); }
 
     return { hardBlockIssues, warningIssues };
 }
 
-module.exports = { collectWritingTechniqueHints, runHardBlockChecks };
+module.exports = { collectWritingTechniqueHints, runHardBlockChecks, collectMetaConstraintIssues };

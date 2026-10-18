@@ -18,5 +18,11 @@ node scripts/audit-cascade-delete.js --ci || exit 1
 echo "[PRE-COMMIT] 项目标准校验..."
 node scripts/verifyProjectStandards.js || exit 1
 
+echo "[PRE-COMMIT] 模块开关矩阵（offValue 语义 + 默认值覆盖，防 F2/P0-A）..."
+node scripts/verifyModuleSwitchDefaults.js || exit 1
+
+echo "[PRE-COMMIT] 关键导出可达性（防空绿/死导出，防 F1/F4/F6）..."
+node scripts/verifyReachability.js || exit 1
+
 echo "[PRE-COMMIT] ✅ 全部检查通过"
 exit 0

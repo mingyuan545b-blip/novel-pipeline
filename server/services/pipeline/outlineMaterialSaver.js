@@ -13,6 +13,7 @@ const { getGenrePlugin } = require('../genreConfig');
 const genreProfileRegistry = require('../genreProfileRegistry');
 const { resolveMaterialName } = require('./materialNameResolver');
 const { STATUS_VALUES } = require('../chapterStatus');
+const { DEFAULT_MODULE_SETTINGS } = require('../../config/moduleDefaults');
 
 function buildCharTags(isChar, mat) {
     if (!isChar) return [];
@@ -175,7 +176,7 @@ async function saveProjectFromTemplate(template) {
         id: projectId, name, genre: genreStr, description: setting || '',
         mode: 'novel', subGenre: resolvedSubGenre, targetChapters: targetChapters ?? 100, currentChapter: 0,
         status: 'template-generated',
-        settings: { autoPipeline: false, chapterRounds: 3, chronicleLevel: 'basic', worldScopeLevel: 'basic' },
+        settings: { autoPipeline: false, chapterRounds: 3, ...DEFAULT_MODULE_SETTINGS },
         styleTemplateId: '', constraints: constraints || getDefaultsForGenre(null, null).defaultConstraints,
         template: { elements: elementStr, style, tone, pov, conflict, themes },
         wordConfig: resolvedWordConfig,

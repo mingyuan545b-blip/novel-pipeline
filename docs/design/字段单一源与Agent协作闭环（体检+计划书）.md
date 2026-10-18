@@ -124,7 +124,7 @@
 
 1. **WARN/HIGH 被当成致命**：`server/services/pipeline/pipelineStepRunner.js:72-84` —— `if (inputCheck.warnings.length > 0) { … return 失败 }`，注释写着"WARN也阻断（用户要求）"。于是 `MM-IN-002 materials应可获取(HIGH)`、`RV-IN-002 project(HIGH)` 等**软规则**也会把 agent 打成失败。severity 分级形同虚设。
 2. **同一个键依赖，手写在 7 份 YAML**：`WR-IN-004 / FR-IN-003 / SR-IN-004 / FA-IN-003 / FE-IN-004 / RV-IN-003 / PO-IN-003` 全部要求 `stateJson.anyOf:[innerConflict, independentStance, fateArc, (protagonistMirror/personality)]`。
-3. **这个键根本产不出来**：`server/services/pipeline/agentMaterialHelpers.js:buildStateJson` 只产出 `name/roleLevel/lifecycleState/position/personality/speakingTone + genreState + KV动态键`，**从不产出** innerConflict/independentStance/fateArc/protagonistMirror；且 `contractValidator.js:66` 要求值非空。只有在 material-organizer 恰好输出了 `innerConflictNote/independentStanceNote/fateArcNote` 时（`characterFieldSpec.js:141-155`）才能间接满足。→ CH2+ 只要该章没有主角内在矛盾/配角独立立场的记录，**7 个 agent 一起被同一个键卡死**。
+3. **这个键根本产不出来**：`server/services/pipeline/agentMaterialHelpers.js:buildStateJson` 只产出 `name/roleLevel/lifecycleState/position/personality/speakingTone + genreState + KV动态键`，**从不产出** innerConflict/independentStance/fateArc/protagonistMirror；且 `contractValidator.js:66` 要求值非空。只有在 material-organizer 恰好输出了 `innerConflictNote/independentStanceNote/fateArcNote` 时（`characterFieldSpec.js:141-155`）才能间接满足。→ CH2+ 只要该章没有主角内在矛盾/配角独立立场的记录，**7 个消费方一起被同一个键卡死**。
 
 **为什么"修过还犯"**：`server/services/pipeline/contractMaterialEnricher.js` 是**消费端合并补丁**（项目自己的原则1把它列为"现行违规项"）——按**名字精确 join** `materials ↔ entities`，join 不上就原样返回、`stateJson` 仍空 → 契约照旧失败。它治的是症状，没治"生产者不产出键"。
 
@@ -215,7 +215,7 @@
 | material-registrar | ✗未声明 | ✗绕过 | organizingPlan | operations/errors | passed=errors.length===0（P1-C） |
 | reader | ✓ | ✓ | recentChapters | readerOutput | 返修旁路（P1-E） |
 
-**共性断点**：① 一半 agent 绕过装配入口 → 缺口不记账；② 深度键的**唯一产生者**是 material-organizer 的 Note 字段，却被 7 个 agent 的契约硬依赖；③ 素材↔实体靠名字 join，无外键。
+**共性断点**：① 一半 agent 绕过装配入口 → 缺口不记账；② 深度键的**唯一产生者**是 material-organizer 的 Note 字段，却被 7 个消费方的契约硬依赖；③ 素材↔实体靠名字 join，无外键。
 
 ---
 

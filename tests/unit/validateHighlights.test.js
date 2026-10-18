@@ -64,3 +64,27 @@ describe('validateHighlights / dedupeHighlights', () => {
         expect(highlightKey(good)).toBe(highlightKey({ ...good, what: good.what + '。' }));
     });
 });
+
+describe('validateHighlight 结构性反模式（2026-10-17 加严，治库中真实脏数据）', () => {
+    test('缺 cost 被拦（高光四问之"有代价"）', () => {
+        const r = validateHighlight({ scene: '对峙', what: '用笔冻结探员行动权', why: '因为他怕线索断在自己手里，所以宁可违规也不退' });
+        expect(r.valid).toBe(false);
+        expect(r.issues.join()).toContain('cost');
+    });
+    test('剧情摘要式 what（事件复述）被拦', () => {
+        const r = validateHighlight({
+            scene: '提出取回原始协议时',
+            what: '摇头否定陆行舟的直接行动力，指出其状态连低级镜像兽都打不过，并给出基于0.5秒逻辑空窗期的精密方案。',
+            cost: '背负失去合作者的风险', why: '因为他信奉审计逻辑，所以宁可担连带责任，也不许数据被破坏'
+        });
+        expect(r.valid).toBe(false);
+        expect(r.issues.join()).toContain('剧情摘要');
+    });
+    test('标签式 why 被拦', () => {
+        const r = validateHighlight({
+            scene: '对峙', what: '划出蓝光弧线冻结探员', cost: '暴露底牌', why: '记忆点：体现冷静'
+        });
+        expect(r.valid).toBe(false);
+        expect(r.issues.join()).toContain('标签');
+    });
+});

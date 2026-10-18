@@ -56,3 +56,31 @@ describe('validateQuotes / dedupeQuotes', () => {
         expect(quoteKey('路就在脚下')).toBe(quoteKey(' 路就在脚下。 '));
     });
 });
+
+describe('validateQuote 结构性反模式（2026-10-17 加严，治库中真实脏数据）', () => {
+    test('quote 混入处境前缀被拦（处境属于 scene）', () => {
+        const r = validateQuote({
+            scene: '处境', quote: '面对新人鲁莽行动：“脑子是用来算账的，不是用来装浆糊的。”',
+            why: '强调理性至上'
+        });
+        expect(r.valid).toBe(false);
+        expect(r.issues.join()).toContain('处境前缀');
+    });
+    test('空壳 scene（"通用场景"/"处境"）被拦', () => {
+        const r = validateQuote({ scene: '通用场景', quote: '路就在脚下', why: '点明他绝不回头的道' });
+        expect(r.valid).toBe(false);
+        expect(r.issues.join()).toContain('空壳词');
+    });
+    test('标签式 why（"记忆点：…"）被拦', () => {
+        const r = validateQuote({ scene: '对账时发现有人做假账', quote: '这笔账不平，谁也别想走', why: '记忆点：强调理性至上' });
+        expect(r.valid).toBe(false);
+        expect(r.issues.join()).toContain('标签');
+    });
+    test('合规范例仍通过（防误伤）', () => {
+        const r = validateQuote({
+            scene: '对账时发现有人做假账', quote: '这笔账不平，谁也别想走',
+            why: '因为把账当成命根子，所以宁可掀桌子，也不肯让一笔糊涂账过夜'
+        });
+        expect(r.valid).toBe(true);
+    });
+});

@@ -8,11 +8,14 @@
  * 判定：见 craftQualitySpec.HIGHLIGHT_TESTS（去名/代价/画面/不可逆）
  * 依据：docs/design/角色编年史升级-多维分层与素材质检.md §十
  */
-const { hasCommentaryVoice } = require('./craftQualitySpec');
+const {
+    hasCommentaryVoice, isGenericScene, isLabelWhy, looksLikeSummary
+} = require('./craftQualitySpec');
 
 const MIN_SCENE_CHARS = 2;
 const MIN_WHAT_CHARS = 6;
 const MIN_WHY_CHARS = 6;
+const MIN_COST_CHARS = 2;
 
 /** 归一化：兼容旧格式（字符串 / {scene,what,why} / {scene,what}）与新格式（含 cost） */
 function normalizeHighlight(raw) {
@@ -46,8 +49,12 @@ function validateHighlight(raw) {
     if (!n) return { valid: false, issues: ['空高光'], normalized: null };
     const issues = [];
     if (n.scene.length < MIN_SCENE_CHARS) issues.push('scene（处境）缺失');
+    else if (isGenericScene(n.scene)) issues.push('scene 是空壳词（处境/通用场景…），须写具体处境');
     if (n.what.length < MIN_WHAT_CHARS) issues.push('what（他做的那个选择/动作原文）过短或缺失');
+    else if (looksLikeSummary(n.what)) issues.push('what 是剧情摘要（事件复述），须写"那一个选择/动作或台词原文"');
+    if (n.cost.length < MIN_COST_CHARS) issues.push('cost（代价/反差）缺失——高光四问之"有代价"不通过');
     if (n.why.length < MIN_WHY_CHARS) issues.push('why（记忆点）缺失');
+    else if (isLabelWhy(n.why)) issues.push('why 是标签（"记忆点：…"），须写"为什么记得住"本身');
     else if (hasCommentaryVoice(n.why)) issues.push('why 是评论腔（展现/体现/立住…），须改写成"因为他…所以宁可…也不…"');
     return { valid: issues.length === 0, issues, normalized: n };
 }
@@ -83,6 +90,6 @@ function dedupeHighlights(existing = [], incoming = []) {
 }
 
 module.exports = {
-    MIN_SCENE_CHARS, MIN_WHAT_CHARS, MIN_WHY_CHARS,
+    MIN_SCENE_CHARS, MIN_WHAT_CHARS, MIN_WHY_CHARS, MIN_COST_CHARS,
     normalizeHighlight, highlightKey, validateHighlight, validateHighlights, dedupeHighlights,
 };
