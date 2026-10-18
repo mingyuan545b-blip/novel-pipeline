@@ -41,4 +41,30 @@ function baseScore(tech) {
     return normalizeSuccessRate(tech && tech.success_rate) * BASE_WEIGHT;
 }
 
-module.exports = { DEFAULT_SUCCESS_RATE, SCALE, BASE_WEIGHT, normalizeSuccessRate, baseScore };
+/** 反馈差分权重上限（与其它 boost 同量级） */
+const FEEDBACK_WEIGHT = 0.3;
+/** 库内静态先验的"等效样本数"：反馈样本越多，差分越可信（置信度 = n/(n+priorStrength)） */
+const FEEDBACK_PRIOR_STRENGTH = 5;
+
+/**
+ * 技法反馈的**差分加权**（D 增量·源头评分）：
+ *   以技法库静态 success_rate（先验）为基准，衡量「实时反馈速率相对先验的偏离」，
+ *   并按反馈样本数做置信度缩放 —— 样本少时几乎不干预，样本多时才显著加减分。
+ *   与旧实现的区别：不再是 `(rate-0.5)*const`（把先验当固定 0.5、样本数无关）。
+ * @param {{rate:number, count:number, prior:number, weight?:number, priorStrength?:number}} p
+ * @returns {number} 可正可负的加分量（count=0 时为 0）
+ */
+function feedbackDelta({ rate, count, prior, weight = FEEDBACK_WEIGHT, priorStrength = FEEDBACK_PRIOR_STRENGTH }) {
+    if (rate === null || rate === undefined || rate === '') return 0;
+    const r = Number(rate);
+    if (!Number.isFinite(r)) return 0;
+    const n = Number(count);
+    const confidence = Number.isFinite(n) && n > 0 ? n / (n + priorStrength) : 0;
+    const base = Number.isFinite(prior) ? prior : DEFAULT_SUCCESS_RATE;
+    return (r - base) * weight * confidence;
+}
+
+module.exports = {
+    DEFAULT_SUCCESS_RATE, SCALE, BASE_WEIGHT, FEEDBACK_WEIGHT, FEEDBACK_PRIOR_STRENGTH,
+    normalizeSuccessRate, baseScore, feedbackDelta,
+};

@@ -4,7 +4,7 @@
  */
 const { getAccessByProject } = require('../knowledgeBase/knowledgeAccess');
 const { resolveGenreFromProject } = require('../genreConfig');
-const { getBatchSuccessRates, recordFeedback } = require('./techniqueFeedback');
+const { getBatchSuccessStats, recordFeedback } = require('./techniqueFeedback');
 const techIndex = require('../techIndex');
 
 /** 选中技法缓存：projectId:chapterNumber → techniqueId[] */
@@ -31,7 +31,8 @@ async function buildFeedbackRates(projectId) {
     try {
         const techIds = techIndex.getTechniquesByInjectionPoint('writer', 'novel').map(t => t.id).slice(0, 20);
         if (!techIds.length) return null;
-        return await getBatchSuccessRates(techIds, projectId);
+        // 返回 {rate,count} 统计（差分加权需要样本数做置信度缩放），不再只返回速率
+        return await getBatchSuccessStats(techIds, projectId);
     } catch (_) { return null; }
 }
 

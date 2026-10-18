@@ -6,7 +6,7 @@
 const techIndex = require('../techIndex');
 const { detectSceneTypes } = require('./contextDecisionRules');
 const { getDepthAdjustment } = require('./contextDecisionRules');
-const { baseScore } = require('./techniqueScoring');
+const { baseScore, normalizeSuccessRate, feedbackDelta, FEEDBACK_PRIOR_STRENGTH } = require('./techniqueScoring');
 const logger = require('../../shared/logger');
 
 /** 场景类型→技法部门映射（使用index.json实际部门名，去掉数字前缀） */
@@ -154,12 +154,19 @@ function _genreBoost(tech, genre) {
     return 0.2 * (preferred.length - idx) / preferred.length;
 }
 
-/** 反馈数据对技法的加分/减分 */
-function _feedbackBoost(tech, feedbackRates) {
-    if (!feedbackRates || !tech.id) return 0;
-    const rate = feedbackRates[tech.id];
-    if (rate === undefined || rate === null) return 0;
-    return (rate - 0.5) * 0.3;
+/** 反馈数据对技法的加分/减分（差分加权：相对库内先验的偏离 × 样本置信度） */
+function _feedbackBoost(tech, feedbackStats) {
+    if (!feedbackStats || !tech.id) return 0;
+    const entry = feedbackStats[tech.id];
+    if (entry === undefined || entry === null) return 0;
+    // 兼容：数字=旧格式(仅速率，无样本数) → 视为中等置信度；对象={rate,count} 走差分
+    const rate = typeof entry === 'number' ? entry : entry.rate;
+    const count = typeof entry === 'number' ? FEEDBACK_PRIOR_STRENGTH : entry.count;
+    return feedbackDelta({
+        rate,
+        count,
+        prior: normalizeSuccessRate(tech.success_rate),
+    });
 }
 
 /** 清理部门名前缀数字 */

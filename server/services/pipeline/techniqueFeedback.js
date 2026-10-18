@@ -40,8 +40,8 @@ async function recordFeedback(projectId, chapterNumber, techniqueIds, passed) {
     await _pruneOldRecords(projectId);
 }
 
-/** 获取某技法的加权成功率（基于最近N条反馈） */
-async function getTechniqueSuccessRate(techniqueId, projectId, limit = 20) {
+/** 获取某技法的反馈统计（速率 + 样本数；基于最近N条反馈） */
+async function getTechniqueStats(techniqueId, projectId, limit = 20) {
     try {
         const all = await store.queryItems(STORE_TYPE, { projectId });
         const filtered = all
@@ -50,8 +50,14 @@ async function getTechniqueSuccessRate(techniqueId, projectId, limit = 20) {
             .slice(0, limit);
         if (filtered.length === 0) return null;
         const passCount = filtered.filter(r => r.passed).length;
-        return passCount / filtered.length;
+        return { rate: passCount / filtered.length, count: filtered.length };
     } catch (_) { return null; }
+}
+
+/** 获取某技法的加权成功率（基于最近N条反馈） */
+async function getTechniqueSuccessRate(techniqueId, projectId, limit = 20) {
+    const stats = await getTechniqueStats(techniqueId, projectId, limit);
+    return stats ? stats.rate : null;
 }
 
 /** 批量获取技法成功率（调度器用） */
@@ -65,6 +71,17 @@ async function getBatchSuccessRates(techniqueIds, projectId) {
     return rates;
 }
 
+/** 批量获取技法反馈统计（速率+样本数，供置信度加权用） */
+async function getBatchSuccessStats(techniqueIds, projectId) {
+    if (!projectId || !techniqueIds?.length) return {};
+    const stats = {};
+    for (const id of techniqueIds) {
+        const s = await getTechniqueStats(id, projectId);
+        if (s !== null) stats[id] = s;
+    }
+    return stats;
+}
+
 /** 删除项目的技法反馈（级联删除用） */
 async function deleteFeedbackByProject(projectId) {
     const items = await store.queryItems(STORE_TYPE, { projectId });
@@ -74,4 +91,4 @@ async function deleteFeedbackByProject(projectId) {
     return items.length;
 }
 
-module.exports = { recordFeedback, getTechniqueSuccessRate, getBatchSuccessRates, deleteFeedbackByProject, STORE_TYPE };
+module.exports = { recordFeedback, getTechniqueStats, getTechniqueSuccessRate, getBatchSuccessRates, getBatchSuccessStats, deleteFeedbackByProject, STORE_TYPE };
