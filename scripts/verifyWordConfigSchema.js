@@ -14,6 +14,7 @@
 const fs = require('fs');
 const path = require('path');
 const { WORD_CONFIG_FIELDS, FIELD_ALIASES } = require('../server/config/wordConfigSchema');
+const { readProjects } = require('./lib/projectDataReader');
 
 const ROOT = path.join(__dirname, '..');
 let errorCount = 0;
@@ -131,48 +132,40 @@ function checkProductionCode() {
 }
 
 // 检查已存项目数据
-function checkProjectData() {
+async function checkProjectData() {
     console.log('\n=== W4: 已存项目数据wordConfig字段名 ===');
-    const projectDir = path.join(ROOT, 'data/projects');
-    if (!fs.existsSync(projectDir)) {
-        warn('data/projects目录不存在');
+    const { source, projects } = await readProjects();
+    if (source === 'none') {
+        warn('未读到任何项目数据（PG/JSON 均无）— 本项**未被覆盖**，不得视为通过');
         return;
     }
 
-    const files = fs.readdirSync(projectDir).filter(f => f.endsWith('.json'));
     let migratedCount = 0;
     let needMigrationCount = 0;
-
-    for (const file of files) {
-        const filePath = path.join(projectDir, file);
-        try {
-            const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-            if (!data.wordConfig) continue;
-
-            const fields = Object.keys(data.wordConfig);
-            const hasNonStandard = fields.some(f => !STANDARD_FIELDS.has(f));
-            if (hasNonStandard) {
-                needMigrationCount++;
-                warn(`${file}: wordConfig使用历史字段名[${fields.join(',')}]，需运行迁移脚本`);
-            } else {
-                migratedCount++;
-            }
-        } catch (e) {
-            // 忽略解析错误
+    let noWordConfig = 0;
+    for (const data of projects) {
+        if (!data || !data.wordConfig) { noWordConfig++; continue; }
+        const fields = Object.keys(data.wordConfig);
+        const hasNonStandard = fields.some(f => !STANDARD_FIELDS.has(f));
+        if (hasNonStandard) {
+            needMigrationCount++;
+            warn(`${data.id || '?'}: wordConfig使用历史字段名[${fields.join(',')}]，需运行迁移脚本`);
+        } else {
+            migratedCount++;
         }
     }
-    ok(`已存项目: ${migratedCount}个已符合标准, ${needMigrationCount}个需迁移`);
+    ok(`数据源=${source}，项目 ${projects.length} 个：符合标准 ${migratedCount} 个, 需迁移 ${needMigrationCount} 个, 无 wordConfig ${noWordConfig} 个`);
 }
 
 // 主函数
-function main() {
+async function main() {
     console.log('========================================');
     console.log('wordConfig Schema一致性校验（W1-W4）');
     console.log('========================================');
 
     checkGenreProfiles();
     checkProductionCode();
-    checkProjectData();
+    await checkProjectData();
 
     console.log('\n========================================');
     console.log(`校验完成: ${errorCount} errors, ${warnCount} warnings`);
@@ -189,4 +182,4 @@ function main() {
     }
 }
 
-main();
+main().catch((e) => { console.error('校验脚本异常:', e.message); process.exit(1); });

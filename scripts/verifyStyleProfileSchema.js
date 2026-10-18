@@ -10,6 +10,7 @@
 const fs = require('fs');
 const path = require('path');
 const { STYLE_PROFILE_FIELDS, CONSTRAINT_FIELDS, FIELD_ALIASES } = require('../server/config/styleProfileSchema');
+const { readProjects } = require('./lib/projectDataReader');
 
 const ROOT = path.join(__dirname, '..');
 let errorCount = 0;
@@ -78,43 +79,37 @@ function checkProductionCode() {
 }
 
 // 检查已存项目数据是否缺少约束字段
-function checkProjectData() {
+async function checkProjectData() {
     console.log('\n=== S2: 已存项目数据约束字段完整性 ===');
-    const projectDir = path.join(ROOT, 'data/projects');
-    if (!fs.existsSync(projectDir)) {
-        warn('data/projects目录不存在');
+    const { source, projects } = await readProjects();
+    if (source === 'none') {
+        warn('未读到任何项目数据（PG/JSON 均无）— 本项**未被覆盖**，不得视为通过');
         return;
     }
 
-    const files = fs.readdirSync(projectDir).filter(f => f.endsWith('.json'));
     let completeCount = 0;
     let incompleteCount = 0;
-
-    for (const file of files) {
-        const filePath = path.join(projectDir, file);
-        try {
-            const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-            if (!data.styleProfile) continue;
-
-            const missingFields = CONSTRAINT_FIELDS.filter(f => data.styleProfile[f] === undefined);
-            if (missingFields.length > 0) {
-                incompleteCount++;
-                warn(`${file}: styleProfile缺少约束字段[${missingFields.join(',')}]`);
-            } else {
-                completeCount++;
-            }
-        } catch (e) { /* 忽略解析错误 */ }
+    let noProfile = 0;
+    for (const data of projects) {
+        if (!data || !data.styleProfile) { noProfile++; continue; }
+        const missingFields = CONSTRAINT_FIELDS.filter(f => data.styleProfile[f] === undefined);
+        if (missingFields.length > 0) {
+            incompleteCount++;
+            warn(`${data.id || '?'}: styleProfile缺少约束字段[${missingFields.join(',')}]`);
+        } else {
+            completeCount++;
+        }
     }
-    ok(`已存项目: ${completeCount}个约束字段完整, ${incompleteCount}个需补齐`);
+    ok(`数据源=${source}，项目 ${projects.length} 个：约束字段完整 ${completeCount} 个, 需补齐 ${incompleteCount} 个, 无 styleProfile ${noProfile} 个`);
 }
 
-function main() {
+async function main() {
     console.log('========================================');
     console.log('styleProfile Schema一致性校验（S1-S2）');
     console.log('========================================');
 
     checkProductionCode();
-    checkProjectData();
+    await checkProjectData();
 
     console.log('\n========================================');
     console.log(`校验完成: ${errorCount} errors, ${warnCount} warnings`);
@@ -130,4 +125,4 @@ function main() {
     }
 }
 
-main();
+main().catch((e) => { console.error('校验脚本异常:', e.message); process.exit(1); });
