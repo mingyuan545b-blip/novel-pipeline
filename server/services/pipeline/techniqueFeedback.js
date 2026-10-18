@@ -5,10 +5,27 @@
 const store = require('../../store');
 const logger = require('../../shared/logger');
 const { v4: uuidv4 } = require('uuid');
+const { isHoldout } = require('../holdoutAssigner');
 
 const STORE_TYPE = 'technique-feedback';
 const FEEDBACK_ALPHA = 0.1;
 const MAX_RECORDS_PER_PROJECT = 100;
+
+/**
+ * 该章节是否为"留出集"（D3-a 接线：训练/评估隔离）。
+ * 由项目 settings.holdoutRatio 驱动（默认未设 → 关闭，不影响既有行为）。
+ * @returns {Promise<boolean>}
+ */
+async function _isHoldoutChapter(projectId, chapterNumber) {
+    try {
+        const project = await store.getItem('projects', projectId);
+        const ratio = project && project.settings ? project.settings.holdoutRatio : undefined;
+        if (ratio === undefined || ratio === null || Number(ratio) <= 0) return false;
+        return isHoldout(projectId, chapterNumber, { ratio: Number(ratio) });
+    } catch (_) {
+        return false; // 读不到项目 → 不隔离（保守，不误伤学习）
+    }
+}
 
 /** 裁剪项目旧反馈记录，保留最近MAX_RECORDS_PER_PROJECT条 */
 async function _pruneOldRecords(projectId) {
@@ -25,6 +42,11 @@ async function _pruneOldRecords(projectId) {
 /** 记录技法反馈（审核步骤后调用） */
 async function recordFeedback(projectId, chapterNumber, techniqueIds, passed) {
     if (!projectId || !techniqueIds?.length) return;
+    // 留出集不写入学习数据（避免评估集被"学习"污染；源头不落，而非事后清洗）
+    if (await _isHoldoutChapter(projectId, chapterNumber)) {
+        logger.info('techniqueFeedback', `skip holdout ch${chapterNumber} (train/eval isolation)`);
+        return;
+    }
     const now = new Date().toISOString();
     const records = techniqueIds.map(id => ({
         id: `tf-${uuidv4()}`,
