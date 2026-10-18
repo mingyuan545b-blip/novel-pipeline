@@ -36,8 +36,7 @@ const DATA_STORE_REGISTRY = {
     'knowledge-facts':       { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: [] },
     'narrative-state':       { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: ['narrative_state'] },
     'consistency-checks':    { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: ['consistency_checks'] },
-    'craft-materials':       { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: ['craft_materials'] },
-    'entities':              { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: [] },
+        'entities':              { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: [] },
     'quests':                { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: [] },
     'timeline':              { dedicated: false, syncable: true,  cascadable: true,  hasProjectId: true,  aliases: [] },
 

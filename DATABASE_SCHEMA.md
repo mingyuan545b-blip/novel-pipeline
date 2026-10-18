@@ -75,7 +75,6 @@ entities (1) ──┬── (N) entity_state_history (per chapter)
 knowledge_facts (per project, L0-L3 分层)
 narrative_state (per chapter, 唯一)
 consistency_checks (per chapter per checkType)
-craft_materials (per project per craftType)
 timeline (per project per chapter)
 ```
 
@@ -868,28 +867,14 @@ timeline (per project per chapter)
 
 ---
 
-### 29. craft_materials — 创作规范素材
+### 29. craft_materials — 创作规范素材（已删除 2026-10-19）
 
-| 列名 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| id | TEXT PK | — | 素材ID |
-| projectId | TEXT NOT NULL | — | 所属项目 |
-| craftType | TEXT NOT NULL | — | catchphrase/famous-scene/writing-technique/craft/mechanism等 |
-| name | TEXT NOT NULL | '' | 素材名称 |
-| content | TEXT | '' | 素材内容 |
-| archived | TEXT | '' | 归档状态 |
-| tags | JSONB | '[]' | 标签数组 |
-| metadata | JSONB | '{}' | 元数据 |
-| data | JSONB | '{}' | JSON完整对象 |
-| createdAt | TIMESTAMPTZ | NOW() | |
-| updatedAt | TIMESTAMPTZ | NOW() | |
-
-**索引**：
-- idx_craft_project(projectId)
-- idx_craft_project_type(projectId, craftType)
-- idx_craft_project_name(projectId, name)
-
-**设计说明**：替代 materials 中 catchphrase/famous-scene/writing-technique/craft/mechanism 等非实体类素材。
+> **状态：表已删除（migration `v0008_drop-craft-materials`）。**
+> 原因（F8，见 `docs/worklog/2026-10-17-假成果审查-问题统计.md` §六.3）：该表结构齐备但全仓无任何运行时
+> 写入/读取通道，实测 0 行 —— "结构齐备、通道零产出"的假成果。用户裁决为删表并清理相关代码
+> （knowledgeSchemaFacts / pgConstants / store-pg-writer-registry / dataStoreRegistry /
+> fieldRegistryRelation / verifyRegistryConsistency 中的声明已同步移除）。
+> 原设计：替代 materials 中 catchphrase/famous-scene/writing-technique/craft/mechanism 等非实体类素材。
 
 ---
 

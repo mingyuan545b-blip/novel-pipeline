@@ -5,7 +5,7 @@ const DEDICATED_TABLES = new Set([
     'entity_registry', 'item_definitions', 'character_binds', 'character_relations',
     'pet_entities', 'servant_entities', 'entities', 'entity_state_history',
     'entity_relations', 'entity_binds', 'foreshadow_ledger', 'knowledge_facts',
-    'narrative_state', 'consistency_checks', 'craft_materials', 'timeline',
+    'narrative_state', 'consistency_checks', 'timeline',
     'character_chronicle', 'knowledge_access', 'memory_layers',
     'world_scopes', 'world_factions', 'cross_world_traces',
     'library_techniques'
@@ -30,7 +30,6 @@ const TABLE_ALIASES = {
     'knowledge-facts': 'knowledge_facts',
     'narrative-state': 'narrative_state',
     'consistency-checks': 'consistency_checks',
-    'craft-materials': 'craft_materials',
     'timeline-events': 'timeline',
     'character-chronicle': 'character_chronicle',
     'knowledge-access': 'knowledge_access',

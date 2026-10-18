@@ -70,20 +70,4 @@ module.exports = {
             updatedAt: { type: 'timestamptz', nullable: false, noExtract: true }
         }
     },
-    craft_materials: {
-        storeType: 'craft-materials',
-        columns: {
-            id: { type: 'text', nullable: false, pk: true },
-            projectId: { type: 'text', nullable: false, indexed: true, extractorDefault: '' },
-            craftType: { type: 'text', nullable: false, indexed: true, extractorDefault: '' },
-            name: { type: 'text', nullable: false, indexed: true, extractorDefault: '' },
-            content: { type: 'text', nullable: false, extractorDefault: '' },
-            archived: { type: 'text', nullable: false, extractorDefault: '' },
-            tags: { type: 'jsonb', nullable: false, extractorDefault: '[]', extractorTransform: 'jsonOrString' },
-            metadata: { type: 'jsonb', nullable: false, extractorDefault: '{}', extractorTransform: 'jsonOrString' },
-            data: { type: 'jsonb', nullable: false, noExtract: true },
-            createdAt: { type: 'timestamptz', nullable: false, noExtract: true },
-            updatedAt: { type: 'timestamptz', nullable: false, noExtract: true }
-        }
-    }
-};
+    };

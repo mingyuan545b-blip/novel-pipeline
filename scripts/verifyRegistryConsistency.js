@@ -98,8 +98,6 @@ const PG_SCHEMA_COLUMNS = {
     entity_state_history: ['id','entityId','projectId','chapterNumber','baseState','genreState',
         'delta','changedFields','bindsSnapshot','relationsSnapshot','briefText','summaryText',
         'detailText','isValid','computedAt','data','createdAt','updatedAt'],
-    craft_materials: ['id','projectId','craftType','name','content','archived','tags',
-        'metadata','data','createdAt','updatedAt'],
     foreshadow_ledger: ['id','projectId','name','description','status','plantChapter',
         'lastAdvanceChapter','resolveChapter','expectedResolveWindow','importance',
         'relatedEntityIds','relatedPlotThreads','advanceLog','resolutionNotes',
@@ -129,7 +127,7 @@ for (const [tableName, pgCols] of Object.entries(PG_SCHEMA_COLUMNS)) {
 console.log('\n=== 3. 验证writer handler ===');
 const { buildWriterHandler } = require('db/store-pg-writer-registry');
 const handlerTables = ['entity_relations','entity_binds','foreshadow_ledger','timeline',
-    'narrative_state','consistency_checks','craft_materials','entity_state_history',
+    'narrative_state','consistency_checks','entity_state_history',
     'reviews','pipeline_logs','infinite_pipeline_state','entities'];
 for (const table of handlerTables) {
     const handler = buildWriterHandler(table);

@@ -41,7 +41,7 @@ function getRegistryHandlers() {
 
     const knowledgeTables = [
         'entity_relations', 'entity_binds', 'foreshadow_ledger', 'timeline',
-        'narrative_state', 'consistency_checks', 'craft_materials', 'entity_state_history',
+        'narrative_state', 'consistency_checks', 'entity_state_history',
         'memory_layers'
     ];
     const generalTables = ['reviews', 'pipeline_logs', 'infinite_pipeline_state'];

@@ -18,6 +18,9 @@
   **F4**（新增 `ValidationEngine.recordTechniqueResults` 并在 `recordReviewFeedback` 调用，技法成功率不再死数据）。
   新增 3 道门禁：`verifyReachability.js`（关键导出可达性）/`verifyModuleSwitchDefaults.js`（开关矩阵）/
   `audit-failopen.js`（降级基线，只许下降），前两道进 pre-commit，三道进 `ci:check`。`npm run test:unit` 3959 例全绿。
+  同日续做**批次 B（用户裁决"删表"）**：`craft_materials` 删表（migration `v0008` 已 DROP，代码+文档清理）；
+  `worldScope` onWriterPrompt 补真（改用真实 `buildWorldScopePrompt`）、onReaderCheck 下线；
+  交付 `audit-technique-cards.js`。**数据侧待做**：114 处工艺违规回炉 + 184 条技法补规则/判定测试。
   → 详情：`docs/worklog/2026-10-19-假成果修复-批次A与治理门禁.md`
 - **2026-10-18 · 模型固定 DeepSeek 官方 V4.1 Flash · 1017**：默认 provider 从
   `bailian/qwen3.8-max` 切到 `deepseek/deepseek-flash`（官方 API，1,048,576 上下文）。
@@ -127,7 +130,8 @@
 - [ ] 决定 modelBakeoff 候选模型名单并授权消耗额度。
 
 ### 🟠 P1 质量与 CI
-- [ ] **假成果批次 B（P1 补真）**：B1 `craftWriteGate` 覆盖全写入路径 + `audit-craft-quality --strict` 0 违规；B2 `worldScope` 两函数（补真/下线，需裁决）；B3 `craft_materials`（接产线/删表，需裁决）；B4 技法卡 `implementation_rules`/`judgement_test`。锚点：`worklog/2026-10-17-假成果审查-问题统计.md` §五批次 B。
+- [x] **假成果批次 B（P1 补真）·代码侧已完成（2026-10-19）**：B3 `craft_materials` **删表**（migration `v0008` 已 DROP，代码+文档清理）；B2 `worldScope` onWriterPrompt **补真**（改用真实 `buildWorldScopePrompt`）+ onReaderCheck **下线**；B1 `craftWriteGate` 已覆盖全部实体写入路径；B4 交付 `scripts/audit-technique-cards.js`。
+- [ ] **假成果批次 B（数据侧，待做）**：B1 存量 104 实体 / 114 处工艺违规回炉（`audit-craft-quality --strict` 0 违规）；B4 补 184 条 `implementation_rules` + 224 条 `judgement_test`（需 LLM 重提取/源小说）。脚本与 `--strict` 门禁已就绪。
 - [ ] **假成果批次 D**：D1 技法成功率差分加权（A4 前置已具备）、D2 技法原子化反趋同、D3 留出集/双盲评判。
 - [ ] C4/C5：验收凭据规范化（✅ 行须可执行断言）/ 陷阱"通用修法"评审关。
 - [ ] **P1-4d 密度策略**：新增 `config/densityPolicy.js` + `densityResolver.js`（优先级：点名>区间命中>同场>题材字段>默认），装配记录写 `densityReason`。锚点：`docs/worklog/2026-09-29-章节因果门槛与素材装配计划书.md`、`design/章节因果门槛与单点素材装配（计划书）.md` §八。

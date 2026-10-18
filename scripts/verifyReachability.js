@@ -33,6 +33,7 @@ const CRITICAL_EXPORTS = [
     { file: 'services/validationEngine.js', name: 'recordTechniqueResults', why: 'F4 技法结果批量回写' },
     { file: 'services/chapterAuditor/hardBlockChecks.js', name: '_buildTechniqueHints', why: 'F6 初审技法提示' },
     { file: 'services/pipeline/techniqueFeedback.js', name: 'recordFeedback', why: '技法效果反馈闭环写入' },
+    { file: 'services/worldScopeCrud.js', name: 'buildWorldScopePrompt', why: 'F7 世界域可见域写入 writer prompt' },
 ];
 
 // 无正则实现（避免转义层次问题）：词法工具

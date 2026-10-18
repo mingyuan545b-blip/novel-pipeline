@@ -1,5 +1,12 @@
 {
-  "applied": [],
+  "applied": [
+    {
+      "version": 8,
+      "name": "drop-craft-materials",
+      "appliedAt": "2026-10-18T19:26:53.464Z",
+      "durationMs": 0
+    }
+  ],
   "rolledBack": [
     {
       "version": 4,

@@ -277,7 +277,7 @@ for (const fs of activeForeshadows) {
 | knowledge_facts | 记忆金字塔 | 新增 |
 | narrative_state | 叙事状态 | 新增 |
 | consistency_checks | 一致性校验 | 新增 |
-| craft_materials | 创作规范素材 | 替代 materials中非实体类型 |
+| ~~craft_materials~~ | 创作规范素材 | **已删除（2026-10-19, F8）** |
 | timeline | 时间轴事件 | 新增 |
 
 ### 3.2 entities 表
@@ -533,7 +533,10 @@ CREATE INDEX idx_ccheck_severity ON consistency_checks(projectId, severity);
 CREATE INDEX idx_ccheck_unresolved ON consistency_checks(projectId, isResolved) WHERE isResolved = false;
 ```
 
-### 3.10 craft_materials 表
+### 3.10 craft_materials 表（已删除 2026-10-19）
+
+> 该表结构齐备但全仓无运行时写入/读取通道（实测 0 行），已由 migration `v0008_drop-craft-materials` 删除。
+> 下列 DDL 仅作历史留存，不代表当前 schema。见 `docs/worklog/2026-10-17-假成果审查-问题统计.md` F8。
 
 ```sql
 CREATE TABLE IF NOT EXISTS craft_materials (
@@ -593,4 +596,4 @@ CREATE INDEX idx_timeline_project_type ON timeline(projectId, eventType);
 | narrative-state | narrative_state | 直接映射 |
 | consistency-checks | consistency_checks | 直接映射 |
 | timeline-events | timeline | type名不同，表名相同 |
-| materials | entities(实体类) + craft_materials(非实体类) | 按type分流 |
+| materials | entities(实体类)（原 craft_materials 非实体类分支已废弃/删表 F8） | 按type分流 |

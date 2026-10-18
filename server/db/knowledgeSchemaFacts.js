@@ -96,24 +96,6 @@ CREATE INDEX IF NOT EXISTS idx_ccheck_project_ch ON consistency_checks(projectId
 CREATE INDEX IF NOT EXISTS idx_ccheck_severity ON consistency_checks(projectId, severity);
 CREATE INDEX IF NOT EXISTS idx_ccheck_unresolved ON consistency_checks(projectId, isResolved) WHERE isResolved = false;
 
-CREATE TABLE IF NOT EXISTS craft_materials (
-    id TEXT PRIMARY KEY,
-    projectId TEXT NOT NULL,
-    craftType TEXT NOT NULL,
-    name TEXT NOT NULL DEFAULT '',
-    content TEXT DEFAULT '',
-    archived TEXT DEFAULT '',
-    tags JSONB DEFAULT '[]'::jsonb,
-    metadata JSONB DEFAULT '{}'::jsonb,
-    data JSONB DEFAULT '{}'::jsonb,
-    createdAt TIMESTAMPTZ DEFAULT NOW(),
-    updatedAt TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_craft_project ON craft_materials(projectId);
-CREATE INDEX IF NOT EXISTS idx_craft_project_type ON craft_materials(projectId, craftType);
-CREATE INDEX IF NOT EXISTS idx_craft_project_name ON craft_materials(projectId, name);
-
 CREATE TABLE IF NOT EXISTS timeline (
     id TEXT PRIMARY KEY,
     projectId TEXT NOT NULL,

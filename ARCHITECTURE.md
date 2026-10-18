@@ -309,7 +309,6 @@ review的prompt注入守卫检查结果：
 - `entity_state_history` — 实体状态快照
 - `entity_relations` — 实体关系
 - `entity_binds` — 实体绑定
-- `craft_materials` — 工艺素材
 - `timeline` — 时间轴事件
 
 ---
@@ -345,7 +344,7 @@ review的prompt注入守卫检查结果：
 
 **表分类**：
 - `DEDICATED_TABLES`：有专用列的表（projects, chapters, materials, entity_registry等）
-- 知识库表：entity_relations, entity_binds, foreshadow_ledger, knowledge_facts, narrative_state, consistency_checks, craft_materials, entity_state_history, timeline
+- 知识库表：entity_relations, entity_binds, foreshadow_ledger, knowledge_facts, narrative_state, consistency_checks, entity_state_history, timeline
 - `kv_store`：无专用表的数据类型
 
 **路由别名**（TABLE_ALIASES）：

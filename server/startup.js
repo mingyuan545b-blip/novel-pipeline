@@ -24,24 +24,20 @@ function registerModules() {
 
     const worldScope = require('./services/worldScopeModule');
     registerModule('worldScope', {
-        onWriterPrompt: async (projectId, chapterNumber, agentContext, config) => {
-            // TODO(worldScope)：worldScope.getWorldScopeForPrompt 从未实现（git 全历史无此函数），
-            // 该注入一直是幻觉调用，每章 onWriterPrompt 抛 "is not a function"（实测23次）。
-            // 暂作存在性守卫止血；真正的世界域提示注入需按 chapterNumber 设计 scope 解析后补。
-            if (typeof worldScope.getWorldScopeForPrompt !== 'function') return;
-            const hint = await worldScope.getWorldScopeForPrompt(projectId, chapterNumber, config);
+        // F7 补真（docs/worklog/2026-10-17-假成果审查-问题统计.md）：
+        // 原 hook 调用 worldScope.getWorldScopeForPrompt —— 该函数 git 全历史从未存在，是幻觉调用。
+        // 真实可用的是 buildWorldScopePrompt(projectId, readerId, readerFaction)（worldScopeCrud 导出）。
+        // readerId/readerFaction 在 writer 阶段无上下文，传 null → 仅注入 public 可见域（安全下限）。
+        onWriterPrompt: async (projectId, chapterNumber, agentContext) => {
+            const hint = await worldScope.buildWorldScopePrompt(projectId, null, null);
             if (hint) agentContext.content += `\n\n${hint}`;
         },
         onPostApproval: async (projectId, chapterNumber, chapterContent, config) => {
             await worldScope.extractAndSave(projectId, chapterNumber, chapterContent, config);
         },
-        onReaderCheck: async (projectId, chapterNumber, readerOutput, config) => {
-            if (config !== 'full') return;
-            // TODO(worldScope)：detectCrossWorldViolation 在 be0d66c 重构中被删除（实测4次 "is not a function"）。
-            // 守卫止血；跨世界一致性检测需重新设计后补。
-            if (typeof worldScope.detectCrossWorldViolation !== 'function') return;
-            await worldScope.detectCrossWorldViolation(projectId, chapterNumber, readerOutput);
-        }
+        // 原 onReaderCheck 依赖 worldScope.detectCrossWorldViolation（be0d66c 已删除，且无数据通路可将
+        // readerOutput 映射为 (writerScope, readerScope) 两参）。**宣布下线**：不再注册 reader 钩子，
+        // 避免"看似存在实则 no-op"的假成果。世界域数据仍经 extractAndSave 落库，由实体中心读侧展示。
     }, 'worldScopeLevel', 'off');
 
     // 陷阱#42-#44: 约束反馈模块——在章节通过后自动收集约束执行情况，形成反馈闭环
