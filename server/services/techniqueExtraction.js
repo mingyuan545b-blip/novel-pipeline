@@ -18,6 +18,7 @@ const { LIBRARY_EXTRACT } = require('../config/systemConfig');
 const { CRAFT_DIMENSIONS, getDimension } = require('../config/libraryExtractDimensions');
 const { buildSystemPrompt, buildUserPrompt } = require('./libraryExtractPrompt');
 const { parseTechniques, normalizeTechnique, makeId } = require('./libraryExtractParse');
+const { atomicKey, isSameAtomic } = require('./techniqueKey');
 
 const CHAPTER_SPLIT = /(?=第[零一二三四五六七八九十百千0-9]+章)/;
 
@@ -119,6 +120,7 @@ async function runExtraction({ text, novelName, dimensions, taskId, onProgress }
     const existing = await libraryStore.listNamesWithDept();
     const allIds = existing.map(e => e.id);
     const seenNames = existing.map(e => e.name);
+    const seenKeys = existing.map(e => atomicKey(e)).filter(Boolean);
     const produced = [];
     const failed = [];
     let duplicates = 0;
@@ -131,11 +133,13 @@ async function runExtraction({ text, novelName, dimensions, taskId, onProgress }
             const batch = [];
             for (const t of list) {
                 if (isDuplicate(t.display_name, seenNames)) { duplicates++; continue; }
+                if (isAtomicDuplicate(t, seenKeys)) { duplicates++; continue; }
                 t.id = makeId(t.department, t.subcategory, allIds);
                 t.source_novel = novelName || '';
                 t.source_type = 'extracted';
                 allIds.push(t.id);
                 seenNames.push(t.display_name);
+                seenKeys.push(atomicKey(t));
                 batch.push(t);
                 produced.push(t);
             }
@@ -165,4 +169,11 @@ async function runExtraction({ text, novelName, dimensions, taskId, onProgress }
     };
 }
 
-module.exports = { runExtraction, splitIntoChunks, sampleEvenly, isDuplicate };
+/** 原子化去重（D2-a）：同一原子键（部门|子类|语义核）只保留一条，防换个说法堆库。 */
+function isAtomicDuplicate(tech, seenKeys) {
+    const key = atomicKey(tech);
+    if (!key) return false;
+    return seenKeys.some(k => isSameAtomic(k, key));
+}
+
+module.exports = { runExtraction, splitIntoChunks, sampleEvenly, isDuplicate, isAtomicDuplicate };
