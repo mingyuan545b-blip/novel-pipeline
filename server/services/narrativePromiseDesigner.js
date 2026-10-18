@@ -63,7 +63,7 @@ async function designNarrativePromise(projectId, options) {
     try {
         const project = await store.getItem('projects', projectId);
         if (!project) return { ok: false, reason: 'project-not-found' };
-        const existing = project.narrativePromise || project.styleProfile?.narrativePromise;
+        const existing = project.narrativePromise;
         if (isComplete(existing)) return { ok: true, promise: existing, reason: 'already-complete' };
 
         const materials = await store.queryItems('materials', { projectId });
