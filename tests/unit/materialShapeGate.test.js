@@ -106,13 +106,28 @@ describe('T4-B/C 闸门真的能拦人', () => {
     });
 });
 
+/**
+ * 真实库抽样是"环境相关"检查：CI 无 PG（.env 不随仓库走）时无法执行。
+ * 此处**显式跳过并说明**（jest 会报 skipped，不会伪装通过），避免"无库即红"或"静默空绿"。
+ */
+function dbConfigured() {
+    try {
+        require('dotenv').config({ path: path.join(ROOT, '.env'), quiet: true });
+    } catch (_) { /* 无 dotenv 时按环境变量判断 */ }
+    return String(process.env.USE_PG || '').toLowerCase() === 'true' && !!process.env.DATABASE_URL;
+}
+const dbTest = dbConfigured() ? test : test.skip;
+if (!dbConfigured()) {
+    console.warn('[materialShapeGate] 未配置 PG（USE_PG+DATABASE_URL）→ T4-D 真实库抽样检查在本环境**跳过**（未被覆盖）');
+}
+
 describe('T4-D 现有仓库必须通过闸门', () => {
     test('node scripts/audit-material-shape.js → exit 0', () => {
         const out = execFileSync('node', [path.join(ROOT, 'scripts', 'audit-material-shape.js')], { cwd: ROOT, encoding: 'utf8' });
         expect(out).toContain('MATERIAL SHAPE AUDIT 通过');
     });
 
-    test('--db 真实库抽样也必须通过（存量数据形状合规）', () => {
+    dbTest('--db 真实库抽样也必须通过（存量数据形状合规）', () => {
         const out = execFileSync('node', [path.join(ROOT, 'scripts', 'audit-material-shape.js'), '--db'], { cwd: ROOT, encoding: 'utf8' });
         expect(out).toContain('MATERIAL SHAPE AUDIT 通过');
     }, 60000);

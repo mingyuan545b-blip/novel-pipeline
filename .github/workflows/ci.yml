@@ -81,8 +81,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check line limit (single source: scripts/lib/ironLawRules.js)
+      - name: 'Check line limit (rule source: scripts/lib/ironLawRules.js)'
         run: node scripts/verifyLineCount.js
+
+  gates:
+    # 自研门禁全链（30 道 verify/audit：可达性、模块开关、fail-open 基线、API 契约、
+    # 字段 Schema、数据源一致性、深审、泄漏修复、性能基线…）。
+    # 说明：CI 无 .env/PG，属"环境相关"的检查会显式 SKIP 或 WARN（不伪装通过）；
+    #       需要真实库的存量体检在本地 pre-commit / 手工 ci:check 中执行。
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24.x }
+      - run: npm install
+      - name: 'Custom gates (ci:check)'
+        run: npm run ci:check
 
   doc-freshness-check:
     runs-on: ubuntu-latest

@@ -1,0 +1,14 @@
+#!/bin/bash
+# pre-push 质量门禁（本地 CI 兜底）
+#
+# 背景（E3c）：自研门禁全链 `npm run ci:check` 只在人手动敲时才会跑；
+# 本机无 git remote / 未接真 CI 时，push 前的最后一道防线就是它。
+# 与 GitHub Actions 的 `gates` job 跑的是同一条命令（单一入口，不分叉）。
+
+echo "[PRE-PUSH] 本地 CI 兜底：npm run ci:check（30 道 verify/audit 全链）..."
+npm run ci:check || {
+  echo "[PRE-PUSH] ❌ ci:check 未通过 — 请修根因，不要绕过（详见各脚本输出）"
+  exit 1
+}
+echo "[PRE-PUSH] ✅ ci:check 全部通过"
+exit 0

@@ -24,5 +24,8 @@ node scripts/verifyModuleSwitchDefaults.js || exit 1
 echo "[PRE-COMMIT] 关键导出可达性（防空绿/死导出，防 F1/F4/F6）..."
 node scripts/verifyReachability.js || exit 1
 
+echo "[PRE-COMMIT] 工作流语法（防 ci.yml 静默非法）..."
+node scripts/verifyWorkflowSyntax.js || exit 1
+
 echo "[PRE-COMMIT] ✅ 全部检查通过"
 exit 0
