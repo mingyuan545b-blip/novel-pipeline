@@ -1,4 +1,5 @@
 const { getGenreEntitySchema } = require('../../config/genreEntitySchemas');
+const { resolveAddressGuide } = require('../addressResolver');
 
 function _estimateTokens(text) {
     if (!text) return 0;
@@ -88,6 +89,8 @@ function _buildDetailText(entity) {
     if (entity.personality) lines.push(`性格: ${entity.personality}`);
     if (entity.speakingTone) lines.push(`说话语气: ${entity.speakingTone}`);
     if (entity.signatureDetail) lines.push(`标志性细节: ${entity.signatureDetail}`);
+    // D2-c 反趋同：按角色等级的称谓建议（配置驱动，见 config/addressTemplates）
+    { const addressGuide = resolveAddressGuide(entity); if (addressGuide) lines.push(`称谓建议: ${addressGuide}`); }
     if (entity.hp !== undefined) lines.push(`HP: ${entity.hp}`);
     if (entity.combatPower > 0) lines.push(`战力: ${entity.combatPower}`);
 
