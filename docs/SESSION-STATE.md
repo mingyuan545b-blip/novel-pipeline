@@ -132,7 +132,8 @@
 ### 🟠 P1 质量与 CI
 - [x] **假成果批次 B（P1 补真）·代码侧已完成（2026-10-19）**：B3 `craft_materials` **删表**（migration `v0008` 已 DROP，代码+文档清理）；B2 `worldScope` onWriterPrompt **补真**（改用真实 `buildWorldScopePrompt`）+ onReaderCheck **下线**；B1 `craftWriteGate` 已覆盖全部实体写入路径；B4 交付 `scripts/audit-technique-cards.js`。
 - [ ] **假成果批次 B（数据侧，待做）**：B1 存量 104 实体 / 114 处工艺违规回炉（`audit-craft-quality --strict` 0 违规）；B4 补 184 条 `implementation_rules` + 224 条 `judgement_test`（需 LLM 重提取/源小说）。脚本与 `--strict` 门禁已就绪。
-- [ ] **假成果批次 D**：D1 技法成功率差分加权（A4 前置已具备）、D2 技法原子化反趋同、D3 留出集/双盲评判。
+- [ ] **假成果批次 D（小步推进中）**：已完 D1 基础分尺度修正 + D 停用技法过滤 + D1 差分加权（`feedbackDelta`）。待做：D2-a 技法原子化合成键 / D2-b 反趋同专名禁令（源头 prompt）/ D2-c 称谓模版 / D3-a 留出集 / D3-b 双盲去标签。锚点：`worklog/2026-10-19-假成果修复-批次A与治理门禁.md` §九。
+- [x] **B1/B4「数据侧」决策（2026-10-19）**：**不回炉改写既有内容**（遵从用户定调）；改由源头门禁守护（craftWriteGate / 提取 prompt 强制 judgement_test / audit-* --strict）。
 - [ ] C4/C5：验收凭据规范化（✅ 行须可执行断言）/ 陷阱"通用修法"评审关。
 - [ ] **P1-4d 密度策略**：新增 `config/densityPolicy.js` + `densityResolver.js`（优先级：点名>区间命中>同场>题材字段>默认），装配记录写 `densityReason`。锚点：`docs/worklog/2026-09-29-章节因果门槛与素材装配计划书.md`、`design/章节因果门槛与单点素材装配（计划书）.md` §八。
 - [ ] 复验长度锚点效果（大纲四段节拍 + 执笔中途检查点）：重跑 1~2 章看字数是否稳定 ≥2500。
