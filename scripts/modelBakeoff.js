@@ -42,6 +42,8 @@ function parseArgs(argv) {
         else if (k === '--temperature') { args.temperature = parseFloat(next); i++; }
         else if (k === '--words') { args.words = parseInt(next, 10); i++; }
         else if (k === '--dry-run') { args.dryRun = true; }
+        else if (k === '--blind') { args.blind = true; }
+        else if (k === '--seed') { args.seed = next; i++; }
     }
     return args;
 }
@@ -113,37 +115,11 @@ async function runOneModel(model, args, messages) {
     return record;
 }
 
-function printTable(results) {
-    console.log('\n===== 对比结果 =====');
-    const header = ['model', 'chars', 'M1-M5 violations', 'prompt_tokens', 'completion_tokens', 'elapsed_s', 'error'];
-    console.log(header.join(' | '));
-    for (const r of results) {
-        const mc = r.metrics && r.metrics.metaConstraints;
-        let vio = 'n/a';
-        if (mc && !mc.error) {
-            vio = String(Object.values(mc).reduce((s, x) => s + (x.violations || 0), 0));
-        } else if (mc && mc.error) {
-            vio = 'err';
-        }
-        console.log([
-            r.model,
-            r.metrics ? r.metrics.chars : '-',
-            vio,
-            r.usage.prompt_tokens != null ? r.usage.prompt_tokens : '-',
-            r.usage.completion_tokens != null ? r.usage.completion_tokens : '-',
-            (r.elapsedMs / 1000).toFixed(1),
-            r.error || ''
-        ].join(' | '));
-    }
-    console.log('提示: violations=元约束检测命中总数（越低越好）；成本对比以tokens为准，' +
-        '单价请按你的套餐自行折算。');
-}
-
 async function main() {
     const args = parseArgs(process.argv);
     if (!args.models || !args.models.length) {
         console.log('用法: node scripts/modelBakeoff.js --models 模型A,模型B [--provider X] ' +
-            '[--base-url URL] [--api-key-env NAME] [--outline-file P] [--words N] [--dry-run]');
+            '[--base-url URL] [--api-key-env NAME] [--outline-file P] [--words N] [--dry-run] [--blind] [--seed S]');
         process.exit(1);
     }
     const { system, user } = buildTaskPrompt(args);
@@ -170,15 +146,26 @@ async function main() {
         results.push(record);
     }
 
-    printTable(results);
+    const { buildReport } = require(path.join(PROJECT_ROOT, 'server/services/bakeoffReport'));
+    const rep = buildReport(results, { blind: args.blind, seed: args.seed || '' });
+    console.log('\n===== 对比结果' + (args.blind ? '（双盲：仅显示代号）' : '') + ' =====');
+    console.log(rep.tableLines.join('\n'));
+    console.log('提示: violations=元约束检测命中总数（越低越好）；成本对比以tokens为准，单价请按套餐自行折算。');
 
     const outDir = path.join(PROJECT_ROOT, 'output');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
-    const outFile = path.join(outDir, 'model-bakeoff-' + new Date().toISOString().replace(/[:.]/g, '-') + '.json');
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const outFile = path.join(outDir, 'model-bakeoff-' + stamp + '.json');
     fs.writeFileSync(outFile, JSON.stringify({
-        at: new Date().toISOString(), args: { ...args, apiKeyEnv: args.apiKeyEnv || null }, results
+        at: new Date().toISOString(), blind: rep.report.blind,
+        args: { ...args, apiKeyEnv: args.apiKeyEnv || null }, results: rep.report.results
     }, null, 2), 'utf8');
     console.log('\n完整报告(含全文): ' + path.relative(PROJECT_ROOT, outFile));
+    if (rep.mapping) {
+        const mapFile = path.join(outDir, 'model-bakeoff-' + stamp + '-mapping.json');
+        fs.writeFileSync(mapFile, JSON.stringify(rep.mapping, null, 2), 'utf8');
+        console.log('盲评映射(揭盲用，勿给评判者): ' + path.relative(PROJECT_ROOT, mapFile));
+    }
 }
 
 main().catch(e => { console.error('bakeoff失败: ' + e.message); process.exit(1); });
