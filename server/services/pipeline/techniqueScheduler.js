@@ -6,6 +6,7 @@
 const techIndex = require('../techIndex');
 const { detectSceneTypes } = require('./contextDecisionRules');
 const { getDepthAdjustment } = require('./contextDecisionRules');
+const { baseScore } = require('./techniqueScoring');
 const logger = require('../../shared/logger');
 
 /** 场景类型→技法部门映射（使用index.json实际部门名，去掉数字前缀） */
@@ -69,7 +70,9 @@ function scheduleTechniques(params) {
 
     const scored = filtered.map(tech => {
         const depth = tech.worldviewDepth || getTechWorldviewDepth(tech);
-        let score = tech.success_rate || 0.5;
+        // 源头修正：success_rate 单位是 0–100 百分数，经 baseScore 归一化到 0–1，
+        // 否则基础分恒为 50 会压过全部 boost，使自适应调度失效（见 techniqueScoring.js）。
+        let score = baseScore(tech);
         score += _sceneBoost(tech, sceneTypes, depth);
         score += _phaseBoost(tech, phase);
         score += _outlineBoost(tech, outlineText);

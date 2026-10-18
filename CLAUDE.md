@@ -55,3 +55,4 @@ This project is indexed by GitNexus as **novel-pipeline** (17832 symbols, 41599 
 6. 改铁律/规则前：`node scripts/audit-iron-law.js --self-check`；规则唯一定义源 `scripts/lib/ironLawRules.js`。
 7. 提交走 pre-commit 五关门禁（铁律→eslint→硬编码→级联→标准），被拦时修根因不要绕。
 8. 用户约定：删文件/改全局配置/破坏性git操作先确认；只读检查可直接做；回答用中文；**命令执行优先使用 cmd**（本机环境不支持 PowerShell）。
+9. **设计理念（用户明确定调，最高优先级）**：**不改已存在的小说内容，在源头生成环节解决**；拒绝堵漏式/头痛医头/打补丁/硬编码；以**开源·模块化·灵活**为设计理念；**每次只改一点点**，不堆屎山；**不追求绝对效率，质量与稳定第一，体验其次，效率最后**。详见 `PROJECT_STANDARDS.md` §一 原则 10。
