@@ -12,7 +12,7 @@ const store = require('../store');
 const llm = require('./llm');
 const logger = require('../shared/logger');
 
-const FIELDS = ['readerPromise', 'sellingPoint', 'mainLoop', 'emotionRecipe'];
+const { FIELDS: PROMISE_FIELDS, KEYS: FIELDS } = require('../config/narrativePromiseSpec');
 
 /** 校验四件是否齐备（纯函数） */
 function isComplete(promise) {
@@ -25,12 +25,10 @@ function buildPrompt(project, materials) {
         .map(m => '- [' + m.type + '] ' + m.name + '：' + String(m.currentContent || m.initialContent || '').slice(0, 120))
         .join('\n');
     const system = '你是网文立项策划。只输出 JSON，不要解释。';
+    const schemaLine = '{' + PROMISE_FIELDS.map(f => `"${f.key}":"${f.hint}"`).join(',') + '}';
     const user = [
         '根据项目前提与已生成素材，提炼这本书的"叙事承诺"四件：',
-        '{"readerPromise":"读者承诺：读者冲着什么来（一句话，具体到情绪/爽点类型）",'
-        + '"sellingPoint":"差异化卖点：同类书没有的那个点",'
-        + '"mainLoop":"主循环：读者每几章能重复获得的那份体验（触发→冲突→兑现）",'
-        + '"emotionRecipe":"情绪配方：全书情绪配比与拐点（如 憋屈40%→翻盘50%→余味10%）"}',
+        schemaLine,
         '要求：必须具体到这本书，禁止"精彩纷呈""热血励志"这类空话。',
         '',
         '项目：' + (project?.name || '') + '（题材：' + (project?.genre || '') + '，目标 ' + (project?.targetChapters || '?') + ' 章）',
