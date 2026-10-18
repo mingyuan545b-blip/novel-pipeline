@@ -167,10 +167,24 @@ function selfCheck() {
     const prepareParts = prepare.split(' ');
     const prepareDir = prepareParts.length > 1 ? prepareParts[prepareParts.length - 1] : '.husky';
     const hooksNorm = hooksPath.split(path.sep).join('/');
-    if (hooksPath && hooksNorm !== prepareDir) {
+    // husky 9 语义：`husky <dir>` 会把 core.hooksPath 设为 <dir>/_（真正的用户钩子在 <dir>/ 下，
+    // 由 <dir>/_/<hook> → h 委托执行）。旧判定只认"相等"，于是本仓库恒报假红（E5）。
+    const isHuskyDelegateLayout = hooksNorm === prepareDir + '/_';
+    if (hooksPath && hooksNorm !== prepareDir && !isHuskyDelegateLayout) {
         problems.push('钩子翻转风险: core.hooksPath=' + hooksPath + ' 但 prepare 指向 ' + prepareDir + '（npm install会翻转钩子）');
     }
-    if (!hooksPath) problems.push('钩子未安装: core.hooksPath 未设置，运行 npx husky ' + prepareDir + ' 安装');
+    if (!hooksPath) {
+        problems.push('钩子未安装: core.hooksPath 未设置，运行 npx husky ' + prepareDir + ' 安装');
+    } else {
+        // 比"字符串相等"更实质的判定：钩子链必须**真的可执行**
+        const entry = path.join(PROJECT_ROOT, hooksNorm, 'pre-commit');
+        const delegate = path.join(PROJECT_ROOT, isHuskyDelegateLayout ? prepareDir : hooksNorm, 'pre-commit');
+        if (!fs.existsSync(entry)) {
+            problems.push('钩子链不可执行: 缺少 ' + path.relative(PROJECT_ROOT, entry).split(path.sep).join('/'));
+        } else if (!fs.existsSync(delegate)) {
+            problems.push('钩子链不可执行: husky 委托目标缺失 ' + path.relative(PROJECT_ROOT, delegate).split(path.sep).join('/'));
+        }
+    }
 
     // 4. 场景完备性：唯一default、动作合法、ID不重复
     const ids = new Set();
