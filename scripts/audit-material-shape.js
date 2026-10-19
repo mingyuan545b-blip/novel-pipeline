@@ -45,6 +45,16 @@ function walk(dir, out = []) {
 const isExempt = (rel) => EXEMPT_FILES.includes(rel)
     || EXEMPT_DIRS.some(d => rel === d || rel.startsWith(d + path.sep));
 
+/**
+ * 路径键统一为 POSIX（/）——基线文件必须跨平台一致。
+ * 背景（E6b，真 CI 首跑抓到）：基线在本机 Windows 生成时键是 `server\routes\materials.js`，
+ * 到 Linux CI 上键变成 `server/routes/materials.js` → 基线查不到 → 26 个文件全被当成"新增写入点"
+ * → 门禁在非 Windows 必红（而 CI 从不跑，所以半年没人发现）。
+ */
+function toPosix(p) {
+    return p.split(path.sep).join('/');
+}
+
 function collectWriteSites(root = ROOT) {
     const sites = {};
     for (const file of walk(path.join(root, 'server'))) {
@@ -55,12 +65,13 @@ function collectWriteSites(root = ROOT) {
             const t = l.trim();
             return !t.startsWith('*') && !t.startsWith('//') && l.includes(NEEDLE);
         }).length;
-        if (hits > 0) sites[rel] = hits;
+        if (hits > 0) sites[toPosix(rel)] = hits;
     }
     return sites;
 }
 
 const WIRING_TARGETS = [path.join('server', 'db', 'storeTrim.js'), path.join('server', 'db', 'storeCommon.js')];
+
 
 function checkWiring(root = ROOT) {
     const problems = [];
@@ -106,7 +117,11 @@ async function main(root = ROOT, args = process.argv.slice(2)) {
     const sites = collectWriteSites(root);
     const total = Object.values(sites).reduce((s, n) => s + n, 0);
     const baselineFile = path.join(root, path.relative(ROOT, BASELINE_FILE));
-    const baseline = fs.existsSync(baselineFile) ? JSON.parse(fs.readFileSync(baselineFile, 'utf8')) : null;
+    const rawBaseline = fs.existsSync(baselineFile) ? JSON.parse(fs.readFileSync(baselineFile, 'utf8')) : null;
+    // 兼容历史（Windows 反斜杠键）基线：读入时统一归一化，避免"平台决定门禁颜色"
+    const baseline = rawBaseline
+        ? Object.fromEntries(Object.entries(rawBaseline).map(([k, v]) => [k === '__total' ? k : toPosix(k), v]))
+        : null;
 
     console.log('\n=== MATERIAL SHAPE AUDIT (T4) ===');
     const wiring = checkWiring(root);

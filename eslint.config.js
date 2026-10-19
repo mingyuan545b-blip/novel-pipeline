@@ -136,6 +136,8 @@ module.exports = [
     {
         files: ['tests/**/*.js', 'server/__tests__/**/*.js'],
         plugins: { jest: jestPlugin },
+        // 自定义测试块别名：让插件认识它们（否则 dbTest(...) 内的 expect 会被误判为
+        // "Expect must be inside of a test block"）。新增别名时在此登记，单一入口。
         languageOptions: {
             globals: {
                 ...globals.node,
@@ -159,7 +161,9 @@ module.exports = [
                 ]
             }],
             'jest/no-conditional-expect': 'error',
-            'jest/no-standalone-expect': 'error',
+            // 自定义测试块别名（如 dbTest = 环境相关时才跑的 test/skip 包装）：
+            // 不登记的话，其内部的 expect 会被误判为"Expect must be inside of a test block"
+            'jest/no-standalone-expect': ['error', { additionalTestBlockFunctions: ['dbTest'] }],
             'jest/no-identical-title': 'error',
             'jest/valid-expect': 'error',
             'jest/no-test-prefixes': 'error'

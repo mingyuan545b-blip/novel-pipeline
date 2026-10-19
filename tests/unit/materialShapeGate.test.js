@@ -11,7 +11,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { execFileSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 const { initDatabaseAsync, closeDatabase } = require('../../server/db/database');
 const sqliteStore = require('../../server/db/store');
@@ -80,7 +80,8 @@ describe('T4-B/C 闸门真的能拦人', () => {
     test('B. 新增写入点 → diffBaseline 判定为"新增"（会被拦）', () => {
         writeFixture(path.join('server', 'services', 'evil.js'), "const store=require('../store');\nawait store.setItem('materials', id, obj);\n");
         const sites = collectWriteSites(tmp);
-        expect(sites[path.join('server', 'services', 'evil.js')]).toBe(1);
+        // 键为 POSIX（E6b：跨平台一致）——不再用 path.join（Windows 下会给反斜杠）
+        expect(sites['server/services/evil.js']).toBe(1);
 
         const emptyBaseline = { __total: 0 };
         expect(diffBaseline(sites, emptyBaseline).increased).toHaveLength(1);
@@ -121,14 +122,31 @@ if (!dbConfigured()) {
     console.warn('[materialShapeGate] 未配置 PG（USE_PG+DATABASE_URL）→ T4-D 真实库抽样检查在本环境**跳过**（未被覆盖）');
 }
 
+/** 跑脚本并把子进程输出/错误码一并带出来（否则失败只剩 "Command failed"，无法诊断） */
+function runAudit(extraArgs = []) {
+    const res = spawnSync('node', [path.join(ROOT, 'scripts', 'audit-material-shape.js'), ...extraArgs], {
+        cwd: ROOT, encoding: 'utf8'
+    });
+    return { out: `${res.stdout || ''}${res.stderr || ''}`, status: res.status };
+}
+
 describe('T4-D 现有仓库必须通过闸门', () => {
+    test('基线文件键必须为 POSIX（防跨平台变红；E6b）', () => {
+        const baseline = JSON.parse(fs.readFileSync(path.join(ROOT, 'scripts', 'materialShapeBaseline.json'), 'utf8'));
+        const BACKSLASH = String.fromCharCode(92);
+        const bad = Object.keys(baseline).filter(k => k.includes(BACKSLASH));
+        expect(bad).toEqual([]);
+    });
+
     test('node scripts/audit-material-shape.js → exit 0', () => {
-        const out = execFileSync('node', [path.join(ROOT, 'scripts', 'audit-material-shape.js')], { cwd: ROOT, encoding: 'utf8' });
+        const { out, status } = runAudit();
         expect(out).toContain('MATERIAL SHAPE AUDIT 通过');
+        expect(status).toBe(0);
     });
 
     dbTest('--db 真实库抽样也必须通过（存量数据形状合规）', () => {
-        const out = execFileSync('node', [path.join(ROOT, 'scripts', 'audit-material-shape.js'), '--db'], { cwd: ROOT, encoding: 'utf8' });
+        const { out, status } = runAudit(['--db']);
         expect(out).toContain('MATERIAL SHAPE AUDIT 通过');
+        expect(status).toBe(0);
     }, 60000);
 });

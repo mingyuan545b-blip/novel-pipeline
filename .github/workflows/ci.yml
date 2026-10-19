@@ -23,6 +23,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24.x }
       - run: npm install
+      - name: 'Install server deps (uuid/multer 等只声明在 server/package.json)'
+        working-directory: server
+        run: npm ci
       - run: npx jest tests/unit --coverage --ci
       - name: Upload backend coverage
         if: always()
@@ -38,6 +41,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24.x }
       - run: npm install
+      - name: 'Install server deps (uuid/multer 等只声明在 server/package.json)'
+        working-directory: server
+        run: npm ci
       - name: Integration tests
         run: node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration --testTimeout=120000
 
@@ -48,6 +54,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24.x }
       - run: npm install
+      - name: 'Install server deps (uuid/multer 等只声明在 server/package.json)'
+        working-directory: server
+        run: npm ci
       - name: E2E material injection tests
         run: node --experimental-vm-modules node_modules/jest/bin/jest.js tests/e2e/e2eMaterialInjection.test.js --testTimeout=60000
 
@@ -95,6 +104,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24.x }
       - run: npm install
+      - name: 'Install server deps (uuid/multer 等只声明在 server/package.json)'
+        working-directory: server
+        run: npm ci
       - name: 'Custom gates (ci:check)'
         run: npm run ci:check
 
@@ -136,5 +148,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 24.x }
       - run: npm install
+      - name: 'Install server deps (uuid/multer 等只声明在 server/package.json)'
+        working-directory: server
+        run: npm ci
       - name: Module load smoke test
         run: node tests/e2e/e2eSmokeTest.js
