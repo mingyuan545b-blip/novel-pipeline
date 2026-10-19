@@ -11,6 +11,14 @@
 
 ## 一、当前状态（只保留最新一条）
 
+- **2026-10-19 · 真 CI 打通（E6）**：gh 2.102.0 便携安装 + SSH 密钥 + 私有仓库
+  `mingyuan545b-blip/novel-pipeline`（本机 github.com:443 被墙，走 api.github.com + SSH:22）。
+  推送即触发 CI。**首跑 4 个 job 红**，暴露三处"本地能跑、干净环境必挂"：①`uuid`/`multer` 只声明在
+  `server/package.json` 而 CI 只装根依赖；②形状基线用 Windows 反斜杠键 → Linux 全判"新增写入点"；
+  ③`checkMemory` 断言依赖 runner 内存。前两处 + ③已修，**现 CI 10/11 绿（含 gates 全链 32 步）**，
+  仅 `frontend-lint` 红（36 处，已精确盘点：9 个零断言假测试 + 7 条件内 expect + 3 expect 参数 +
+  9 React Compiler memo + 3 set-state-in-effect + 2 react-refresh + 其他）。
+  → 详情：`docs/worklog/2026-10-19-批次E-门禁可信化施工.md` §六
 - **2026-10-19 · 批次 E「门禁可信化」（E1–E5，8 个提交）**：承接第三轮审查 G1–G12。让门禁从装饰品变成守门人：
   `npm run ci:check`（32 步）**首次全绿**并接进 GitHub Actions（新增 `gates` job + 触发分支补 `milestone/**`）
   + `.githooks/pre-push` 本地兜底。修掉门禁自身 5 处说谎/空绿/影子规则：E1 API 契约 37 条全误报（前缀表陈旧 +
