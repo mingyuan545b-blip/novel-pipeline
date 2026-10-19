@@ -5,94 +5,21 @@ module.exports = {
     roots: ['<rootDir>/tests'],
     testMatch: ['**/tests/**/*.test.js'],
     testTimeout: 30000,
-    collectCoverageFrom: [
-        'server/config/systemConfigDefs.js',
-        'server/config/systemConfig.js',
-        'server/config/envValidator.js',
-        'server/config/configManifest.js',
-        'server/config/providerRegistry.js',
-        'server/config/genreEntitySchemas.js',
-        'server/config/promptFragments.js',
-        'server/config/stateSchemaUtils.js',
-        'server/db/storeCommon.js',
-        'server/db/dbHelpers.js',
-        'server/shared/errors.js',
-        'server/shared/logger.js',
-        // Q1: 告警引擎纳入覆盖率统计（S1 拆分为目录，统计入口 + 引擎类）
-        'server/shared/alertRules/index.js',
-        'server/shared/alertRules/alertEngine.js',
-        'server/shared/alertRules/constants.js',
-        // Q2: 错误分类器纳入覆盖率统计
-        'server/shared/errorClassifier.js',
-        // G7: fallback writer 纳入覆盖率统计
-        'server/shared/debugFallbackWriter.js',
-        'server/services/rateLimiter.js',
-        'server/services/tokenBucketLimiter.js',
-        'server/services/contentCleaners.js',
-        'server/services/chapterStatus.js',
-        'server/services/llmRequestBuilder.js',
-        'server/services/llmRetryUtils.js',
-        'server/services/llmResponseParser.js',
-        'server/services/llmConfig.js',
-        'server/services/materialIntegrityCheck.js',
-        'server/services/materialIntegrityHelpers.js',
-        'server/services/remediationHelpers.js',
-        'server/services/prompts/constraintDedupe.js',
-        'server/services/prompts/constraintInjector.js',
-        'server/services/pipeline/initialMaterialHelpers.js',
-        'server/services/pipeline/pipelineUtils.js',
-        'server/services/pipeline/volumeHelpers.js',
-        'server/services/pipeline/outlineRhythmMatchers.js',
-        'server/services/pipeline/pipelineConfig.js',
-        'server/services/pipeline/pipelineContractDefs.js',
-        'server/services/pipeline/pipelineContract.js',
-        'server/services/pipeline/pipelineOutputContract.js',
-        'server/services/pipeline/outputContractDefs.js',
-        'server/services/pipeline/pipelinePollutionGuard.js',
-        'server/services/pipeline/pipelinePreflight.js',
-        'server/services/pipeline/dataFlowSpec.js',
-        'server/services/reviewRemediation.js',
-        'server/services/llm.js',
-        'server/services/pipeline/outlineTemplateExpander/templateEntityAssocHelpers.js',
-        'server/services/genreConfig.js',
-        'server/services/genreDetectorHelpers.js',
-        'server/services/materialValidator.js',
-        // R7: 阶段九新增覆盖率统计（R1-R5 源文件 + genreValidator）
-        'server/services/healthCheckers.js',
-        'server/services/healthMonitor.js',
-        'server/services/contextTruncator.js',
-        'server/services/materialLifecycleService.js',
-        'server/services/foreshadowGuard.js',
-        'server/services/characterArcGuard.js',
-        'server/services/genres/genreValidator.js',
-        // S1-S5: 阶段十新增覆盖率统计（核心服务 + 路由层）
-        'server/services/reviewCircuitBreaker.js',
-        'server/services/reviewRemediation.js',
-        'server/services/llmConfig.js',
-        'server/routes/chapters.js',
-        'server/routes/materials.js',
-        'server/routes/reviews.js',
-        'server/routes/projects/crudRoutes.js',
-        'server/routes/projects/graphRoutes.js',
-        'server/routes/projects/projectConfigRoutes.js',
-        'server/routes/projects/styleRoutes.js',
-        'server/routes/projects/cleanupRoutes.js',
-        'server/routes/projects/initializeRoutes.js',
-        // 阶段十一 S4: core/pipeline 纳入覆盖率统计（S5 已设独立阈值）
-        'server/core/pipeline/**/*.js',
-        // 阶段十一 S6: middleware 全量纳入覆盖率统计
-        'server/middleware/apiResponse.js',
-        'server/middleware/auth.js',
-        'server/middleware/debugRateLimit.js',
-        'server/middleware/errorContextHelper.js',
-        'server/middleware/errorHandler.js',
-        'server/middleware/httpMetricsMiddleware.js',
-        'server/middleware/inputSanitizer.js',
-        'server/middleware/responseFormatter.js',
-        'server/middleware/securityHeaders.js',
-        'server/middleware/sensitiveFilter.js',
-        'server/middleware/traceIdMiddleware.js',
-        'server/middleware/validators.js'
+    // 覆盖率统计口径（E4 / 2026-10-19）：**全量 server 代码**，不再是 80 文件白名单。
+    // 旧口径把 chapterAuditor / validationEngine / technique* / worldScope / craft* /
+    // blindJudge / holdoutAssigner 等 F1–F11 肇事子系统全部排除在外 ——
+    // 于是"语句覆盖 91%"只描述约 8.5% 的后端代码，而最危险的区域从不进覆盖率账本。
+    // 门禁分工：
+    //   1) jest global 阈值：全量真实水位（只升不降）
+    //   2) 重点文件 per-file 阈值：保留（关键路径更严）
+    //   3) 每文件"只升不降"：scripts/verifyCoverageRatchet.js + docs/coverage-baseline.json
+    collectCoverageFrom: ['server/**/*.js'],
+    coveragePathIgnorePatterns: [
+        '/node_modules/',
+        '^<rootDir>/server/tests/',
+        '^<rootDir>/server/__tests__/',
+        '^<rootDir>/server/scripts/',
+        '^<rootDir>/server/docs/'
     ],
     transform: {},
     moduleFileExtensions: ['js', 'json'],
@@ -110,11 +37,14 @@ module.exports = {
     coverageThreshold: {
         // 全局基线（S5升级：实际 Stmts 94.35% / Branches 83.88% / Funcs 94.4% / Lines 96.45%）
         // 注意：jest global threshold 计算含未测试文件，实际阈值校验值低于 All files 行
+        // E4 / 2026-10-19：口径改为**全量 server**后的真实水位（此前 91/78/83/93 描述的是
+        // 80 文件白名单，约占后端 8.5%）。数值为 jest 实测 global 值向下取整。
+        // 之后只许上升：单文件粒度由 scripts/verifyCoverageRatchet.js 守着。
         global: {
-            statements: 91,
-            branches: 78,
-            functions: 83,
-            lines: 93
+            statements: 42,
+            branches: 31,
+            functions: 39,
+            lines: 46
         },
         // S5: core/pipeline 独立阈值（实际 Stmts 98.9% / Branches 86.7% / Funcs 95.8% / Lines 99.4%，留3%缓冲）
         './server/core/pipeline/': {
@@ -131,16 +61,18 @@ module.exports = {
             lines: 94
         },
         // 关键模块基线（已高覆盖，防止退化）
+        // E4 / 2026-10-19：口径放宽到全量后，目录内新增文件拉低了聚合值，
+        // 按实测水位重设（config funcs 86.18 / shared stmts 89.62 / shared funcs 85.35）。
         './server/config/': {
             statements: 85,
             branches: 75,
-            functions: 90,
+            functions: 86,
             lines: 85
         },
         './server/shared/': {
-            statements: 90,
+            statements: 89,
             branches: 80,
-            functions: 95,
+            functions: 85,
             lines: 90
         },
         // Q1: 告警引擎覆盖率阈值（S1 拆分为目录，按子文件设阈值）

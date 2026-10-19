@@ -1,0 +1,3612 @@
+{
+  "_note": "覆盖率棘轮基线：每文件四项指标的实测水位（取历史最优）。只许上升；下降超过单文件容差 5pp 会被 scripts/verifyCoverageRatchet.js 拦下。",
+  "_updatedAt": "2026-10-19",
+  "_aggregate": {
+    "statements": 64.68,
+    "branches": 54.92,
+    "functions": 61.64,
+    "lines": 64.68
+  },
+  "files": {
+    "server/startup.js": {
+      "statements": 37.04,
+      "branches": 0,
+      "functions": 12.5,
+      "lines": 37.04
+    },
+    "server/store.js": {
+      "statements": 74.56,
+      "branches": 76.74,
+      "functions": 71.43,
+      "lines": 74.56
+    },
+    "server/bootstrap/crashDump.js": {
+      "statements": 77.78,
+      "branches": 31.58,
+      "functions": 80,
+      "lines": 77.78
+    },
+    "server/bootstrap/loggerSetup.js": {
+      "statements": 89.66,
+      "branches": 50,
+      "functions": 50,
+      "lines": 89.66
+    },
+    "server/config/addressTemplates.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/apiRegistry.js": {
+      "statements": 76.19,
+      "branches": 71.43,
+      "functions": 75,
+      "lines": 76.19
+    },
+    "server/config/assemblyTracePolicy.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/budgetPolicy.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/chapterIntentsNormalizer.js": {
+      "statements": 96.97,
+      "branches": 94.44,
+      "functions": 100,
+      "lines": 96.97
+    },
+    "server/config/chapterIntentsSchema.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/characterFieldGenreOverrides.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/characterFieldSpec.js": {
+      "statements": 30.3,
+      "branches": 25,
+      "functions": 14.29,
+      "lines": 30.3
+    },
+    "server/config/characterStateSchemas.js": {
+      "statements": 62,
+      "branches": 46.88,
+      "functions": 60,
+      "lines": 62
+    },
+    "server/config/configManifest.js": {
+      "statements": 95.83,
+      "branches": 93.55,
+      "functions": 100,
+      "lines": 95.83
+    },
+    "server/config/configManifestDefs.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/dataStoreRegistry.js": {
+      "statements": 76.47,
+      "branches": 66.67,
+      "functions": 38.46,
+      "lines": 76.47
+    },
+    "server/config/envValidator.js": {
+      "statements": 97.67,
+      "branches": 97.3,
+      "functions": 100,
+      "lines": 97.67
+    },
+    "server/config/fieldRegistry.js": {
+      "statements": 100,
+      "branches": 70,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/genreDefaults.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/genreEntitySchemas.js": {
+      "statements": 97.56,
+      "branches": 63.89,
+      "functions": 100,
+      "lines": 97.56
+    },
+    "server/config/genreStateFields.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/libraryExtractDimensions.js": {
+      "statements": 100,
+      "branches": 50,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/materialContentPolicy.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/materialDepthConstants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/materialDepthRequirements.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/materialDepthSpec.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/materialLifecyclePolicy.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/materialProvenance.js": {
+      "statements": 93.9,
+      "branches": 90.76,
+      "functions": 100,
+      "lines": 93.9
+    },
+    "server/config/materialShape.js": {
+      "statements": 77.78,
+      "branches": 72.97,
+      "functions": 100,
+      "lines": 77.78
+    },
+    "server/config/materialTypes.js": {
+      "statements": 94.34,
+      "branches": 88.24,
+      "functions": 100,
+      "lines": 94.34
+    },
+    "server/config/materialWriteOwnership.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/memoryPolicy.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/modelResolver.js": {
+      "statements": 50,
+      "branches": 0,
+      "functions": 0,
+      "lines": 50
+    },
+    "server/config/moduleDefaults.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/narrativePromiseSpec.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/promptFragments.js": {
+      "statements": 100,
+      "branches": 94.59,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/properNounSignals.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/providerDefs.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/providerRegistry.js": {
+      "statements": 98.86,
+      "branches": 91.8,
+      "functions": 100,
+      "lines": 98.86
+    },
+    "server/config/stateSchemaUtils.js": {
+      "statements": 94.74,
+      "branches": 86.21,
+      "functions": 100,
+      "lines": 94.74
+    },
+    "server/config/styleProfileNormalizer.js": {
+      "statements": 93.94,
+      "branches": 86.36,
+      "functions": 100,
+      "lines": 93.94
+    },
+    "server/config/styleProfileSchema.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/systemConfig.js": {
+      "statements": 87.23,
+      "branches": 84.78,
+      "functions": 100,
+      "lines": 87.23
+    },
+    "server/config/systemConfigBudget.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/systemConfigDefs.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/systemConfigLibrary.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/targetChaptersNormalizer.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/targetChaptersSchema.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/tokenSlotLabels.js": {
+      "statements": 91.67,
+      "branches": 63.64,
+      "functions": 100,
+      "lines": 91.67
+    },
+    "server/config/unifiedConfig.js": {
+      "statements": 100,
+      "branches": 84,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/wordConfigNormalizer.js": {
+      "statements": 92.31,
+      "branches": 90,
+      "functions": 100,
+      "lines": 92.31
+    },
+    "server/config/wordConfigSchema.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/config/writerLengthPolicy.js": {
+      "statements": 91.67,
+      "branches": 87.5,
+      "functions": 100,
+      "lines": 91.67
+    },
+    "server/core/pipeline/errorRecovery.js": {
+      "statements": 100,
+      "branches": 88.89,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/orchestrator.js": {
+      "statements": 94.12,
+      "branches": 76,
+      "functions": 100,
+      "lines": 94.12
+    },
+    "server/core/pipeline/orchestratorFinalEditorHandler.js": {
+      "statements": 97.92,
+      "branches": 72.41,
+      "functions": 100,
+      "lines": 97.92
+    },
+    "server/core/pipeline/orchestratorHelpers.js": {
+      "statements": 95.83,
+      "branches": 89.06,
+      "functions": 100,
+      "lines": 95.83
+    },
+    "server/core/pipeline/orchestratorPreflight.js": {
+      "statements": 96,
+      "branches": 76.32,
+      "functions": 83.33,
+      "lines": 96
+    },
+    "server/core/pipeline/orchestratorRoundHelpers.js": {
+      "statements": 92.11,
+      "branches": 73.21,
+      "functions": 85.71,
+      "lines": 92.11
+    },
+    "server/core/pipeline/orchestratorStepHandlers.js": {
+      "statements": 98.06,
+      "branches": 76.12,
+      "functions": 85.71,
+      "lines": 98.06
+    },
+    "server/core/pipeline/orchestratorStepLoop.js": {
+      "statements": 95.97,
+      "branches": 85.88,
+      "functions": 100,
+      "lines": 95.97
+    },
+    "server/core/pipeline/preflightChecker.js": {
+      "statements": 97.3,
+      "branches": 100,
+      "functions": 80,
+      "lines": 97.3
+    },
+    "server/core/pipeline/roundOutcomeHelpers.js": {
+      "statements": 100,
+      "branches": 76.47,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/BaseStep.js": {
+      "statements": 100,
+      "branches": 97.37,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/FastReviewStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/FinalEditorStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/FirstReviewStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/MaterialManagerStep.js": {
+      "statements": 100,
+      "branches": 83.33,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/MaterialOrganizerStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/MaterialRegistrarStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/PolisherStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/ReaderStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/ReviserStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/SecondReviewStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/StepRegistry.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/StepResult.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/core/pipeline/steps/WriterStep.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/database.js": {
+      "statements": 73.33,
+      "branches": 53.7,
+      "functions": 63.16,
+      "lines": 73.33
+    },
+    "server/db/dbHelpers.js": {
+      "statements": 96.88,
+      "branches": 93.55,
+      "functions": 100,
+      "lines": 96.88
+    },
+    "server/db/fieldRegistryCharacter.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/fieldRegistryCore.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/fieldRegistryData.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/fieldRegistryEntity.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/fieldRegistryNarrative.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/fieldRegistryRelation.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/db/fieldValidator.js": {
+      "statements": 93.1,
+      "branches": 92.59,
+      "functions": 83.33,
+      "lines": 93.1
+    },
+    "server/db/jsonStore.js": {
+      "statements": 46.51,
+      "branches": 28.13,
+      "functions": 81.25,
+      "lines": 46.51
+    },
+    "server/db/jsonStoreFoundation.js": {
+      "statements": 58.06,
+      "branches": 53.45,
+      "functions": 50,
+      "lines": 58.06
+    },
+    "server/db/jsonStoreHelpers.js": {
+      "statements": 69.23,
+      "branches": 57.5,
+      "functions": 81.82,
+      "lines": 69.23
+    },
+    "server/db/pgPool.js": {
+      "statements": 19.51,
+      "branches": 7.69,
+      "functions": 16.67,
+      "lines": 19.51
+    },
+    "server/db/store.js": {
+      "statements": 71.78,
+      "branches": 60.63,
+      "functions": 52.94,
+      "lines": 71.78
+    },
+    "server/db/storeCommon.js": {
+      "statements": 89.04,
+      "branches": 90.24,
+      "functions": 100,
+      "lines": 89.04
+    },
+    "server/db/storeLock.js": {
+      "statements": 75,
+      "branches": 66.67,
+      "functions": 100,
+      "lines": 75
+    },
+    "server/db/storeTrim.js": {
+      "statements": 71.11,
+      "branches": 70.21,
+      "functions": 100,
+      "lines": 71.11
+    },
+    "server/middleware/apiResponse.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/auth.js": {
+      "statements": 78.79,
+      "branches": 78.75,
+      "functions": 100,
+      "lines": 78.79
+    },
+    "server/middleware/debugRateLimit.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/errorContextHelper.js": {
+      "statements": 100,
+      "branches": 97.14,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/errorHandler.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/httpMetricsMiddleware.js": {
+      "statements": 94.44,
+      "branches": 77.78,
+      "functions": 100,
+      "lines": 94.44
+    },
+    "server/middleware/inputSanitizer.js": {
+      "statements": 100,
+      "branches": 97.22,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/responseFormatter.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/securityHeaders.js": {
+      "statements": 100,
+      "branches": 83.33,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/sensitiveFilter.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/traceIdMiddleware.js": {
+      "statements": 100,
+      "branches": 90,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/middleware/validators.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/chapters.js": {
+      "statements": 97.17,
+      "branches": 81.08,
+      "functions": 91.67,
+      "lines": 97.17
+    },
+    "server/routes/debugErrorRoutes.js": {
+      "statements": 96,
+      "branches": 88.89,
+      "functions": 100,
+      "lines": 96
+    },
+    "server/routes/debugRoutes.js": {
+      "statements": 100,
+      "branches": 83.33,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/healthDeepRoutes.js": {
+      "statements": 60,
+      "branches": 12.5,
+      "functions": 50,
+      "lines": 60
+    },
+    "server/routes/healthMetricsRoutes.js": {
+      "statements": 100,
+      "branches": 87.5,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/library.js": {
+      "statements": 37.14,
+      "branches": 28.26,
+      "functions": 23.53,
+      "lines": 37.14
+    },
+    "server/routes/materials.js": {
+      "statements": 94.87,
+      "branches": 84.69,
+      "functions": 100,
+      "lines": 94.87
+    },
+    "server/routes/questAutoInit.js": {
+      "statements": 7.32,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.32
+    },
+    "server/routes/questHelpers.js": {
+      "statements": 33.33,
+      "branches": 43.04,
+      "functions": 33.33,
+      "lines": 33.33
+    },
+    "server/routes/reviews.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/pipeline/asyncTaskManager.js": {
+      "statements": 66.67,
+      "branches": 46.34,
+      "functions": 76.92,
+      "lines": 66.67
+    },
+    "server/routes/projects/cleanupRoutes.js": {
+      "statements": 97.37,
+      "branches": 84.38,
+      "functions": 100,
+      "lines": 97.37
+    },
+    "server/routes/projects/crudRoutes.js": {
+      "statements": 91.11,
+      "branches": 64.29,
+      "functions": 93.75,
+      "lines": 91.11
+    },
+    "server/routes/projects/graphRoutes.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/projects/initializeRoutes.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/projects/projectConfigRoutes.js": {
+      "statements": 100,
+      "branches": 89.29,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/routes/projects/styleRoutes.js": {
+      "statements": 100,
+      "branches": 96.43,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/addressResolver.js": {
+      "statements": 100,
+      "branches": 90,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/agentPrompts.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/auditLog.js": {
+      "statements": 96.77,
+      "branches": 96.15,
+      "functions": 87.5,
+      "lines": 96.77
+    },
+    "server/services/bakeoffReport.js": {
+      "statements": 100,
+      "branches": 96.3,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/beatAllocator.js": {
+      "statements": 7.58,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.58
+    },
+    "server/services/blindJudge.js": {
+      "statements": 100,
+      "branches": 89.47,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/carryOutGate.js": {
+      "statements": 94.83,
+      "branches": 80.77,
+      "functions": 100,
+      "lines": 94.83
+    },
+    "server/services/chapterIntent.js": {
+      "statements": 16.38,
+      "branches": 3.3,
+      "functions": 22.22,
+      "lines": 16.38
+    },
+    "server/services/chapterStateMachine.js": {
+      "statements": 100,
+      "branches": 92.86,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/chapterStatus.js": {
+      "statements": 87.5,
+      "branches": 88,
+      "functions": 91.67,
+      "lines": 87.5
+    },
+    "server/services/characterArcGuard.js": {
+      "statements": 100,
+      "branches": 81.18,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/characterBind.js": {
+      "statements": 6.59,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.59
+    },
+    "server/services/characterChronicle.js": {
+      "statements": 7.07,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.07
+    },
+    "server/services/characterDepthExtractor.js": {
+      "statements": 4.94,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.94
+    },
+    "server/services/characterStateCache.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/chronicleExtractor.js": {
+      "statements": 64.29,
+      "branches": 67.27,
+      "functions": 85.71,
+      "lines": 64.29
+    },
+    "server/services/consistencyAuditService.js": {
+      "statements": 13.04,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.04
+    },
+    "server/services/consistencyConstraint.js": {
+      "statements": 9.62,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.62
+    },
+    "server/services/contentCleaners.js": {
+      "statements": 89.85,
+      "branches": 75,
+      "functions": 100,
+      "lines": 89.85
+    },
+    "server/services/contentDetectors.js": {
+      "statements": 26.09,
+      "branches": 15.08,
+      "functions": 36,
+      "lines": 26.09
+    },
+    "server/services/contentMetadataDetector.js": {
+      "statements": 7.25,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.25
+    },
+    "server/services/contentMetrics.js": {
+      "statements": 5,
+      "branches": 0,
+      "functions": 0,
+      "lines": 5
+    },
+    "server/services/contentUtils.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/contextBudget.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/contextTrace.js": {
+      "statements": 9.09,
+      "branches": 0,
+      "functions": 12.5,
+      "lines": 9.09
+    },
+    "server/services/contextTruncator.js": {
+      "statements": 89.83,
+      "branches": 86.54,
+      "functions": 100,
+      "lines": 89.83
+    },
+    "server/services/craftDesigner.js": {
+      "statements": 11.76,
+      "branches": 0,
+      "functions": 0,
+      "lines": 11.76
+    },
+    "server/services/craftQualitySpec.js": {
+      "statements": 100,
+      "branches": 50,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/craftTargets.js": {
+      "statements": 92.75,
+      "branches": 84.38,
+      "functions": 100,
+      "lines": 92.75
+    },
+    "server/services/craftWriteGate.js": {
+      "statements": 87.23,
+      "branches": 82.76,
+      "functions": 100,
+      "lines": 87.23
+    },
+    "server/services/crossWorldTraceConstants.js": {
+      "statements": 74.19,
+      "branches": 56.76,
+      "functions": 100,
+      "lines": 74.19
+    },
+    "server/services/cryptoUtil.js": {
+      "statements": 97.92,
+      "branches": 100,
+      "functions": 100,
+      "lines": 97.92
+    },
+    "server/services/dataContext.js": {
+      "statements": 65.52,
+      "branches": 45.45,
+      "functions": 66.67,
+      "lines": 65.52
+    },
+    "server/services/dataContextDelegates.js": {
+      "statements": 21.43,
+      "branches": 0,
+      "functions": 0,
+      "lines": 21.43
+    },
+    "server/services/dataContextProject.js": {
+      "statements": 10.67,
+      "branches": 0,
+      "functions": 4.55,
+      "lines": 10.67
+    },
+    "server/services/dialectRegistry.js": {
+      "statements": 41.04,
+      "branches": 26.44,
+      "functions": 38.1,
+      "lines": 41.04
+    },
+    "server/services/entityCenter.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/entityCraftReflow.js": {
+      "statements": 96.97,
+      "branches": 94.44,
+      "functions": 100,
+      "lines": 96.97
+    },
+    "server/services/entityRegistry.js": {
+      "statements": 42.27,
+      "branches": 38.05,
+      "functions": 41.67,
+      "lines": 42.27
+    },
+    "server/services/fileOutput.js": {
+      "statements": 16.22,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16.22
+    },
+    "server/services/foreshadowGuard.js": {
+      "statements": 100,
+      "branches": 87.72,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genreConfig.js": {
+      "statements": 100,
+      "branches": 97.52,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genreDetection.js": {
+      "statements": 47.92,
+      "branches": 36.11,
+      "functions": 37.5,
+      "lines": 47.92
+    },
+    "server/services/genreDetectorHelpers.js": {
+      "statements": 90.63,
+      "branches": 88.31,
+      "functions": 100,
+      "lines": 90.63
+    },
+    "server/services/genreLoader.js": {
+      "statements": 78.69,
+      "branches": 80.77,
+      "functions": 71.43,
+      "lines": 78.69
+    },
+    "server/services/genreProfileRegistry.js": {
+      "statements": 35.42,
+      "branches": 1.45,
+      "functions": 22.22,
+      "lines": 35.42
+    },
+    "server/services/healthCheckers.js": {
+      "statements": 95.8,
+      "branches": 81.82,
+      "functions": 100,
+      "lines": 95.8
+    },
+    "server/services/healthMonitor.js": {
+      "statements": 96.3,
+      "branches": 82.5,
+      "functions": 100,
+      "lines": 96.3
+    },
+    "server/services/holdoutAssigner.js": {
+      "statements": 100,
+      "branches": 68.75,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/hookBudget.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/hookRepetitionDetector.js": {
+      "statements": 6.56,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.56
+    },
+    "server/services/httpMetrics.js": {
+      "statements": 95.56,
+      "branches": 74.07,
+      "functions": 100,
+      "lines": 95.56
+    },
+    "server/services/intentPromptBuilder.js": {
+      "statements": 8.49,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.49
+    },
+    "server/services/itemDefinition.js": {
+      "statements": 7.84,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.84
+    },
+    "server/services/itemStageParser.js": {
+      "statements": 88.24,
+      "branches": 60.53,
+      "functions": 100,
+      "lines": 88.24
+    },
+    "server/services/jsonUtils.js": {
+      "statements": 79.31,
+      "branches": 83.33,
+      "functions": 100,
+      "lines": 79.31
+    },
+    "server/services/knowledgeBase.js": {
+      "statements": 88.89,
+      "branches": 100,
+      "functions": 0,
+      "lines": 88.89
+    },
+    "server/services/libraryCompleteness.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/libraryExtractParse.js": {
+      "statements": 98.36,
+      "branches": 83.02,
+      "functions": 100,
+      "lines": 98.36
+    },
+    "server/services/libraryExtractPrompt.js": {
+      "statements": 53.85,
+      "branches": 0,
+      "functions": 20,
+      "lines": 53.85
+    },
+    "server/services/libraryStore.js": {
+      "statements": 9.26,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.26
+    },
+    "server/services/license.js": {
+      "statements": 11.46,
+      "branches": 0,
+      "functions": 0,
+      "lines": 11.46
+    },
+    "server/services/llm.js": {
+      "statements": 88.24,
+      "branches": 79.25,
+      "functions": 62.5,
+      "lines": 88.24
+    },
+    "server/services/llmConfig.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/llmContentFallback.js": {
+      "statements": 18.18,
+      "branches": 0,
+      "functions": 0,
+      "lines": 18.18
+    },
+    "server/services/llmMetrics.js": {
+      "statements": 94.59,
+      "branches": 84.21,
+      "functions": 100,
+      "lines": 94.59
+    },
+    "server/services/llmRequestBuilder.js": {
+      "statements": 97.56,
+      "branches": 96.47,
+      "functions": 100,
+      "lines": 97.56
+    },
+    "server/services/llmResponseParser.js": {
+      "statements": 100,
+      "branches": 88.24,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/llmRetryUtils.js": {
+      "statements": 100,
+      "branches": 91.67,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/llmTimeoutTracker.js": {
+      "statements": 96.15,
+      "branches": 75,
+      "functions": 100,
+      "lines": 96.15
+    },
+    "server/services/machineFingerprint.js": {
+      "statements": 48.65,
+      "branches": 27.27,
+      "functions": 62.5,
+      "lines": 48.65
+    },
+    "server/services/materialBudgetCalc.js": {
+      "statements": 76.47,
+      "branches": 50,
+      "functions": 100,
+      "lines": 76.47
+    },
+    "server/services/materialDepthBatch.js": {
+      "statements": 86.96,
+      "branches": 58.33,
+      "functions": 100,
+      "lines": 86.96
+    },
+    "server/services/materialDepthRepairPrompt.js": {
+      "statements": 9.52,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.52
+    },
+    "server/services/materialDepthValidator.js": {
+      "statements": 88,
+      "branches": 76.36,
+      "functions": 100,
+      "lines": 88
+    },
+    "server/services/materialIndex.js": {
+      "statements": 16.33,
+      "branches": 0,
+      "functions": 15.38,
+      "lines": 16.33
+    },
+    "server/services/materialIndexIO.js": {
+      "statements": 28.24,
+      "branches": 0,
+      "functions": 42.86,
+      "lines": 28.24
+    },
+    "server/services/materialIntegrity.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/materialIntegrityCheck.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/materialIntegrityFix.js": {
+      "statements": 2.78,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.78
+    },
+    "server/services/materialIntegrityHelpers.js": {
+      "statements": 100,
+      "branches": 98.04,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/materialLifecycle.js": {
+      "statements": 93.33,
+      "branches": 88.89,
+      "functions": 100,
+      "lines": 93.33
+    },
+    "server/services/materialLifecycleService.js": {
+      "statements": 100,
+      "branches": 87.18,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/materialRefResolver.js": {
+      "statements": 14,
+      "branches": 4.17,
+      "functions": 10,
+      "lines": 14
+    },
+    "server/services/materialRepository.js": {
+      "statements": 74.47,
+      "branches": 53.01,
+      "functions": 66.67,
+      "lines": 74.47
+    },
+    "server/services/materialValidator.js": {
+      "statements": 91.3,
+      "branches": 84,
+      "functions": 100,
+      "lines": 91.3
+    },
+    "server/services/metricsCollector.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/metricsPersistence.js": {
+      "statements": 46.67,
+      "branches": 25,
+      "functions": 66.67,
+      "lines": 46.67
+    },
+    "server/services/metricsRecorder.js": {
+      "statements": 85.59,
+      "branches": 73.53,
+      "functions": 100,
+      "lines": 85.59
+    },
+    "server/services/metricsReport.js": {
+      "statements": 100,
+      "branches": 88.89,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/namingGenreMap.js": {
+      "statements": 22.22,
+      "branches": 0,
+      "functions": 0,
+      "lines": 22.22
+    },
+    "server/services/namingQualitySpec.js": {
+      "statements": 100,
+      "branches": 90,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/namingStyleRegistry.js": {
+      "statements": 12.7,
+      "branches": 0,
+      "functions": 23.08,
+      "lines": 12.7
+    },
+    "server/services/narrativePromiseDesigner.js": {
+      "statements": 40.38,
+      "branches": 30.95,
+      "functions": 42.86,
+      "lines": 40.38
+    },
+    "server/services/phraseTemplateDetector.js": {
+      "statements": 6.25,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.25
+    },
+    "server/services/pipeline.js": {
+      "statements": 25,
+      "branches": 100,
+      "functions": 100,
+      "lines": 25
+    },
+    "server/services/pipelineConfig.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipelineMetrics.js": {
+      "statements": 91.3,
+      "branches": 60,
+      "functions": 100,
+      "lines": 91.3
+    },
+    "server/services/pipelineModuleRegistry.js": {
+      "statements": 18.52,
+      "branches": 7.41,
+      "functions": 33.33,
+      "lines": 18.52
+    },
+    "server/services/pipelineRegistry.js": {
+      "statements": 28.36,
+      "branches": 8,
+      "functions": 33.33,
+      "lines": 28.36
+    },
+    "server/services/powerGuard.js": {
+      "statements": 18.84,
+      "branches": 11.9,
+      "functions": 28.57,
+      "lines": 18.84
+    },
+    "server/services/powerLevelMap.js": {
+      "statements": 17.65,
+      "branches": 0,
+      "functions": 0,
+      "lines": 17.65
+    },
+    "server/services/promptAuditConstants.js": {
+      "statements": 87.5,
+      "branches": 50,
+      "functions": 100,
+      "lines": 87.5
+    },
+    "server/services/promptAuditor.js": {
+      "statements": 59.26,
+      "branches": 47.5,
+      "functions": 18.18,
+      "lines": 59.26
+    },
+    "server/services/properNounGuard.js": {
+      "statements": 77.78,
+      "branches": 71.43,
+      "functions": 33.33,
+      "lines": 77.78
+    },
+    "server/services/rateLimiter.js": {
+      "statements": 100,
+      "branches": 97.14,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/remediationApplier.js": {
+      "statements": 7.69,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.69
+    },
+    "server/services/remediationHelpers.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/remediationRules.js": {
+      "statements": 88.1,
+      "branches": 75,
+      "functions": 83.33,
+      "lines": 88.1
+    },
+    "server/services/remediationTargets.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/reviewCircuitBreaker.js": {
+      "statements": 96.3,
+      "branches": 93.33,
+      "functions": 100,
+      "lines": 96.3
+    },
+    "server/services/reviewRemediation.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/ruleStack.js": {
+      "statements": 4.24,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.24
+    },
+    "server/services/ruleStackConstants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/ruleStackExtractors.js": {
+      "statements": 3.13,
+      "branches": 0,
+      "functions": 0,
+      "lines": 3.13
+    },
+    "server/services/rulesLoader.js": {
+      "statements": 8.42,
+      "branches": 1.52,
+      "functions": 3.85,
+      "lines": 8.42
+    },
+    "server/services/sensitiveWordGuard.js": {
+      "statements": 23.61,
+      "branches": 7.41,
+      "functions": 15.38,
+      "lines": 23.61
+    },
+    "server/services/speechStyleRegistry.js": {
+      "statements": 38.46,
+      "branches": 9.62,
+      "functions": 35.71,
+      "lines": 38.46
+    },
+    "server/services/stateKVHelpers.js": {
+      "statements": 72.88,
+      "branches": 58.33,
+      "functions": 87.5,
+      "lines": 72.88
+    },
+    "server/services/stateKVIndex.js": {
+      "statements": 70.91,
+      "branches": 54.69,
+      "functions": 68.18,
+      "lines": 70.91
+    },
+    "server/services/stateKVSummary.js": {
+      "statements": 36.49,
+      "branches": 26.53,
+      "functions": 40,
+      "lines": 36.49
+    },
+    "server/services/stateSnapshot.js": {
+      "statements": 8.54,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.54
+    },
+    "server/services/stateSnapshotDiff.js": {
+      "statements": 4.84,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.84
+    },
+    "server/services/stateSnapshotQueries.js": {
+      "statements": 5.56,
+      "branches": 0,
+      "functions": 0,
+      "lines": 5.56
+    },
+    "server/services/techIndex.js": {
+      "statements": 61.43,
+      "branches": 50,
+      "functions": 55.56,
+      "lines": 61.43
+    },
+    "server/services/techIndexJsonSeed.js": {
+      "statements": 80.77,
+      "branches": 50,
+      "functions": 66.67,
+      "lines": 80.77
+    },
+    "server/services/techIndexSearch.js": {
+      "statements": 96.49,
+      "branches": 81.4,
+      "functions": 83.33,
+      "lines": 96.49
+    },
+    "server/services/techniqueExtraction.js": {
+      "statements": 43.7,
+      "branches": 41.51,
+      "functions": 53.33,
+      "lines": 43.7
+    },
+    "server/services/techniqueKey.js": {
+      "statements": 96.55,
+      "branches": 95.83,
+      "functions": 100,
+      "lines": 96.55
+    },
+    "server/services/timelineAdapter.js": {
+      "statements": 59.38,
+      "branches": 83.93,
+      "functions": 66.67,
+      "lines": 59.38
+    },
+    "server/services/timelineService.js": {
+      "statements": 12.32,
+      "branches": 16.67,
+      "functions": 6.45,
+      "lines": 12.32
+    },
+    "server/services/tokenBucketLimiter.js": {
+      "statements": 100,
+      "branches": 84.62,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/trendingSearch.js": {
+      "statements": 11.76,
+      "branches": 0,
+      "functions": 0,
+      "lines": 11.76
+    },
+    "server/services/validateCatchphrases.js": {
+      "statements": 92.19,
+      "branches": 76.47,
+      "functions": 100,
+      "lines": 92.19
+    },
+    "server/services/validateHighlights.js": {
+      "statements": 95.52,
+      "branches": 87.5,
+      "functions": 100,
+      "lines": 95.52
+    },
+    "server/services/validateQuotes.js": {
+      "statements": 92.31,
+      "branches": 80.36,
+      "functions": 100,
+      "lines": 92.31
+    },
+    "server/services/validationEngine.js": {
+      "statements": 27.91,
+      "branches": 18.39,
+      "functions": 11.11,
+      "lines": 27.91
+    },
+    "server/services/versionControl.js": {
+      "statements": 4.88,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.88
+    },
+    "server/services/websocket.js": {
+      "statements": 46.49,
+      "branches": 51.79,
+      "functions": 35,
+      "lines": 46.49
+    },
+    "server/services/worldConstants.js": {
+      "statements": 77.78,
+      "branches": 73.91,
+      "functions": 100,
+      "lines": 77.78
+    },
+    "server/services/worldFactionModule.js": {
+      "statements": 16.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16.67
+    },
+    "server/services/worldRefResolve.js": {
+      "statements": 69.09,
+      "branches": 50,
+      "functions": 100,
+      "lines": 69.09
+    },
+    "server/services/worldScopeCrud.js": {
+      "statements": 57.63,
+      "branches": 45.95,
+      "functions": 55.56,
+      "lines": 57.63
+    },
+    "server/services/worldScopeExtractRunner.js": {
+      "statements": 54.67,
+      "branches": 6.48,
+      "functions": 42.86,
+      "lines": 54.67
+    },
+    "server/services/worldScopeModule.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/worldScopePrompts.js": {
+      "statements": 37.84,
+      "branches": 18.18,
+      "functions": 50,
+      "lines": 37.84
+    },
+    "server/services/worldviewTopics.js": {
+      "statements": 89.66,
+      "branches": 70.97,
+      "functions": 100,
+      "lines": 89.66
+    },
+    "server/services/wsTicketAuth.js": {
+      "statements": 85.71,
+      "branches": 77.27,
+      "functions": 100,
+      "lines": 85.71
+    },
+    "server/services/chapterAuditor/hardBlockChecks.js": {
+      "statements": 23.57,
+      "branches": 15.83,
+      "functions": 3.03,
+      "lines": 23.57
+    },
+    "server/services/characterStateCache/index.js": {
+      "statements": 17.14,
+      "branches": 0,
+      "functions": 0,
+      "lines": 17.14
+    },
+    "server/services/characterStateCache/stateCacheCompute.js": {
+      "statements": 13.89,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.89
+    },
+    "server/services/consistencyEngine/checkCharRelation.js": {
+      "statements": 8.2,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.2
+    },
+    "server/services/consistencyEngine/checkMethods.js": {
+      "statements": 21.21,
+      "branches": 0,
+      "functions": 0,
+      "lines": 21.21
+    },
+    "server/services/consistencyEngine/checkPowerTimeline.js": {
+      "statements": 30,
+      "branches": 6.35,
+      "functions": 30,
+      "lines": 30
+    },
+    "server/services/consistencyEngine/constants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/consistencyEngine/extractorPower.js": {
+      "statements": 11.54,
+      "branches": 0,
+      "functions": 0,
+      "lines": 11.54
+    },
+    "server/services/consistencyEngine/extractorTimeline.js": {
+      "statements": 2.44,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.44
+    },
+    "server/services/consistencyEngine/extractors.js": {
+      "statements": 13.04,
+      "branches": 23.88,
+      "functions": 12.5,
+      "lines": 13.04
+    },
+    "server/services/consistencyEngine/index.js": {
+      "statements": 17.31,
+      "branches": 0,
+      "functions": 5,
+      "lines": 17.31
+    },
+    "server/services/contextBudget/contextBudgetConstants.js": {
+      "statements": 67.78,
+      "branches": 47.83,
+      "functions": 100,
+      "lines": 67.78
+    },
+    "server/services/contextBudget/contextBudgetManager.js": {
+      "statements": 23.12,
+      "branches": 21.82,
+      "functions": 23.33,
+      "lines": 23.12
+    },
+    "server/services/contextBudget/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/entityCenter/entityBehaviorRules.js": {
+      "statements": 43.4,
+      "branches": 50,
+      "functions": 22.22,
+      "lines": 43.4
+    },
+    "server/services/entityCenter/entityCRUD.js": {
+      "statements": 34.45,
+      "branches": 12.96,
+      "functions": 30.77,
+      "lines": 34.45
+    },
+    "server/services/entityCenter/entityFuzzyMatch.js": {
+      "statements": 22.22,
+      "branches": 0,
+      "functions": 0,
+      "lines": 22.22
+    },
+    "server/services/entityCenter/entityGenreDetect.js": {
+      "statements": 16.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16.67
+    },
+    "server/services/entityCenter/entityLifecycle.js": {
+      "statements": 28.13,
+      "branches": 0,
+      "functions": 0,
+      "lines": 28.13
+    },
+    "server/services/entityCenter/entityQueries.js": {
+      "statements": 13.51,
+      "branches": 0,
+      "functions": 36.36,
+      "lines": 13.51
+    },
+    "server/services/entityCenter/formatters.js": {
+      "statements": 56.71,
+      "branches": 47.22,
+      "functions": 62.5,
+      "lines": 56.71
+    },
+    "server/services/entityCenter/index.js": {
+      "statements": 56.9,
+      "branches": 58.62,
+      "functions": 21.88,
+      "lines": 56.9
+    },
+    "server/services/entityCenter/relations.js": {
+      "statements": 8.33,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.33
+    },
+    "server/services/genres/baseGenreTemplate.js": {
+      "statements": 100,
+      "branches": 97.3,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/genreModuleAssembler.js": {
+      "statements": 69.74,
+      "branches": 57.43,
+      "functions": 36.36,
+      "lines": 69.74
+    },
+    "server/services/genres/genreModuleSpec.js": {
+      "statements": 68.89,
+      "branches": 67.5,
+      "functions": 100,
+      "lines": 68.89
+    },
+    "server/services/genres/genrePluginSpec.js": {
+      "statements": 100,
+      "branches": 80,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/genreValidator.js": {
+      "statements": 100,
+      "branches": 87.14,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/moduleHintBuilder.js": {
+      "statements": 16,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16
+    },
+    "server/services/genres/baby/access.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/config.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/constraintPresets.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/dedupRules.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/detectors.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/detectorsCore.js": {
+      "statements": 15.79,
+      "branches": 0,
+      "functions": 0,
+      "lines": 15.79
+    },
+    "server/services/genres/baby/detectorsExtra1.js": {
+      "statements": 4.17,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.17
+    },
+    "server/services/genres/baby/detectorsExtra2.js": {
+      "statements": 31.25,
+      "branches": 0,
+      "functions": 0,
+      "lines": 31.25
+    },
+    "server/services/genres/baby/detectorsHelpers.js": {
+      "statements": 90.36,
+      "branches": 76.47,
+      "functions": 100,
+      "lines": 90.36
+    },
+    "server/services/genres/baby/entitySchema.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/foundation.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/interceptors.js": {
+      "statements": 4.55,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.55
+    },
+    "server/services/genres/baby/perspectiveConfig.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/qualityChecks.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/reviewRules.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/schemaConfig.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/styleProfile.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/baby/writerHints.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/access.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/config.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/constraintPresets.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/contentValidation.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/dedupRules.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/detectors.js": {
+      "statements": 3.81,
+      "branches": 0,
+      "functions": 0,
+      "lines": 3.81
+    },
+    "server/services/genres/high-martial-crossplane/entitySchema.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/foundation.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/interceptors.js": {
+      "statements": 2.53,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.53
+    },
+    "server/services/genres/high-martial-crossplane/materialTemplates.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/qualityChecks.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/reviewRules.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/schemaConfig.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/styleProfile.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/writerHints.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/branches/branchKanDing.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/branches/branchLayered.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/branches/branchMetaverse.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/branches/branchProgrammatic.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/branches/index.js": {
+      "statements": 18,
+      "branches": 0,
+      "functions": 0,
+      "lines": 18
+    },
+    "server/services/genres/high-martial-crossplane/modules/cultivationSystem.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/modules/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/modules/subPlaneSystem.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/genres/high-martial-crossplane/modules/supportingDepth.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/hookBudget/hookBudgetConstants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/hookBudget/hookBudgetDetector.js": {
+      "statements": 3.08,
+      "branches": 0,
+      "functions": 0,
+      "lines": 3.08
+    },
+    "server/services/hookBudget/index.js": {
+      "statements": 4.46,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.46
+    },
+    "server/services/knowledgeBase/ConsistencyChecker.js": {
+      "statements": 9.09,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.09
+    },
+    "server/services/knowledgeBase/ForeshadowLedger.js": {
+      "statements": 5.97,
+      "branches": 0,
+      "functions": 0,
+      "lines": 5.97
+    },
+    "server/services/knowledgeBase/MemoryPyramid.js": {
+      "statements": 28.21,
+      "branches": 2.9,
+      "functions": 22.22,
+      "lines": 28.21
+    },
+    "server/services/knowledgeBase/factExtractors.js": {
+      "statements": 1.18,
+      "branches": 0,
+      "functions": 0,
+      "lines": 1.18
+    },
+    "server/services/knowledgeBase/factLookup.js": {
+      "statements": 17.39,
+      "branches": 0,
+      "functions": 0,
+      "lines": 17.39
+    },
+    "server/services/knowledgeBase/factSync.js": {
+      "statements": 32.14,
+      "branches": 3.23,
+      "functions": 14.29,
+      "lines": 32.14
+    },
+    "server/services/knowledgeBase/knowledgeAccess.js": {
+      "statements": 8.11,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.11
+    },
+    "server/services/pipeline/agentDeclarations.js": {
+      "statements": 92.31,
+      "branches": 56.25,
+      "functions": 100,
+      "lines": 92.31
+    },
+    "server/services/pipeline/agentDeclarationsSupplement.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/agentMaterialFormatter.js": {
+      "statements": 16.67,
+      "branches": 8.11,
+      "functions": 33.33,
+      "lines": 16.67
+    },
+    "server/services/pipeline/agentMaterialHelpers.js": {
+      "statements": 21.43,
+      "branches": 34.18,
+      "functions": 7.69,
+      "lines": 21.43
+    },
+    "server/services/pipeline/agentMaterialScheduler.js": {
+      "statements": 10.64,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10.64
+    },
+    "server/services/pipeline/agentRunner.js": {
+      "statements": 48,
+      "branches": 28.95,
+      "functions": 50,
+      "lines": 48
+    },
+    "server/services/pipeline/agentUsageReporter.js": {
+      "statements": 30,
+      "branches": 0,
+      "functions": 0,
+      "lines": 30
+    },
+    "server/services/pipeline/chapterPlanRefresh.js": {
+      "statements": 97.75,
+      "branches": 81.25,
+      "functions": 100,
+      "lines": 97.75
+    },
+    "server/services/pipeline/chapterTimelineExtractor.js": {
+      "statements": 10,
+      "branches": 5.48,
+      "functions": 8.33,
+      "lines": 10
+    },
+    "server/services/pipeline/characterSectionBuilders.js": {
+      "statements": 2.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.67
+    },
+    "server/services/pipeline/characterStateExtractor.js": {
+      "statements": 82.29,
+      "branches": 52.63,
+      "functions": 100,
+      "lines": 82.29
+    },
+    "server/services/pipeline/characterStateLabeledFields.js": {
+      "statements": 55.56,
+      "branches": 31.82,
+      "functions": 60,
+      "lines": 55.56
+    },
+    "server/services/pipeline/configSyncCheck.js": {
+      "statements": 71.43,
+      "branches": 54.17,
+      "functions": 100,
+      "lines": 71.43
+    },
+    "server/services/pipeline/constants.js": {
+      "statements": 30,
+      "branches": 0,
+      "functions": 0,
+      "lines": 30
+    },
+    "server/services/pipeline/constraintConflictDetector.js": {
+      "statements": 57.14,
+      "branches": 56,
+      "functions": 57.14,
+      "lines": 57.14
+    },
+    "server/services/pipeline/constraintConflictPatterns.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/contextAssemblyRecorder.js": {
+      "statements": 64.62,
+      "branches": 59.43,
+      "functions": 81.82,
+      "lines": 64.62
+    },
+    "server/services/pipeline/contextBudgetPlanner.js": {
+      "statements": 84.21,
+      "branches": 57.38,
+      "functions": 100,
+      "lines": 84.21
+    },
+    "server/services/pipeline/contextCommander.js": {
+      "statements": 87.65,
+      "branches": 57.14,
+      "functions": 85.71,
+      "lines": 87.65
+    },
+    "server/services/pipeline/contextCommanderHelpers.js": {
+      "statements": 80.95,
+      "branches": 73.08,
+      "functions": 90.91,
+      "lines": 80.95
+    },
+    "server/services/pipeline/contextCommanderLoaders.js": {
+      "statements": 66.67,
+      "branches": 16.67,
+      "functions": 50,
+      "lines": 66.67
+    },
+    "server/services/pipeline/contextDecisionRules.js": {
+      "statements": 96.43,
+      "branches": 90.63,
+      "functions": 90,
+      "lines": 96.43
+    },
+    "server/services/pipeline/contextDecisionTables.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/contextDepthConstants.js": {
+      "statements": 88.89,
+      "branches": 66.67,
+      "functions": 100,
+      "lines": 88.89
+    },
+    "server/services/pipeline/contextOverrideStore.js": {
+      "statements": 22.64,
+      "branches": 0,
+      "functions": 16.67,
+      "lines": 22.64
+    },
+    "server/services/pipeline/contextRelevance.js": {
+      "statements": 79.07,
+      "branches": 72.73,
+      "functions": 83.33,
+      "lines": 79.07
+    },
+    "server/services/pipeline/contractCompat.js": {
+      "statements": 95.24,
+      "branches": 80,
+      "functions": 100,
+      "lines": 95.24
+    },
+    "server/services/pipeline/contractFieldChecker.js": {
+      "statements": 75,
+      "branches": 63.04,
+      "functions": 100,
+      "lines": 75
+    },
+    "server/services/pipeline/contractMaterialEnricher.js": {
+      "statements": 75.68,
+      "branches": 65.22,
+      "functions": 100,
+      "lines": 75.68
+    },
+    "server/services/pipeline/contractPostMaterialValidator.js": {
+      "statements": 88.89,
+      "branches": 66.67,
+      "functions": 100,
+      "lines": 88.89
+    },
+    "server/services/pipeline/contractValidator.js": {
+      "statements": 96.2,
+      "branches": 79.49,
+      "functions": 100,
+      "lines": 96.2
+    },
+    "server/services/pipeline/dataFlowSpec.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/dataFlowSpecSupplement.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/degradationTracker.js": {
+      "statements": 9.52,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.52
+    },
+    "server/services/pipeline/entityProjection.js": {
+      "statements": 81.82,
+      "branches": 84.21,
+      "functions": 75,
+      "lines": 81.82
+    },
+    "server/services/pipeline/foreshadowExtractorHelpers.js": {
+      "statements": 7.5,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.5
+    },
+    "server/services/pipeline/infinitePipeline.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/initialMaterialHelpers.js": {
+      "statements": 90,
+      "branches": 70.83,
+      "functions": 75,
+      "lines": 90
+    },
+    "server/services/pipeline/intentDepthConstants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/intentDepthResolver.js": {
+      "statements": 11.67,
+      "branches": 5.21,
+      "functions": 20,
+      "lines": 11.67
+    },
+    "server/services/pipeline/knowledgeSyncService.js": {
+      "statements": 80.77,
+      "branches": 78.57,
+      "functions": 100,
+      "lines": 80.77
+    },
+    "server/services/pipeline/llmBudgetGuard.js": {
+      "statements": 96.67,
+      "branches": 90.91,
+      "functions": 100,
+      "lines": 96.67
+    },
+    "server/services/pipeline/materialAssemblyReport.js": {
+      "statements": 100,
+      "branches": 92.54,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/materialBatchPlan.js": {
+      "statements": 100,
+      "branches": 80,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/materialDepthBackfill.js": {
+      "statements": 95.52,
+      "branches": 88.24,
+      "functions": 100,
+      "lines": 95.52
+    },
+    "server/services/pipeline/materialDepthChecker.js": {
+      "statements": 37.7,
+      "branches": 7.69,
+      "functions": 33.33,
+      "lines": 37.7
+    },
+    "server/services/pipeline/materialDepthCheckerProject.js": {
+      "statements": 12.5,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12.5
+    },
+    "server/services/pipeline/materialDepthEnforcer.js": {
+      "statements": 8.62,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.62
+    },
+    "server/services/pipeline/materialDepthThresholds.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/materialGate.js": {
+      "statements": 98.98,
+      "branches": 89.66,
+      "functions": 100,
+      "lines": 98.98
+    },
+    "server/services/pipeline/materialGenerator.js": {
+      "statements": 15.31,
+      "branches": 0,
+      "functions": 0,
+      "lines": 15.31
+    },
+    "server/services/pipeline/materialInjector.js": {
+      "statements": 73.08,
+      "branches": 72.92,
+      "functions": 66.67,
+      "lines": 73.08
+    },
+    "server/services/pipeline/materialManagerCatchup.js": {
+      "statements": 68.75,
+      "branches": 36.84,
+      "functions": 100,
+      "lines": 68.75
+    },
+    "server/services/pipeline/materialNameResolver.js": {
+      "statements": 17.65,
+      "branches": 0,
+      "functions": 0,
+      "lines": 17.65
+    },
+    "server/services/pipeline/materialStateAssembler.js": {
+      "statements": 100,
+      "branches": 85.71,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/outlineConstants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/outlineDriftGuard.js": {
+      "statements": 94.29,
+      "branches": 71.43,
+      "functions": 100,
+      "lines": 94.29
+    },
+    "server/services/pipeline/outlineEntitySync.js": {
+      "statements": 18.03,
+      "branches": 0,
+      "functions": 0,
+      "lines": 18.03
+    },
+    "server/services/pipeline/outlineEquipmentBinds.js": {
+      "statements": 29.03,
+      "branches": 0,
+      "functions": 0,
+      "lines": 29.03
+    },
+    "server/services/pipeline/outlineFormatter.js": {
+      "statements": 45.31,
+      "branches": 17.07,
+      "functions": 33.33,
+      "lines": 45.31
+    },
+    "server/services/pipeline/outlineGenerator.js": {
+      "statements": 20.62,
+      "branches": 0,
+      "functions": 0,
+      "lines": 20.62
+    },
+    "server/services/pipeline/outlineMaterialSaver.js": {
+      "statements": 22.22,
+      "branches": 0,
+      "functions": 0,
+      "lines": 22.22
+    },
+    "server/services/pipeline/outlineRelationCreator.js": {
+      "statements": 7.69,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.69
+    },
+    "server/services/pipeline/outlineResponseParser.js": {
+      "statements": 50,
+      "branches": 44.74,
+      "functions": 50,
+      "lines": 50
+    },
+    "server/services/pipeline/outlineRhythmMatchers.js": {
+      "statements": 100,
+      "branches": 86.67,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/outlineTemplateBuilder.js": {
+      "statements": 26.79,
+      "branches": 12.86,
+      "functions": 33.33,
+      "lines": 26.79
+    },
+    "server/services/pipeline/outlineTemplateGenerator.js": {
+      "statements": 15.25,
+      "branches": 0,
+      "functions": 0,
+      "lines": 15.25
+    },
+    "server/services/pipeline/outlineTemplateValidator.js": {
+      "statements": 86.57,
+      "branches": 57.38,
+      "functions": 75,
+      "lines": 86.57
+    },
+    "server/services/pipeline/outputContractDefs.js": {
+      "statements": 97.96,
+      "branches": 75.81,
+      "functions": 100,
+      "lines": 97.96
+    },
+    "server/services/pipeline/overrideGovernance.js": {
+      "statements": 12.96,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12.96
+    },
+    "server/services/pipeline/pipelineContract.js": {
+      "statements": 100,
+      "branches": 94.74,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/pipelineContractDefs.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/pipelineErrors.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/pipelineOutputContract.js": {
+      "statements": 88.31,
+      "branches": 77.46,
+      "functions": 90.91,
+      "lines": 88.31
+    },
+    "server/services/pipeline/pipelinePhases.js": {
+      "statements": 97.3,
+      "branches": 85.71,
+      "functions": 100,
+      "lines": 97.3
+    },
+    "server/services/pipeline/pipelinePollutionGuard.js": {
+      "statements": 90.48,
+      "branches": 73.03,
+      "functions": 90.91,
+      "lines": 90.48
+    },
+    "server/services/pipeline/pipelinePreflight.js": {
+      "statements": 84.21,
+      "branches": 78.13,
+      "functions": 100,
+      "lines": 84.21
+    },
+    "server/services/pipeline/pipelineStepRunner.js": {
+      "statements": 76.71,
+      "branches": 66,
+      "functions": 66.67,
+      "lines": 76.71
+    },
+    "server/services/pipeline/pipelineUtils.js": {
+      "statements": 97.62,
+      "branches": 80.6,
+      "functions": 100,
+      "lines": 97.62
+    },
+    "server/services/pipeline/pollutionPatterns.js": {
+      "statements": 100,
+      "branches": 77.27,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/povRuleSectionBuilder.js": {
+      "statements": 20,
+      "branches": 0,
+      "functions": 0,
+      "lines": 20
+    },
+    "server/services/pipeline/progressView.js": {
+      "statements": 98.21,
+      "branches": 81.82,
+      "functions": 91.67,
+      "lines": 98.21
+    },
+    "server/services/pipeline/projectBudget.js": {
+      "statements": 89.61,
+      "branches": 92.78,
+      "functions": 100,
+      "lines": 89.61
+    },
+    "server/services/pipeline/readerAdvisory.js": {
+      "statements": 4.55,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.55
+    },
+    "server/services/pipeline/relationMaterialLoader.js": {
+      "statements": 8.57,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.57
+    },
+    "server/services/pipeline/relationshipStageGuard.js": {
+      "statements": 13.16,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.16
+    },
+    "server/services/pipeline/reviewOverride.js": {
+      "statements": 80,
+      "branches": 62.41,
+      "functions": 75,
+      "lines": 80
+    },
+    "server/services/pipeline/schedulerStrategy.js": {
+      "statements": 72.41,
+      "branches": 62.5,
+      "functions": 60,
+      "lines": 72.41
+    },
+    "server/services/pipeline/sectionBuilders.js": {
+      "statements": 61.76,
+      "branches": 45.19,
+      "functions": 66.67,
+      "lines": 61.76
+    },
+    "server/services/pipeline/servantDecisionEngine.js": {
+      "statements": 8.51,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.51
+    },
+    "server/services/pipeline/styleRuleSectionBuilder.js": {
+      "statements": 2.94,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.94
+    },
+    "server/services/pipeline/techniqueContextHelpers.js": {
+      "statements": 12.77,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12.77
+    },
+    "server/services/pipeline/techniqueFeedback.js": {
+      "statements": 67.61,
+      "branches": 68.57,
+      "functions": 76.92,
+      "lines": 67.61
+    },
+    "server/services/pipeline/techniqueScheduler.js": {
+      "statements": 69.07,
+      "branches": 47.69,
+      "functions": 86.67,
+      "lines": 69.07
+    },
+    "server/services/pipeline/techniqueScoring.js": {
+      "statements": 100,
+      "branches": 95.24,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/timelineContextResolver.js": {
+      "statements": 48.86,
+      "branches": 5.48,
+      "functions": 42.31,
+      "lines": 48.86
+    },
+    "server/services/pipeline/timelineExtractorHelpers.js": {
+      "statements": 10,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10
+    },
+    "server/services/pipeline/tokenLedger.js": {
+      "statements": 26,
+      "branches": 24.05,
+      "functions": 28.57,
+      "lines": 26
+    },
+    "server/services/pipeline/tokenLedgerAlerts.js": {
+      "statements": 94.12,
+      "branches": 95,
+      "functions": 87.5,
+      "lines": 94.12
+    },
+    "server/services/pipeline/tokenLedgerView.js": {
+      "statements": 98.04,
+      "branches": 84,
+      "functions": 93.75,
+      "lines": 98.04
+    },
+    "server/services/pipeline/unifiedBudgetPool.js": {
+      "statements": 17.82,
+      "branches": 4.85,
+      "functions": 10.53,
+      "lines": 17.82
+    },
+    "server/services/pipeline/volumeHelpers.js": {
+      "statements": 88.39,
+      "branches": 80.39,
+      "functions": 78.95,
+      "lines": 88.39
+    },
+    "server/services/pipeline/volumeRhythm.js": {
+      "statements": 85.11,
+      "branches": 56,
+      "functions": 77.78,
+      "lines": 85.11
+    },
+    "server/services/pipeline/worldviewClassification.js": {
+      "statements": 4.35,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.35
+    },
+    "server/services/pipeline/writingGuardSectionBuilder.js": {
+      "statements": 94.74,
+      "branches": 75,
+      "functions": 100,
+      "lines": 94.74
+    },
+    "server/services/pipeline/contracts/_registry.js": {
+      "statements": 83.33,
+      "branches": 75,
+      "functions": 100,
+      "lines": 83.33
+    },
+    "server/services/pipeline/infinite/batchExecutor.js": {
+      "statements": 7.78,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.78
+    },
+    "server/services/pipeline/infinite/chapterExecutor.js": {
+      "statements": 11.54,
+      "branches": 0,
+      "functions": 0,
+      "lines": 11.54
+    },
+    "server/services/pipeline/infinite/chapterLogDetails.js": {
+      "statements": 2.7,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.7
+    },
+    "server/services/pipeline/infinite/chapterScheduler.js": {
+      "statements": 87.27,
+      "branches": 79.55,
+      "functions": 85.71,
+      "lines": 87.27
+    },
+    "server/services/pipeline/infinite/heartbeat.js": {
+      "statements": 16.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16.67
+    },
+    "server/services/pipeline/infinite/index.js": {
+      "statements": 66.67,
+      "branches": 100,
+      "functions": 0,
+      "lines": 66.67
+    },
+    "server/services/pipeline/infinite/outlineSupplementor.js": {
+      "statements": 15.31,
+      "branches": 8.06,
+      "functions": 13.33,
+      "lines": 15.31
+    },
+    "server/services/pipeline/infinite/pipelineInit.js": {
+      "statements": 13.33,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.33
+    },
+    "server/services/pipeline/infinite/pipelineLogger.js": {
+      "statements": 91.67,
+      "branches": 92.86,
+      "functions": 100,
+      "lines": 91.67
+    },
+    "server/services/pipeline/infinite/stateManager.js": {
+      "statements": 54.95,
+      "branches": 57.14,
+      "functions": 72.73,
+      "lines": 54.95
+    },
+    "server/services/pipeline/infinite/stopConditions.js": {
+      "statements": 6.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.67
+    },
+    "server/services/pipeline/infinite/subplaneUnlock.js": {
+      "statements": 16.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16.67
+    },
+    "server/services/pipeline/modules/constraintFeedbackModule.js": {
+      "statements": 34.78,
+      "branches": 0,
+      "functions": 16.67,
+      "lines": 34.78
+    },
+    "server/services/pipeline/outlineTemplateExpander/templateEntityAssocHelpers.js": {
+      "statements": 97.9,
+      "branches": 81.2,
+      "functions": 100,
+      "lines": 97.9
+    },
+    "server/services/pipeline/pipelineHelpers/pipelineWordCount.js": {
+      "statements": 100,
+      "branches": 94.44,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/steps/expansionInstructionBuilder.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/steps/finalEditor.js": {
+      "statements": 14.29,
+      "branches": 0,
+      "functions": 0,
+      "lines": 14.29
+    },
+    "server/services/pipeline/steps/foreshadowArchiveLoader.js": {
+      "statements": 14.29,
+      "branches": 0,
+      "functions": 0,
+      "lines": 14.29
+    },
+    "server/services/pipeline/steps/materialActions.js": {
+      "statements": 75.61,
+      "branches": 61.43,
+      "functions": 100,
+      "lines": 75.61
+    },
+    "server/services/pipeline/steps/materialArchive.js": {
+      "statements": 31.71,
+      "branches": 22.22,
+      "functions": 40,
+      "lines": 31.71
+    },
+    "server/services/pipeline/steps/materialBindProcessor.js": {
+      "statements": 11.11,
+      "branches": 0,
+      "functions": 0,
+      "lines": 11.11
+    },
+    "server/services/pipeline/steps/materialChangePrecheck.js": {
+      "statements": 96.77,
+      "branches": 87.18,
+      "functions": 100,
+      "lines": 96.77
+    },
+    "server/services/pipeline/steps/materialCharacterFinder.js": {
+      "statements": 7.69,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.69
+    },
+    "server/services/pipeline/steps/materialCharacterProcessor.js": {
+      "statements": 8.13,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.13
+    },
+    "server/services/pipeline/steps/materialContentMerger.js": {
+      "statements": 94.55,
+      "branches": 84.09,
+      "functions": 100,
+      "lines": 94.55
+    },
+    "server/services/pipeline/steps/materialContentPruner.js": {
+      "statements": 57.89,
+      "branches": 48.84,
+      "functions": 71.43,
+      "lines": 57.89
+    },
+    "server/services/pipeline/steps/materialCreateAction.js": {
+      "statements": 75,
+      "branches": 70.27,
+      "functions": 100,
+      "lines": 75
+    },
+    "server/services/pipeline/steps/materialCreateHelpers.js": {
+      "statements": 21.95,
+      "branches": 0,
+      "functions": 0,
+      "lines": 21.95
+    },
+    "server/services/pipeline/steps/materialFieldUtils.js": {
+      "statements": 16.67,
+      "branches": 2.33,
+      "functions": 25,
+      "lines": 16.67
+    },
+    "server/services/pipeline/steps/materialFinder.js": {
+      "statements": 8.82,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.82
+    },
+    "server/services/pipeline/steps/materialItemProcessor.js": {
+      "statements": 46.53,
+      "branches": 34.91,
+      "functions": 16.67,
+      "lines": 46.53
+    },
+    "server/services/pipeline/steps/materialJsonParser.js": {
+      "statements": 70.97,
+      "branches": 59.38,
+      "functions": 60,
+      "lines": 70.97
+    },
+    "server/services/pipeline/steps/materialLifecycle.js": {
+      "statements": 43.88,
+      "branches": 28,
+      "functions": 34.78,
+      "lines": 43.88
+    },
+    "server/services/pipeline/steps/materialManager.js": {
+      "statements": 89.25,
+      "branches": 71.05,
+      "functions": 42.86,
+      "lines": 89.25
+    },
+    "server/services/pipeline/steps/materialManagerSideEffects.js": {
+      "statements": 58.06,
+      "branches": 20,
+      "functions": 66.67,
+      "lines": 58.06
+    },
+    "server/services/pipeline/steps/materialMarkdownExtractor.js": {
+      "statements": 21.05,
+      "branches": 2.44,
+      "functions": 25,
+      "lines": 21.05
+    },
+    "server/services/pipeline/steps/materialOrganizer.js": {
+      "statements": 33.33,
+      "branches": 8.7,
+      "functions": 25,
+      "lines": 33.33
+    },
+    "server/services/pipeline/steps/materialOrganizerGuards.js": {
+      "statements": 38.24,
+      "branches": 28.95,
+      "functions": 60,
+      "lines": 38.24
+    },
+    "server/services/pipeline/steps/materialOutputSchema.js": {
+      "statements": 93.02,
+      "branches": 84.62,
+      "functions": 100,
+      "lines": 93.02
+    },
+    "server/services/pipeline/steps/materialPostProcessor.js": {
+      "statements": 52.83,
+      "branches": 18.42,
+      "functions": 62.5,
+      "lines": 52.83
+    },
+    "server/services/pipeline/steps/materialPromptBuilder.js": {
+      "statements": 81.63,
+      "branches": 33.33,
+      "functions": 85.71,
+      "lines": 81.63
+    },
+    "server/services/pipeline/steps/materialRegistrar.js": {
+      "statements": 36.99,
+      "branches": 51.06,
+      "functions": 20,
+      "lines": 36.99
+    },
+    "server/services/pipeline/steps/materialRelationProcessor.js": {
+      "statements": 18.18,
+      "branches": 0,
+      "functions": 0,
+      "lines": 18.18
+    },
+    "server/services/pipeline/steps/materialRelationSync.js": {
+      "statements": 7.94,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.94
+    },
+    "server/services/pipeline/steps/materialRelationWriter.js": {
+      "statements": 27.78,
+      "branches": 19.15,
+      "functions": 33.33,
+      "lines": 27.78
+    },
+    "server/services/pipeline/steps/materialUpdateApplier.js": {
+      "statements": 96.97,
+      "branches": 79.41,
+      "functions": 100,
+      "lines": 96.97
+    },
+    "server/services/pipeline/steps/materialUpdateHelpers.js": {
+      "statements": 7.79,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.79
+    },
+    "server/services/pipeline/steps/materialUpdateProcessor.js": {
+      "statements": 12.04,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12.04
+    },
+    "server/services/pipeline/steps/materialUpdateRepair.js": {
+      "statements": 88.89,
+      "branches": 81.25,
+      "functions": 100,
+      "lines": 88.89
+    },
+    "server/services/pipeline/steps/polisher.js": {
+      "statements": 34.62,
+      "branches": 33.33,
+      "functions": 33.33,
+      "lines": 34.62
+    },
+    "server/services/pipeline/steps/reader.js": {
+      "statements": 14.58,
+      "branches": 0,
+      "functions": 0,
+      "lines": 14.58
+    },
+    "server/services/pipeline/steps/reviser.js": {
+      "statements": 16.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 16.67
+    },
+    "server/services/pipeline/steps/reviserPrompt.js": {
+      "statements": 22.58,
+      "branches": 0,
+      "functions": 0,
+      "lines": 22.58
+    },
+    "server/services/pipeline/steps/reviserWordGuard.js": {
+      "statements": 13.79,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.79
+    },
+    "server/services/pipeline/steps/writer.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/steps/review/fastReview.js": {
+      "statements": 4.62,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.62
+    },
+    "server/services/pipeline/steps/review/firstReview.js": {
+      "statements": 10.39,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10.39
+    },
+    "server/services/pipeline/steps/review/firstReviewChecks.js": {
+      "statements": 16.96,
+      "branches": 12.39,
+      "functions": 21.74,
+      "lines": 16.96
+    },
+    "server/services/pipeline/steps/review/firstReviewParser.js": {
+      "statements": 4.26,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.26
+    },
+    "server/services/pipeline/steps/review/reviewShared.js": {
+      "statements": 56.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 56.67
+    },
+    "server/services/pipeline/steps/review/reviewSoftHardSeparator.js": {
+      "statements": 12.5,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12.5
+    },
+    "server/services/pipeline/steps/review/secondReview.js": {
+      "statements": 7.29,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.29
+    },
+    "server/services/pipeline/steps/review/secondReviewParser.js": {
+      "statements": 6.9,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.9
+    },
+    "server/services/pipeline/steps/review/supportingRoleDepthCheck.js": {
+      "statements": 12.82,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12.82
+    },
+    "server/services/pipeline/steps/review/wordCountGate.js": {
+      "statements": 95.24,
+      "branches": 84.62,
+      "functions": 100,
+      "lines": 95.24
+    },
+    "server/services/pipeline/steps/writer/index.js": {
+      "statements": 13.64,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.64
+    },
+    "server/services/pipeline/steps/writer/sceneFloorInstruction.js": {
+      "statements": 100,
+      "branches": 33.33,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/pipeline/steps/writer/writerCharacterFormatter.js": {
+      "statements": 3.16,
+      "branches": 0,
+      "functions": 0,
+      "lines": 3.16
+    },
+    "server/services/pipeline/steps/writer/writerMaterialBuilder.js": {
+      "statements": 22.22,
+      "branches": 0,
+      "functions": 0,
+      "lines": 22.22
+    },
+    "server/services/pipeline/steps/writer/writerPostProcess.js": {
+      "statements": 5.88,
+      "branches": 0,
+      "functions": 0,
+      "lines": 5.88
+    },
+    "server/services/pipeline/steps/writer/writerPromptBuilder.js": {
+      "statements": 10.77,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10.77
+    },
+    "server/services/pipeline/steps/writer/writerPromptContextBuilders.js": {
+      "statements": 2.44,
+      "branches": 0,
+      "functions": 0,
+      "lines": 2.44
+    },
+    "server/services/pipeline/steps/writer/writerShared.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/prompts/agentJobTemplates.js": {
+      "statements": 40,
+      "branches": 0,
+      "functions": 0,
+      "lines": 40
+    },
+    "server/services/prompts/agentPromptAssembler.js": {
+      "statements": 10.1,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10.1
+    },
+    "server/services/prompts/agentSlotRegistry.js": {
+      "statements": 13.64,
+      "branches": 0,
+      "functions": 0,
+      "lines": 13.64
+    },
+    "server/services/prompts/agentTemplateFallbacks.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/prompts/constraintAgentMap.js": {
+      "statements": 60,
+      "branches": 0,
+      "functions": 0,
+      "lines": 60
+    },
+    "server/services/prompts/constraintDedupe.js": {
+      "statements": 93.33,
+      "branches": 85.71,
+      "functions": 100,
+      "lines": 93.33
+    },
+    "server/services/prompts/constraintDetectionConfig.js": {
+      "statements": 40,
+      "branches": 0,
+      "functions": 0,
+      "lines": 40
+    },
+    "server/services/prompts/constraintDetectionRegistry.js": {
+      "statements": 51.72,
+      "branches": 0,
+      "functions": 0,
+      "lines": 51.72
+    },
+    "server/services/prompts/constraintFeedbackCollector.js": {
+      "statements": 8.16,
+      "branches": 0,
+      "functions": 0,
+      "lines": 8.16
+    },
+    "server/services/prompts/constraintGovernanceConfig.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/prompts/constraintInjector.js": {
+      "statements": 93.65,
+      "branches": 89.36,
+      "functions": 80,
+      "lines": 93.65
+    },
+    "server/services/prompts/constraintMetaSpec.js": {
+      "statements": 38.46,
+      "branches": 0,
+      "functions": 0,
+      "lines": 38.46
+    },
+    "server/services/prompts/constraintMetaSpecAiSlop.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/prompts/constraintModuleDefs.js": {
+      "statements": 30.77,
+      "branches": 0,
+      "functions": 0,
+      "lines": 30.77
+    },
+    "server/services/prompts/constraintModuleExtras.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/prompts/constraintModuleExtrasCraft.js": {
+      "statements": 14.29,
+      "branches": 0,
+      "functions": 0,
+      "lines": 14.29
+    },
+    "server/services/prompts/constraintModuleExtrasRedlines.js": {
+      "statements": 14.29,
+      "branches": 0,
+      "functions": 0,
+      "lines": 14.29
+    },
+    "server/services/prompts/constraintModules.js": {
+      "statements": 10.71,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10.71
+    },
+    "server/services/prompts/constraintScopes.js": {
+      "statements": 66.67,
+      "branches": 68.42,
+      "functions": 50,
+      "lines": 66.67
+    },
+    "server/services/prompts/flavorInjector.js": {
+      "statements": 10.71,
+      "branches": 0,
+      "functions": 0,
+      "lines": 10.71
+    },
+    "server/services/prompts/genreInjector.js": {
+      "statements": 3.54,
+      "branches": 0,
+      "functions": 0,
+      "lines": 3.54
+    },
+    "server/services/prompts/index.js": {
+      "statements": 87.5,
+      "branches": 100,
+      "functions": 0,
+      "lines": 87.5
+    },
+    "server/services/prompts/narrativePromise.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/services/prompts/promptBuilder.js": {
+      "statements": 36.28,
+      "branches": 20.22,
+      "functions": 42.86,
+      "lines": 36.28
+    },
+    "server/services/prompts/promptDedup.js": {
+      "statements": 82.93,
+      "branches": 50,
+      "functions": 50,
+      "lines": 82.93
+    },
+    "server/services/prompts/slotResolvers.js": {
+      "statements": 15.73,
+      "branches": 7.14,
+      "functions": 18.75,
+      "lines": 15.73
+    },
+    "server/services/prompts/styleHierarchy.js": {
+      "statements": 7.14,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.14
+    },
+    "server/services/prompts/styleInjector.js": {
+      "statements": 37.5,
+      "branches": 0,
+      "functions": 0,
+      "lines": 37.5
+    },
+    "server/services/prompts/styleProfileInjection.js": {
+      "statements": 23.08,
+      "branches": 0,
+      "functions": 0,
+      "lines": 23.08
+    },
+    "server/services/prompts/styleProfileLoader.js": {
+      "statements": 57.89,
+      "branches": 40.91,
+      "functions": 40,
+      "lines": 57.89
+    },
+    "server/services/prompts/detectors/detectAbstractEnding.js": {
+      "statements": 6.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.67
+    },
+    "server/services/prompts/detectors/detectAbstractSentiment.js": {
+      "statements": 9.52,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.52
+    },
+    "server/services/prompts/detectors/detectAiSlop.js": {
+      "statements": 20,
+      "branches": 0,
+      "functions": 0,
+      "lines": 20
+    },
+    "server/services/prompts/detectors/detectBanterDeflation.js": {
+      "statements": 7.41,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.41
+    },
+    "server/services/prompts/detectors/detectChapterCoherence.js": {
+      "statements": 3.7,
+      "branches": 0,
+      "functions": 0,
+      "lines": 3.7
+    },
+    "server/services/prompts/detectors/detectConflictPatternRepeat.js": {
+      "statements": 6.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.67
+    },
+    "server/services/prompts/detectors/detectEmotionalContinuity.js": {
+      "statements": 7.69,
+      "branches": 0,
+      "functions": 0,
+      "lines": 7.69
+    },
+    "server/services/prompts/detectors/detectHookMonotony.js": {
+      "statements": 12,
+      "branches": 0,
+      "functions": 0,
+      "lines": 12
+    },
+    "server/services/prompts/detectors/detectMetaphorSubstitution.js": {
+      "statements": 9.52,
+      "branches": 0,
+      "functions": 0,
+      "lines": 9.52
+    },
+    "server/services/prompts/detectors/detectMotifReuse.js": {
+      "statements": 6.67,
+      "branches": 0,
+      "functions": 0,
+      "lines": 6.67
+    },
+    "server/services/prompts/detectors/detectToolCharacter.js": {
+      "statements": 4.44,
+      "branches": 0,
+      "functions": 0,
+      "lines": 4.44
+    },
+    "server/shared/auditLogStore.js": {
+      "statements": 91.25,
+      "branches": 75.76,
+      "functions": 100,
+      "lines": 91.25
+    },
+    "server/shared/debugArchiveReader.js": {
+      "statements": 87.1,
+      "branches": 60,
+      "functions": 100,
+      "lines": 87.1
+    },
+    "server/shared/debugFallbackWriter.js": {
+      "statements": 97.22,
+      "branches": 94.12,
+      "functions": 100,
+      "lines": 97.22
+    },
+    "server/shared/debugPgWriter.js": {
+      "statements": 94.34,
+      "branches": 100,
+      "functions": 100,
+      "lines": 94.34
+    },
+    "server/shared/errorClassifier.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/errorCodes.js": {
+      "statements": 22.22,
+      "branches": 0,
+      "functions": 0,
+      "lines": 22.22
+    },
+    "server/shared/errors.js": {
+      "statements": 100,
+      "branches": 83.33,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/fieldValueGuards.js": {
+      "statements": 68.75,
+      "branches": 71.43,
+      "functions": 50,
+      "lines": 68.75
+    },
+    "server/shared/logAggregator.js": {
+      "statements": 86.21,
+      "branches": 78.95,
+      "functions": 87.5,
+      "lines": 86.21
+    },
+    "server/shared/logger.js": {
+      "statements": 86.54,
+      "branches": 86.67,
+      "functions": 100,
+      "lines": 86.54
+    },
+    "server/shared/runContext.js": {
+      "statements": 90.91,
+      "branches": 90,
+      "functions": 75,
+      "lines": 90.91
+    },
+    "server/shared/shutdownManager.js": {
+      "statements": 92.59,
+      "branches": 88.24,
+      "functions": 75,
+      "lines": 92.59
+    },
+    "server/shared/traceContext.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/alertRules/alertEngine.js": {
+      "statements": 97.53,
+      "branches": 94.74,
+      "functions": 90.91,
+      "lines": 97.53
+    },
+    "server/shared/alertRules/constants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/alertRules/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/debugPersister/constants.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/debugPersister/debugPersisterClass.js": {
+      "statements": 74.47,
+      "branches": 68.97,
+      "functions": 60.87,
+      "lines": 74.47
+    },
+    "server/shared/debugPersister/index.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/shared/logStore/index.js": {
+      "statements": 71.43,
+      "branches": 100,
+      "functions": 0,
+      "lines": 71.43
+    },
+    "server/shared/logStore/logStoreClass.js": {
+      "statements": 90.74,
+      "branches": 88.24,
+      "functions": 100,
+      "lines": 90.74
+    },
+    "server/shared/logStore/sinkState.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/startupChecks/apiSelfCheck.js": {
+      "statements": 80,
+      "branches": 62.5,
+      "functions": 100,
+      "lines": 80
+    },
+    "server/utils/percentile.js": {
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
+    },
+    "server/utils/processGuard.js": {
+      "statements": 50,
+      "branches": 25,
+      "functions": 57.14,
+      "lines": 50
+    }
+  }
+}
