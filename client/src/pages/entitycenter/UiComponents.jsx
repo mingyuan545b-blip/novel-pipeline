@@ -1,14 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { RARITY_COLORS, RARITY_LABELS } from './constants';
 import s from './uiComponents.module.css';
-
-function hashStr(s) {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; }
-    return Math.abs(h);
-}
-
-export { hashStr };
+import { hashStr } from './uiHelpers';
 
 export function GenerativeAvatar({ name, size = 40 }) {
     const canvasRef = useRef(null);
@@ -167,7 +160,3 @@ export function LoadingSkeleton() {
         </div>
     );
 }
-
-export const handleCardKey = (fn) => (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(); }
-};

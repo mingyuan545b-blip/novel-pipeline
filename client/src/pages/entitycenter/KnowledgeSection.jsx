@@ -5,15 +5,25 @@ import s from './knowledgeSection.module.css';
 
 export default function KnowledgeSection({ entityId, projectId }) {
     const [records, setRecords] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);   // 初始即"加载中"：拉到数据前不闪空态
+
+    // 目标实体变化时重置（渲染期派生状态；effect 内同步 setState 会触发级联渲染且被 lint 拦下）
+    const [prevTarget, setPrevTarget] = useState(`${projectId}|${entityId}`);
+    const target = `${projectId}|${entityId}`;
+    if (target !== prevTarget) {
+        setPrevTarget(target);
+        setLoading(true);
+        setRecords([]);
+    }
 
     useEffect(() => {
-        if (!entityId || !projectId) return;
-        setLoading(true);
+        if (!entityId || !projectId) return undefined;
+        let cancelled = false;
         knowledgeAccessApi.getByEntity(projectId, entityId)
-            .then(res => setRecords(res.data || []))
-            .catch(() => setRecords([]))
-            .finally(() => setLoading(false));
+            .then(res => { if (!cancelled) setRecords(res.data || []); })
+            .catch(() => { if (!cancelled) setRecords([]); })
+            .finally(() => { if (!cancelled) setLoading(false); });
+        return () => { cancelled = true; };
     }, [entityId, projectId]);
 
     if (!entityId || !projectId) return null;

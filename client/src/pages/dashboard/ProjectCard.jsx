@@ -6,7 +6,7 @@ function formatCreatedAt(dateStr) {
         const d = new Date(dateStr);
         const pad = n => String(n).padStart(2, '0');
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-    } catch (_) { return ''; }
+    } catch { return ''; }
 }
 
 export default function ProjectCard({ project, isActive, onSelect, onDelete, onCleanup, variant }) {

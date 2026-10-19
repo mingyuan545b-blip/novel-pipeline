@@ -121,7 +121,9 @@ export function useFullPipelineHandler(currentProject, selectedChapter) {
         } else if (taskStatusData.progress && typeof taskStatusData.progress === 'string') {
             addPipelineLog({ step: 'full-pipeline', status: 'running', message: taskStatusData.progress, chapterNumber: selectedChapter?.chapterNumber, timestamp: new Date().toISOString() });
         }
-    }, [taskStatusData, fullPipelinePolling, currentProject?.id, addPipelineLog, queryClient]);
+        // selectedChapter 来自上层 useState（引用稳定，仅在章节数据刷新时才变）——
+        // 轮询回调要用它的章号/标题记日志，故必须进依赖，否则日志章号可能过期
+    }, [taskStatusData, fullPipelinePolling, currentProject?.id, addPipelineLog, queryClient, selectedChapter]);
 
     return {
         runStep,

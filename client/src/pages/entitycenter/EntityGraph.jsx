@@ -23,24 +23,25 @@ export default function EntityGraph({ allRelations, getCharName, characters, onC
     const [filters, setFilters] = useState({ q: '', type: 'all', compoundOnly: false });
     const [centerId, setCenterId] = useState('');
 
-    const nameOf = (id) => getCharName(id);
-    const pairs = useMemo(() => buildPairs(allRelations || [], nameOf), [allRelations, getCharName]);
+    // 直接用 props.getCharName（原局部包装 nameOf 每次渲染都是新函数，
+    // 导致 useMemo 的依赖与实际使用不一致 → React Compiler 报 memo/依赖问题）
+    const pairs = useMemo(() => buildPairs(allRelations || [], getCharName), [allRelations, getCharName]);
     const shown = useMemo(() => filterPairs(pairs, filters), [pairs, filters]);
     const counts = useMemo(() => typeCounts(allRelations || []), [allRelations]);
     const compoundCount = pairs.filter(p => p.compound).length;
-    const center = useMemo(() => (centerId ? centerView(allRelations || [], centerId, nameOf) : null), [centerId, allRelations, getCharName]);
+    const center = useMemo(() => (centerId ? centerView(allRelations || [], centerId, getCharName) : null), [centerId, allRelations, getCharName]);
 
     const centerPairs = useMemo(() => {
         if (!center) return [];
         return center.direct.map(d => {
             const edges = d.edges.map(e => e.rel);
             return {
-                key: 'c-' + d.other.id, a: { id: centerId, name: nameOf(centerId) }, b: d.other, edges,
+                key: 'c-' + d.other.id, a: { id: centerId, name: getCharName(centerId) }, b: d.other, edges,
                 types: [...new Set(edges.map(e => e.relType || 'other'))],
                 strength: Math.max(...edges.map(e => e.strength || 50)), compound: edges.length > 1,
             };
         });
-    }, [center, centerId, allRelations, getCharName]);
+    }, [center, centerId, getCharName]);
 
     // 关系图：默认中心=连接数最多的人；点击节点即以他为中心重新展开（带返回栈）
     const [history, setHistory] = useState([]);
@@ -50,7 +51,7 @@ export default function EntityGraph({ allRelations, getCharName, characters, onC
         return [...deg.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
     }, [pairs]);
     const gCenterId = centerId || mostConnected;
-    const gCenter = useMemo(() => (gCenterId ? centerView(allRelations || [], gCenterId, nameOf) : null), [gCenterId, allRelations, getCharName]);
+    const gCenter = useMemo(() => (gCenterId ? centerView(allRelations || [], gCenterId, getCharName) : null), [gCenterId, allRelations, getCharName]);
     const pickNode = (id) => { setHistory(h => [...h, gCenterId]); setCenterId(id); };
     const goBack = () => setHistory(h => { setCenterId(h[h.length - 1] || ''); return h.slice(0, -1); });
 
@@ -70,7 +71,7 @@ export default function EntityGraph({ allRelations, getCharName, characters, onC
     const centerOptions = (() => {
         const ids = new Set();
         for (const r of allRelations) { ids.add(r.fromCharacterId); ids.add(r._adapted?.toCharacterId || r.toCharacterId); }
-        return [...ids].map(id => ({ id, name: nameOf(id) })).sort((a, b) => a.name.localeCompare(b.name));
+        return [...ids].map(id => ({ id, name: getCharName(id) })).sort((a, b) => a.name.localeCompare(b.name));
     })();
     const chip = (on) => 'cb-chip ' + (on ? 'cb-chip-on' : '');
 
@@ -105,7 +106,7 @@ export default function EntityGraph({ allRelations, getCharName, characters, onC
                         {gCenter && <span className="cb-count">{gCenter.direct.length} 个直接关系 · {gCenter.second.length} 条二跳</span>}
                     </div>
                     {gCenter
-                        ? <RelationGraphView center={{ id: gCenterId, name: nameOf(gCenterId) }} direct={gCenter.direct} onPick={pickNode} />
+                        ? <RelationGraphView center={{ id: gCenterId, name: getCharName(gCenterId) }} direct={gCenter.direct} onPick={pickNode} />
                         : <div className="cb-empty">选择一个人物开始</div>}
                 </>
             ) : mode === 'pairs' ? (

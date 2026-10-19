@@ -89,9 +89,17 @@ describe('dashboard constants', () => {
         expect(layout).toHaveProperty('right');
     });
 
-    test('saveLayout calls localStorage', async () => {
-        const { saveLayout } = await import('../../pages/dashboard/constants');
-        saveLayout({ left: [], right: [] });
-        // No error thrown
+    test('saveLayout 真写入 localStorage（key + 内容）', async () => {
+        // 本文件 mock 了 constants 模块，故这里取**真实实现**来测
+        const actual = await vi.importActual('../../pages/dashboard/constants');
+        // 用与默认卡片集一致的布局，才能命中 loadLayout 的"卡片集校验"分支
+        const layout = { left: [...actual.DEFAULT_LAYOUT.left], right: [...actual.DEFAULT_LAYOUT.right] };
+        localStorage.removeItem(actual.LAYOUT_KEY);
+        actual.saveLayout(layout);
+        expect(localStorage.getItem(actual.LAYOUT_KEY)).toBe(JSON.stringify(layout));
+        expect(actual.loadLayout()).toEqual(layout);
+        // 卡片集对不上时必须回退默认（防脏布局把卡片弄丢）
+        actual.saveLayout({ left: ['不存在'], right: [] });
+        expect(actual.loadLayout()).toEqual(actual.DEFAULT_LAYOUT);
     });
 });

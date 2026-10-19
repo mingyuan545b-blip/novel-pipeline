@@ -49,12 +49,18 @@ export default function CommandPalette() {
         return all.filter(it => it.label.toLowerCase().includes(q) || it.hint.toLowerCase().includes(q) || it.group.toLowerCase().includes(q));
     }, [query, navigate]);
 
+    // 打开时重置查询/光标：用"渲染期派生状态"（React 官方推荐）而不是 effect 内同步 setState
+    // （后者会触发级联渲染；且 react-hooks/set-state-in-effect 会拦下）
+    const [prevOpen, setPrevOpen] = useState(open);
+    if (open !== prevOpen) {
+        setPrevOpen(open);
+        if (open) { setQuery(''); setCursor(0); }
+    }
+
     useEffect(() => {
-        if (open) {
-            setQuery('');
-            setCursor(0);
-            setTimeout(() => inputRef.current?.focus(), 30);
-        }
+        if (!open) return undefined;
+        const t = setTimeout(() => inputRef.current?.focus(), 30);
+        return () => clearTimeout(t);
     }, [open]);
 
 

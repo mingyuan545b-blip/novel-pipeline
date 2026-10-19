@@ -60,11 +60,11 @@ describe('resolveDepth（深度分类回归：原实现按色值比部门名，�
     test('DEPT_DEPTH 覆盖全部 7 个部门，且取值合法', () => {
         const valid = new Set(['macro', 'meso', 'micro']);
         expect(Object.keys(DEPT_DEPTH)).toHaveLength(7);
-        for (const [dept, depth] of Object.entries(DEPT_DEPTH)) {
-            expect(DEPT_ICONS[dept], `部门 ${dept} 缺少图标`).toBeTruthy();
-            expect(DEPT_COLORS[dept], `部门 ${dept} 缺少颜色`).toBeTruthy();
-            expect(valid.has(depth), `部门 ${dept} 深度非法: ${depth}`).toBe(true);
-        }
+        const entries = Object.entries(DEPT_DEPTH);
+        // 失败时直接列出问题项（不用 expect 的第二参数——vitest/valid-expect 不允许）
+        expect(entries.filter(([d]) => !DEPT_ICONS[d]).map(([d]) => d)).toEqual([]);
+        expect(entries.filter(([d]) => !DEPT_COLORS[d]).map(([d]) => d)).toEqual([]);
+        expect(entries.filter(([, depth]) => !valid.has(depth)).map(([d, depth]) => `${d}:${depth}`)).toEqual([]);
     });
 });
 

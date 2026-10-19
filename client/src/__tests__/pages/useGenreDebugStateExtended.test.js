@@ -98,10 +98,14 @@ describe('useGenreDebugState', () => {
     });
 
     test('handleSave does nothing without editData', async () => {
+        const { useMutation } = await import('@tanstack/react-query');
         const { default: useGenreDebugState } = await import('../../pages/genre-debug/useGenreDebugState');
         const { result } = renderHook(() => useGenreDebugState());
         act(() => { result.current.handleSave(); });
-        // No error thrown, mutation not called
+        // 真断言：saveMutation.mutate 必须没被调用（原测试只写注释，等于什么都没验）
+        const mutates = useMutation.mock.results.map(r => r.value && r.value.mutate).filter(Boolean);
+        expect(mutates.length).toBeGreaterThan(0);
+        mutates.forEach(m => expect(m).not.toHaveBeenCalled());
     });
 
     test('genres defaults to empty array', async () => {

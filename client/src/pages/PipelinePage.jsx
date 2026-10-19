@@ -4,7 +4,6 @@ import GenreConstraintsBar from './pipeline/GenreConstraintsBar';
 import PipelineSettingsPanel from './pipeline/PipelineSettingsPanel';
 import ChapterListPanel from './pipeline/ChapterListPanel';
 
-/* eslint-disable max-lines-per-function */
 import PipelineLogViewer from './pipeline/PipelineLogViewer';
 import ChapterContentViewer from './pipeline/ChapterContentViewer';
 import OutputViewer from './pipeline/OutputViewer';

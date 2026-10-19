@@ -13,7 +13,7 @@ const PALETTE = ['#00c8ff', '#a29bfe', '#4ecdc4', '#ffd700', '#ff6b9d', '#ff9f43
 
 /** 世界名归一：去掉括号/斜杠后缀（"苍生界（…）"→"苍生界"），用于合并同一世界的多次描述 */
 export function baseWorldName(name) {
-    const s = String(name || '').split(/[（(]/)[0].split(/[\/／]/)[0].trim();
+    const s = String(name || '').split(/[（(]/)[0].split(/[/／]/)[0].trim();
     return s || '未命名世界';
 }
 

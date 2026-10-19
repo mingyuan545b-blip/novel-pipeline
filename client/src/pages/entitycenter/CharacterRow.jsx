@@ -1,7 +1,8 @@
 /**
  * CharacterRow.jsx — 单个角色行（按等级分级显示：主角醒目 / 配角次之 / NPC 收敛）
  */
-import { GenerativeAvatar, handleCardKey } from './UiComponents';
+import { GenerativeAvatar } from './UiComponents';
+import { handleCardKey } from './uiHelpers';
 import { ROLE_COLORS, ROLE_LABELS } from './constants';
 import { RoleBadge, WorldScopeBadge, formatTime } from './CharacterDetail';
 

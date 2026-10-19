@@ -14,11 +14,10 @@ describe('settingsConstants', () => {
         });
 
         it('should have defaultModel for each provider', () => {
-            PROVIDER_LIST.forEach(p => {
-                if (p.key !== 'custom') {
-                    expect(p.defaultModel).toBeTruthy();
-                }
-            });
+            const nonCustom = PROVIDER_LIST.filter(p => p.key !== 'custom');
+            expect(nonCustom.length).toBeGreaterThan(0);
+            const missing = nonCustom.filter(p => !p.defaultModel).map(p => p.key);
+            expect(missing).toEqual([]);   // 失败时直接列出缺 defaultModel 的 provider
         });
 
         it('should have models array for each provider', () => {

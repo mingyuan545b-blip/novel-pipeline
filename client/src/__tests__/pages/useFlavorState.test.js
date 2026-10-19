@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { createWrapper } from '../helpers/testUtils';
 import useAppStore from '../../store/useAppStore';
 
@@ -42,12 +42,30 @@ describe('useFlavorState', () => {
         expect(result.current.editingFlavor).toBe(false);
     });
 
-    test('loads flavor options', async () => {
+    test('loads flavor options（5 类选项都真的拉到并写进 state）', async () => {
+        const api = await import('../../services/api');
+        api.flavorsApi.getDialects.mockResolvedValue({ data: [{ id: 'd1' }] });
+        api.flavorsApi.getNamingStyles.mockResolvedValue({ data: [{ id: 'n1' }] });
+        api.flavorsApi.getStyles.mockResolvedValue({ data: [{ id: 's1' }] });
+        api.flavorsApi.getWorldviewTemplates.mockResolvedValue({ data: [{ id: 'w1' }] });
+        api.flavorsApi.getSystemPersonas.mockResolvedValue({ data: [{ id: 'p1' }] });
+
         const { result } = renderHook(
             () => useFlavorState({ currentProject: { id: 'p1' }, setProjects: vi.fn(), showError: vi.fn() }),
             { wrapper: createWrapper() }
         );
         await act(async () => { await result.current.loadFlavorOptions(); });
+
+        await waitFor(() => expect(result.current.flavorDialects).toEqual([{ id: 'd1' }]));
+        expect(result.current.flavorNamingStyles).toEqual([{ id: 'n1' }]);
+        expect(result.current.flavorSpeechStyles).toEqual([{ id: 's1' }]);
+        expect(result.current.worldviewTemplates).toEqual([{ id: 'w1' }]);
+        expect(result.current.systemPersonas).toEqual([{ id: 'p1' }]);
+        expect(api.flavorsApi.getDialects).toHaveBeenCalled();
+        expect(api.flavorsApi.getNamingStyles).toHaveBeenCalled();
+        expect(api.flavorsApi.getStyles).toHaveBeenCalled();
+        expect(api.flavorsApi.getWorldviewTemplates).toHaveBeenCalled();
+        expect(api.flavorsApi.getSystemPersonas).toHaveBeenCalled();
     });
 
     test('starts edit flavor', () => {

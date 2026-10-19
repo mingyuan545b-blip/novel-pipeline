@@ -40,13 +40,21 @@ describe('useFranchiseProductState', () => {
         expect(result.current.selectedCharacters).not.toContain('char-1');
     });
 
-    it('should select all characters', () => {
+    it('should select all characters（全选/再点一次全不选）', async () => {
+        franchiseApi.getCharacters.mockResolvedValue({
+            data: { data: { characters: [{ id: 'c1', name: '甲' }, { id: 'c2', name: '乙' }] } }
+        });
         const { result } = renderHook(() =>
             useFranchiseProductState(mockLoadProjects, mockLoadFranchises, mockSelectProject, mockShowError)
         );
-        act(() => {
-            result.current.availableCharacters = [{ id: 'c1' }, { id: 'c2' }];
-        });
+        await act(async () => { await result.current.openCreateProduct('fr-1'); });
+        expect(result.current.availableCharacters.map(c => c.id)).toEqual(['c1', 'c2']);
+
+        act(() => { result.current.selectAllCharacters(); });
+        expect(result.current.selectedCharacters).toEqual(['c1', 'c2']);
+
+        act(() => { result.current.selectAllCharacters(); });
+        expect(result.current.selectedCharacters).toEqual([]);
     });
 
     it('should open create product and load characters', async () => {

@@ -17,6 +17,17 @@ vi.mock('../../services/api', () => ({
 describe('useGenreDebugState', () => {
     beforeEach(() => vi.clearAllMocks());
 
+    /** 进入编辑态：选题材 → flush mock 查询 → handleReset 生成 editData。
+     *  返回后 editData 必然非空（断言在调用处，不再用 if 把断言藏起来）。 */
+    async function renderInEditMode() {
+        const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
+        act(() => { result.current.handleSelectGenre('urban-sweet'); });
+        await act(async () => { await new Promise(r => setTimeout(r, 0)); });
+        act(() => { result.current.handleReset(); });
+        expect(result.current.editData).not.toBeNull();
+        return result;
+    }
+
     test('initializes with default state', () => {
         const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
         expect(result.current.selectedGenreId).toBeNull();
@@ -49,55 +60,37 @@ describe('useGenreDebugState', () => {
     });
 
     test('handleAddConstraint adds to editData', async () => {
-        const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
-        act(() => { result.current.handleSelectGenre('urban-sweet'); });
-        await act(async () => { await new Promise(r => setTimeout(r, 100)); });
-        if (result.current.editData) {
-            const prevLen = result.current.editData.constraints.length;
-            act(() => { result.current.handleAddConstraint(); });
-            expect(result.current.editData.constraints.length).toBe(prevLen + 1);
-        }
+        const result = await renderInEditMode();
+        const prevLen = result.current.editData.constraints.length;
+        act(() => { result.current.handleAddConstraint(); });
+        expect(result.current.editData.constraints.length).toBe(prevLen + 1);
     });
 
     test('handleRemoveConstraint removes from editData', async () => {
-        const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
-        act(() => { result.current.handleSelectGenre('urban-sweet'); });
-        await act(async () => { await new Promise(r => setTimeout(r, 100)); });
-        if (result.current.editData && result.current.editData.constraints.length > 0) {
-            const prevLen = result.current.editData.constraints.length;
-            act(() => { result.current.handleRemoveConstraint(0); });
-            expect(result.current.editData.constraints.length).toBe(prevLen - 1);
-        }
+        const result = await renderInEditMode();
+        expect(result.current.editData.constraints.length).toBeGreaterThan(0);
+        const prevLen = result.current.editData.constraints.length;
+        act(() => { result.current.handleRemoveConstraint(0); });
+        expect(result.current.editData.constraints.length).toBe(prevLen - 1);
     });
 
     test('handleConstraintChange updates constraint field', async () => {
-        const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
-        act(() => { result.current.handleSelectGenre('urban-sweet'); });
-        await act(async () => { await new Promise(r => setTimeout(r, 100)); });
-        if (result.current.editData && result.current.editData.constraints.length > 0) {
-            act(() => { result.current.handleConstraintChange(0, 'label', 'updated'); });
-            expect(result.current.editData.constraints[0].label).toBe('updated');
-        }
+        const result = await renderInEditMode();
+        expect(result.current.editData.constraints.length).toBeGreaterThan(0);
+        act(() => { result.current.handleConstraintChange(0, 'label', 'updated'); });
+        expect(result.current.editData.constraints[0].label).toBe('updated');
     });
 
     test('handleAddFoundationRule adds rule', async () => {
-        const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
-        act(() => { result.current.handleSelectGenre('urban-sweet'); });
-        await act(async () => { await new Promise(r => setTimeout(r, 100)); });
-        if (result.current.editData) {
-            const prevLen = result.current.editData.foundationRules.length;
-            act(() => { result.current.handleAddFoundationRule(); });
-            expect(result.current.editData.foundationRules.length).toBe(prevLen + 1);
-        }
+        const result = await renderInEditMode();
+        const prevLen = result.current.editData.foundationRules.length;
+        act(() => { result.current.handleAddFoundationRule(); });
+        expect(result.current.editData.foundationRules.length).toBe(prevLen + 1);
     });
 
     test('handleStyleChange updates style profile', async () => {
-        const { result } = renderHook(() => useGenreDebugState(), { wrapper: createWrapper() });
-        act(() => { result.current.handleSelectGenre('urban-sweet'); });
-        await act(async () => { await new Promise(r => setTimeout(r, 100)); });
-        if (result.current.editData) {
-            act(() => { result.current.handleStyleChange('tone', 'cool'); });
-            expect(result.current.editData.styleProfile.tone).toBe('cool');
-        }
+        const result = await renderInEditMode();
+        act(() => { result.current.handleStyleChange('tone', 'cool'); });
+        expect(result.current.editData.styleProfile.tone).toBe('cool');
     });
 });

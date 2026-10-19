@@ -1,4 +1,5 @@
-import { GenerativeAvatar, RadialProgress, RarityBadge, handleCardKey } from './UiComponents';
+import { GenerativeAvatar, RadialProgress, RarityBadge } from './UiComponents';
+import { handleCardKey } from './uiHelpers';
 import { GROWTH_COLORS, SERVANT_LABELS } from './constants';
 import CategoryBrowser from './CategoryBrowser';
 import {
