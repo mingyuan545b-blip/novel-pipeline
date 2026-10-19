@@ -48,9 +48,13 @@ describe('healthDeepRoutes (Q5)', () => {
     });
 
     describe('checkMemory', () => {
-        test('返回内存使用信息', () => {
+        test('返回内存使用信息（ok 取决于 RSS 阈值，属环境相关：只断言自洽性）', () => {
             const result = checkMemory();
-            expect(result.ok).toBe(true);
+            // 不能断言 ok===true：CI runner / 并行 worker 的 RSS 可能超过阈值（真 CI 首跑即因此变红）
+            // ok=false 时必须给出 warning（阈值逻辑自洽）——不写条件内 expect（jest/no-conditional-expect）
+            const okOrWarned = result.ok !== false || /exceeds/.test(String(result.warning || ''));
+            expect(typeof result.ok).toBe('boolean');
+            expect(okOrWarned).toBe(true);
             expect(result.source).toBe('memory');
             expect(result.rss).toBeGreaterThan(0);
             expect(result.rssMB).toBeGreaterThan(0);
