@@ -11,6 +11,13 @@
 
 ## 一、当前状态（只保留最新一条）
 
+- **2026-10-20 · 真 CI 全绿（11/11）+ 批次 F 死代码清理**：仓库转公开后 runner 恢复，最后一次推送
+  **11 个 job 全 success**（含 `gates` 自研门禁全链 32 步、`frontend-lint`）。批次 F 按用户定调
+  "不是为了业务写的代码全删"执行：删 21 个零消费者服务端模块（≈1600 行）、4 个前端 hook/store、
+  312 行发布模块死副本、21 个死测试文件、无用的 supervisor/checklist 工具、`franchise-materials` 只写不读通道；
+  **意外收获**：`server/tests` 下 15 个套件"能跑却从不跑"（假覆盖 156 例）→ 14 个已迁入 `tests/unit` 变真保护。
+  铁律「写代码前先答：这段代码是为谁写的」已写入用户级记忆 + 项目四处。
+  → 详情：`docs/worklog/2026-10-19-批次E-门禁可信化施工.md` §六~§八
 - **2026-10-19 · 真 CI 打通（E6）**：gh 2.102.0 便携安装 + SSH 密钥 + 私有仓库
   `mingyuan545b-blip/novel-pipeline`（本机 github.com:443 被墙，走 api.github.com + SSH:22）。
   推送即触发 CI。**首跑 4 个 job 红**，暴露三处"本地能跑、干净环境必挂"：①`uuid`/`multer` 只声明在
