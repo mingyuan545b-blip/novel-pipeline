@@ -32,7 +32,7 @@ class MaterialLifecycleService {
                     await store.setItem('materials', candidate.id, { ...mat, isArchived: true, archivedAt: new Date().toISOString(), archivedReason: `${candidate.refGap}章未引用` });
                     archived.push(candidate.id);
                 }
-            } catch (_) { logger.warn('materialLifecycleSer', _.message || _); }
+            } catch (_) { logger.warn('materialLifecycleSer', _.message || _); }  // DEGRADE: 影响=store.getItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
         logger.info('materialLifecycle', `Archived ${archived.length} stale materials in project ${projectId}`);
         return archived;

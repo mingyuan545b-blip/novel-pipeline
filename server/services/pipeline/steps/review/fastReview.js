@@ -30,7 +30,7 @@ async function handleFastReview(params) {
         if (constraintsText) {
             _fastConstraintsSection = `\n\n【行为约束（审核依据——检查正文是否违反行为规则）】\n${constraintsText}`;
         }
-    } catch (_) { logger.warn('fastReview', _.message || _); }
+    } catch (_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=loadReviewEntityData 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 视角规则明确引用：避免审核员自行提高标准或脑补"第三人称限知"等未定义约束
     // 统一构建器：povRuleSectionBuilder.js，包含完整判定标准（违规示例+合规示例）
@@ -50,7 +50,7 @@ async function handleFastReview(params) {
         logger.warn('fastReview', `fast-review HARD BLOCK: ${wcBlocks.map(b => b.title).join('; ')}`);
         const revIdWC = uuidv4();
         await store.setItem('reviews', revIdWC, { id: revIdWC, chapterId, projectId, step: 'fast-review', type: 'fast-review', reviewer: 'word-count-gate', result: { passed: false }, passed: false, content: wcBlocks.map(b => b.description).join('；'), issues: wcBlocks, suggestions: [], round, createdAt: new Date().toISOString() });
-        try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'fast-review', result: { response: '' }, passed: false, feedback: { passed: false, summary: `硬性检测拦截：${wcBlocks.map(b => b.title).join('；')}`, issues: wcBlocks, suggestions: [], _hardBlock: true }, chapter };
     }
 
@@ -65,18 +65,18 @@ async function handleFastReview(params) {
         logger.warn('fastReview', 'fast-review returned empty response - defaulting to NOT passed');
         const revIdFEmpty = uuidv4();
         await store.setItem('reviews', revIdFEmpty, { id: revIdFEmpty, chapterId, projectId, step: 'fast-review', type: 'fast-review', reviewer: 'fast-review-agent', result: { passed: false, summary: '快审员返回空响应，默认未通过' }, passed: false, content: '快审员返回空响应，默认未通过', issues: [{ desc: '快审Agent返回空响应', severity: 'critical' }], suggestions: ['请检查LLM API配置'], round, createdAt: new Date().toISOString() });
-        try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'fast-review', result, passed: false, roundFailed: true, feedbackPart: '【快审空响应】审核Agent未返回有效结果', chapter };
     }
 
     const parsed = _parseFastReviewResult(result, projectId, chapterId, round, chapter, ctx);
     if (parsed) return parsed;
 
-    try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
-    try { _checkCharacterNames(chapter, ctx); } catch(_) { logger.warn('fastReview', _.message || _); }
+    try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { _checkCharacterNames(chapter, ctx); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=_checkCharacterNames 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     let fastPassFeedback = { passed: true, summary: '快审通过', issues: [], suggestions: [] };
-    try { const p = extractJSON(result.response); if (p) fastPassFeedback = { passed: true, summary: p.summary || '快审通过', issues: p.issues || [], suggestions: p.suggestions || [] }; } catch(_) { logger.warn('fastReview', _.message || _); }
+    try { const p = extractJSON(result.response); if (p) fastPassFeedback = { passed: true, summary: p.summary || '快审通过', issues: p.issues || [], suggestions: p.suggestions || [] }; } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=extractJSON 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return { step: 'fast-review', result, passed: true, feedback: fastPassFeedback, chapter };
 }
 
@@ -90,16 +90,16 @@ async function _parseFastReviewResult(result, projectId, chapterId, round, chapt
             const criticalIssues = (parsed.issues || []).filter(i => i.severity === 'critical');
             if (criticalIssues.length === 0 && round >= 2) {
                 logger.info('fastReview', `fast-review round ${round}: no critical issues, auto-passing`);
-                try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+                try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                 return { step: 'fast-review', result, passed: true, feedback: { passed: true, summary: `快审自动通过（R${round}无critical问题）`, issues: [], suggestions: parsed.suggestions || [] }, chapter };
             }
-            try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+            try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             chapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, chapter);
             return { step: 'fast-review', result, passed: false, feedback: parsed, chapter };
         }
         // parsed.passed === true: return success result
-        try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'fast-review', result, passed: true, feedback: { passed: true, summary: parsed.summary || '快审通过', issues: parsed.issues || [], suggestions: parsed.suggestions || [] }, chapter };
     } catch (e) {
         logger.warn('fastReview', 'fast-review JSON parse failed, fallback to markdown');
@@ -111,13 +111,13 @@ async function _parseFastReviewResult(result, projectId, chapterId, round, chapt
         const revIdFRfb = uuidv4();
         await store.setItem('reviews', revIdFRfb, { id: revIdFRfb, chapterId, projectId, step: 'fast-review', type: 'fast-review', reviewer: 'fast-review-agent', result: fallbackFeedback, passed: fallbackPassed, content: fallbackFeedback.summary, issues: fallbackFeedback.issues, suggestions: [], round, createdAt: new Date().toISOString() });
         if (!fallbackPassed) {
-            try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+            try { getMetrics(projectId).recordAgentPassRate('fast-review', false, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             chapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, chapter);
             return { step: 'fast-review', result, passed: false, feedback: fallbackFeedback, chapter };
         }
         // fallbackPassed === true: markdown review passed
-        try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('fast-review', true, chapter.chapterNumber); } catch(_) { logger.warn('fastReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'fast-review', result, passed: true, feedback: fallbackFeedback, chapter };
     }
 }

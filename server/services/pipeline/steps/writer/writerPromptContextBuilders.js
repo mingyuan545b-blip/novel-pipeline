@@ -28,7 +28,7 @@ async function _buildTimeline(ctx, chapter) {
     try {
         const timelineSummary = await ctx.getTimelineSummary(chapter.chapterNumber, 5, 800);
         if (timelineSummary) return `\n\n${timelineSummary}\n【时间线规则】本章事件必须与前章时间线保持连贯，不得出现时间矛盾。主线时间线事件必须延续推进，不得遗忘或跳过。`;
-    } catch (_) { logger.warn('writerPrompt', _.message || _); }
+    } catch (_) { logger.warn('writerPrompt', _.message || _); }  // DEGRADE: 影响=ctx.getTimelineSummary 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return '';
 }
 
@@ -36,7 +36,7 @@ async function _buildForeshadow(ctx, chapter) {
     try {
         const foreshadowHint = await ctx.getForeshadowHint(chapter.chapterNumber);
         if (foreshadowHint) return `\n\n${foreshadowHint}\n【伏笔规则】必须尊重已有伏笔状态，不得遗忘或矛盾。超期伏笔优先推进。`;
-    } catch (_) { logger.warn('writerPrompt', _.message || _); }
+    } catch (_) { logger.warn('writerPrompt', _.message || _); }  // DEGRADE: 影响=ctx.getForeshadowHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return '';
 }
 
@@ -44,7 +44,7 @@ async function _buildCharacterActivity(ctx, chapter) {
     try {
         const activityHint = await ctx.getCharacterActivityHint(chapter.chapterNumber);
         if (activityHint) return `\n\n${activityHint}`;
-    } catch (_) { logger.warn('writerPrompt', _.message || _); }
+    } catch (_) { logger.warn('writerPrompt', _.message || _); }  // DEGRADE: 影响=ctx.getCharacterActivityHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return '';
 }
 
@@ -106,14 +106,14 @@ async function _buildGuardHints(ctx, chapter, outlineText) {
             }
             sections.push(`【📜 任务系统提示 - 主线必须推进，支线可穿插】\n${questText}`);
         }
-    } catch (e) { logger.warn('writerPrompt', 'quests hint:', e.message); }
+    } catch (e) { logger.warn('writerPrompt', 'quests hint:', e.message); }  // DEGRADE: 影响=写手上下文构建 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 1. 战力守卫提示（仅战斗场景注入）
     if (isCombatScene) {
         try {
             const hint = await ctx.getPowerCheckHint(chapterNum);
             if (hint) sections.push(`【⚔️ 战力守卫提示 - 必须遵守战力边界】\n${hint}`);
-        } catch (e) { logger.warn('writerPrompt', 'power guard hint:', e.message); }
+        } catch (e) { logger.warn('writerPrompt', 'power guard hint:', e.message); }  // DEGRADE: 影响=ctx.getPowerCheckHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     // 2. 伏笔检查提示（仅涉及伏笔的章节注入）
@@ -121,7 +121,7 @@ async function _buildGuardHints(ctx, chapter, outlineText) {
         try {
             const hint = await ctx.getForeshadowCheckHint(chapterNum);
             if (hint) sections.push(`【📌 伏笔状态提示 - 禁止重复埋设已回收伏笔】\n${hint}`);
-        } catch (e) { logger.warn('writerPrompt', 'foreshadow guard hint:', e.message); }
+        } catch (e) { logger.warn('writerPrompt', 'foreshadow guard hint:', e.message); }  // DEGRADE: 影响=ctx.getForeshadowCheckHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     // 3. 角色弧线守卫提示（仅角色发展章节注入）
@@ -129,7 +129,7 @@ async function _buildGuardHints(ctx, chapter, outlineText) {
         try {
             const hint = await ctx.getCharacterArcCheckHint(chapterNum);
             if (hint) sections.push(`【🎭 角色弧线提示 - 必须符合角色发展轨迹】\n${hint}`);
-        } catch (e) { logger.warn('writerPrompt', 'character arc hint:', e.message); }
+        } catch (e) { logger.warn('writerPrompt', 'character arc hint:', e.message); }  // DEGRADE: 影响=ctx.getCharacterArcCheckHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     // 4. 时间线矛盾检测（所有章节都注入，基础约束）
@@ -139,7 +139,7 @@ async function _buildGuardHints(ctx, chapter, outlineText) {
             const conflictText = conflicts.map(c => `  - ${c.description || c.message || JSON.stringify(c)}`).join('\n');
             sections.push(`【⏰ 时间线矛盾警告 - 必须避免以下矛盾】\n${conflictText}`);
         }
-    } catch (e) { logger.warn('writerPrompt', 'timeline conflict:', e.message); }
+    } catch (e) { logger.warn('writerPrompt', 'timeline conflict:', e.message); }  // DEGRADE: 影响=ctx.detectTimelineConflicts 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 5. 长线审计（仅当shouldRunAudit返回true时执行，通常每5章一次）
     try {
@@ -151,7 +151,7 @@ async function _buildGuardHints(ctx, chapter, outlineText) {
                 if (text) sections.push(`【🔍 长线一致性审计 - 必须修复以下问题】\n${text}`);
             }
         }
-    } catch (e) { logger.warn('writerPrompt', 'full audit:', e.message); }
+    } catch (e) { logger.warn('writerPrompt', 'full audit:', e.message); }  // DEGRADE: 影响=if 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 6. 跨章重复检测（所有章节都注入，基础约束）
     try {
@@ -166,7 +166,7 @@ async function _buildGuardHints(ctx, chapter, outlineText) {
                 sections.push(`【🔁 跨章重复警告 - 禁止逐字复制上一章内容】\n与上一章存在${result.repeatedCount}处相似段落(重叠率${(result.overlapScore * 100).toFixed(0)}%)，必须改写或删除`);
             }
         }
-    } catch (e) { logger.warn('writerPrompt', 'cross chapter repetition:', e.message); }
+    } catch (e) { logger.warn('writerPrompt', 'cross chapter repetition:', e.message); }  // DEGRADE: 影响=ctx.getChapters 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     if (sections.length === 0) return '';
     return `\n\n【🛡️ 审核守卫提示 - 创作时必须遵守，违反将被退回】\n${sections.join('\n\n')}`;

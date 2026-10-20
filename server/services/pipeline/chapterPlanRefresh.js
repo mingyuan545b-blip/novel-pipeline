@@ -116,7 +116,7 @@ async function refreshNearOutline(projectId, chapterNumber, options = {}) {
         // 失败不阻断：保留粗纲继续开写，但留下故障锚点（谁在哪一步坏了能一眼定位）
         chapter.outlineRefineFailed = `[就近细纲刷新失败] ${e.message}`;
         chapter.updatedAt = new Date().toISOString();
-        try { await store.setItem('chapters', chapter.id, chapter); } catch (persistErr) { logger.warn('chapterPlanRefresh', `失败标记落盘失败: ${persistErr.message}`); }
+        try { await store.setItem('chapters', chapter.id, chapter); } catch (persistErr) { logger.warn('chapterPlanRefresh', `失败标记落盘失败: ${persistErr.message}`); }  // DEGRADE: 影响=store.setItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         logger.error('chapterPlanRefresh', `第${chapterNumber}章就近细纲刷新失败，保留远景粗纲开写: ${e.message}`, { chapterNumber });
         if (typeof options.onStep === 'function') options.onStep({ step: 'near-outline', status: 'warning', summary: `第${chapterNumber}章就近细纲刷新失败，改用远景粗纲：${e.message}` });
         return { ok: false, error: e.message, keptFar: true };

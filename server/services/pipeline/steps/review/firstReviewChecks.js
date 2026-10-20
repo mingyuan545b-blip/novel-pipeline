@@ -42,20 +42,20 @@ async function collectWritingTechniqueHints(chapter, ctx, project) {
             if (hookHint) hints += `\n${hookHint}`;
             const phraseHint = buildPhraseTemplateHint(recentChapters);
             if (phraseHint) hints += `\n${phraseHint}`;
-        } catch (e) { logger.warn('firstReview', 'cross-chapter check:', e.message || e); }
-    } catch (e) { logger.warn('firstReview', e.message || e); }
+        } catch (e) { logger.warn('firstReview', 'cross-chapter check:', e.message || e); }  // DEGRADE: 影响=跨章检查日志 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=初审提示收集 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
-    try { const conflicts = await ctx.detectTimelineConflicts(chapter.chapterNumber); if (conflicts.length > 0) hints += `\n【时间线矛盾检测】发现${conflicts.length}处时间矛盾：${conflicts.map(c => c.description).join('；')}`; } catch (e) { logger.warn('firstReview', e.message || e); }
-    try { const h = await ctx.getPowerCheckHint(chapter.chapterNumber); if (h) hints += `\n${h}`; } catch (e) { logger.warn('firstReview', e.message || e); }
-    try { const h = await ctx.getForeshadowCheckHint(chapter.chapterNumber); if (h) hints += `\n${h}`; } catch (e) { logger.warn('firstReview', e.message || e); }
-    try { const h = await ctx.getCharacterArcCheckHint(chapter.chapterNumber); if (h) hints += `\n${h}`; } catch (e) { logger.warn('firstReview', e.message || e); }
-    try { if (ctx.shouldRunAudit(chapter.chapterNumber)) { const report = await ctx.runFullAudit(chapter.chapterNumber); const { consistencyAuditService } = require('../../../consistencyAuditService'); const text = consistencyAuditService.formatAuditReport(report); if (text && !report.summary.passed) hints += `\n\n${text}`; } } catch (e) { logger.warn('firstReview', e.message || e); }
+    try { const conflicts = await ctx.detectTimelineConflicts(chapter.chapterNumber); if (conflicts.length > 0) hints += `\n【时间线矛盾检测】发现${conflicts.length}处时间矛盾：${conflicts.map(c => c.description).join('；')}`; } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.detectTimelineConflicts 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { const h = await ctx.getPowerCheckHint(chapter.chapterNumber); if (h) hints += `\n${h}`; } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.getPowerCheckHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { const h = await ctx.getForeshadowCheckHint(chapter.chapterNumber); if (h) hints += `\n${h}`; } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.getForeshadowCheckHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { const h = await ctx.getCharacterArcCheckHint(chapter.chapterNumber); if (h) hints += `\n${h}`; } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.getCharacterArcCheckHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { if (ctx.shouldRunAudit(chapter.chapterNumber)) { const report = await ctx.runFullAudit(chapter.chapterNumber); const { consistencyAuditService } = require('../../../consistencyAuditService'); const text = consistencyAuditService.formatAuditReport(report); if (text && !report.summary.passed) hints += `\n\n${text}`; } } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=if 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 配角反工具人化检测（检测内心描写/自主决策/反预期行为是否缺失）
     try {
         const depthHint = await buildSupportingDepthHint(ctx.projectId, chapter.chapterNumber);
         if (depthHint) hints += `\n${depthHint}`;
-    } catch (e) { logger.warn('firstReview', `supporting depth: ${e.message}`); }
+    } catch (e) { logger.warn('firstReview', `supporting depth: ${e.message}`); }  // DEGRADE: 影响=buildSupportingDepthHint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return hints;
 }
@@ -106,7 +106,7 @@ async function collectMetaConstraintIssues(content, chapter, ctx) {
                 });
             }
         }
-    } catch (e) { logger.warn('firstReview', 'meta-constraint: ' + (e.message || e)); }
+    } catch (e) { logger.warn('firstReview', 'meta-constraint: ' + (e.message || e)); }  // DEGRADE: 影响=初审附加检查 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return issues;
 }
 
@@ -122,11 +122,11 @@ async function runHardBlockChecks(chapter, ctx, projectId) {
         if (metadataLeak.count > 0) { const notAllowable = metadataLeak.instances.filter(l => !l.allowable); if (notAllowable.length > 0) hardBlockIssues.push({ severity: 'critical', description: `管线元数据泄露：发现${notAllowable.length}处问题词汇`, title: '管线元数据泄露' }); }
 
         let crossChapterDup = null;
-        try { const allChapters = await ctx.getChapters(); const prev = allChapters.filter(c => c.chapterNumber === chapter.chapterNumber - 1 && c.content && (c.status === STATUS_VALUES.MATERIAL_UPDATED || c.status === STATUS_VALUES.APPROVED)).sort((a, b) => b.chapterNumber - a.chapterNumber)[0]; if (prev) crossChapterDup = detectCrossChapterRepetition(content, prev.content); } catch (e) { logger.warn('firstReview', e.message || e); }
+        try { const allChapters = await ctx.getChapters(); const prev = allChapters.filter(c => c.chapterNumber === chapter.chapterNumber - 1 && c.content && (c.status === STATUS_VALUES.MATERIAL_UPDATED || c.status === STATUS_VALUES.APPROVED)).sort((a, b) => b.chapterNumber - a.chapterNumber)[0]; if (prev) crossChapterDup = detectCrossChapterRepetition(content, prev.content); } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.getChapters 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         if (crossChapterDup?.hasRepetition) warningIssues.push({ severity: 'high', description: `跨章重复：与上一章存在${crossChapterDup.repeatedCount}处相似段落`, title: '跨章内容重复' });
 
         let sensitiveBlock = false; let sensitiveHits = [];
-        try { const scanResult = scanSensitiveWords(content); const blockHits = scanResult.hits.filter(h => h.severity === 'block'); if (blockHits.length > 0) { sensitiveBlock = true; sensitiveHits = blockHits; } } catch (e) { logger.warn('firstReview', e.message || e); }
+        try { const scanResult = scanSensitiveWords(content); const blockHits = scanResult.hits.filter(h => h.severity === 'block'); if (blockHits.length > 0) { sensitiveBlock = true; sensitiveHits = blockHits; } } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=scanSensitiveWords 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         // 对齐审计系统（auditMethods/hardBlockChecks均带命中词）：反馈必须含具体词，
         // 否则返修员无从定位修改（2026-09-06实测：不含词的反馈导致reviser两轮修复无效）
         if (sensitiveBlock) hardBlockIssues.push({ severity: 'critical', description: `敏感词拦截：发现${sensitiveHits.length}处block级敏感词：${sensitiveHits.slice(0, 5).map(h => `"${h.word}"`).join('、')}。必须将这些词所在句子改写为合规表达（保持剧情走向，可用动作替代或侧面描写）。`, title: '敏感词拦截' });
@@ -146,8 +146,8 @@ async function runHardBlockChecks(chapter, ctx, projectId) {
         // F1 修复：T0 元约束（M1–M11）接入 pipeline 初审硬阻断通道
         hardBlockIssues.push(...await collectMetaConstraintIssues(content, chapter, ctx));
 
-        try { const charMats = await ctx.getCharacterMaterials(); const charNames = charMats.filter(m => !m.archived).map(m => m.name).filter(Boolean); if (charNames.length > 0) { const nameResult = detectCharacterNameMismatch(content, charNames); if (nameResult.unknownNames.length > 0) warningIssues.push({ severity: 'medium', description: `可能有未知角色名：${nameResult.unknownNames.slice(0, 5).map(n => `"${n.name}"`).join('、')}`, title: '疑似未知角色名' }); } } catch (e) { logger.warn('firstReview', e.message || e); }
-    } catch (e) { logger.warn('firstReview', e.message || e); }
+        try { const charMats = await ctx.getCharacterMaterials(); const charNames = charMats.filter(m => !m.archived).map(m => m.name).filter(Boolean); if (charNames.length > 0) { const nameResult = detectCharacterNameMismatch(content, charNames); if (nameResult.unknownNames.length > 0) warningIssues.push({ severity: 'medium', description: `可能有未知角色名：${nameResult.unknownNames.slice(0, 5).map(n => `"${n.name}"`).join('、')}`, title: '疑似未知角色名' }); } } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.getCharacterMaterials 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=ctx.getCharacterMaterials 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return { hardBlockIssues, warningIssues };
 }

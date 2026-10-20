@@ -19,7 +19,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(MEME_DIR, file), 'utf8'));
             memeEntries.set(data.id, data);
-        } catch(_) { logger.warn('memeLexicon', _.message || _); }
+        } catch(_) { logger.warn('memeLexicon', _.message || _); }  // DEGRADE: 影响=JSON.parse 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     if (!fs.existsSync(HUMOR_DIR)) return 0;
@@ -28,7 +28,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(HUMOR_DIR, file), 'utf8'));
             humorDevices.set(data.id, data);
-        } catch(_) { logger.warn('memeLexicon', _.message || _); }
+        } catch(_) { logger.warn('memeLexicon', _.message || _); }  // DEGRADE: 影响=JSON.parse 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     return { memes: memeEntries.size, devices: humorDevices.size };

@@ -28,7 +28,7 @@ router.post('/', createChapter, async (req, res) => {
         chapterNumber: req.body.chapterNumber || 1,
         title: req.body.title || `Chapter ${req.body.chapterNumber || 1}`,
         outline: req.body.outline || '', content: req.body.content || '',
-        status: req.body.status || 'outlined',
+        status: req.body.status || STATUS_VALUES.OUTLINED,
         wordCount: req.body.content ? req.body.content.length : 0,
         round: req.body.round || 1,
         writerOutput: req.body.writerOutput || '',
@@ -47,7 +47,7 @@ router.post('/:id/reset', chapterIdParam, async (req, res) => {
 
     const cascade = await cascadeCleanup(chapter.id, chapter.projectId, chapter.chapterNumber, chapter);
 
-    chapter.status = 'outlined'; chapter._reviewRounds = 0; chapter._wordCountRetry = 0;
+    chapter.status = STATUS_VALUES.OUTLINED; chapter._reviewRounds = 0; chapter._wordCountRetry = 0;
     chapter._skipReason = undefined; chapter.round = 0; chapter.wordCount = 0;
     chapter.content = ''; chapter.writerOutput = ''; chapter.firstReviewOutput = '';
     chapter.secondReviewOutput = ''; chapter.finalEditorOutput = '';
@@ -63,7 +63,7 @@ router.post('/:id/reset', chapterIdParam, async (req, res) => {
         await metrics.resetAgentPassRates();
         const cb = getCircuitBreaker(chapter.projectId);
         await cb.reset();
-    } catch (e) { logger.warn('chapters', '[CHAPTERS] Failed to reset metrics/circuitBreaker:', e.message); }
+    } catch (e) { logger.warn('chapters', '[CHAPTERS] Failed to reset metrics/circuitBreaker:', e.message); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     logger.info('chapters', `[CHAPTERS] Reset chapter ${chapter.chapterNumber} (id=${chapter.id}):`, JSON.stringify(cascade));
     res.json({ success: true, resetChapter: chapter.id, cascade });
@@ -88,7 +88,7 @@ router.put('/:id', updateChapter, async (req, res) => {
     }
     await store.setItem('chapters', chapter.id, updated);
     if (updated.status === STATUS_VALUES.APPROVED && req.body.content) {
-        try { saveFinalContent(updated.projectId, updated); } catch (e) { logger.warn('chapters', '[CHAPTERS] Failed to update final content:', e.message); }
+        try { saveFinalContent(updated.projectId, updated); } catch (e) { logger.warn('chapters', '[CHAPTERS] Failed to update final content:', e.message); }  // DEGRADE: 影响=saveFinalContent 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     res.json(updated);
 });

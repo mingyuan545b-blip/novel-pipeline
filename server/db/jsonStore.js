@@ -75,7 +75,7 @@ async function getItem(type, id) {
         const content = fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, '');
         if (!content.trim()) return null;
         return JSON.parse(content);
-    } catch (e) { logger.warn('jsonStore', `[STORE-JSON] Corrupt file on read: ${type}/${id}`, e.message); return null; }
+    } catch (e) { logger.warn('jsonStore', `[STORE-JSON] Corrupt file on read: ${type}/${id}`, e.message); return null; }  // DEGRADE: 影响=fs.readFileSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 async function setItem(type, id, data) {

@@ -38,7 +38,7 @@ function getGenreRoleStrategy(genreId) {
             GENRE_ROLE_STRATEGIES[genreId] = strategy;
             return strategy;
         }
-    } catch (_) { logger.warn('characterStateSchema', '[char-state-schemas]', _.message || _); }
+    } catch (_) { logger.warn('characterStateSchema', '[char-state-schemas]', _.message || _); }  // DEGRADE: 影响=角色状态 Schema 迁移 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return null;
 }
 

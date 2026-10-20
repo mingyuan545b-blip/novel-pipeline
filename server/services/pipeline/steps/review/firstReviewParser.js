@@ -34,7 +34,7 @@ async function parseAndSaveReview(result, chapter, chapterId, projectId, round, 
         });
 
         if (!parsed.passed) {
-            try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }
+            try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             if (hasCriticalBlocker(parsed)) parsed._criticalBlocker = true;
             chapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, chapter);
@@ -68,7 +68,7 @@ async function fallbackMarkdownReview(result, chapter, chapterId, projectId, rou
         round, createdAt: new Date().toISOString()
     });
     if (!fallbackPassed) {
-        try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }
+        try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         if (hasCriticalIssues) fallbackFeedback._criticalBlocker = true;
         chapter.updatedAt = new Date().toISOString();
         await store.setItem('chapters', chapterId, chapter);
@@ -99,7 +99,7 @@ async function buildWriterConstraints(ctx, projectId, chapter, project) {
             }
             sections.push(`【📜 任务系统约束（审核依据——判断主线偏离）】\n${questText}\n审核规则：如发现正文完全偏离主线任务（如主线是寻宝，正文却在谈恋爱且无关联），判定为high`);
         }
-    } catch (e) { logger.warn('firstReview', 'writer constraints quests:', e.message); }
+    } catch (e) { logger.warn('firstReview', 'writer constraints quests:', e.message); }  // DEGRADE: 影响=初审结果解析 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 1. 角色动态状态全量快照（审核员需要知道状态继承规则，才能判断状态倒退）
     try {
@@ -111,7 +111,7 @@ async function buildWriterConstraints(ctx, projectId, chapter, project) {
         if (summary && summary !== '无角色状态数据') {
             sections.push(`【📊 角色状态继承约束（审核依据——判断状态倒退）】\n以下是writer看到的角色状态全量快照，正文必须在此基础上延续：\n${summary}\n审核规则：石化/伤势/中毒等负面状态只能恶化或维持，境界/战力等正面状态只能提升或维持。如发现状态倒退（如石化进度变小、伤势无故消失），判定为critical`);
         }
-    } catch (e) { logger.warn('firstReview', 'writer constraints state:', e.message); }
+    } catch (e) { logger.warn('firstReview', 'writer constraints state:', e.message); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 2. 关系阶段守卫（审核员需要知道关系阶段铁律，才能判断关系越级）
     try {
@@ -120,7 +120,7 @@ async function buildWriterConstraints(ctx, projectId, chapter, project) {
         if (guard) {
             sections.push(`【🔗 关系阶段守卫（审核依据——判断关系越级）】\n以下是writer看到的关系阶段铁律，正文必须遵守：\n${guard}\n审核规则：如发现关系越级（如仇人突然变挚友、陌生人突然表白），判定为critical`);
         }
-    } catch (e) { logger.warn('firstReview', 'writer constraints relationship:', e.message); }
+    } catch (e) { logger.warn('firstReview', 'writer constraints relationship:', e.message); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 3. 叙事桥接（审核员需要知道跳章衔接要求，才能判断衔接质量）
     try {
@@ -129,7 +129,7 @@ async function buildWriterConstraints(ctx, projectId, chapter, project) {
             const bridgeMaterials = await ctx.getNarrativeBridgeMaterials(chapterNum);
             sections.push(`【🌉 叙事桥接约束（审核依据——判断跳章衔接）】\n本章跳过了章节：${skipped.join('、')}\nwriter需要衔接这些跳过章节的事件。\n审核规则：如发现跳过章节的事件未被提及或衔接断裂，判定为high`);
         }
-    } catch (e) { logger.warn('firstReview', 'writer constraints bridge:', e.message); }
+    } catch (e) { logger.warn('firstReview', 'writer constraints bridge:', e.message); }  // DEGRADE: 影响=ctx.getSkippedChapters 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 4. 上一季结局（审核员需要知道跨季承接要求）
     try {
@@ -138,7 +138,7 @@ async function buildWriterConstraints(ctx, projectId, chapter, project) {
         if (prevFinale) {
             sections.push(`【🎬 上一季结局约束（审核依据——判断跨季承接）】\n上一季结局：${prevFinale}\n审核规则：如发现与上一季结局矛盾（如已死角色复活、已销毁物品再现），判定为critical`);
         }
-    } catch (e) { logger.warn('firstReview', 'writer constraints season:', e.message); }
+    } catch (e) { logger.warn('firstReview', 'writer constraints season:', e.message); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     if (sections.length === 0) return '';
     return `\n\n${sections.join('\n\n')}`;

@@ -90,7 +90,7 @@ async function generateInitialMaterials(projectId, userPrompt) {
         for (const mat of materials) {
             if (!mat || !mat.name || !mat.type) continue;
             try { await _saveOneMaterial(projectId, mat, created, allMaterials); saved++; }
-            catch (e) { logger.warn('outlineGen', `saveMaterial failed (${mat.type}/${mat.name}): ${e.message}`); }
+            catch (e) { logger.warn('outlineGen', `saveMaterial failed (${mat.type}/${mat.name}): ${e.message}`); }  // DEGRADE: 影响=_saveOneMaterial 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
         batchResults.push({ batchKey: batch.batchKey, types: batch.types, parsed: materials.length, saved });
     }
@@ -116,13 +116,13 @@ async function generateInitialMaterials(projectId, userPrompt) {
         try {
             const { designCharacterCraft } = require('../craftDesigner');
             craftStats = await designCharacterCraft(projectId, { apply: true, apiConfig });
-        } catch (e) { logger.warn('outlineGen', `craft designer failed: ${e.message}`); }
+        } catch (e) { logger.warn('outlineGen', `craft designer failed: ${e.message}`); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         // 立项四件（叙事承诺）：缺失才生成，注入所有 agent 防"一眼AI文"
         let promiseStats = null;
         try {
             const { designNarrativePromise } = require('../narrativePromiseDesigner');
             promiseStats = await designNarrativePromise(projectId, { apply: true, apiConfig });
-        } catch (e) { logger.warn('outlineGen', `narrative promise failed: ${e.message}`); }
+        } catch (e) { logger.warn('outlineGen', `narrative promise failed: ${e.message}`); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { created, count: created.length, syncedFacts, depthStats, craftStats, narrativePromise: promiseStats, batches: batchResults };
     } catch (e) {
         return { created, count: created.length, batches: batchResults, error: e.message };

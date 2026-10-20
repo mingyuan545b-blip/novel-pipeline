@@ -6,7 +6,7 @@ async function getStyleProfileByKey(key) {
         const profiles = await store.listItems('style-profiles');
         const found = profiles.find(p => p.key === key);
         if (found) return found;
-    } catch(_) { logger.warn('styleInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }
+    } catch(_) { logger.warn('styleInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }  // DEGRADE: 影响=store.listItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return null;
 }
 
@@ -18,7 +18,7 @@ async function getAllStyleProfiles() {
             for (const p of profiles) { map[p.key] = p; }
             return map;
         }
-    } catch(_) { logger.warn('styleInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }
+    } catch(_) { logger.warn('styleInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }  // DEGRADE: 影响=store.listItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return null;
 }
 

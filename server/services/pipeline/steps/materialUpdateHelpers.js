@@ -117,7 +117,7 @@ async function findExistingMaterial(update, projectId, materials) {
                 const fuzzyMatch = storeMats.find(m => { if (m.archived) return false; const mName = (m.name || '').toLowerCase().replace(/[\s\-_··]/g, ''); return mName === updateNameLower || mName.includes(updateNameLower) || updateNameLower.includes(mName); });
                 if (fuzzyMatch) { logger.info('materialUpdateHelp', `findExistingMaterial: 从store模糊匹配到已有角色 "${update.name}" -> "${fuzzyMatch.name}"`); existing = fuzzyMatch; }
             }
-        } catch (_) { logger.warn('materialUpdateHelp', '[material-helpers]', _.message || _); }
+        } catch (_) { logger.warn('materialUpdateHelp', '[material-helpers]', _.message || _); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     return existing;
 }
@@ -150,7 +150,7 @@ async function injectPlaneForCreate(update, chapter, projectId, styleProfile) {
                 update.currentPlaneId = currentVolume.subplaneId;
             }
         }
-    } catch (_) { logger.warn('materialUpdateHelp', _.message || _); }
+    } catch (_) { logger.warn('materialUpdateHelp', _.message || _); }  // DEGRADE: 影响=素材更新落库 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function injectFactionForCharacter(update, projectId, materials) {

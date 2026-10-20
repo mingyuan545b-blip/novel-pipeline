@@ -140,7 +140,7 @@ function _appendSeasonInfo(config, project, chapter, agentContext) {
         }
         const seasonInfo = config.seasons[project.season];
         if (seasonInfo) agentContext.content += `\n\n【📺 当前季信息】第${project.season}季「${seasonInfo.name}」· 本季符咒：${seasonInfo.talismans.join('、')}· 本季暗影：${seasonInfo.shadows.join('、')}`;
-    } catch (e) { logger.warn('writerPrompt', 'talisman season injection failed:', e.message); }
+    } catch (e) { logger.warn('writerPrompt', 'talisman season injection failed:', e.message); }  // DEGRADE: 影响=if 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 async function _appendCrossSeason(projectId, project, chapter, agentContext) {
@@ -149,7 +149,7 @@ async function _appendCrossSeason(projectId, project, chapter, agentContext) {
         const { getPreviousSeasonFinale } = require('../../../projectService');
         const prevFinale = await getPreviousSeasonFinale(projectId);
         if (prevFinale) agentContext.content += `\n\n【📖 上一季结局回顾】第${prevFinale.seasonNumber}季最终章「${prevFinale.lastChapterTitle || '无标题'}」：\n${(prevFinale.lastChapterContent || '').substring(0, 1500)}\n\n本章必须承接上一季的结局和未闭合线索。`;
-    } catch (e) { logger.warn('writerPrompt', 'cross-season continuity injection failed:', e.message); }
+    } catch (e) { logger.warn('writerPrompt', 'cross-season continuity injection failed:', e.message); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function _appendRoundContext(chapter, round, config, context, agentContext) {

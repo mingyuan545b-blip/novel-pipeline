@@ -37,11 +37,11 @@ async function searchTrendingMemes(genre, keywords) {
                     const words = res.data.result.map(r => r[0]).filter(Boolean);
                     results.hotWords.push(...words);
                 }
-            } catch(_) { logger.warn('trendingSearch', _.message || _); }
+            } catch(_) { logger.warn('trendingSearch', _.message || _); }  // DEGRADE: 影响=axios.get 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
 
         results.hotWords = [...new Set(results.hotWords)].slice(0, 20);
-    } catch(_) { logger.warn('trendingSearch', _.message || _); }
+    } catch(_) { logger.warn('trendingSearch', _.message || _); }  // DEGRADE: 影响=趋势检索 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const genreMemes = getGenreDefaultMemes(genre);
     results.memes = genreMemes.memes;

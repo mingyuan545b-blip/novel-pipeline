@@ -97,7 +97,7 @@ class CharacterArcGuard {
                         severity: issue.severity,
                         entityId: issue.entityId
                     });
-                } catch (_) { logger.warn('characterArcGuard', '[arc-guard]', _.message || _); }
+                } catch (_) { logger.warn('characterArcGuard', '[arc-guard]', _.message || _); }  // DEGRADE: 影响=consistencyChecker.recordCheck 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             }
         } catch (err) {
             logger.warn('characterArcGuard', `Character arc check failed for ch${chapterNumber}: ${err.message}`);
@@ -131,7 +131,7 @@ class CharacterArcGuard {
                     arcPhase: (char.genreState || char.baseState?.genreState || {}).arcPhase || ''
                 });
             }
-        } catch (_) { logger.warn('characterArcGuard', '[arc-guard]', _.message || _); }
+        } catch (_) { logger.warn('characterArcGuard', '[arc-guard]', _.message || _); }  // DEGRADE: 影响=角色弧光守卫 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
         return stats.sort((a, b) => {
             const roleOrder = { protagonist: 0, main: 1, supporting: 2, background: 3 };

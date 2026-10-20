@@ -147,7 +147,7 @@ class ForeshadowGuard {
                     severity: fs.severity,
                     entityId: fs.id
                 });
-            } catch (_) { logger.warn('foreshadowGuard', '[foreshadow-guard]', _.message || _); }
+            } catch (_) { logger.warn('foreshadowGuard', '[foreshadow-guard]', _.message || _); }  // DEGRADE: 影响=consistencyChecker.recordCheck 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
 
         return issues;

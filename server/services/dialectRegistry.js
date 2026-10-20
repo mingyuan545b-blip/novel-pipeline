@@ -21,7 +21,7 @@ function startWatcher() {
             }, 500);
         });
         _watcher.on('error', () => {});
-    } catch(_) { logger.warn('dialectRegistry', _.message || _); }
+    } catch(_) { logger.warn('dialectRegistry', _.message || _); }  // DEGRADE: 影响=fs.watch 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function loadAll() {

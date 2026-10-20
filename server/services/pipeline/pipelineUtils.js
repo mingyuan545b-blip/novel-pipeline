@@ -45,7 +45,7 @@ async function checkAlertLoop(projectId) {
     try {
         const cb = getCircuitBreaker(projectId);
         diagnosticReport.circuitBreakerStatus = cb.getStats();
-    } catch(_) { logger.warn('pipelineUtils', _.message || _); }
+    } catch(_) { logger.warn('pipelineUtils', _.message || _); }  // DEGRADE: 影响=getCircuitBreaker 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     for (const alert of alerts) {
         if (['first-review', 'second-review', 'fast-review'].includes(alert.agentType)) {
@@ -127,7 +127,7 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
             selectedBranch,
             reason
         );
-    } catch (e) { logger.warn('pipelineUtils', '[pipeline-utils]', e.message || e); }
+    } catch (e) { logger.warn('pipelineUtils', '[pipeline-utils]', e.message || e); }  // DEGRADE: 影响=metrics.recordBranching 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         createVersionTag(projectId, chapterId, chapter.chapterNumber || 0, (chapter.version || 0) + 1, selectedBranch === 'A' ? contentB : contentA, {
@@ -135,7 +135,7 @@ async function runBranchingWrite(projectId, chapterId, chapter, context, runAgen
             parentTag: null,
             reason: 'branching-unselected'
         });
-    } catch (e) { logger.warn('pipelineUtils', '[pipeline-utils]', e.message || e); }
+    } catch (e) { logger.warn('pipelineUtils', '[pipeline-utils]', e.message || e); }  // DEGRADE: 影响=createVersionTag 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return {
         content: selectedContent,

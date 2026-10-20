@@ -146,12 +146,12 @@ async function queryItems(type, filter) {
     if (dbQuery && filter[dbQuery.key]) {
         const opts = { ...filter }; delete opts[dbQuery.key];
         try { return await dbQuery.fn(filter[dbQuery.key], opts); }
-        catch (_) { logger.warn('store-pg', `${type} DB query failed, falling back`, { error: _.message }); }
+        catch (_) { logger.warn('store-pg', `${type} DB query failed, falling back`, { error: _.message }); }  // DEGRADE: 影响=dbQuery.fn 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     if (type === 'character-state-cache' && filter.projectId && filter.chapterNumber) {
         const opts = { ...filter }; delete opts.projectId; delete opts.chapterNumber;
         try { return await queryCharacterStateCacheDB(filter.projectId, filter.chapterNumber, opts); }
-        catch (_) { logger.warn('store-pg', 'character-state-cache DB query failed, falling back', { error: _.message }); }
+        catch (_) { logger.warn('store-pg', 'character-state-cache DB query failed, falling back', { error: _.message }); }  // DEGRADE: 影响=queryCharacterStateCacheDB 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     return applyFilter(await listItems(type), filter);
 }

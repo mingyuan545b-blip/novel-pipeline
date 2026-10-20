@@ -37,7 +37,7 @@ function findCharNode(nodes, name) {
 
 async function buildRelationshipGraph(projectId) {
     let styleProfile = null;
-    try { const project = await store.getItem('projects', projectId); styleProfile = project?.styleProfile || null; } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }
+    try { const project = await store.getItem('projects', projectId); styleProfile = project?.styleProfile || null; } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }  // DEGRADE: 影响=store.getItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const materials = await store.queryItems('materials', m => m.projectId === projectId && !m.archived);
     const characters = materials.filter(m => m.type === 'character');
@@ -50,7 +50,7 @@ async function buildRelationshipGraph(projectId) {
     }));
 
     let genreId = '';
-    try { const genre = detectGenre(styleProfile); if (genre) genreId = genre.id; } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }
+    try { const genre = detectGenre(styleProfile); if (genre) genreId = genre.id; } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }  // DEGRADE: 影响=detectGenre 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const genreRelationTypes = getGenreRelationTypes(genreId);
     const genreKeywords = getGenreRelationTypeKeywords(genreId);
 
@@ -72,7 +72,7 @@ async function buildRelationshipGraph(projectId) {
     }
 
     let registryIdToName = {};
-    try { const regEntities = await store.queryItems('entity-registry', er => er.projectId === projectId); for (const re of regEntities) { registryIdToName[re.id] = re.name; } } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }
+    try { const regEntities = await store.queryItems('entity-registry', er => er.projectId === projectId); for (const re of regEntities) { registryIdToName[re.id] = re.name; } } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const charRels = await store.queryItems('character-relations', cr => cr.projectId === projectId);
@@ -91,7 +91,7 @@ async function buildRelationshipGraph(projectId) {
                 }
             }
         }
-    } catch (crErr) { logger.warn('relationshipGraphBui', '[KNOWLEDGE] character_relations query failed:', crErr.message); }
+    } catch (crErr) { logger.warn('relationshipGraphBui', '[KNOWLEDGE] character_relations query failed:', crErr.message); }  // DEGRADE: 影响=关系图构建 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const entityRels = await store.queryItems('entity-relations', er => er.projectId === projectId);
@@ -110,13 +110,13 @@ async function buildRelationshipGraph(projectId) {
                 }
             }
         }
-    } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }
+    } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }  // DEGRADE: 影响=关系图节点补全 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const entityRegistry = require('../../services/entityRegistry');
         const regEntities = await entityRegistry.getEntitiesForProject(projectId);
         for (const re of regEntities) { const node = nodes.find(n => n.id === re.id || n.name === re.name); if (node && re.roleLevel) node.role = re.roleLevel; }
-    } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }
+    } catch (_) { logger.warn('relationshipGraphBui', '[graph-builder]', _.message || _); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const snapshot = await stateSnapshot.getSnapshot(projectId);
     if (snapshot?.relationshipStates) {

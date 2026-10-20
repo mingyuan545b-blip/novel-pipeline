@@ -66,7 +66,7 @@ async function handleMaterialRegistrar(params) {
             if (charNames.length > 0 && chapter.content) {
                 await processChapterDepth(projectId, chapterNum, chapter.content, charNames);
             }
-        } catch (depthErr) { logger.warn('materialRegistrar', `depth extract: ${depthErr.message}`); }
+        } catch (depthErr) { logger.warn('materialRegistrar', `depth extract: ${depthErr.message}`); }  // DEGRADE: 影响=filter 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
         await stateKVIndex.updateAfterOperations(projectId, chapterNum, operations);
         await stateKVIndex.clearHotFlags(projectId, chapterNum);
@@ -82,7 +82,7 @@ async function handleMaterialRegistrar(params) {
             try {
                 await characterStateCache.invalidateForProject(projectId);
                 logger.info('materialRegistrar', `CharacterStateCache invalidated after ${charOps.length} character operations in ch${chapterNum}`);
-            } catch (_) { logger.warn('materialRegistrar', '[material-registrar]', _.message || _); }
+            } catch (_) { logger.warn('materialRegistrar', '[material-registrar]', _.message || _); }  // DEGRADE: 影响=characterStateCache.invalidateForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
 
         return {

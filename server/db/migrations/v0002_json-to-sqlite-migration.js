@@ -110,16 +110,16 @@ async function down(db) {
     const tables = ['reviews', 'pipeline_logs', 'infinite_pipeline_state', 'quests', 'timelines'];
     for (const table of tables) {
         try { runSql(db, `DELETE FROM ${table}`); logger.info('migration-v0002', `Rollback: cleared ${table}`); }
-        catch (e) { logger.warn('migration-v0002', `Rollback: could not clear ${table}: ${e.message}`); }
+        catch (e) { logger.warn('migration-v0002', `Rollback: could not clear ${table}: ${e.message}`); }  // DEGRADE: 影响=runSql 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     try { runSql(db, `DELETE FROM kv_store WHERE type IN ('chapter-audits', 'circuit-breakers', 'state-snapshots', 'version-snapshots')`); }
-    catch (e) { logger.warn('migration-v0002', `Rollback: could not clear kv_store: ${e.message}`); }
+    catch (e) { logger.warn('migration-v0002', `Rollback: could not clear kv_store: ${e.message}`); }  // DEGRADE: 影响=runSql 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try { runSql(db, `UPDATE materials SET dialectRegion=NULL, dialectIntensity='medium', speechStyle=NULL, speechStyleIntensity='medium', namingStyle=NULL, namingStyleIntensity='medium', archetype=NULL, currentPlaneId=NULL, isLocked=0, version=1, sourceChapter=NULL`); }
-    catch (e) { logger.warn('migration-v0002', `Rollback: could not reset materials: ${e.message}`); }
+    catch (e) { logger.warn('migration-v0002', `Rollback: could not reset materials: ${e.message}`); }  // DEGRADE: 影响=runSql 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try { runSql(db, `UPDATE chapters SET title='', wordCount=0, round=0`); }
-    catch (e) { logger.warn('migration-v0002', `Rollback: could not reset chapters: ${e.message}`); }
+    catch (e) { logger.warn('migration-v0002', `Rollback: could not reset chapters: ${e.message}`); }  // DEGRADE: 影响=runSql 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try { runSql(db, `UPDATE projects SET mode='novel', targetChapterCount=NULL, targetWordCount=NULL`); }
-    catch (e) { logger.warn('migration-v0002', `Rollback: could not reset projects: ${e.message}`); }
+    catch (e) { logger.warn('migration-v0002', `Rollback: could not reset projects: ${e.message}`); }  // DEGRADE: 影响=runSql 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     logger.info('migration-v0002', 'Data migration rolled back');
 }
 

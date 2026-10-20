@@ -53,7 +53,7 @@ async function parseSecondReviewResult(result, projectId, chapterId, round, chap
         });
 
         if (!parsed.passed) {
-            try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }
+            try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             chapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, chapter);
             return { step: 'second-review', result, passed: false, feedback: parsed, chapter };
@@ -86,7 +86,7 @@ async function fallbackMarkdownReview(result, projectId, chapterId, round, chapt
         round, createdAt: new Date().toISOString()
     });
     if (!fallbackPassed) {
-        try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         chapter.updatedAt = new Date().toISOString();
         await store.setItem('chapters', chapterId, chapter);
         return { step: 'second-review', result, passed: false, feedback: fallbackFeedback, chapter };

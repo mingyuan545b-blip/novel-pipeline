@@ -120,7 +120,7 @@ function createCrudRoutes(pathPrefix, storeType) {
                     const entityCenter = require('../services/entityCenter');
                     const entity = await entityCenter.findEntityByName(existing.projectId, 'character', existing.name);
                     if (entity) await store.deleteItem('entities', entity.id);
-                } catch (_) { logger.warn('entityCenter', _.message || _); }
+                } catch (_) { logger.warn('entityCenter', _.message || _); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             }
             const deleted = await store.deleteItem(storeType, req.params.id);
             if (!deleted) return res.apiError(NOT_FOUND.statusCode, `${storeType} not found`, NOT_FOUND.code);

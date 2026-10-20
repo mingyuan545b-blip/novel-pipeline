@@ -69,7 +69,7 @@ async function detectGenre(projectId) {
         if (project?.genre) return project.genre;
         const styleTemplate = project?.styleTemplateId ? await store.getItem('style-templates', project.styleTemplateId) : null;
         if (styleTemplate?.genre) return styleTemplate.genre;
-    } catch (_) { logger.warn('characterStateExtrac', '[char-state-extractor]', _.message || _); }
+    } catch (_) { logger.warn('characterStateExtrac', '[char-state-extractor]', _.message || _); }  // DEGRADE: 影响=getDataContext 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return 'high-martial';
 }
 

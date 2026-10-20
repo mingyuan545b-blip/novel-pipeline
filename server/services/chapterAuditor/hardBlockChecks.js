@@ -14,7 +14,7 @@ async function _runHardBlockChecks(content, styleProfile, project, projectId, st
             const criticals = adultResult.issues.filter(i => i.severity === 'critical');
             if (criticals.length > 0) issues.push(`视角违规(critical): ${criticals.map(i => i.desc).join('；')}`);
         }
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectAdultPerspective 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const techResult = detectTechJargon(content, styleProfile);
@@ -22,22 +22,22 @@ async function _runHardBlockChecks(content, styleProfile, project, projectId, st
             const genreJargons = techResult.instances.filter(j => !j.allowable).map(j => `"${j.match}"`);
             if (genreJargons.length > 0) issues.push(`幼崽视角科技术语: ${genreJargons.join('、')}`);
         }
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectTechJargon 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const leakResult = detectPipelineMetadataLeak(content);
         if (leakResult.hasLeak) issues.push(`流水线元数据泄露: ${leakResult.instances.map(i => i.match).join('、')}`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectPipelineMetadataLeak 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const slangResult = detectModernSlang(content, styleProfile);
         if (slangResult.count > 0) issues.push(`网络用语: ${slangResult.instances.map(s => `"${s.match}"`).join('、')}`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectModernSlang 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const sensitiveResult = scanSensitiveWords(content);
         if (sensitiveResult.blockCount > 0) issues.push(`敏感词(severity=block): ${sensitiveResult.instances.filter(i => i.severity === 'block').map(i => `"${i.match}"`).join('、')}`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=scanSensitiveWords 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const chapters = await store.queryItems('chapters', c => c.projectId === projectId);
@@ -49,13 +49,13 @@ async function _runHardBlockChecks(content, styleProfile, project, projectId, st
                 if (crossRep.hasRepetition) issues.push(`跨章内容重复(${crossRep.instances?.length || 0}处)`);
             }
         }
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const wc = content.replace(/\s/g, '').length;
         if (wc < _auditConfig.word.rejectMin) issues.push(`字数${wc}低于最低要求${_auditConfig.word.rejectMin}`);
         if (wc > _auditConfig.word.maxChapter) issues.push(`字数${wc}超出上限${_auditConfig.word.maxChapter}`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=content.replace 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 陷阱#44: T0元约束检测——让约束词真正能阻断pipeline
     // 详见 SOP: docs/sop/08-约束执行规范.md 第六节
@@ -90,7 +90,7 @@ async function _runHardBlockChecks(content, styleProfile, project, projectId, st
                 issues.push(`T0元约束${id}违规: ${topViolation?.reason || '检测违规'} (实际${result.actual}/阈值${result.threshold})`);
             }
         }
-    } catch (_) { logger.warn('hardBlockChecks', '[META-CONSTRAINT] ' + (_.message || _)); }
+    } catch (_) { logger.warn('hardBlockChecks', '[META-CONSTRAINT] ' + (_.message || _)); }  // DEGRADE: 影响=硬阻断检查加载 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return { blocked: issues.length > 0, issues };
 }
@@ -112,19 +112,19 @@ async function _buildTechniqueHints(content, styleProfile, projectId, store) {
     try {
         const tellResult = detectTellVerbs(content);
         if (tellResult.count > 0) hints.push(`【展示代替告知检测】发现${tellResult.count}处告知式描写(density:${tellResult.density}/千字)，请检查是否需要转化为动作/生理/环境描写`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectTellVerbs 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try {
         const dripScore = calcInfoDripScore(content);
         if (dripScore < 0.4) hints.push(`【信息注入节奏检测】info_drip_score=${dripScore.toFixed(2)}(<0.4)，存在连续设定说明，建议将信息包裹在动作冲突/对话博弈中`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=calcInfoDripScore 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try {
         const endingResult = extractEndingTension(content);
         if (!endingResult.hasTension) hints.push(`【章节收尾检测】末段缺乏张力点，请检查是否需要增加悬念/抉择/伏笔提及/关系转折`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=extractEndingTension 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try {
         const slangResult = detectModernSlang(content, styleProfile);
         if (slangResult.count > 0) hints.push(`【🚨年代语言污染检测 - 严重违规】发现${slangResult.count}处网络用语/网文腔：${slangResult.instances.map(s => `"${s.match}"(${s.type})`).join('、')}。必须全部替换`);
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectModernSlang 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try {
         const adultResult = detectAdultPerspective(content, styleProfile);
         if (adultResult.isAdultPerspective) {
@@ -136,7 +136,7 @@ async function _buildTechniqueHints(content, styleProfile, projectId, store) {
             }
             if (highDescs.length > 0) hints.push(`【⚠️视角偏移检测 - 需调整】${highDescs.join('；')}`);
         }
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectAdultPerspective 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try {
         const techJargonResult = detectTechJargon(content, styleProfile);
         if (techJargonResult.violationCount > 0) {
@@ -144,7 +144,7 @@ async function _buildTechniqueHints(content, styleProfile, projectId, store) {
             const perspectiveLabel = genre?.id === 'baby' ? '幼崽视角' : '角色视角';
             hints.push(`【🚨科技术语检测 - ${perspectiveLabel}违规】发现${techJargonResult.violationCount}处${perspectiveLabel}中的科技术语：${genreJargons}。必须替换为感官隐喻`);
         }
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=detectTechJargon 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     try {
         const chapters = await store.queryItems('chapters', c => c.projectId === projectId);
         const currentChapter = chapters.find(c => c.content === content || (c.content && content.includes(c.content.substring(0, 50))));
@@ -155,7 +155,7 @@ async function _buildTechniqueHints(content, styleProfile, projectId, store) {
                 if (crossChapterResult.hasRepetition) hints.push(`【跨章相似提示】与上一章存在${crossChapterResult.repeatedCount}处高度相似段落`);
             }
         }
-    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }
+    } catch (_) { logger.warn('hardBlockChecks', _.message || _); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return hints.length > 0 ? hints.join('\n') : '';
 }
 

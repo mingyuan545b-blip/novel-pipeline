@@ -116,7 +116,7 @@ async function _loadTimelineAndForeshadow(projectId, chapterNumber) {
         if (timelineSummary) timelineSection = `\n\n${timelineSummary}\n【时间线规则】修改时必须与前章时间线保持连贯，不得引入时间矛盾。`;
         const foreshadowHint = await ctx.getForeshadowHint(chapterNumber);
         if (foreshadowHint) foreshadowSection = `\n\n${foreshadowHint}\n【伏笔规则】修改时必须保持伏笔一致性，不得遗忘或矛盾。`;
-    } catch (e) { logger.warn('reviser', 'Timeline/Foreshadow load failed:', e.message || e); }
+    } catch (e) { logger.warn('reviser', 'Timeline/Foreshadow load failed:', e.message || e); }  // DEGRADE: 影响=getDataContext 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return { timelineSection, foreshadowSection };
 }
 

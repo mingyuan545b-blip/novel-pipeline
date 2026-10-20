@@ -38,7 +38,7 @@ async function createCharacterRelations(projectId, materials, createdItems) {
                 notes: (mat.content || '').substring(0, 500),
                 createdAt: now, updatedAt: now
             });
-        } catch (err) { logger.warn('outlineRelCreate', '[OUTLINE] Relation create failed:', err.message); }
+        } catch (err) { logger.warn('outlineRelCreate', '[OUTLINE] Relation create failed:', err.message); }  // DEGRADE: 影响=大纲关系创建 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     // 2. 从角色素材content中提取关系描述

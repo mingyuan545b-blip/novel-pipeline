@@ -42,7 +42,7 @@ async function handleSecondReview(params) {
         if (constraintsText) {
             _srConstraintsSection = `\n\n【行为约束（审核依据——检查正文是否违反行为规则）】\n${constraintsText}`;
         }
-    } catch (_) { logger.warn('secondReview', _.message || _); }
+    } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=loadReviewEntityData 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 意图规划约束：复审员必须知道Must Keep/Avoid，避免误判
     const _intentSection = agentContext.chapterIntent
@@ -61,7 +61,7 @@ async function handleSecondReview(params) {
         logger.warn('secondReview', `second-review HARD BLOCK: ${srWcBlocks.map(b => b.title).join('; ')}`);
         const revIdSRWC = uuidv4();
         await store.setItem('reviews', revIdSRWC, { id: revIdSRWC, chapterId, projectId, step: 'second-review', type: 'second-review', reviewer: 'word-count-gate', result: { passed: false }, passed: false, content: srWcBlocks.map(b => b.description).join('；'), issues: srWcBlocks, suggestions: [], round, createdAt: new Date().toISOString() });
-        try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'second-review', result: { response: '' }, passed: false, feedback: { passed: false, summary: `硬性检测拦截：${srWcBlocks.map(b => b.title).join('；')}`, issues: srWcBlocks, suggestions: [], _hardBlock: true }, chapter };
     }
 
@@ -76,7 +76,7 @@ async function handleSecondReview(params) {
         logger.warn('secondReview', 'second-review returned empty response - defaulting to NOT passed');
         const revId2Empty = uuidv4();
         await store.setItem('reviews', revId2Empty, { id: revId2Empty, chapterId, projectId, step: 'second-review', type: 'second-review', reviewer: 'second-review-agent', result: { passed: false, summary: '复审员返回空响应，默认未通过' }, passed: false, content: '复审员返回空响应，默认未通过', issues: [{ desc: '复审Agent返回空响应', severity: 'critical' }], suggestions: ['请检查LLM API配置'], round, createdAt: new Date().toISOString() });
-        try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }
+        try { getMetrics(projectId).recordAgentPassRate('second-review', false, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'second-review', result, passed: false, roundFailed: true, feedbackPart: '【复审空响应】审核Agent未返回有效结果', chapter };
     }
 
@@ -84,7 +84,7 @@ async function handleSecondReview(params) {
     const parsed = await parseSecondReviewResult(result, projectId, chapterId, round, chapter);
     if (parsed) return parsed;
 
-    try { getMetrics(projectId).recordAgentPassRate('second-review', true, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }
+    try { getMetrics(projectId).recordAgentPassRate('second-review', true, chapter.chapterNumber); } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // Post-pass hard block checks
     try {
@@ -103,10 +103,10 @@ async function handleSecondReview(params) {
             logger.warn('secondReview', `second-review passed but word count HARD BLOCK: ${_srWc} > ${_srMaxWords}`);
             return { step: 'second-review', result, passed: false, feedback: { passed: false, summary: `字数超标：${_srWc}字超出上限${_srMaxWords}字，必须精简`, issues: [{ title: '字数超标(系统HARD BLOCK)', description: `当前${_srWc}字 > 上限${_srMaxWords}字`, severity: 'critical' }], suggestions: [{ title: '精简内容', description: '删除冗余描写、合并重复段落、精简过渡句' }] }, chapter };
         }
-    } catch (_srErr) { logger.warn('secondReview', 'second-review HARD BLOCK check failed:', _srErr.message); }
+    } catch (_srErr) { logger.warn('secondReview', 'second-review HARD BLOCK check failed:', _srErr.message); }  // DEGRADE: 影响=二审核查 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     let secondPassFeedback = { passed: true, summary: '复审通过', issues: [], suggestions: [] };
-    try { const p = extractJSON(result.response); if (p) secondPassFeedback = { passed: true, summary: p.summary || '复审通过', issues: p.issues || [], suggestions: p.suggestions || [] }; } catch (_) { logger.warn('secondReview', _.message || _); }
+    try { const p = extractJSON(result.response); if (p) secondPassFeedback = { passed: true, summary: p.summary || '复审通过', issues: p.issues || [], suggestions: p.suggestions || [] }; } catch (_) { logger.warn('secondReview', _.message || _); }  // DEGRADE: 影响=extractJSON 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return { step: 'second-review', result, passed: true, feedback: secondPassFeedback, chapter };
 }
 

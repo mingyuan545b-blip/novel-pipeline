@@ -6,8 +6,8 @@ const INDEX_DIR = path.join(__dirname, '..', '..', 'data', 'material-index');
 const DISCOVERY_DIR = path.join(INDEX_DIR, 'discoveries');
 const MAX_DISCOVERY_CHAPTERS = 10;
 
-try { fs.mkdirSync(INDEX_DIR, { recursive: true }); } catch(_) { logger.warn('materialIndex', _.message || _); }
-try { fs.mkdirSync(DISCOVERY_DIR, { recursive: true }); } catch(_) { logger.warn('materialIndex', _.message || _); }
+try { fs.mkdirSync(INDEX_DIR, { recursive: true }); } catch(_) { logger.warn('materialIndex', _.message || _); }  // DEGRADE: 影响=fs.mkdirSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+try { fs.mkdirSync(DISCOVERY_DIR, { recursive: true }); } catch(_) { logger.warn('materialIndex', _.message || _); }  // DEGRADE: 影响=fs.mkdirSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
 const PLANE_INDEX_FILE = (projectId) => path.join(INDEX_DIR, `${projectId}-planes.json`);
 const TYPE_INDEX_FILE = (projectId) => path.join(INDEX_DIR, `${projectId}-types.json`);
@@ -40,7 +40,7 @@ function recordDiscovery(projectId, chapterNumber, discovery, cache, cacheTTL) {
         const archived = index.chapters.slice(0, index.chapters.length - MAX_DISCOVERY_CHAPTERS);
         for (const ch of archived) {
             const archivePath = path.join(DISCOVERY_DIR, `${projectId}-ch${ch.chapter}.json`);
-            try { fs.writeFileSync(archivePath, JSON.stringify(ch, null, 2), 'utf8'); } catch(_) { logger.warn('materialIndex', _.message || _); }
+            try { fs.writeFileSync(archivePath, JSON.stringify(ch, null, 2), 'utf8'); } catch(_) { logger.warn('materialIndex', _.message || _); }  // DEGRADE: 影响=fs.writeFileSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
         index.chapters = index.chapters.slice(-MAX_DISCOVERY_CHAPTERS);
     }
@@ -62,7 +62,7 @@ function removeChapterDiscoveries(projectId, chapterNumber, cache, cacheTTL) {
     index.lastUpdated = new Date().toISOString();
     writeJson(indexPath, index, cache);
     const archivePath = path.join(DISCOVERY_DIR, `${projectId}-ch${chapterNumber}.json`);
-    try { if (fs.existsSync(archivePath)) fs.unlinkSync(archivePath); } catch(_) { logger.warn('materialIndex', _.message || _); }
+    try { if (fs.existsSync(archivePath)) fs.unlinkSync(archivePath); } catch(_) { logger.warn('materialIndex', _.message || _); }  // DEGRADE: 影响=if 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function getDiscoverySummary(projectId, cache, cacheTTL) {

@@ -145,7 +145,7 @@ async function createNarrativeBridge(projectId, chNum, uc, ch) {
             changeLog: [{ action: 'auto-bridge', reason: `第${chNum}章冷却等待`, at: new Date().toISOString() }],
             createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         });
-    } catch (_) { logger.warn('infinitePipeline', 'Narrative bridge creation failed', { errMsg: _.message || _ }); }
+    } catch (_) { logger.warn('infinitePipeline', 'Narrative bridge creation failed', { errMsg: _.message || _ }); }  // DEGRADE: 影响=章节失败标记 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 module.exports = { handleException, createNarrativeBridge, forceMaterialUpdate };

@@ -118,7 +118,7 @@ async function _syncJsonToPgIfNeeded() {
                             await _backend.setItem(table, data.id, data);
                             count++;
                         }
-                    } catch (_) { logger.warn('store', _.message || _); }
+                    } catch (_) { logger.warn('store', _.message || _); }  // DEGRADE: 影响=path.join 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                 }
                 if (count > 0) {
                     logger.info('store', `  [SYNC] ${table}: ${count} 条`);

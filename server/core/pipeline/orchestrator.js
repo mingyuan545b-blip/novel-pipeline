@@ -151,7 +151,7 @@ class PipelineOrchestrator {
             // 安全网：确保Pipeline日志总是持久化，无论通过哪个路径退出
             if (pipelineLog.length > 0) {
                 try { await persistPipelineLog(chapterId, projectId, pipelineLog); }
-                catch (e) { logger.warn('pipeline', 'Failed to persist pipeline log in finally block', { error: e.message }); }
+                catch (e) { logger.warn('pipeline', 'Failed to persist pipeline log in finally block', { error: e.message }); }  // DEGRADE: 影响=persistPipelineLog 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             }
             // 辅助系统降级汇总上报
             const degradSummary = summarizeDegradations(`chapter-${chapterNumber}`);

@@ -69,7 +69,7 @@ async function executeSupplementAttempt(projectId, batchSize, attemptNum, lastEr
             const currentVolume = volumeOrder.volumeOrder.find(v => !v.completed);
             if (currentVolume) volumeGuidance = `当前卷：${currentVolume.name}。请继续当前卷的章节。`;
         }
-    } catch (_) { logger.warn('infinitePipeline', '[SILENT-CATCH]', { value1: _.message || _ }); }
+    } catch (_) { logger.warn('infinitePipeline', '[SILENT-CATCH]', { value1: _.message || _ }); }  // DEGRADE: 影响=getVolumeOrder 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const supplementHint = attemptNum > 1 ? `（第${attemptNum}次尝试，上次失败：${lastError}。请确保：1.大纲与已有章节衔接 2.不重复已有情节 3.推进主线）` : '';
     const { generateChapterOutlines } = require("../outlineGenerator");

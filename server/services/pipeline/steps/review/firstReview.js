@@ -36,7 +36,7 @@ async function handleFirstReview(params) {
         if (constraintsText) {
             _frConstraintsSection = `\n\n【行为约束（审核依据——检查正文是否违反行为规则）】\n${constraintsText}`;
         }
-    } catch (e) { logger.warn('firstReview', e.message || e); }
+    } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=loadReviewEntityData 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 意图规划约束：审核员必须知道Must Keep/Avoid，避免误判
     const _intentSection = agentContext.chapterIntent
@@ -69,7 +69,7 @@ async function handleFirstReview(params) {
         logger.warn('firstReview', 'first-review returned empty response - defaulting to NOT passed');
         const revId = uuidv4();
         await store.setItem('reviews', revId, { id: revId, chapterId, projectId, step: 'first-review', type: 'first-review', reviewer: 'first-review-agent', result: { passed: false, summary: '审核员返回空响应，默认未通过（安全策略）' }, passed: false, content: '审核员返回空响应，默认未通过', issues: [{ desc: '审核Agent返回空响应', severity: 'critical' }], suggestions: ['请检查LLM API配置'], round, createdAt: new Date().toISOString() });
-        try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }
+        try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         return { step: 'first-review', result, passed: false, roundFailed: true, feedbackPart: '【初审空响应】审核Agent未返回有效结果', chapter };
     }
 
@@ -81,15 +81,15 @@ async function handleFirstReview(params) {
     const { hardBlockIssues, warningIssues } = await runHardBlockChecks(chapter, ctx, projectId);
     if (hardBlockIssues.length > 0) {
         logger.warn('firstReview', `HARD BLOCK: ${hardBlockIssues.map(i => i.title).join('; ')}`);
-        try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }
+        try { getMetrics(projectId).recordAgentPassRate('first-review', false, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         chapter.updatedAt = new Date().toISOString(); await store.setItem('chapters', chapterId, chapter);
         return { step: 'first-review', result, passed: false, feedback: { passed: false, summary: `硬性检测拦截：${hardBlockIssues.map(i => i.title).join('；')}`, issues: [...hardBlockIssues, ...warningIssues], suggestions: hardBlockIssues.map(i => ({ description: i.description })), _hardBlock: true }, chapter };
     } else if (warningIssues.length > 0) { logger.warn('firstReview', `SOFT WARNING: ${warningIssues.map(i => i.title).join('; ')} — not blocking`); }
 
     // 7. Pass
-    try { getMetrics(projectId).recordAgentPassRate('first-review', true, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }
+    try { getMetrics(projectId).recordAgentPassRate('first-review', true, chapter.chapterNumber); } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     let passFeedback = { passed: true, summary: '初审通过', issues: [], suggestions: [] };
-    try { const parsed = require('./reviewShared').extractJSON(result.response); if (parsed) passFeedback = { passed: true, summary: parsed.summary || '初审通过', issues: parsed.issues || [], suggestions: parsed.suggestions || [] }; } catch (e) { logger.warn('firstReview', e.message || e); }
+    try { const parsed = require('./reviewShared').extractJSON(result.response); if (parsed) passFeedback = { passed: true, summary: parsed.summary || '初审通过', issues: parsed.issues || [], suggestions: parsed.suggestions || [] }; } catch (e) { logger.warn('firstReview', e.message || e); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return { step: 'first-review', result, passed: true, feedback: passFeedback, chapter };
 }
 

@@ -44,9 +44,9 @@ async function processUpdates(allUpdates, chapter, projectId, materials, stylePr
                 if (archiveExisting) {
                     await handleArchiveAction(update, archiveExisting, chapter, projectId);
                     appliedUpdates.push({ action: update.action, type: archiveExisting.type, name: archiveExisting.name, reason: update.reason });
-                    try { getMetrics(projectId).recordMaterialAdded(chapter.chapterNumber, archiveExisting.type, archiveExisting.name, update.action); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'metrics', _.message || String(_)); }
+                    try { getMetrics(projectId).recordMaterialAdded(chapter.chapterNumber, archiveExisting.type, archiveExisting.name, update.action); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'metrics', _.message || String(_)); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     if (archiveExisting.type === 'foreshadowing' && update.action === 'recycle') {
-                        try { await foreshadowLedger.resolve(projectId, archiveExisting.name, chapter.chapterNumber, update.reason || '伏笔回收'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'foreshadowLedger', _.message || String(_)); }
+                        try { await foreshadowLedger.resolve(projectId, archiveExisting.name, chapter.chapterNumber, update.reason || '伏笔回收'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'foreshadowLedger', _.message || String(_)); }  // DEGRADE: 影响=foreshadowLedger.resolve 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     }
                 }
                 continue;
@@ -56,12 +56,12 @@ async function processUpdates(allUpdates, chapter, projectId, materials, stylePr
                 const success = await handleUpdateAction(update, existing, chapter, projectId, styleProfile);
                 if (success) {
                     appliedUpdates.push({ action: 'update', type: existing.type, name: existing.name, reason: update.reason });
-                    try { getMetrics(projectId).recordMaterialAdded(chapter.chapterNumber, existing.type, existing.name, 'update'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'metrics', _.message || String(_)); }
+                    try { getMetrics(projectId).recordMaterialAdded(chapter.chapterNumber, existing.type, existing.name, 'update'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'metrics', _.message || String(_)); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     if (existing.type === 'foreshadowing') {
-                        try { await foreshadowLedger.advance(projectId, existing.name, chapter.chapterNumber, update.reason || '素材更新'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'foreshadowLedger', _.message || String(_)); }
+                        try { await foreshadowLedger.advance(projectId, existing.name, chapter.chapterNumber, update.reason || '素材更新'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'foreshadowLedger', _.message || String(_)); }  // DEGRADE: 影响=foreshadowLedger.advance 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     }
                     if (existing.type === 'relationship') {
-                        try { await entityCenter.syncRelationshipFromMaterial(projectId, existing.name, update.content || '', chapter.chapterNumber); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'entityCenter', _.message || String(_)); }
+                        try { await entityCenter.syncRelationshipFromMaterial(projectId, existing.name, update.content || '', chapter.chapterNumber); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'entityCenter', _.message || String(_)); }  // DEGRADE: 影响=entityCenter.syncRelationshipFromMaterial 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     }
                 }
                 continue;
@@ -71,13 +71,13 @@ async function processUpdates(allUpdates, chapter, projectId, materials, stylePr
                 const result = await handleCreateAction(update, chapter, projectId, styleProfile, materials);
                 if (result) {
                     appliedUpdates.push({ action: 'create', type: result.type, name: update.name, reason: update.reason });
-                    try { getMetrics(projectId).recordMaterialAdded(chapter.chapterNumber, update.type, update.name, 'create'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'metrics', _.message || String(_)); }
+                    try { getMetrics(projectId).recordMaterialAdded(chapter.chapterNumber, update.type, update.name, 'create'); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'metrics', _.message || String(_)); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     await createTimelineEntry(update, chapter, projectId, result.id);
                     if (result.type === 'foreshadowing') {
-                        try { await foreshadowLedger.plant(projectId, update.name, update.content || '', { plantChapter: chapter.chapterNumber, importance: 'normal' }); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'foreshadowLedger', _.message || String(_)); }
+                        try { await foreshadowLedger.plant(projectId, update.name, update.content || '', { plantChapter: chapter.chapterNumber, importance: 'normal' }); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'foreshadowLedger', _.message || String(_)); }  // DEGRADE: 影响=foreshadowLedger.plant 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     }
                     if (result.type === 'relationship') {
-                        try { await entityCenter.syncRelationshipFromMaterial(projectId, update.name, update.content || '', chapter.chapterNumber); logger.info('materialUpdate', `EntityCenter: relationship "${update.name}" synced to entity_relations`); } catch (_) { logger.warn('materialUpdate', `Relationship sync failed: ${_.message}`); recordDegradation('materialUpdate', 'entityCenter', _.message || String(_)); }
+                        try { await entityCenter.syncRelationshipFromMaterial(projectId, update.name, update.content || '', chapter.chapterNumber); logger.info('materialUpdate', `EntityCenter: relationship "${update.name}" synced to entity_relations`); } catch (_) { logger.warn('materialUpdate', `Relationship sync failed: ${_.message}`); recordDegradation('materialUpdate', 'entityCenter', _.message || String(_)); }  // DEGRADE: 影响=entityCenter.syncRelationshipFromMaterial 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                     }
                 }
             }
@@ -88,13 +88,13 @@ async function processUpdates(allUpdates, chapter, projectId, materials, stylePr
 
     const charUpdates = appliedUpdates.filter(u => u.type === 'character');
     if (charUpdates.length > 0) {
-        try { await characterStateCache.invalidateForProject(projectId); logger.info('materialUpdate', `CharacterStateCache invalidated after ${charUpdates.length} character material updates in ch${chapter.chapterNumber}`); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'characterStateCache', _.message || String(_)); }
+        try { await characterStateCache.invalidateForProject(projectId); logger.info('materialUpdate', `CharacterStateCache invalidated after ${charUpdates.length} character material updates in ch${chapter.chapterNumber}`); } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'characterStateCache', _.message || String(_)); }  // DEGRADE: 影响=characterStateCache.invalidateForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     try {
         const synced = await syncFactsFromMaterials(projectId, materials);
         if (synced > 0) logger.info('materialUpdate', `MemoryPyramid: synced ${synced} facts from materials in ch${chapter.chapterNumber}`);
-    } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'syncFacts', _.message || String(_)); }
+    } catch (_) { logger.warn('materialUpdate', _.message || _); recordDegradation('materialUpdate', 'syncFacts', _.message || String(_)); }  // DEGRADE: 影响=syncFactsFromMaterials 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return appliedUpdates;
 }

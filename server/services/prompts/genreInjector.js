@@ -36,7 +36,7 @@ async function buildGenreInjection(projectId, agentType, project, options = {}) 
                 if (genreBlock) { result.text += '\n\n' + genreBlock; result.logEntries.push({ step: 'genreProfile', chars: genreBlock.length }); }
             }
         }
-    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'genreProfile', _.message || String(_)); }
+    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'genreProfile', _.message || String(_)); }  // DEGRADE: 影响=题材提示注入(主) 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const namingStyleRegistry = require('../namingStyleRegistry');
@@ -47,7 +47,7 @@ async function buildGenreInjection(projectId, agentType, project, options = {}) 
             const namingReviewBlock = await namingStyleRegistry.buildCombinedReviewBlock(projectId);
             if (namingReviewBlock) { result.text += '\n\n' + namingReviewBlock; result.logEntries.push({ step: 'namingStyle-review', chars: namingReviewBlock.length }); }
         }
-    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'namingStyle', _.message || String(_)); }
+    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'namingStyle', _.message || String(_)); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const memeLexicon = require('../memeLexicon');
@@ -58,7 +58,7 @@ async function buildGenreInjection(projectId, agentType, project, options = {}) 
             const memeReviewBlock = memeLexicon.buildReviewerPrompt(projectId);
             if (memeReviewBlock) { result.text += '\n\n' + memeReviewBlock; result.logEntries.push({ step: 'memeLexicon-review', chars: memeReviewBlock.length }); }
         }
-    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'memeLexicon', _.message || String(_)); }
+    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'memeLexicon', _.message || String(_)); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const worldviewTemplateRegistry = require('../worldviewTemplateRegistry');
@@ -75,7 +75,7 @@ async function buildGenreInjection(projectId, agentType, project, options = {}) 
                 if (wvReviewBlock) { result.text += '\n\n' + wvReviewBlock; result.logEntries.push({ step: 'worldviewTemplate-review', chars: wvReviewBlock.length }); }
             }
         }
-    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'worldviewTemplate', _.message || String(_)); }
+    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'worldviewTemplate', _.message || String(_)); }  // DEGRADE: 影响=题材提示注入(补充) 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const characterArchetypeRegistry = require('../characterArchetypeRegistry');
@@ -86,7 +86,7 @@ async function buildGenreInjection(projectId, agentType, project, options = {}) 
             const archReviewBlock = await characterArchetypeRegistry.buildCombinedReviewerPrompt(project.id);
             if (archReviewBlock) { result.text += '\n\n' + archReviewBlock; result.logEntries.push({ step: 'characterArchetype-review', chars: archReviewBlock.length }); }
         }
-    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'characterArchetype', _.message || String(_)); }
+    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'characterArchetype', _.message || String(_)); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const systemPersonaRegistry = require('../systemPersonaRegistry');
@@ -97,7 +97,7 @@ async function buildGenreInjection(projectId, agentType, project, options = {}) 
             const spReviewBlock = await systemPersonaRegistry.buildCombinedReviewerPrompt(project.id);
             if (spReviewBlock) { result.text += '\n\n' + spReviewBlock; result.logEntries.push({ step: 'systemPersona-review', chars: spReviewBlock.length }); }
         }
-    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'systemPersona', _.message || String(_)); }
+    } catch(_) { logger.warn('genreInjector', '[SILENT-CATCH]', { value1: _.message || _ }); recordDegradation('genreInjector', 'systemPersona', _.message || String(_)); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return result;
 }

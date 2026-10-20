@@ -14,7 +14,7 @@ async function handleWriter(params) {
     try {
         const discoverySummary = materialIndex.getDiscoverySummary(projectId);
         if (discoverySummary) agentContext.discoveryLog = discoverySummary;
-    } catch(_) { logger.warn('index', '[writer]', _.message || _); }
+    } catch(_) { logger.warn('index', '[writer]', _.message || _); }  // DEGRADE: 影响=materialIndex.getDiscoverySummary 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     let materialSectionData;
     try {

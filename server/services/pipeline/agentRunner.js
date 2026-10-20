@@ -44,7 +44,7 @@ async function runAgent(agentType, context) {
             const _arProject = await _arCtx.getProject();
             resolvedGenre = resolveGenreFromProject(_arProject);
             genreId = resolvedGenre?.id || null;
-        } catch(_) { logger.warn('agentRunner', _.message || _); }
+        } catch(_) { logger.warn('agentRunner', _.message || _); }  // DEGRADE: 影响=getStyleProfileForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     const fullSystem = assembled.system;
@@ -87,7 +87,7 @@ async function runAgent(agentType, context) {
     const result = await _executeWithRetry(messages, chatOptions, context, budget, assembled, userContent, agentType);
 
     const responseText = result.choices?.[0]?.message?.content || '';
-    if (projectId) try { getMetrics(projectId).recordAgentTiming(agentType, Date.now() - (context._startTime || Date.now()), result.usage?.total_tokens || 0); } catch(_) { logger.warn('agentRunner', _.message || _); }
+    if (projectId) try { getMetrics(projectId).recordAgentTiming(agentType, Date.now() - (context._startTime || Date.now()), result.usage?.total_tokens || 0); } catch(_) { logger.warn('agentRunner', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     // 单点上报：token 账本（花在哪几段提示词上） + 项目账（预算熔断）
     await reportAgentUsage({
         projectId, chapterNumber: context.chapterNumber, step: agentType,
@@ -151,7 +151,7 @@ async function _executeWithRetry(messages, chatOptions, context, budget, assembl
         return await llm.chat(messages, chatOptions);
     } catch (err) {
         if (context.projectId) {
-            try { getMetrics(context.projectId).recordError(agentType, err.isContextOverflow ? 'context_overflow' : 'llm_error'); } catch(_) { logger.warn('agentRunner', _.message || _); }
+            try { getMetrics(context.projectId).recordError(agentType, err.isContextOverflow ? 'context_overflow' : 'llm_error'); } catch(_) { logger.warn('agentRunner', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
         if (!err.isContextOverflow) throw err;
 

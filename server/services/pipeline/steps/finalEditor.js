@@ -21,7 +21,7 @@ const { getDataContext } = require('../../dataContext');
 /** 处理定稿通过：更新chapter状态、字数、quest */
 async function handleApprovedChapter({ chapter, chapterId, projectId, parsed, modeConfig, ctx }) {
     if (!ctx) throw new Error('handleApprovedChapter requires ctx (DataContext)');
-    try { getMetrics(projectId).recordAgentPassRate('final-editor', true, chapter.chapterNumber); } catch (_) { logger.warn('finalEditor', _.message || _); }
+    try { getMetrics(projectId).recordAgentPassRate('final-editor', true, chapter.chapterNumber); } catch (_) { logger.warn('finalEditor', _.message || _); }  // DEGRADE: 影响=getMetrics 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const endingCheck = extractEndingTension(chapter.content || '');
     if (!endingCheck.hasTension) {
         if (!parsed.edits) parsed.edits = [];

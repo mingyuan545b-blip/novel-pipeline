@@ -174,7 +174,7 @@ async function processChapterDepth(projectId, chapterNumber, content, characterN
                 indicators[char.name].autonomous = Math.max(indicators[char.name].autonomous, extraDepth >= 2 ? 1 : 0);
             }
         }
-    } catch (err) { logger.warn('characterDepthExtractor', `[trap#76] stateKV fallback: ${err.message}`); }
+    } catch (err) { logger.warn('characterDepthExtractor', `[trap#76] stateKV fallback: ${err.message}`); }  // DEGRADE: 影响=角色深度提取 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     await persistDepthIndicators(projectId, chapterNumber, indicators);
     return indicators;

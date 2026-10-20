@@ -29,7 +29,7 @@ async function syncFactsFromMaterials(projectId, materials, memoryPyramid) {
         for (const f of existingFacts) {
             existingTexts.add(f.factText);
         }
-    } catch (_) { logger.warn('factSync', _.message || _); }
+    } catch (_) { logger.warn('factSync', _.message || _); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // M0: 世界观核心规则
     for (const mat of activeMats.filter(m => m.type === 'worldview')) {

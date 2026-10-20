@@ -104,7 +104,7 @@ async function syncRelationshipFromMaterial(center, projectId, relName, content,
         for (const [type, words] of Object.entries(keywords)) {
             if (words.some(w => text.includes(w))) { relType = type; break; }
         }
-    } catch (_) { logger.warn('relations', '[entity-relations]', _.message || _); }
+    } catch (_) { logger.warn('relations', '[entity-relations]', _.message || _); }  // DEGRADE: 影响=detectGenreId 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return await addRelation(center, projectId, fromEntity.id, toEntity.id, relType, relLabel, {
         startChapter: chapterNumber || 0, strength: 50, notes: content.substring(0, 200)

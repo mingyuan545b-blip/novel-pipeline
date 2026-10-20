@@ -23,7 +23,7 @@ function startHeartbeat(projectId, state) {
                 persisted.supplementCount = state.supplementCount;
                 await store.setItem('infinite-pipeline-state', projectId, persisted);
             }
-        } catch (hbErr) { logger.warn('infinitePipeline', '[INFINITE] Heartbeat persist failed:', { hbErrMessage: hbErr.message }); }
+        } catch (hbErr) { logger.warn('infinitePipeline', '[INFINITE] Heartbeat persist failed:', { hbErrMessage: hbErr.message }); }  // DEGRADE: 影响=心跳写库 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }, HEARTBEAT_INTERVAL_MS);
     state.lastHeartbeat = Date.now();
     state._heartbeatTimer = timer;

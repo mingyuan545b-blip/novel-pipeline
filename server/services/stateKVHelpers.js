@@ -39,7 +39,7 @@ function getGenreImportantKeys(genreId) {
     try {
         const genre = getGenreById(genreId);
         if (genre?.kvImportantKeys?.length) return genre.kvImportantKeys;
-    } catch (_) { logger.warn('stateKVHelpers', '[state-kv]', _.message || _); }
+    } catch (_) { logger.warn('stateKVHelpers', '[state-kv]', _.message || _); }  // DEGRADE: 影响=getGenreById 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const GENRE_DEFAULTS = {
         'high-martial-comedy': ['name', 'hp', 'combatPower', 'cultivationStage', 'currentPlane', 'factionName'],
         'baby': ['name', 'hp', 'affectionLevel', 'relationshipStatus', 'guardianStatus'],

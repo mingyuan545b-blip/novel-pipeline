@@ -61,7 +61,7 @@ async function renderStoryboard(id) {
             }
             workflowJson = JSON.stringify(parsed);
         }
-    } catch (_) { logger.warn('comicStoryboard', '[comicStoryboard] Workflow parse error:', _.message || _); }
+    } catch (_) { logger.warn('comicStoryboard', '[comicStoryboard] Workflow parse error:', _.message || _); }  // DEGRADE: 影响=JSON.parse 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const queueItem = {
         id: uuidv4(), storyboardId: id,

@@ -109,7 +109,7 @@ function getGenrePlugin(styleProfile) {
                 }
             });
         }
-    } catch(_) { logger.warn('genreConfig', _.message || _); }
+    } catch(_) { logger.warn('genreConfig', _.message || _); }  // DEGRADE: 影响=题材配置加载 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return genre;
 }
 

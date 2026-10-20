@@ -44,13 +44,13 @@ async function runReaderCheck(projectId, chapterId, chapterNumber, round, pipeli
 
     try {
         await autoResolveConstraints(projectId, chapterNumber);
-    } catch (autoResErr) { logger.warn('readerCheck', 'Auto-resolve constraints failed:', autoResErr.message); }
+    } catch (autoResErr) { logger.warn('readerCheck', 'Auto-resolve constraints failed:', autoResErr.message); }  // DEGRADE: 影响=autoResolveConstraints 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const chapter = await store.getItem('chapters', chapterId);
         const readerOutput = chapter?.readerOutput || '';
         if (!readerOutput) return;
-        try { await onReaderCheck(projectId, chapterNumber, readerOutput); } catch (_) { logger.warn('readerCheck', '[reader-check]', _.message || _); }
+        try { await onReaderCheck(projectId, chapterNumber, readerOutput); } catch (_) { logger.warn('readerCheck', '[reader-check]', _.message || _); }  // DEGRADE: 影响=onReaderCheck 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         const parsed = extractJSON(readerOutput);
         const hardIssues = parsed?.hardIssues || [];
         if (hardIssues.length === 0) return;
@@ -66,7 +66,7 @@ async function runReaderCheck(projectId, chapterId, chapterNumber, round, pipeli
                     sourceChapter: issue.chapter || chapterNumber,
                     evidence: issue.evidence || ''
                 });
-            } catch (ccErr) { logger.warn('readerCheck', 'Failed to write consistency constraint:', ccErr.message); }
+            } catch (ccErr) { logger.warn('readerCheck', 'Failed to write consistency constraint:', ccErr.message); }  // DEGRADE: 影响=addConstraint 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
 
         const affectedChapters = [...new Set(hardIssues.map(i => i.chapter))].filter(Boolean);
@@ -93,7 +93,7 @@ async function runReaderCheck(projectId, chapterId, chapterNumber, round, pipeli
                         issues: hardIssuesForChapter.map(i => ({ desc: `${i.type}: ${i.description}`, severity: 'high' })),
                         createdAt: new Date().toISOString()
                     });
-                } catch (revReviewErr) { logger.warn('readerCheck', 'Failed to save reader-triggered reviser review:', revReviewErr.message); }
+                } catch (revReviewErr) { logger.warn('readerCheck', 'Failed to save reader-triggered reviser review:', revReviewErr.message); }  // DEGRADE: 影响=读者视角检查 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
                 const revisedCh = await store.getItem('chapters', affectedCh.id);
                 if (revisedCh?.content) {
@@ -103,13 +103,13 @@ async function runReaderCheck(projectId, chapterId, chapterNumber, round, pipeli
                         if (onStep) onStep({ step: 'final-editor', round, passed: reFinalResult.passed, roleName: '定稿人', chapterNumber: affectedCh.chapterNumber });
                         if (reFinalResult.passed) {
                             try { await stepFn(projectId, affectedCh.id, 'material-manager', round, {}); if (onStep) onStep({ step: 'material-manager', round, passed: true, roleName: '素材管理', chapterNumber: affectedCh.chapterNumber }); }
-                            catch (reMatErr) { logger.warn('readerCheck', `Re-material-manager failed for chapter ${affectedCh.chapterNumber}:`, reMatErr.message); }
+                            catch (reMatErr) { logger.warn('readerCheck', `Re-material-manager failed for chapter ${affectedCh.chapterNumber}:`, reMatErr.message); }  // DEGRADE: 影响=stepFn 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                         }
-                    } catch (reFinalErr) { logger.warn('readerCheck', `Re-final-editor failed for chapter ${affectedCh.chapterNumber}:`, reFinalErr.message); }
+                    } catch (reFinalErr) { logger.warn('readerCheck', `Re-final-editor failed for chapter ${affectedCh.chapterNumber}:`, reFinalErr.message); }  // DEGRADE: 影响=stepFn 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
                 }
-            } catch (reviseErr) { logger.warn('readerCheck', `Reviser failed for chapter ${affectedCh.chapterNumber}:`, reviseErr.message); }
+            } catch (reviseErr) { logger.warn('readerCheck', `Reviser failed for chapter ${affectedCh.chapterNumber}:`, reviseErr.message); }  // DEGRADE: 影响=stepFn 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
-    } catch (readerPostErr) { logger.warn('readerCheck', 'Reader post-processing failed:', readerPostErr.message); }
+    } catch (readerPostErr) { logger.warn('readerCheck', 'Reader post-processing failed:', readerPostErr.message); }  // DEGRADE: 影响=stepFn 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 module.exports = { shouldTriggerReader, runReaderCheck, READER_INTERVAL, TOMATO_SUBGENRE_READER_TRIGGERS };

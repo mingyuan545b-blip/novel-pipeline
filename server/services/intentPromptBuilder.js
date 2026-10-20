@@ -22,7 +22,7 @@ function getVolumeSubplaneForChapter(projectId, chapterNumber) {
             const entry = order.volumeOrder.find(v => v.volume === volume);
             if (entry) return entry;
         }
-    } catch (e) { logger.warn('intentPromptBuilder', '[chapter-intent]', e.message || e); }
+    } catch (e) { logger.warn('intentPromptBuilder', '[chapter-intent]', e.message || e); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return null;
 }
 
@@ -47,7 +47,7 @@ async function buildMustKeepItems(ctx, chapterNumber, chapterScene, currentSubpl
     for (const char of coreCharacters.slice(0, 6)) {
         try {
             let cacheStates = [];
-            try { cacheStates = await ctx.getEntitiesForIntentPlanner(chapterNumber); } catch (_) { logger.warn('intentPromptBuilder', '[chapter-intent]', _.message || _); }
+            try { cacheStates = await ctx.getEntitiesForIntentPlanner(chapterNumber); } catch (_) { logger.warn('intentPromptBuilder', '[chapter-intent]', _.message || _); }  // DEGRADE: 影响=ctx.getEntitiesForIntentPlanner 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             const cached = cacheStates.find(cs => (cs.entityId || cs.characterId) === char.id);
             if (cached && (cached.text || cached.briefText)) {
                 if (!intentAppend(`- ${char.name}: ${cached.text || cached.briefText}`)) break;
@@ -95,7 +95,7 @@ async function buildMustKeepItems(ctx, chapterNumber, chapterScene, currentSubpl
             if (readerParsed?.readerExperience && readerParsed.wantToContinue === false) {
                 if (!intentAppend(`- 阅读者警告[Ch${rc.chapterNumber}]: ${readerParsed.readerExperience.substring(0, 150)}`)) break;
             }
-        } catch (_) { logger.warn('intentPromptBuilder', '[chapter-intent]', _.message || _); }
+        } catch (_) { logger.warn('intentPromptBuilder', '[chapter-intent]', _.message || _); }  // DEGRADE: 影响=extractJSON 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     const equipMats = activeMaterials.filter(m => m.type === 'equipment').filter(m => {

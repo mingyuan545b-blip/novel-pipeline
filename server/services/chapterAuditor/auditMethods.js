@@ -43,17 +43,17 @@ async function auditChapter(projectId, project, styleProfile, genre, chapterId) 
     const vis = detectVisualAnchors(content, styleProfile);
     if (vis.issues && vis.issues.length > 0) violations.push({ type: 'noVisualAnchor', severity: vis.issues[0].severity, desc: vis.issues[0].desc, category: '视觉锚点不足', count: vis.count });
 
-    try { const tellVerbs = detectTellVerbs(content); if (tellVerbs.count > 5) violations.push({ type: 'tellVerbs', severity: 'medium', desc: `告知式动词过多(${tellVerbs.count}处)，建议改为感官描写`, category: '告知式描写' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }
-    try { const infoDrip = calcInfoDripScore(content); if (infoDrip.score < 0.4) violations.push({ type: 'infoDump', severity: 'medium', desc: `设定说明堆砌(节奏分${infoDrip.score.toFixed(1)}，目标≥0.4)`, category: '设定堆砌' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }
-    try { const ending = extractEndingTension(content); if (!ending.hasTension) violations.push({ type: 'noTension', severity: 'medium', desc: '章节收尾缺乏张力/悬念钩子', category: '收尾张力不足' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }
+    try { const tellVerbs = detectTellVerbs(content); if (tellVerbs.count > 5) violations.push({ type: 'tellVerbs', severity: 'medium', desc: `告知式动词过多(${tellVerbs.count}处)，建议改为感官描写`, category: '告知式描写' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }  // DEGRADE: 影响=detectTellVerbs 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { const infoDrip = calcInfoDripScore(content); if (infoDrip.score < 0.4) violations.push({ type: 'infoDump', severity: 'medium', desc: `设定说明堆砌(节奏分${infoDrip.score.toFixed(1)}，目标≥0.4)`, category: '设定堆砌' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }  // DEGRADE: 影响=calcInfoDripScore 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
+    try { const ending = extractEndingTension(content); if (!ending.hasTension) violations.push({ type: 'noTension', severity: 'medium', desc: '章节收尾缺乏张力/悬念钩子', category: '收尾张力不足' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }  // DEGRADE: 影响=extractEndingTension 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     try {
         const chapters = (await store.queryItems('chapters')).filter(c => c.projectId === projectId);
         const prevChapter = chapters.find(c => c.chapterNumber === chapter.chapterNumber - 1);
         if (prevChapter?.content) { const crossRep = detectCrossChapterRepetition(content, prevChapter.content); if (crossRep.hasRepetition) violations.push({ type: 'crossChapterRep', severity: 'high', desc: `与上一章内容重复(${crossRep.instances?.length || 0}处)`, category: '跨章重复' }); }
-    } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }
+    } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
-    try { const sensitive = scanSensitiveWords(content); const blocks = (sensitive.instances || []).filter(i => i.severity === 'block'); if (blocks.length > 0) violations.push({ type: 'sensitiveWords', severity: 'critical', desc: `敏感词(${blocks.length}处): ${blocks.slice(0, 3).map(i => `"${i.match}"`).join('、')}`, category: '敏感词' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }
+    try { const sensitive = scanSensitiveWords(content); const blocks = (sensitive.instances || []).filter(i => i.severity === 'block'); if (blocks.length > 0) violations.push({ type: 'sensitiveWords', severity: 'critical', desc: `敏感词(${blocks.length}处): ${blocks.slice(0, 3).map(i => `"${i.match}"`).join('、')}`, category: '敏感词' }); } catch (_) { logger.warn('auditMethods', '[audit-methods]', _.message || _); }  // DEGRADE: 影响=scanSensitiveWords 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const _auditConfig = resolveConfig(resolveGenreFromProject(project), project);
     const wc = content.replace(/\s/g, '').length;

@@ -67,7 +67,7 @@ async function persistPipelineLog(chapterId, projectId, pipelineLog) {
         }
         const trimmed = entries.length > MAX_PIPELINE_LOG_ENTRIES ? entries.slice(-150) : entries;
         await store.setItem('pipeline-logs', logId, { id: logId, chapterId, projectId, entries: trimmed, updatedAt: new Date().toISOString() });
-    } catch (err) { logger.warn('pipeline', 'Failed to persist pipeline log', { error: err.message }); }
+    } catch (err) { logger.warn('pipeline', 'Failed to persist pipeline log', { error: err.message }); }  // DEGRADE: 影响=store.getItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 module.exports = { MAX_PIPELINE_LOG_ENTRIES, checkStopped, getSteps, clearDownstreamOutputs, generateOverrideOutput, persistPipelineLog };

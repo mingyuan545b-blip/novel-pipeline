@@ -21,7 +21,7 @@ async function processCharacterUpdates(organizingPlan, chapter, projectId, mater
                 if (entity) {
                     existingMat = { id: entity.id, name: entity.name, roleLevel: entity.roleLevel, _fromEntityCenter: true };
                 }
-            } catch (e) { logger.warn('materialCharProc', `[trap#79] entityCenter fallback failed for ${charUpdate.name}: ${e.message}`); }
+            } catch (e) { logger.warn('materialCharProc', `[trap#79] entityCenter fallback failed for ${charUpdate.name}: ${e.message}`); }  // DEGRADE: 影响=entityCenter.findEntityByName 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
 
         // 修复陷阱#70：organizingPlan.characters[].roleLevel此前被丢弃，

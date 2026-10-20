@@ -24,7 +24,7 @@ async function checkStuckChapters() {
                 issues.push({ projectId: project.id, chapterId: c.id, chapterNumber: c.chapterNumber, status: c.status, stuckSince: c.updatedAt || c.createdAt });
             }
         }
-    } catch (_) { logger.warn('healthMonitor', _.message || _); }
+    } catch (_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=健康检查-磁盘探测 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return issues;
 }
 
@@ -38,7 +38,7 @@ function checkOrphanBrowsers() {
                 issues.push({ browserId: id, age: Date.now() - browser._openedAt });
             }
         }
-    } catch (_) { logger.warn('healthMonitor', _.message || _); }
+    } catch (_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return issues;
 }
 
@@ -64,7 +64,7 @@ function checkDiskSpace() {
                 issues.push({ type: 'data-dir-size', sizeMB: Math.round(totalMB), threshold: 1000 });
             }
         }
-    } catch (_) { logger.warn('healthMonitor', _.message || _); }
+    } catch (_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=fs.statSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return issues;
 }
 
@@ -78,7 +78,7 @@ function checkPipelineState() {
                 issues.push({ type: 'stale-pipeline', projectId: infiniteState.projectId, lastUpdate: infiniteState.lastUpdate });
             }
         }
-    } catch (_) { logger.warn('healthMonitor', _.message || _); }
+    } catch (_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=if 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return issues;
 }
 
@@ -104,7 +104,7 @@ function checkDataIntegrity() {
                 issues.push({ type: 'no-progress', projectId: project.id, outlinedCount: outlines.length });
             }
         }
-    } catch (_) { logger.warn('healthMonitor', _.message || _); }
+    } catch (_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=for 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return issues;
 }
 
@@ -125,9 +125,9 @@ function cleanupOldFiles() {
                     fs.unlinkSync(filePath);
                     cleaned.push(file);
                 }
-            } catch(_) { logger.warn('healthMonitor', _.message || _); }
+            } catch(_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=fs.statSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
-    } catch (_) { logger.warn('healthMonitor', _.message || _); }
+    } catch (_) { logger.warn('healthMonitor', _.message || _); }  // DEGRADE: 影响=fs.statSync 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return cleaned;
 }
 

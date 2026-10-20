@@ -98,11 +98,11 @@ function _registerProcess() {
             logger.warn('jsonStore', `[STORE-JSON] ⚠️ 多进程并发写入会导致数据损坏。请改用SQLite后端(USE_SQLITE=true)或单进程部署。\n`);
         }
         fs.writeFileSync(_pidFilePath, String(process.pid));
-    } catch(_) { logger.warn('jsonStore', _.message || _); }
+    } catch(_) { logger.warn('jsonStore', _.message || _); }  // DEGRADE: 影响=process.kill 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function _unregisterProcess() {
-    try { if (fs.existsSync(_pidFilePath)) fs.unlinkSync(_pidFilePath); } catch(_) { logger.warn('jsonStore', _.message || _); }
+    try { if (fs.existsSync(_pidFilePath)) fs.unlinkSync(_pidFilePath); } catch(_) { logger.warn('jsonStore', _.message || _); }  // DEGRADE: 影响=if 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 module.exports = {

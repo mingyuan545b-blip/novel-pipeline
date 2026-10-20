@@ -1,5 +1,5 @@
 const store = require("../../../store");
-const { STUCK_STATUSES } = require("../../chapterStatus");
+const { STUCK_STATUSES, STATUS_VALUES } = require("../../chapterStatus");
 const logger = require("../../../shared/logger");
 
 const INFINITE_PIPELINE_STATE = {};
@@ -129,11 +129,11 @@ async function forceResetPipeline(projectId) {
         }
     } catch (resetErr) {
         logger.warn('infinitePipeline', '[INFINITE] Force reset persist failed:', { resetErrMessage: resetErr.message });
-        try { await store.deleteItem('infinite-pipeline-state', projectId); } catch (delErr) { logger.warn('infinitePipeline', '[INFINITE] Force delete failed:', { delErrMessage: delErr.message }); }
+        try { await store.deleteItem('infinite-pipeline-state', projectId); } catch (delErr) { logger.warn('infinitePipeline', '[INFINITE] Force delete failed:', { delErrMessage: delErr.message }); }  // DEGRADE: 影响=store.deleteItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     const projectLogs = await store.queryItems('pipeline-logs', { projectId });
     for (const l of (projectLogs || [])) {
-        try { await store.deleteItem('pipeline-logs', l.id); } catch (delErr) { logger.warn('infinitePipeline', '[INFINITE] Pipeline log delete failed:', { delErrMessage: delErr.message }); }
+        try { await store.deleteItem('pipeline-logs', l.id); } catch (delErr) { logger.warn('infinitePipeline', '[INFINITE] Pipeline log delete failed:', { delErrMessage: delErr.message }); }  // DEGRADE: 影响=store.deleteItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     return { success: true, message: 'Pipeline state and logs reset' };
 }
@@ -154,7 +154,7 @@ async function cleanupStalePipelineStates() {
                 const chapters = await store.queryItems('chapters', { projectId: state.projectId });
                 for (const ch of chapters) {
                     if (STUCK_STATUSES.includes(ch.status) || ch.status === 'pipeline-failed') {
-                        ch.status = 'outlined';
+                        ch.status = STATUS_VALUES.OUTLINED;
                         delete ch.skipUntil;
                         ch._pipelineRetries = 0;
                         ch._wordCountRetry = 0;

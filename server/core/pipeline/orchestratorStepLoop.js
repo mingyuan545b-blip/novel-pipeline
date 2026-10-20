@@ -59,7 +59,7 @@ async function prepareStepContext(params, stepIn, round, currentFeedback, curren
         context.chapterIntent = await intentPlanner.formatIntentForPrompt(chapter.chapterNumber);
     }
     if (step === 'writer') {
-        try { const hookBudget = getHookBudgetForProject(projectId); context.hookAgenda = await hookBudget.formatHookAgendaForPrompt(chapter.chapterNumber); } catch (e) { logger.warn('orchestrator', e.message || e); }
+        try { const hookBudget = getHookBudgetForProject(projectId); context.hookAgenda = await hookBudget.formatHookAgendaForPrompt(chapter.chapterNumber); } catch (e) { logger.warn('orchestrator', e.message || e); }  // DEGRADE: 影响=getHookBudgetForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     if (step === 'material-manager' && currentMaterialGuidance) context.materialGuidance = currentMaterialGuidance;
 

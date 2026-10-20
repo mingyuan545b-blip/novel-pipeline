@@ -18,7 +18,7 @@ async function createVersionTag(projectId, chapterId, chapterNumber, version, co
             maxHooks: status.max || 0,
             staleDebt: status.staleDebt || 0
         };
-    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
+    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }  // DEGRADE: 影响=hookBudget.getHookBudgetForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     let characterStateSnapshot = null;
     try {
@@ -34,14 +34,14 @@ async function createVersionTag(projectId, chapterId, chapterNumber, version, co
                 };
             }
         }
-    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
+    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }  // DEGRADE: 影响=版本快照写入 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     let memoryVersion = null;
     try {
         const _vcCtx = await getDataContext(projectId);
         const project = await _vcCtx.getProject();
         memoryVersion = project?._memoryVersion || 0;
-    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
+    } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }  // DEGRADE: 影响=getDataContext 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const snapshot = {
         tag,
@@ -71,7 +71,7 @@ async function createVersionTag(projectId, chapterId, chapterNumber, version, co
         const removedTags = chapter._versionTags.slice(0, chapter._versionTags.length - 20);
         chapter._versionTags = chapter._versionTags.slice(-20);
         for (const rt of removedTags) {
-            try { await store.removeItem('version-snapshots', rt); } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }
+            try { await store.removeItem('version-snapshots', rt); } catch (e) { logger.warn('versionControl', '[version-ctrl]', e.message || e); }  // DEGRADE: 影响=store.removeItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
     }
 

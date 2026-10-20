@@ -73,7 +73,7 @@ function registerCleanupRoutes(router) {
         const exportDir = path.join(dataDir, id, 'export');
         let logSize = 0;
         [outputDir, exportDir].forEach(d => {
-            if (fs.existsSync(d)) { try { logSize += getDirSize(d); } catch (_) { logger.warn('cleanupRoutes', '[cleanup]', _.message || _); } }
+            if (fs.existsSync(d)) { try { logSize += getDirSize(d); } catch (_) { logger.warn('cleanupRoutes', '[cleanup]', _.message || _); } }  // DEGRADE: 影响=getDirSize 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         });
 
         res.json({

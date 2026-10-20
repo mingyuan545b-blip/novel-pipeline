@@ -32,7 +32,7 @@ async function getConstraintPresets(genre) {
             }
             return map;
         }
-    } catch(_) { logger.warn('constraintInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }
+    } catch(_) { logger.warn('constraintInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }  // DEGRADE: 影响=store.listItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const result = { ...BASE_CONSTRAINT_PRESETS };
     if (genre) {
         const genrePresets = getGenreConstraintPresets(genre);

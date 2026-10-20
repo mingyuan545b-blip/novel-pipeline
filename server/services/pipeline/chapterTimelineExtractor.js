@@ -37,7 +37,7 @@ async function extractAndPersist(projectId, chapter, outlineText, intentResult) 
             const saved = await timelineService.addEvent(projectId, event);
             savedEventIds.push(saved.id);
             timelineCount++;
-        } catch (e) { logger.warn('timelineExtractor', `Failed to add timeline event: ${e.message}`); }
+        } catch (e) { logger.warn('timelineExtractor', `Failed to add timeline event: ${e.message}`); }  // DEGRADE: 影响=timelineService.addEvent 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     const foreshadowChanges = await _extractForeshadowChanges(projectId, content, chapterNum, intentResult, savedEventIds);
@@ -56,7 +56,7 @@ async function extractAndPersist(projectId, chapter, outlineText, intentResult) 
                 await foreshadowLedger.resolve(projectId, change.name, chapterNum, change.notes);
             }
             foreshadowCount++;
-        } catch (e) { logger.warn('timelineExtractor', `Failed to update foreshadow: ${e.message}`); }
+        } catch (e) { logger.warn('timelineExtractor', `Failed to update foreshadow: ${e.message}`); }  // DEGRADE: 影响=章节时间线提取 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     logger.info('timelineExtractor', `Ch${chapterNum}: extracted ${timelineCount} timeline events, ${foreshadowCount} foreshadow changes`);
@@ -75,7 +75,7 @@ async function _buildCharacterNameMap(projectId) {
                 if (alias && typeof alias === 'string') nameMap.set(alias, entity.id);
             }
         }
-    } catch (e) { logger.warn('timelineExtractor', `Failed to build character name map: ${e.message}`); }
+    } catch (e) { logger.warn('timelineExtractor', `Failed to build character name map: ${e.message}`); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     return nameMap;
 }
 

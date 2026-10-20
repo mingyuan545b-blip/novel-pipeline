@@ -18,7 +18,7 @@ async function getAgentTemplate(agentType, mode) {
         if (generic) return generic;
         const anyMatch = templates.find(t => t.agentType === agentType);
         if (anyMatch) return anyMatch;
-    } catch(_) { logger.warn('promptBuilder', '[SILENT-CATCH]', { value1: _.message || _ }); }
+    } catch(_) { logger.warn('promptBuilder', '[SILENT-CATCH]', { value1: _.message || _ }); }  // DEGRADE: 影响=store.listItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const fallback = FALLBACK_AGENT_TEMPLATES[agentType];
     if (fallback) return fallback;
     return null;

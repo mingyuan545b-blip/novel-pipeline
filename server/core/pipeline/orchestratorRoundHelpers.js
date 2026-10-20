@@ -103,7 +103,7 @@ async function handleStepError(error, step, round, chapterId, projectId, pipelin
             errChapter.updatedAt = new Date().toISOString();
             await store.setItem('chapters', chapterId, errChapter);
         }
-    } catch (saveErr) { logger.warn('pipeline', 'Failed to update chapter status after error', { error: saveErr.message }); }
+    } catch (saveErr) { logger.warn('pipeline', 'Failed to update chapter status after error', { error: saveErr.message }); }  // DEGRADE: 影响=store.getItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     if (isOverloaded || isTimeout) {
         const waitMs = isOverloaded ? LLM_DEFAULTS.overloadedWaitMs : LLM_DEFAULTS.timeoutWaitMs;

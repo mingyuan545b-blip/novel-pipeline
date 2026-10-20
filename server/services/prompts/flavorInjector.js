@@ -29,7 +29,7 @@ async function buildFlavorInjection(projectId, agentType, genre) {
                 if (reviewBlock) { result.text += '\n\n' + reviewBlock; result.logEntries.push({ step: 'flavor-review', chars: reviewBlock.length }); }
             }
         }
-    } catch(_) { logger.warn('flavorInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }
+    } catch(_) { logger.warn('flavorInjector', '[SILENT-CATCH]', { value1: _.message || _ }); }  // DEGRADE: 影响=风味提示注入 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     return result;
 }

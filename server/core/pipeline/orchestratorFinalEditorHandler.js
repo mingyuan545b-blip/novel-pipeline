@@ -28,9 +28,9 @@ async function handleFinalEditorResult(stepResult, chapterId, projectId, chapter
         await runPostApproval(projectId, chapterId, chapter.chapterNumber, round, pipelineLog, onStep, {
             mode, materialGuidance, chapterIntent, circuitBreaker, genre
         });
-        try { await characterStateCache.invalidateForProject(projectId); await characterStateCache.getCacheForChapter(projectId, chapter.chapterNumber + 1); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }
+        try { await characterStateCache.invalidateForProject(projectId); await characterStateCache.getCacheForChapter(projectId, chapter.chapterNumber + 1); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }  // DEGRADE: 影响=characterStateCache.invalidateForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         await characterStateCache.commitSession(projectId, chapter.chapterNumber);
-        try { await onPostApproval(projectId, chapter.chapterNumber, chapter.content || ''); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }
+        try { await onPostApproval(projectId, chapter.chapterNumber, chapter.content || ''); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }  // DEGRADE: 影响=onPostApproval 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         await persistPipelineLog(chapterId, projectId, pipelineLog);
         return { success: true, rounds: round, log: pipelineLog, message: `Chapter approved after ${round} round(s)` };
     }
@@ -83,9 +83,9 @@ async function _handleWordCountOverride(stepResult, chapterId, projectId, chapte
     await runPostApproval(projectId, chapterId, chapter.chapterNumber, round, pipelineLog, onStep, {
         mode, materialGuidance, chapterIntent, circuitBreaker, genre
     });
-    try { await characterStateCache.invalidateForProject(projectId); await characterStateCache.getCacheForChapter(projectId, chapter.chapterNumber + 1); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }
+    try { await characterStateCache.invalidateForProject(projectId); await characterStateCache.getCacheForChapter(projectId, chapter.chapterNumber + 1); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }  // DEGRADE: 影响=characterStateCache.invalidateForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     await characterStateCache.commitSession(projectId, chapter.chapterNumber);
-    try { await onPostApproval(projectId, chapter.chapterNumber, chapter.content || ''); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }
+    try { await onPostApproval(projectId, chapter.chapterNumber, chapter.content || ''); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }  // DEGRADE: 影响=onPostApproval 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     await persistPipelineLog(chapterId, projectId, pipelineLog);
     return { success: true, rounds: round, log: pipelineLog, message: 'Chapter approved (word-count override)' };
 }
@@ -111,9 +111,9 @@ async function _handleMultiRoundOverride(stepResult, chapterId, projectId, chapt
     await runPostApproval(projectId, chapterId, chapter.chapterNumber, round, pipelineLog, onStep, {
         mode, materialGuidance, chapterIntent, circuitBreaker, genre
     });
-    try { await characterStateCache.invalidateForProject(projectId); await characterStateCache.getCacheForChapter(projectId, chapter.chapterNumber + 1); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }
+    try { await characterStateCache.invalidateForProject(projectId); await characterStateCache.getCacheForChapter(projectId, chapter.chapterNumber + 1); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }  // DEGRADE: 影响=characterStateCache.invalidateForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     await characterStateCache.commitSession(projectId, chapter.chapterNumber);
-    try { await onPostApproval(projectId, chapter.chapterNumber, chapter.content || ''); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }
+    try { await onPostApproval(projectId, chapter.chapterNumber, chapter.content || ''); } catch (_) { logger.warn('orchestratorFE', '[final-editor]', _.message || _); }  // DEGRADE: 影响=onPostApproval 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     await persistPipelineLog(chapterId, projectId, pipelineLog);
     return { success: true, rounds: round, log: pipelineLog, message: `Chapter approved after ${round} round(s) (multi-round override)` };
 }

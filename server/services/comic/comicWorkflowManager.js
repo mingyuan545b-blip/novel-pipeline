@@ -28,7 +28,7 @@ async function createWorkflow(data) {
         try {
             const parsed = JSON.parse(jsonContent);
             nodeCount = Object.keys(parsed || {}).length;
-        } catch (_) { logger.warn('comicWorkflowManager', '[comicWorkflow] JSON parse error:', _.message || _); }
+        } catch (_) { logger.warn('comicWorkflowManager', '[comicWorkflow] JSON parse error:', _.message || _); }  // DEGRADE: 影响=JSON.parse 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 
     const workflow = {
@@ -58,7 +58,7 @@ async function updateWorkflow(id, data) {
         try {
             const parsed = JSON.parse(data.jsonContent);
             updated.nodeCount = Object.keys(parsed || {}).length;
-        } catch (_) { logger.warn('comicWorkflowManager', '[comicWorkflow] JSON parse error:', _.message || _); }
+        } catch (_) { logger.warn('comicWorkflowManager', '[comicWorkflow] JSON parse error:', _.message || _); }  // DEGRADE: 影响=JSON.parse 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         const dir = ensureComicDir('workflows');
         fs.writeFileSync(path.join(dir, `${id}.json`), data.jsonContent, 'utf-8');
     }

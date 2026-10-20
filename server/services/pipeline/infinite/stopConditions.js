@@ -71,7 +71,7 @@ async function checkForeshadowing(projectId, chapters, state, addLog, effectiveS
                 if (!unresolvedHooks.includes(hn)) unresolvedHooks.push(hn);
             }
         }
-    } catch (e) { logger.warn('infinitePipeline', 'Foreshadowing check error', { eMessage: e.message }); }
+    } catch (e) { logger.warn('infinitePipeline', 'Foreshadowing check error', { eMessage: e.message }); }  // DEGRADE: 影响=getHookBudgetForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     if (unresolvedHooks.length > 0 && (state._foreshadowingRetryCount || 0) < 2) {
         state._foreshadowingRetryCount = (state._foreshadowingRetryCount || 0) + 1;

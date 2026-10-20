@@ -57,7 +57,7 @@ async function handleCreateAction(update, chapter, projectId, styleProfile) {
                 if (fieldMatch) newMaterial[fieldMatch[1]] = '';
             }
         }
-    } catch (_) { logger.warn('materialCreate', '[material-actions]', _.message || _); }
+    } catch (_) { logger.warn('materialCreate', '[material-actions]', _.message || _); }  // DEGRADE: 影响=validateMaterial 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     await save(newMaterial);
     await syncToRegistries(newMaterial, update, chapter, projectId, protagonistName);

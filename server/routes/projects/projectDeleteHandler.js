@@ -42,7 +42,7 @@ async function cascadeDeleteProject(projectId) {
             // Bug#6修复：记录实际删除数而非查询数
             if (deleted > 0) deletedCounts[storeType] = deleted;
             if (failed > 0) failedCounts[storeType] = failed;
-        } catch (_) { logger.warn('projectDelete', '[cascade-delete]', _.message || _); }
+        } catch (_) { logger.warn('projectDelete', '[cascade-delete]', _.message || _); }  // DEGRADE: 影响=删除项目时清理关联数据 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     await store.deleteItem('projects', projectId);
 

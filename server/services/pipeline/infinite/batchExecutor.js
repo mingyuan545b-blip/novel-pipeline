@@ -122,13 +122,13 @@ async function runInfinitePipeline(projectId, options = {}) {
             }
 
             if (iteration % 10 === 0) {
-                try { await persistState(projectId, state); } catch (e) { logger.warn('infinitePipeline', 'Periodic persist failed', { eMessage: e.message }); }
+                try { await persistState(projectId, state); } catch (e) { logger.warn('infinitePipeline', 'Periodic persist failed', { eMessage: e.message }); }  // DEGRADE: 影响=persistState 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             }
         }
 
         state.running = false;
         addLog(`Pipeline结束，共完成${state.completedChapters}章`);
-        try { await persistState(projectId, state); } catch (e) { logger.warn('infinitePipeline', 'Final persist failed', { eMessage: e.message }); }
+        try { await persistState(projectId, state); } catch (e) { logger.warn('infinitePipeline', 'Final persist failed', { eMessage: e.message }); }  // DEGRADE: 影响=persistState 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         broadcastToProject(projectId, 'pipeline:status', { running: false, stopped: false, completedChapters: state.completedChapters, phase: 'stopped' });
         broadcastToProject(projectId, 'pipeline:complete', { completedChapters: state.completedChapters });
         return { success: true, completedChapters: state.completedChapters, logs: state.logs };
@@ -163,7 +163,7 @@ async function stopInfinitePipeline(projectId) {
             persisted.phase = 'stopped';
             await store.setItem('infinite-pipeline-state', projectId, persisted);
         }
-    } catch (persistErr) { logger.warn('infinitePipeline', 'Stop persist failed', { persistErrMessage: persistErr.message }); }
+    } catch (persistErr) { logger.warn('infinitePipeline', 'Stop persist failed', { persistErrMessage: persistErr.message }); }  // DEGRADE: 影响=store.getItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     const RESET_STATUSES = ['failed-skipped', 'timeout-skipped', 'context-error', 'cooldown-waiting', 'pipeline-failed'];
     try {
@@ -180,7 +180,7 @@ async function stopInfinitePipeline(projectId) {
                 await store.setItem('chapters', ch.id, ch);
             }
         }
-    } catch (e) { logger.warn('infinitePipeline', 'Stop cleanup failed', { eMessage: e.message }); }
+    } catch (e) { logger.warn('infinitePipeline', 'Stop cleanup failed', { eMessage: e.message }); }  // DEGRADE: 影响=批次内章节落库 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     setTimeout(async () => {
         await deleteState(projectId);

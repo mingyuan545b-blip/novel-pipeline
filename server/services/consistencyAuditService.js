@@ -111,7 +111,7 @@ class ConsistencyAuditService {
                 `全局审计：${report.summary.totalIssues}个问题（${report.summary.criticalCount}严重，${report.summary.warningCount}警告）`,
                 report.summary
             );
-        } catch (_) { logger.warn('consistencyAuditServ', '[consistency-audit]', _.message || _); }
+        } catch (_) { logger.warn('consistencyAuditServ', '[consistency-audit]', _.message || _); }  // DEGRADE: 影响=consistencyChecker.recordCheck 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
         logger.info('consistencyAudit', `Audit completed for ch${currentChapter}: ${report.summary.totalIssues} issues (${report.summary.durationMs}ms)`);
         return report;

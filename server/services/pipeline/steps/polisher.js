@@ -37,7 +37,7 @@ function guardPolishedLength(polished, original, project, genre) {
     if (!polishedWc) return { content: original, wordCount: originalWc, reverted: true, reason: '润色输出为空' };
     if (originalWc === 0) return { content: polished, wordCount: polishedWc, reverted: false };
     let word = {};
-    try { word = resolveConfig(genre, project).word || {}; } catch (_) { logger.warn('polisher', _.message || _); }
+    try { word = resolveConfig(genre, project).word || {}; } catch (_) { logger.warn('polisher', _.message || _); }  // DEGRADE: 影响=resolveConfig 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     if (!shouldAcceptPolishedLength(originalWc, polishedWc, word)) {
         logger.warn('polisher', `[字数守卫] 润色稿被拒(${originalWc}→${polishedWc}，targetMin=${word.targetMin}，rejectMin=${word.rejectMin})，保留定稿正文`);
         return { content: original, wordCount: originalWc, reverted: true, reason: `润色不得把稿件降到下限以下（${originalWc}→${polishedWc}）` };

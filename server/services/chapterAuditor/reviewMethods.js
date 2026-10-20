@@ -78,7 +78,7 @@ issues中每个问题必须包含完整修改指导，让返修员能直接按�
         } else if (typeof result === 'string') reviewContent = result;
 
         let parsed = null;
-        try { const jsonMatch = reviewContent.match(/\{[\s\S]*\}/); if (jsonMatch) parsed = JSON.parse(jsonMatch[0]); } catch (_) { logger.warn('reviewMethods', '[review-methods]', _.message || _); }
+        try { const jsonMatch = reviewContent.match(/\{[\s\S]*\}/); if (jsonMatch) parsed = JSON.parse(jsonMatch[0]); } catch (_) { logger.warn('reviewMethods', '[review-methods]', _.message || _); }  // DEGRADE: 影响=reviewContent.match 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
         if (parsed) {
             const hardBlockResult = await _runHardBlockChecks(content, styleProfile, project, projectId, store);

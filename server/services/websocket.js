@@ -22,7 +22,7 @@ function initWebSocket(server) {
         }
         ws._isAlive = true; ws._projectId = null; ws._connectedAt = Date.now();
         ws.on('pong', () => { ws._isAlive = true; });
-        ws.on('message', (raw) => { try { handleMessage(ws, JSON.parse(raw)); } catch (e) { logger.warn('ws', 'Invalid message', { error: e.message }); } });
+        ws.on('message', (raw) => { try { handleMessage(ws, JSON.parse(raw)); } catch (e) { logger.warn('ws', 'Invalid message', { error: e.message }); } });  // DEGRADE: 影响=handleMessage 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         ws.on('close', () => { removeClient(ws); });
         ws.on('error', (err) => { logger.warn('ws', 'WebSocket error', { error: err.message }); removeClient(ws); });
         send(ws, 'connected', { message: 'WebSocket connected' });
@@ -54,20 +54,20 @@ function removeClient(ws) {
 function send(ws, event, data) {
     if (ws.readyState !== 1) return;
     if (ws.bufferedAmount > MAX_BUFFERED_AMOUNT) { logger.warn('ws', 'Dropping message, client buffer overloaded', { bufferedAmount: ws.bufferedAmount }); return; }
-    try { ws.send(JSON.stringify({ event, data })); } catch (e) { logger.warn('ws', 'Send failed', { error: e.message }); }
+    try { ws.send(JSON.stringify({ event, data })); } catch (e) { logger.warn('ws', 'Send failed', { error: e.message }); }  // DEGRADE: 影响=ws.send 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function broadcastToProject(projectId, event, data) {
     const projectClients = clients.get(projectId);
     if (!projectClients || projectClients.size === 0) return;
     const payload = JSON.stringify({ event, projectId, data });
-    projectClients.forEach((ws) => { if (ws.readyState === 1 && ws.bufferedAmount <= MAX_BUFFERED_AMOUNT) { try { ws.send(payload); } catch (e) { logger.warn('ws', 'Broadcast send failed', { error: e.message }); } } });
+    projectClients.forEach((ws) => { if (ws.readyState === 1 && ws.bufferedAmount <= MAX_BUFFERED_AMOUNT) { try { ws.send(payload); } catch (e) { logger.warn('ws', 'Broadcast send failed', { error: e.message }); } } });  // DEGRADE: 影响=ws.send 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function broadcastAll(event, data) {
     if (!wss) return;
     const payload = JSON.stringify({ event, data });
-    wss.clients.forEach((ws) => { if (ws.readyState === 1 && ws.bufferedAmount <= MAX_BUFFERED_AMOUNT) { try { ws.send(payload); } catch (e) { logger.warn('ws', 'BroadcastAll send failed', { error: e.message }); } } });
+    wss.clients.forEach((ws) => { if (ws.readyState === 1 && ws.bufferedAmount <= MAX_BUFFERED_AMOUNT) { try { ws.send(payload); } catch (e) { logger.warn('ws', 'BroadcastAll send failed', { error: e.message }); } } });  // DEGRADE: 影响=ws.send 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 function extractTicket(req) { const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`); return url.searchParams.get('ticket') || ''; }
@@ -78,7 +78,7 @@ function getStats() {
 
 function shutdown() {
     if (heartbeatTimer) { clearInterval(heartbeatTimer); heartbeatTimer = null; }
-    if (wss) { wss.clients.forEach((ws) => { try { ws.close(1001, 'Server shutting down'); } catch (_) { logger.warn('ws', 'Close error during shutdown'); } }); wss.close(); wss = null; }
+    if (wss) { wss.clients.forEach((ws) => { try { ws.close(1001, 'Server shutting down'); } catch (_) { logger.warn('ws', 'Close error during shutdown'); } }); wss.close(); wss = null; }  // DEGRADE: 影响=ws.close 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     clients.clear(); clearTickets();
 }
 

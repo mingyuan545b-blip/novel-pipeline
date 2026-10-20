@@ -70,7 +70,7 @@ async function injectBehaviorRulesFromGenre(projectId) {
         }
         if (updated > 0) logger.info('entityCenter', `Injected behaviorRules for ${updated} entities in project ${projectId}`);
         return updated;
-    } catch (_) { logger.warn('entityBehaviorRules', '[entity-crud] injectBehaviorRulesFromGenre failed:', _.message || _); return 0; }
+    } catch (_) { logger.warn('entityBehaviorRules', '[entity-crud] injectBehaviorRulesFromGenre failed:', _.message || _); return 0; }  // DEGRADE: 影响=实体字段合并(去占位) 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 /** 同步实体数据到entity-registry
@@ -99,7 +99,7 @@ async function syncToRegistry(entity, force = false) {
             extra.profile = entity.profile;
         }
         await entityRegistry.registerEntity(entity.projectId, entity.entityType, entity.name, extra, { force });
-    } catch (_) { logger.warn('entityBehaviorRules', '[entity-crud]', _.message || _); }
+    } catch (_) { logger.warn('entityBehaviorRules', '[entity-crud]', _.message || _); }  // DEGRADE: 影响=实体行为规则读取 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 /** 合并已有实体的字段（占位/空值不覆盖已有好数据） */

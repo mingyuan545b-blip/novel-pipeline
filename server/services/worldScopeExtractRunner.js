@@ -123,7 +123,7 @@ async function extractAndSave(projectId, chapterNumber, chapterContent, level) {
 /** 软门禁：检测跨副本带出缺渠道标签并落库（私有） */
 async function _detectAndStoreViolations(projectId, chapterNumber, transitions, crossWorldItems, now) {
     let worlds = [];
-    try { worlds = await getProjectWorlds(projectId); } catch (e) { logger.warn('worldScope', `load worlds failed: ${e.message}`); }
+    try { worlds = await getProjectWorlds(projectId); } catch (e) { logger.warn('worldScope', `load worlds failed: ${e.message}`); }  // DEGRADE: 影响=getProjectWorlds 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const candidates = [
         ...transitions.map(t => ({ character: t.character, from: t.from, to: t.to, channel: t.channel })),
         ...crossWorldItems.map(it => ({ entityName: it.entityName, from: it.transitionFrom, to: it.transitionTo, channel: it.transitionChannel }))

@@ -103,7 +103,7 @@ async function processNewMaterials(organizingPlan, chapter, projectId, materials
                     patch.sourceChapter = chapter.chapterNumber || 0;
                     patch.sourceContent = content.substring(0, 2000);
                     await entityCenter.getOrCreateEntity(projectId, 'character', newMat.name, patch);
-                } catch (regErr) { logger.warn('materialItem', 'EntityCenter create failed for', newMat.name, ':', regErr.message); }
+                } catch (regErr) { logger.warn('materialItem', 'EntityCenter create failed for', newMat.name, ':', regErr.message); }  // DEGRADE: 影响=extractCharacterStateFromContent 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             }
             operations.push({ type: 'createMaterial', scope: 'material', entityKey: matId, data: { type: newMat.type, name: newMat.name, depthLevel: depthResult.depthLevel, depthValid: depthResult.valid }, status: 'success' });
         } catch (e) { errors.push(`Failed to create material ${newMat.name}: ${e.message}`); }
@@ -120,7 +120,7 @@ async function processArchiveCandidates(organizingPlan, chapter, projectId, mate
             existing.archived = true; existing.deprecatedReason = candidate.reason || '归档';
             existing.archivedAt = new Date().toISOString(); existing.archivedChapter = chapter.chapterNumber;
             await store.setItem('materials', existing.id, existing);
-            try { await entityRegistry.deactivateEntity(existing.id); } catch (deactErr) { logger.warn('materialItem', 'Entity deactivation failed for', candidate.name, ':', deactErr.message); }
+            try { await entityRegistry.deactivateEntity(existing.id); } catch (deactErr) { logger.warn('materialItem', 'Entity deactivation failed for', candidate.name, ':', deactErr.message); }  // DEGRADE: 影响=entityRegistry.deactivateEntity 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
             operations.push({ type: 'archiveMaterial', scope: 'material', entityKey: existing.id, data: { reason: candidate.reason }, status: 'success' });
         } catch (e) { errors.push(`Failed to archive ${candidate.name}: ${e.message}`); }
     }
@@ -149,7 +149,7 @@ async function processWorldviewChanges(organizingPlan, chapter, projectId, opera
         const kvRows = await store.queryItems('state-kv-index', { projectId, scope: 'worldview' });
         const mats = await store.queryItems('materials', { projectId, type: 'worldview' });
         existingKeys = [...new Set([...kvRows.map(r => r.entityKey), ...mats.map(m => m.name)])].filter(Boolean);
-    } catch (e) { logger.warn('materialItem', 'worldview topic keys load failed:', e.message); }
+    } catch (e) { logger.warn('materialItem', 'worldview topic keys load failed:', e.message); }  // DEGRADE: 影响=store.queryItems 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     const seen = new Set(existingKeys);
 
     for (const wc of organizingPlan.worldviewChanges) {

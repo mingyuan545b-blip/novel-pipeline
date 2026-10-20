@@ -57,7 +57,7 @@ async function createEquipmentBinds(projectId, materials, createdItems) {
 
             const bindId = `bind-${uuidv4()}`;
             await store.setItem('character-binds', bindId, buildCharBind(bindId, projectId, ownerId, defId, mat));
-        } catch (err) { logger.warn('outlineEquipBinds', '[OUTLINE] Bind failed:', err.message); }
+        } catch (err) { logger.warn('outlineEquipBinds', '[OUTLINE] Bind failed:', err.message); }  // DEGRADE: 影响=大纲装备绑定写库 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
 }
 

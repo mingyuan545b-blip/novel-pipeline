@@ -65,7 +65,7 @@ async function handleUpdateAction(update, existing, chapter, projectId, stylePro
             try {
                 const genreState = extractGenreStateFromContent(update.content || '', genreId);
                 if (Object.keys(genreState).length > 0) updatedMaterial.genreState = genreState;
-            } catch (_) { logger.warn('materialActions', '[material-actions]', _.message || _); }
+            } catch (_) { logger.warn('materialActions', '[material-actions]', _.message || _); }  // DEGRADE: 影响=extractGenreStateFromContent 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
         }
     }
 

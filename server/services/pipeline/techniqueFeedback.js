@@ -57,7 +57,7 @@ async function recordFeedback(projectId, chapterNumber, techniqueIds, passed) {
         createdAt: now,
     }));
     for (const r of records) {
-        try { await store.setItem(STORE_TYPE, r.id, r); } catch (e) { logger.warn('techniqueFeedback', e.message); }
+        try { await store.setItem(STORE_TYPE, r.id, r); } catch (e) { logger.warn('techniqueFeedback', e.message); }  // DEGRADE: 影响=store.setItem 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     await _pruneOldRecords(projectId);
 }

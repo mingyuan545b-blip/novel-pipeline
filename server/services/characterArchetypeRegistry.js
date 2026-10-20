@@ -14,7 +14,7 @@ function load() {
         try {
             const data = JSON.parse(fs.readFileSync(path.join(ARCHETYPE_DIR, file), 'utf8'));
             archetypes.set(data.id, data);
-        } catch(_) { logger.warn('characterArchetypeRe', _.message || _); }
+        } catch(_) { logger.warn('characterArchetypeRe', _.message || _); }  // DEGRADE: 影响=JSON.parse 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
     }
     return archetypes.size;
 }

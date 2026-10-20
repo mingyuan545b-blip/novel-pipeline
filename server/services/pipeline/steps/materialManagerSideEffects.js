@@ -22,7 +22,7 @@ async function syncCharacterSideEffects(projectId, appliedUpdates, chapter) {
     try {
         await characterStateCache.invalidateForProject(projectId);
         logger.info('materialManager', `CharacterStateCache 失效（${charRelated.length} 条角色/关系更新, ch${chapter.chapterNumber}）`);
-    } catch (_) { logger.warn('materialManager', '[material-manager]', _.message || _); }
+    } catch (_) { logger.warn('materialManager', '[material-manager]', _.message || _); }  // DEGRADE: 影响=characterStateCache.invalidateForProject 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 
     // 防护4：Pipeline后自动同步实体到registry
     try {
@@ -31,7 +31,7 @@ async function syncCharacterSideEffects(projectId, appliedUpdates, chapter) {
         const entities = await entityCenter.getEntitiesForProject(projectId, { entityType: 'character' });
         for (const entity of entities) await syncToRegistry(entity);
         logger.info('materialManager', `Entity-registry 已同步（${charRelated.length} 条角色更新, ch${chapter.chapterNumber}）`);
-    } catch (_) { logger.warn('materialManager', '[material-manager] Registry sync failed:', _.message || _); }
+    } catch (_) { logger.warn('materialManager', '[material-manager] Registry sync failed:', _.message || _); }  // DEGRADE: 影响=require 失败→本步跳过（业务继续，质量/可观测性下降） 可见性=仅日志(logger.warn)
 }
 
 /**
