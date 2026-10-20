@@ -62,11 +62,10 @@ describe('outlineFormatter - parseMarkdownOutlines', () => {
     test('should clean markdown formatting from outline text', () => {
         const text = `第1章：格式测试\n**加粗文本**在开头\n## 二级标题\n---\n正常的大纲内容，这段足够长可以满足最低字数要求。`;
         const result = parseMarkdownOutlines(text);
-        if (result.length > 0) {
+        expect(result.length).toBeGreaterThan(0);
             expect(result[0].outline).not.toContain('**');
             expect(result[0].outline).not.toContain('## ');
             expect(result[0].outline).not.toContain('---');
-        }
     });
 });
 

@@ -29,7 +29,7 @@ describe('techIndexSearch - BM25检索', () => {
         const res = search.searchEntries(ENTRIES, '压力 倒计时', stats, { topK: 3 });
         expect(res.length).toBeGreaterThan(0);
         expect(res[0].id).toBe('a');
-        if (res.length > 1) expect(res[0].score).toBeGreaterThanOrEqual(res[1].score);
+        expect(res.length <= 1 || res[0].score >= res[1].score).toBe(true);   // 结果按分数降序
     });
 
     test('mode过滤生效', () => {

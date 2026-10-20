@@ -24,7 +24,7 @@ describe('providerRegistry', () => {
                 expect(p.name).toBeDefined();
                 if (id === 'custom') continue;
                 expect(p.defaultModel).toBeDefined();
-                if (!p.noApiKey) expect(p.envKey).toBeDefined();
+                expect(p.noApiKey ? true : p.envKey !== undefined).toBe(true);   // 蕴含断言
             }
         });
     });

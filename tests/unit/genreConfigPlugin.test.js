@@ -16,12 +16,9 @@ describe('genreConfig branch coverage', () => {
         test('returns genre with Proxy when dataRules exist', () => {
             // high-martial-comedy should have genre directory with rules
             const result = getGenrePlugin({ key: 'high-martial-comedy' });
-            if (result) {
-                // If Proxy is active, accessing reviewRules should work
-                const reviewRules = result.reviewRules;
-                // Just verify it doesn't throw
-                expect(typeof reviewRules === 'object' || reviewRules === undefined).toBe(true);
-            }
+            expect(result).toBeDefined();                 // 前置条件成为断言
+            const reviewRules = result.reviewRules;
+            expect(typeof reviewRules === 'object' || reviewRules === undefined).toBe(true);
         });
     });
 
@@ -65,9 +62,8 @@ describe('genreConfig branch coverage', () => {
         test('matches by genreProfileIds fuzzy match', () => {
             const result = detectGenre({ label: '高武穿越' });
             // Should find high-martial-comedy via genreProfileIds
-            if (result) {
-                expect(result.id).toBeTruthy();
-            }
+            expect(result).not.toBeNull();                // 前置条件成为断言（模糊匹配应命中）
+            expect(result.id).toBeTruthy();
         });
 
         test('falls through to isMatch', () => {

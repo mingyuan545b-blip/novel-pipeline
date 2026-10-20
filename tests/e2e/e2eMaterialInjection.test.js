@@ -168,10 +168,10 @@ describe('E2E素材注入测试', () => {
 
             // reviserPrompt可能导出不同函数名，尝试常见入口
             const entryFn = reviserPrompt.buildReviserPrompt || reviserPrompt.handleReviser || reviserPrompt.default;
-            if (typeof entryFn === 'function') {
-                const result = await entryFn({ projectId, chapter, materials, ctx, project, genre: 'tomato-sweet' });
-                expect(result).toBeDefined();
-            }
+            // 前置条件成为断言（原写法在入口名不匹配时静默跳过断言 → 假绿）
+            expect(typeof entryFn).toBe('function');
+            const result = await entryFn({ projectId, chapter, materials, ctx, project, genre: 'tomato-sweet' });
+            expect(result).toBeDefined();
         });
     });
 });

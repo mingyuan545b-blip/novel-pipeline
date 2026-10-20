@@ -173,8 +173,6 @@ describe('P0回归测试 - 素材验证', () => {
             name: '铁皮瓦片导流层',
             currentContent: '这个结构具有过滤和传导功能，触发条件是灵气浓度'
         });
-        if (result.typeMismatch) {
-            expect(result.suggestedType).toBeDefined();
-        }
+        expect(!result.typeMismatch || result.suggestedType !== undefined).toBe(true);
     });
 });

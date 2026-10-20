@@ -81,12 +81,9 @@ describe('perfBaselineCheck (Q6)', () => {
                 expect(m).toHaveProperty('module');
                 expect(m).toHaveProperty('loadMs');
                 expect(m).toHaveProperty('ok');
-                if (m.ok) {
-                    expect(m).toHaveProperty('heapDeltaKB');
-                    expect(m.loadMs).toBeGreaterThanOrEqual(0);
-                } else {
-                    expect(m).toHaveProperty('error');
-                }
+                // 蕴含断言：ok ⇒ heapDeltaKB 且 loadMs>=0；!ok ⇒ 有 error（不用条件内 expect）
+                expect(!m.ok || (Object.prototype.hasOwnProperty.call(m, 'heapDeltaKB') && m.loadMs >= 0)).toBe(true);
+                expect(m.ok || Object.prototype.hasOwnProperty.call(m, 'error')).toBe(true);
             }
         });
 

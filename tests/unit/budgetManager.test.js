@@ -66,9 +66,9 @@ describe('budgetManager', () => {
             sceneTypes: [],
             totalBudget: 50000,
         });
-        if (result.status.level !== 'green') {
-            expect(result.degradationPlan).toBeDefined();
-            expect(result.degradationPlan.steps.length).toBeGreaterThan(0);
-        }
+        // 蕴含断言：非 green 必须给出非空降级计划（不用条件内 expect）
+        const degradeOk = result.status.level === 'green'
+            || (result.degradationPlan !== undefined && result.degradationPlan.steps.length > 0);
+        expect(degradeOk).toBe(true);
     });
 });

@@ -62,7 +62,9 @@ describe('rateLimiter - branch coverage', () => {
     describe('RateLimiter - acquire', () => {
         test('resolves immediately when tokens available', async () => {
             const limiter = new RateLimiter({ rpm: 60, burst: 10 });
+            const started = Date.now();
             await limiter.acquire();
+            expect(Date.now() - started).toBeLessThan(200);   // 有票即取，不排队
         });
 
         test('queues when tokens exhausted and resolves after wait', async () => {

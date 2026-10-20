@@ -41,9 +41,8 @@ describe('healthDeepRoutes (Q5)', () => {
             // 在测试环境 PG pool 可能未初始化
             expect(result).toHaveProperty('ok');
             expect(result).toHaveProperty('source', 'pg');
-            if (!result.ok) {
-                expect(result).toHaveProperty('error');
-            }
+            // 自洽断言：ok=false 必须给出 error（不用条件内 expect）
+            expect(result.ok || typeof result.error !== 'undefined').toBe(true);
         });
     });
 
@@ -77,18 +76,16 @@ describe('healthDeepRoutes (Q5)', () => {
             const result = checkDisk();
             expect(result).toHaveProperty('ok');
             expect(result.source).toBe('disk');
-            if (result.ok) {
-                expect(result).toHaveProperty('path');
-            }
+            // 自洽断言：ok=true 必须有 path，ok=false 必须有 error
+            expect(result.ok ? result.path !== undefined : result.error !== undefined).toBe(true);
         });
 
         test('data 目录存在时返回子目录数', () => {
             const result = checkDisk();
-            if (result.ok && result.subdirs !== undefined) {
-                expect(result.subdirs).toBeGreaterThanOrEqual(0);
-                expect(result.systemFreeMemMB).toBeGreaterThan(0);
-                expect(result.systemTotalMemMB).toBeGreaterThan(0);
-            }
+            // 字段存在时必须合法；环境不支持而缺失（undefined）不算失败 —— 均为无条件断言
+            expect(result.subdirs === undefined || result.subdirs >= 0).toBe(true);
+            expect(result.systemFreeMemMB === undefined || result.systemFreeMemMB > 0).toBe(true);
+            expect(result.systemTotalMemMB === undefined || result.systemTotalMemMB > 0).toBe(true);
         });
     });
 
@@ -97,15 +94,13 @@ describe('healthDeepRoutes (Q5)', () => {
             const result = checkPersistence();
             expect(result).toHaveProperty('ok');
             expect(result.source).toBe('persistence');
-            if (result.ok) {
-                expect(result).toHaveProperty('pgEnabled');
-                expect(result).toHaveProperty('fallbackEnabled');
-                expect(result).toHaveProperty('bufferLength');
-                expect(result).toHaveProperty('totalWritten');
-                expect(result).toHaveProperty('totalErrors');
-                expect(result).toHaveProperty('consecutiveFailures');
-                expect(result).toHaveProperty('fallbackWritten');
-            }
+            // 自洽断言：ok=true 时七个字段必须齐备；ok=false 时必须给出 error
+            const PERSIST_FIELDS = ['pgEnabled', 'fallbackEnabled', 'bufferLength', 'totalWritten',
+                'totalErrors', 'consecutiveFailures', 'fallbackWritten'];
+            const consistent = result.ok
+                ? PERSIST_FIELDS.every((f) => Object.prototype.hasOwnProperty.call(result, f))
+                : Object.prototype.hasOwnProperty.call(result, 'error');
+            expect(consistent).toBe(true);
         });
     });
 

@@ -60,10 +60,10 @@ describe('pipelineRegistry - registerPipelineFn / getPipelineFn', () => {
         expect(getPipelineFn()).toBe(fn);
     });
 
-    test('registered pipeline function is callable and returns expected value', () => {
+    test('registered pipeline function is callable and returns expected value', async () => {
         const fn = async (id) => ({ projectId: id, status: 'done' });
         registerPipelineFn(fn);
-        expect(getPipelineFn()('p1')).resolves.toEqual({ projectId: 'p1', status: 'done' });
+        await expect(getPipelineFn()('p1')).resolves.toEqual({ projectId: 'p1', status: 'done' });
     });
 
     test('getPipelineFn throws if registered value is not a function', () => {

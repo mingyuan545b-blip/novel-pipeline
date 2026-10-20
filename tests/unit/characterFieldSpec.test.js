@@ -36,7 +36,9 @@ describe('characterFieldSpec', () => {
         expect(tpl).toContain('【性格】');
         expect(tpl).toContain('【说话语气】');
         const genreId = Object.keys(GENRE_FIELD_OVERRIDES).find(g => GENRE_FIELD_OVERRIDES[g].characterPromptNote);
-        if (genreId) expect(getInitialMaterialTemplate(genreId)).toContain('题材要求：');
+        // 有带 note 的题材时，模板必须带上"题材要求："（蕴含断言，不用条件内 expect）
+        const tplWithNote = genreId ? getInitialMaterialTemplate(genreId) : '';
+        expect(genreId === undefined || tplWithNote.includes('题材要求：')).toBe(true);
     });
 
     test('getOrganizerFieldHints：主角/配角带深度必填字段，NPC 不带', () => {

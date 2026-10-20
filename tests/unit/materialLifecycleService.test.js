@@ -208,15 +208,15 @@ describe('materialLifecycleService (R4)', () => {
         test('相似度 >= 0.8 触发重复检测', async () => {
             store.queryItems.mockResolvedValue([
                 makeMaterial('m1', '张三的剑', 'item'),
-                makeMaterial('m2', '张三之剑', 'item') // 字符集相似
+                makeMaterial('m2', '张三的宝剑', 'item')   // 字符集：并集 5、交集 4 → Jaccard 0.8
             ]);
             const result = await materialLifecycleService.detectDuplicateMaterials('p1');
-            // 计算相似度：张三的剑 vs 张三之剑 — 4 个相同字符 + 1 个不同 = 0.8
-            if (result.length > 0) {
-                expect(result[0].similarity).toBeGreaterThanOrEqual(0.8);
-                expect(result[0].materials.length).toBe(2);
-                expect(result[0].suggestion).toContain('合并');
-            }
+            // 相似度实现是字符集 Jaccard（交集/并集），阈值 0.8
+            // （原夹具"张三的剑 vs 张三之剑"实为 3/5=0.6，注释写错；因断言在 if 内从未执行 → 假测试掩盖了错夹具）
+            expect(result.length).toBeGreaterThan(0);
+            expect(result[0].similarity).toBeGreaterThanOrEqual(0.8);
+            expect(result[0].materials.length).toBe(2);
+            expect(result[0].suggestion).toContain('合并');
         });
 
         test('不相似素材不触发', async () => {
@@ -244,9 +244,8 @@ describe('materialLifecycleService (R4)', () => {
             ]);
             const result = await materialLifecycleService.detectDuplicateMaterials('p1');
             // 都归为 other，会互相比较
-            if (result.length > 0) {
-                expect(result[0].type).toBe('other');
-            }
+            expect(result.length).toBeGreaterThan(0);
+            expect(result[0].type).toBe('other');
         });
     });
 

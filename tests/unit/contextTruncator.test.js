@@ -71,12 +71,8 @@ describe('contextTruncator (R3)', () => {
         test('默认模型（未识别）走 CONTEXT_BUDGETS.default', () => {
             const limits = getReviewLimits('unknown-model-xyz');
             const expectedBudget = CONTEXT_BUDGETS.default;
-            // 默认预算通常 < 40000，走小模型分支
-            if (expectedBudget <= 40000) {
-                expect(limits.contentLimit).toBe(6000);
-            } else if (expectedBudget >= 100000) {
-                expect(limits.contentLimit).toBe(50000);
-            }
+            // 档位 → 期望上限（与实现同源的两档），无条件断言
+            expect(limits.contentLimit).toBe(expectedBudget <= 40000 ? 6000 : 50000);
         });
     });
 
@@ -129,10 +125,9 @@ describe('contextTruncator (R3)', () => {
 
         test('CONTEXT_BUDGETS 中已定义的模型优先精确匹配', () => {
             // 若 CONTEXT_BUDGETS 中有 qwen-plus
-            if (CONTEXT_BUDGETS['qwen-plus']) {
-                const limits = getReviewLimits('qwen-plus');
-                expect(limits).toBeDefined();
-            }
+            // 蕴含断言：配置里有 qwen-plus 时必须拿到 limits（不写条件内 expect）
+            const limits = getReviewLimits('qwen-plus');
+            expect(CONTEXT_BUDGETS['qwen-plus'] ? limits !== undefined : true).toBe(true);
         });
     });
 

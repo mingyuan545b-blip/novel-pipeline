@@ -1,33 +1,56 @@
+/**
+ * storeLock — 锁语义测试（互斥 + 不同 key 独立）
+ *
+ * 原测试只有"调用不抛错"（零断言 = 假测试）。锁的唯一价值是**互斥**，
+ * 故改为断言：同 key 第二次 acquire 必须等 release 之后；不同 key 不被互相阻塞。
+ */
 const { acquireLock, releaseLock } = require('../../server/db/storeLock');
 
 describe('storeLock', () => {
-    it('should acquire and release lock without error', async () => {
-        await acquireLock('test-type', 'test-id');
-        releaseLock('test-type', 'test-id');
+    it('同一 key 的第二次 acquireLock 必须被阻塞到 release 之后（互斥）', async () => {
+        const events = [];
+        await acquireLock('test-type', 'mutex');
+        events.push('A-acquired');
+
+        const second = (async () => {
+            await acquireLock('test-type', 'mutex');
+            events.push('B-acquired');
+            releaseLock('test-type', 'mutex');
+        })();
+
+        await new Promise(r => setTimeout(r, 30));
+        expect(events).toEqual(['A-acquired']);        // B 仍在等锁
+
+        releaseLock('test-type', 'mutex');
+        await second;
+        expect(events).toEqual(['A-acquired', 'B-acquired']);
     });
 
-    it('should allow sequential lock acquire/release', async () => {
-        await acquireLock('test-type', 'seq-1');
-        releaseLock('test-type', 'seq-1');
-        await acquireLock('test-type', 'seq-1');
-        releaseLock('test-type', 'seq-1');
+    it('不同 key 互不阻塞（key-b 不会等 key-a）', async () => {
+        await acquireLock('test-type', 'key-a');
+        const started = Date.now();
+        await acquireLock('test-type', 'key-b');
+        expect(Date.now() - started).toBeLessThan(500);
+        releaseLock('test-type', 'key-b');
+        releaseLock('test-type', 'key-a');
     });
 
-    it('should handle concurrent lock requests sequentially', async () => {
-        const results = [];
+    it('并发同 key：3 个任务全部完成且顺序串行', async () => {
+        const order = [];
         const tasks = [1, 2, 3].map(n => (async () => {
-            await acquireLock('test-type', 'concurrent-1');
-            results.push(n);
-            releaseLock('test-type', 'concurrent-1');
+            await acquireLock('test-type', 'concurrent');
+            order.push(n);
+            releaseLock('test-type', 'concurrent');
         })());
         await Promise.all(tasks);
-        expect(results.length).toBe(3);
+        expect(order.sort()).toEqual([1, 2, 3]);
     });
 
-    it('should handle different keys independently', async () => {
-        await acquireLock('test-type', 'key-a');
-        await acquireLock('test-type', 'key-b');
-        releaseLock('test-type', 'key-a');
-        releaseLock('test-type', 'key-b');
+    it('acquire/release 可重复使用（不泄漏锁状态）', async () => {
+        await acquireLock('test-type', 'reuse');
+        releaseLock('test-type', 'reuse');
+        await acquireLock('test-type', 'reuse');       // 若上次未真正释放，这里会挂住
+        releaseLock('test-type', 'reuse');
+        expect(true).toBe(true);
     });
 });

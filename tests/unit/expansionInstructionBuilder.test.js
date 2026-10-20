@@ -68,9 +68,11 @@ describe('expansionInstructionBuilder', () => {
             expect(needsShortfallSalvage(2500, WORD_CONFIG)).toBe(false);
         });
         it('严重不足区是抢救区的超集', () => {
-            [0, 700, 750, 1615, 2000, 2264, 2500].forEach(w => {
-                if (needsSalvageExpansion(w, WORD_CONFIG)) expect(needsShortfallSalvage(w, WORD_CONFIG)).toBe(true);
-            });
+            // 收集反例后整体断言（循环内不写 expect）
+            const counterExamples = [0, 700, 750, 1615, 2000, 2264, 2500].filter(
+                (w) => needsSalvageExpansion(w, WORD_CONFIG) && !needsShortfallSalvage(w, WORD_CONFIG)
+            );
+            expect(counterExamples).toEqual([]);
         });
     });
 

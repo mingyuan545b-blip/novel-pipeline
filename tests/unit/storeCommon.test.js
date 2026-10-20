@@ -112,9 +112,8 @@ describe('storeCommon', () => {
             const changeLog = Array.from({ length: 200 }, (_, i) => ({ v: i, text: 'D' }));
             const data = { id: '1', changeLog, currentContent: bigContent };
             const result = trimItemData('materials', data);
-            if (result.changeLog) {
+            expect(!result.changeLog || result.changeLog.length <= 50).toBe(true);
                 expect(result.changeLog.length).toBeLessThanOrEqual(50);
-            }
         });
 
         test('trims project fields when oversized', () => {

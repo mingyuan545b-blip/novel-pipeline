@@ -57,15 +57,11 @@ describe('materialIntegrityCheck', () => {
         const result = await checkIntegrity('proj1');
         // Check all issues - duplicate detection uses type::name key
         const duplicateIssues = result.issues.filter(i => i.type === 'duplicate');
-        // If no duplicate detected, at least verify the function ran
-        if (duplicateIssues.length === 0) {
-            // The mock may not propagate correctly to materialIntegrityHelpers
-            // Just verify the function returns a result
-            expect(result.issues).toBeDefined();
-            expect(Array.isArray(result.issues)).toBe(true);
-        } else {
-            expect(duplicateIssues[0].severity).toBe('critical');
-        }
+        // 前置条件成为断言；两分支语义用蕴含断言表达（不用条件内 expect）
+        expect(result.issues).toBeDefined();
+        expect(Array.isArray(result.issues)).toBe(true);
+        const severityOk = duplicateIssues.length === 0 || duplicateIssues[0].severity === 'critical';
+        expect(severityOk).toBe(true);
     });
 
     test('counts severity levels correctly', async () => {

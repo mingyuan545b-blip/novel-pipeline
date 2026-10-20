@@ -84,10 +84,12 @@ describe('orchestratorStepHandlers.executeStep', () => {
         expect(pipelineLog.length).toBe(200);
     });
 
-    test('onStep 缺失时不抛错', async () => {
+    test('onStep 缺失时不抛错且仍调用 runStepFn', async () => {
         const stepResult = { passed: true };
         const runStepFn = jest.fn().mockResolvedValue(stepResult);
-        await executeStep('p1', 'ch-1', 'writer', 1, {}, [], null, runStepFn, null);
+        const result = await executeStep('p1', 'ch-1', 'writer', 1, {}, [], null, runStepFn, null);
+        expect(runStepFn).toHaveBeenCalled();          // 真断言（原测试只调用不验证）
+        expect(result).toBeDefined();
     });
 
     test('abortController 透传给 context', async () => {

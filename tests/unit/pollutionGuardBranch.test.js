@@ -75,9 +75,8 @@ describe('pipelinePollutionGuard branch coverage', () => {
                 { id: '2', type: 'character', name: '苏曼', currentContent: longContent }
             ];
             const result = detectMaterialDuplication(materials);
-            if (result.hasDuplication) {
+            expect(!result.hasDuplication || result.duplicates.some(d => d.type === 'similar_content')).toBe(true);
                 expect(result.duplicates.some(d => d.type === 'similar_content')).toBe(true);
-            }
         });
     });
 

@@ -42,9 +42,7 @@ describe('templateEntityAssocHelpers', () => {
             const allQuests = [{ id: 'q1', title: '幽冥界探索', description: '进入幽冥界', priority: 'critical' }];
             await associateTimelinesToQuests(timelines, mainQuests, allQuests);
             expect(timelines[0].questIds).toBeDefined();
-            if (timelines[0].questIds) {
-                expect(timelines[0].questIds).toContain('q1');
-            }
+            expect(timelines[0].questIds).toContain('q1');
         });
         test('does not associate when score < 2', async () => {
             const timelines = [{ id: 't1', title: '无关事件', description: '无关描述' }];
@@ -88,11 +86,14 @@ describe('templateEntityAssocHelpers', () => {
             const chapters = [{ id: 'ch1', chapterNumber: 1 }];
             const chapterQuests = [];
             await distributeTimelinesToChapters(timelines, chapters, chapterQuests);
+            expect(chapterQuests).toEqual([]);                 // 无 quest → 不得凭空造关联
+            expect(timelines[0].chapterIds).toBeUndefined();
         });
         test('skips when no timelines', async () => {
             const chapters = [{ id: 'ch1', chapterNumber: 1 }];
             const chapterQuests = [{ id: 'q1', chapterIds: ['ch1'] }];
             await distributeTimelinesToChapters([], chapters, chapterQuests);
+            expect(chapterQuests[0].timelineEventIds).toBeUndefined();   // 无线索 → 不写关联
         });
     });
 
@@ -112,6 +113,7 @@ describe('templateEntityAssocHelpers', () => {
         test('skips when no characters', async () => {
             const timelines = [{ id: 't1', eventType: 'character', title: '张三觉醒' }];
             await associateCharactersToTimelines(timelines, []);
+            expect(timelines[0].characterIds).toBeUndefined();            // 无角色 → 不写关联
         });
         test('does not associate when score < 2', async () => {
             const timelines = [{ id: 't1', eventType: 'character', title: '无关事件', description: '' }];

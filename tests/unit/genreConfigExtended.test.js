@@ -83,9 +83,8 @@ describe('genreConfig - extended', () => {
         });
         test('proxy returns reviewRules when available', () => {
             const result = getGenrePlugin({ key: 'high-martial-comedy' });
-            if (result?.reviewRules) {
+            expect(typeof result.reviewRules).toBe('object');
                 expect(typeof result.reviewRules).toBe('object');
-            }
         });
     });
 });

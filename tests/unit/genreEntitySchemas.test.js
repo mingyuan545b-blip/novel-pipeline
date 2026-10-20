@@ -102,13 +102,11 @@ describe('genreEntitySchemas', () => {
         });
         test('returns errors for invalid number type', () => {
             const keys = getGenreStateKeys('high-martial-comedy');
-            if (Object.keys(keys).length > 0) {
-                const numKey = Object.entries(keys).find(([k, v]) => v.type === 'number');
-                if (numKey) {
-                    const errors = validateGenreState('high-martial-comedy', { [numKey[0]]: 'not-a-number' });
-                    expect(errors.length).toBeGreaterThan(0);
-                }
-            }
+            expect(Object.keys(keys).length).toBeGreaterThan(0);   // 前置条件成为断言
+            const numKey = Object.entries(keys).find(([k, v]) => v.type === 'number');
+            expect(numKey).toBeDefined();
+            const errors = validateGenreState('high-martial-comedy', { [numKey[0]]: 'not-a-number' });
+            expect(errors.length).toBeGreaterThan(0);
         });
         test('returns no errors for undefined keys', () => {
             const errors = validateGenreState('high-martial-comedy', {});

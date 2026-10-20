@@ -36,25 +36,24 @@ describe('Store Lock Mechanism - R-01', () => {
 
     test('lock queue processes writes in order', async () => {
         const storeModule = require('../../server/db/store');
-        const _lockQueues = storeModule._lockQueues;
-
-        if (_lockQueues) {
-            const results = [];
-            const promises = [];
-            for (let i = 0; i < 3; i++) {
-                promises.push(
-                    store.setItem('projects', `lock-queue-${i}`, { id: `lock-queue-${i}`, name: `Queue ${i}` })
-                        .then(() => results.push(i))
-                );
-            }
-            await Promise.all(promises);
-            expect(results.length).toBe(3);
-            for (let i = 0; i < 3; i++) {
-                const item = await store.getItem('projects', `lock-queue-${i}`);
-                expect(item).not.toBeNull();
-                expect(item.name).toBe(`Queue ${i}`);
-            }
+        // 原先断言 store._lockQueues 这个内部结构——它**早已被移除**，故旧测试一直静默跳过全部断言。
+        // 改为只验证可观察行为：并发写入被串行化且全部落库。
+        const results = [];
+        const promises = [];
+        for (let i = 0; i < 3; i++) {
+            promises.push(
+                // 用 materials：其列含 id/projectId/type/name；projects 存储会裁剪未声明字段（name 会被丢）
+                store.setItem('materials', `lock-queue-${i}`, {
+                    id: `lock-queue-${i}`, projectId: 'p1', type: 'other', name: `Queue ${i}`
+                }).then(() => results.push(i))
+            );
         }
+        await Promise.all(promises);
+        expect(results.sort()).toEqual([0, 1, 2]);
+        // 循环内不写 expect：先收集读回结果，再整体断言
+        const readBack = [];
+        for (let i = 0; i < 3; i++) readBack.push(await store.getItem('materials', `lock-queue-${i}`));
+        expect(readBack.map(x => x && x.name)).toEqual(['Queue 0', 'Queue 1', 'Queue 2']);
     });
 
     test('deleteItem acquires and releases lock', async () => {

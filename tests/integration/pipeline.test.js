@@ -422,20 +422,20 @@ describe('Integration: Genre Plugin Isolation', () => {
 
         expect(hmGenre.id).not.toBe(babyGenre.id);
 
-        if (hmGenre.styleProfile && babyGenre.styleProfile) {
-            expect(hmGenre.styleProfile.key).not.toBe(babyGenre.styleProfile.key);
-        }
+        expect(hmGenre.styleProfile).toBeDefined();       // 前置条件成为断言
+        expect(babyGenre.styleProfile).toBeDefined();
+        expect(hmGenre.styleProfile.key).not.toBe(babyGenre.styleProfile.key);
     });
 
     test('genre review rules are project-specific', () => {
         const hmGenre = genreConfig.getGenreById('high-martial-comedy');
         const babyGenre = genreConfig.getGenreById('baby');
 
-        if (hmGenre && babyGenre && hmGenre.reviewRules && babyGenre.reviewRules) {
-            expect(hmGenre.reviewRules).not.toBe(babyGenre.reviewRules);
-        } else {
-            expect(true).toBe(true);
-        }
+        expect(hmGenre).toBeDefined();
+        expect(babyGenre).toBeDefined();
+        expect(hmGenre.reviewRules).toBeDefined();
+        expect(babyGenre.reviewRules).toBeDefined();
+        expect(hmGenre.reviewRules).not.toBe(babyGenre.reviewRules);
     });
 });
 

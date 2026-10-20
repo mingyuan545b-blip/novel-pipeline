@@ -14,9 +14,8 @@ describe('providerRegistry - extended', () => {
         });
         test('resolves alias to provider key', () => {
             const aliyun = PROVIDERS.aliyunCoding;
-            if (aliyun?.aliases?.length > 0) {
+            expect(!(aliyun?.aliases?.length > 0) || resolveProviderKey(aliyun.aliases[0]) === 'aliyunCoding').toBe(true);
                 expect(resolveProviderKey(aliyun.aliases[0])).toBe('aliyunCoding');
-            }
         });
     });
 

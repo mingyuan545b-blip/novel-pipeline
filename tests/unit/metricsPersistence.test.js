@@ -111,9 +111,15 @@ describe('G4: metricsPersistence.startPersistence/stopPersistence', () => {
     });
 
     test('重复调用 startPersistence 不应创建多个 timer', () => {
-        metricsPersistence.startPersistence();
-        metricsPersistence.startPersistence();
-        metricsPersistence.stopPersistence();
-        // 不抛错即可
+        jest.useFakeTimers();
+        try {
+            metricsPersistence.startPersistence();
+            const afterFirst = jest.getTimerCount();
+            metricsPersistence.startPersistence();      // 二次调用必须幂等
+            expect(jest.getTimerCount()).toBe(afterFirst);
+            metricsPersistence.stopPersistence();
+        } finally {
+            jest.useRealTimers();
+        }
     });
 });

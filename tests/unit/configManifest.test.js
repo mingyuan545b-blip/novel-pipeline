@@ -44,29 +44,29 @@ describe('configManifest', () => {
             delete process.env.ALIYUN_CODING_API_KEY;
             const status = getConfigStatus();
             const llmKey = status.find(s => s.key === 'ALIYUN_CODING_API_KEY');
-            if (llmKey && llmKey.required) {
-                expect(llmKey.level).toBe('error');
-            }
+            // 前置条件本身成为断言（不满足即失败，不再静默跳过）
+            expect(llmKey).toBeDefined();
+            expect(llmKey.required).toBe(true);
+            expect(llmKey.level).toBe('error');
         });
 
         test('reports ok for set required key', () => {
             process.env.ALIYUN_CODING_API_KEY = 'sk-test-key-12345678';
             const status = getConfigStatus();
             const llmKey = status.find(s => s.key === 'ALIYUN_CODING_API_KEY');
-            if (llmKey) {
-                expect(llmKey.isSet).toBe(true);
-                expect(llmKey.level).toBe('ok');
-            }
+            expect(llmKey).toBeDefined();
+            expect(llmKey.isSet).toBe(true);
+            expect(llmKey.level).toBe('ok');
         });
 
         test('masks sensitive values', () => {
             process.env.ALIYUN_CODING_API_KEY = 'sk-very-long-key-12345678';
             const status = getConfigStatus();
             const llmKey = status.find(s => s.key === 'ALIYUN_CODING_API_KEY');
-            if (llmKey && llmKey.sensitive) {
-                expect(llmKey.displayValue).toContain('***');
-                expect(llmKey.displayValue).not.toBe(process.env.ALIYUN_CODING_API_KEY);
-            }
+            expect(llmKey).toBeDefined();
+            expect(llmKey.sensitive).toBe(true);
+            expect(llmKey.displayValue).toContain('***');
+            expect(llmKey.displayValue).not.toBe(process.env.ALIYUN_CODING_API_KEY);
         });
     });
 
