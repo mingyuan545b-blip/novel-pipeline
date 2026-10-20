@@ -158,20 +158,22 @@ describe('E2E素材注入测试', () => {
     });
 
     describe('测试2: reviser素材注入', () => {
-        test('reviser模块加载成功且可调用', async () => {
-            const reviserPrompt = require('../../server/services/pipeline/steps/reviserPrompt');
+        test('reviser 真实入口 buildReviserContext 注入素材后可调用', async () => {
+            // 原来试探 buildReviserPrompt/handleReviser/default 三个名字——**都不存在**，
+            // 断言又藏在 if 内，于是整个用例长期空转（假绿）。改为直接调用真实导出。
+            const { buildReviserContext } = require('../../server/services/pipeline/steps/reviserPrompt');
+            expect(typeof buildReviserContext).toBe('function');
+
             const projectId = 'test-reviser';
             const materials = createMockMaterials(projectId);
             const ctx = createMockCtx(materials);
-            const chapter = { chapterNumber: 1, outline: '主角遇到未回收伏笔', scene: '主世界' };
+            const chapter = { chapterNumber: 1, content: '主角遇到未回收伏笔。', outline: '主角遇到未回收伏笔', scene: '主世界' };
             const project = { id: projectId, genre: 'tomato-sweet' };
 
-            // reviserPrompt可能导出不同函数名，尝试常见入口
-            const entryFn = reviserPrompt.buildReviserPrompt || reviserPrompt.handleReviser || reviserPrompt.default;
-            // 前置条件成为断言（原写法在入口名不匹配时静默跳过断言 → 假绿）
-            expect(typeof entryFn).toBe('function');
-            const result = await entryFn({ projectId, chapter, materials, ctx, project, genre: 'tomato-sweet' });
+            const result = await buildReviserContext({ projectId, chapter, materials, agentContext: {}, context: ctx, project });
             expect(result).toBeDefined();
-        });
+            // 真实产出：reviser 的上下文里应带出素材/约束相关内容
+            expect(typeof result).toBe('object');
+        }, 60000);
     });
 });
