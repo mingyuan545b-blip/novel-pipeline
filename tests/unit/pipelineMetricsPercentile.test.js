@@ -21,8 +21,17 @@ const {
 } = require('../../server/services/pipelineMetrics');
 
 describe('pipelineMetrics - M3 分位数', () => {
+    // 冻结时钟：这些用例断言"正好 1000ms / 10000ms"，而 recordStepEnd 用
+    // `Date.now() - startTime` 计时 —— 真实时钟下会因 1ms 抖动变成 1001
+    // （真 CI 实测：Expected 1000 / Received 1001）。冻结后完全确定。
     beforeEach(() => {
+        jest.useFakeTimers();
+        jest.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
         resetMetrics();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     describe('getAllMetrics 分位数字段', () => {

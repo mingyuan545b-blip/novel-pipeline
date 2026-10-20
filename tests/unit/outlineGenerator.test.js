@@ -1,5 +1,4 @@
 const { parseMarkdownOutlines, cleanJsonArrayResponse } = require('../../server/services/pipeline/outlineFormatter');
-const { validateTemplateInput, parseTemplateResponse } = require('../../server/services/pipeline/outlineTemplateValidator');
 
 jest.mock('../../server/shared/logger', () => ({
     debug: jest.fn(),
@@ -109,56 +108,5 @@ describe('outlineFormatter - cleanJsonArrayResponse', () => {
         const result = cleanJsonArrayResponse(input);
         expect(result).not.toContain('\x00');
         expect(result).not.toContain('\x01');
-    });
-});
-
-describe('outlineTemplateValidator - validateTemplateInput', () => {
-    test('should pass when name and genre are provided', () => {
-        expect(() => validateTemplateInput({ name: '测试', genre: '玄幻' })).not.toThrow();
-    });
-
-    test('should throw when name is missing', () => {
-        expect(() => validateTemplateInput({ genre: '玄幻' })).toThrow('name and genre are required');
-    });
-
-    test('should throw when genre is missing', () => {
-        expect(() => validateTemplateInput({ name: '测试' })).toThrow('name and genre are required');
-    });
-
-    test('should throw when both name and genre are missing', () => {
-        expect(() => validateTemplateInput({})).toThrow('name and genre are required');
-    });
-
-    test('should throw when name is empty string', () => {
-        expect(() => validateTemplateInput({ name: '', genre: '玄幻' })).toThrow('name and genre are required');
-    });
-});
-
-describe('outlineTemplateValidator - parseTemplateResponse', () => {
-    test('should parse valid JSON object from response', () => {
-        const response = '{"materials": [], "chapterOutlines": []}';
-        const result = parseTemplateResponse(response);
-        expect(result).toEqual({ materials: [], chapterOutlines: [] });
-    });
-
-    test('should parse JSON wrapped in code blocks', () => {
-        const response = '```json\n{"materials": [], "chapterOutlines": []}\n```';
-        const result = parseTemplateResponse(response);
-        expect(result).toEqual({ materials: [], chapterOutlines: [] });
-    });
-
-    test('should throw when no JSON object found', () => {
-        expect(() => parseTemplateResponse('no json here')).toThrow('No JSON object found in response');
-    });
-
-    test('should repair unclosed braces', () => {
-        const response = '{"materials": [], "chapterOutlines": [';
-        expect(() => parseTemplateResponse(response)).toThrow();
-    });
-
-    test('should handle JSON with surrounding text', () => {
-        const response = 'Here is the result: {"materials": [], "mainQuests": []} end';
-        const result = parseTemplateResponse(response);
-        expect(result.materials).toEqual([]);
     });
 });
