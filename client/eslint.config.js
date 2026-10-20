@@ -6,7 +6,14 @@ import vitest from 'eslint-plugin-vitest'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage']),
+  // 构建产物/覆盖率报告不属于源码：dist_backup 是历史 bundle 备份，
+  // 若不忽略会把压缩后的 bundle 也 lint（实测 371 条噪声错误，是"client lint 392 errors"的真正来源）
+  globalIgnores(['dist', 'dist_backup', 'coverage', 'node_modules']),
+  {
+    // 构建/测试配置文件跑在 Node 下（vite.config.js 用 process.env）
+    files: ['*.config.js', 'vite.config.js', 'vitest.config.js'],
+    languageOptions: { globals: globals.node },
+  },
   {
     files: ['**/*.{js,jsx}'],
     plugins: {

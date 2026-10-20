@@ -148,6 +148,8 @@ module.exports = [
             'jest/expect-expect': ['error', {
                 assertFunctionNames: [
                     'expect',
+                    // 项目内的断言辅助函数（内部含 expect）：登记后不再被误判为"零断言测试"
+                    'verifyTrim',
                     'assert',
                     'assert.equal',
                     'assert.strictEqual',
@@ -163,7 +165,7 @@ module.exports = [
             'jest/no-conditional-expect': 'error',
             // 自定义测试块别名（如 dbTest = 环境相关时才跑的 test/skip 包装）：
             // 不登记的话，其内部的 expect 会被误判为"Expect must be inside of a test block"
-            'jest/no-standalone-expect': ['error', { additionalTestBlockFunctions: ['dbTest'] }],
+            'jest/no-standalone-expect': ['error', { additionalTestBlockFunctions: ['dbTest', 'covTest'] }],
             'jest/no-identical-title': 'error',
             'jest/valid-expect': 'error',
             'jest/no-test-prefixes': 'error'
