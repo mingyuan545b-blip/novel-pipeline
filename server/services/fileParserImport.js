@@ -73,7 +73,6 @@ function importParsedToFranchise(franchiseId, parsed, selectedCategories) {
                 sourceFile: parsed.fileName,
                 importedAt: new Date().toISOString()
             };
-            store.setItem('franchise-materials', summary.id, summary);
             importCounts[type] = (importCounts[type] || 0) + 1;
         }
     }

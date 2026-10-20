@@ -29,7 +29,6 @@ async function importFromProject(franchise, importFromProjectId, importCategorie
                 content: m.currentContent || m.initialContent || '',
                 importedAt: new Date().toISOString()
             };
-            await store.setItem('franchise-materials', summary.id, summary);
             importCounts[cat] = (importCounts[cat] || 0) + 1;
         }
     }
@@ -44,7 +43,6 @@ async function importFromProject(franchise, importFromProjectId, importCategorie
                 content: node.description || '', factionName: node.factionName || '',
                 importedAt: new Date().toISOString()
             };
-            await store.setItem('franchise-materials', summary.id, summary);
             importCounts.mapNodes++;
         }
     }
@@ -58,7 +56,6 @@ async function importFromProject(franchise, importFromProjectId, importCategorie
                 type: 'quest', name: q.title, content: q.description || '',
                 importedAt: new Date().toISOString()
             };
-            await store.setItem('franchise-materials', summary.id, summary);
             importCounts.quests++;
         }
     }
@@ -72,7 +69,6 @@ async function importFromProject(franchise, importFromProjectId, importCategorie
                 type: 'timeline', name: t.title, content: t.description || '',
                 importedAt: new Date().toISOString()
             };
-            await store.setItem('franchise-materials', summary.id, summary);
             importCounts.timelines++;
         }
     }

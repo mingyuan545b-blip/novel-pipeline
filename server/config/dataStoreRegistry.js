@@ -90,7 +90,6 @@ const DATA_STORE_REGISTRY = {
     'agent-templates':       { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },
     'chapter-audits':        { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },
     'franchises':            { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },
-    'franchise-materials':   { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },
     'foundation-prompts':    { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },
     'comic-config':          { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },
     'comic-render-queue':    { dedicated: false, syncable: false, cascadable: false, hasProjectId: false, aliases: [] },

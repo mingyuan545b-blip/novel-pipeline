@@ -51,7 +51,7 @@ const { pipelineLimiter } = setupMiddleware(app, REQUEST_SECRET);
 
 // Data directories
 const dataDir = path.join(__dirname, '..', 'data');
-['projects','materials','chapters','reviews','platform-accounts','publish-queue','interactions','comic-config','comic-workflows','comic-storyboards','comic-render-queue','api-keys','quests','timelines','style-templates','memory-layers','state-snapshots','consistency-reports','franchises','franchise-materials','map-nodes','agent-templates','style-profiles','constraint-presets','foundation-prompts','circuit-breakers'].forEach(dir => {
+['projects','materials','chapters','reviews','platform-accounts','publish-queue','interactions','comic-config','comic-workflows','comic-storyboards','comic-render-queue','api-keys','quests','timelines','style-templates','memory-layers','state-snapshots','consistency-reports','franchises','map-nodes','agent-templates','style-profiles','constraint-presets','foundation-prompts','circuit-breakers'].forEach(dir => {
     const full = path.join(dataDir, dir);
     if (!fs.existsSync(full)) fs.mkdirSync(full, { recursive: true });
 });
